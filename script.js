@@ -1,6 +1,27 @@
 (function () {
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+const stepsEl = document.getElementById("steps");
+const steps = Array.from(document.querySelectorAll(".step"));
+
+const country = document.getElementById("country");
+const status1 = document.getElementById("status1");
+
+const chips = Array.from(document.querySelectorAll(".chip"));
+const status2 = document.getElementById("status2");
+
+const serviceRadios = Array.from(document.querySelectorAll('input[name="service"]'));
+const status3 = document.getElementById("status3");
+
+const bizName = document.getElementById("bizName");
+const bizPhone = document.getElementById("bizPhone");
+const bizDesc = document.getElementById("bizDesc");
+const status4 = document.getElementById("status4");
+
+const markDemo = document.getElementById("markDemo");
+const status5 = document.getElementById("status5");
+
+const agree = document.getElementById("agree");
+const activateBtn = document.getElementById("activateBtn");
+const activateMsg = document.getElementById("activateMsg");
 
 const state = {
 country: "",
@@ -10,175 +31,143 @@ bizName: "",
 bizPhone: "",
 bizDesc: "",
 demoDone: false,
-agreed: false
+agree: false,
 };
 
-// Accordion
-const cards = $$(".stepCard");
-cards.forEach((card) => {
-const head = card.querySelector(".stepHead");
-const body = card.querySelector(".stepBody");
-
-// default open step 1 (already open in HTML)
-if (body.classList.contains("open")) card.dataset.open = "true";
-else card.dataset.open = "false";
-
-head.addEventListener("click", () => {
-const isOpen = card.dataset.open === "true";
-cards.forEach((c) => {
-c.dataset.open = "false";
-c.querySelector(".stepHead").setAttribute("aria-expanded", "false");
-c.querySelector(".stepBody").classList.remove("open");
+// Accordion behavior
+function openStep(n) {
+steps.forEach((s) => {
+const isTarget = Number(s.dataset.step) === n;
+s.classList.toggle("isOpen", isTarget);
+const btn = s.querySelector(".stepHead");
+if (btn) btn.setAttribute("aria-expanded", String(isTarget));
 });
+}
 
-if (!isOpen) {
-card.dataset.open = "true";
-head.setAttribute("aria-expanded", "true");
-body.classList.add("open");
+steps.forEach((s) => {
+const btn = s.querySelector(".stepHead");
+btn?.addEventListener("click", () => {
+const alreadyOpen = s.classList.contains("isOpen");
+steps.forEach(x => {
+x.classList.remove("isOpen");
+x.querySelector(".stepHead")?.setAttribute("aria-expanded", "false");
+});
+if (!alreadyOpen) {
+s.classList.add("isOpen");
+btn.setAttribute("aria-expanded", "true");
 }
 });
 });
 
-// Step 1: country
-const countrySelect = $("#countrySelect");
-const step1Status = $("#step1Status");
-countrySelect.addEventListener("change", () => {
-state.country = countrySelect.value;
-step1Status.textContent = `Selected: ${countrySelect.options[countrySelect.selectedIndex].text}`;
-refresh();
-autoAdvance(2);
-});
-
-// Step 2: industry
-const chips = $$(".chip");
-const step2Status = $("#step2Status");
-chips.forEach((btn) => {
-btn.setAttribute("aria-pressed", "false");
-btn.addEventListener("click", () => {
-chips.forEach((b) => b.setAttribute("aria-pressed", "false"));
-btn.setAttribute("aria-pressed", "true");
-state.industry = btn.dataset.industry || "";
-step2Status.textContent = `Selected: ${state.industry}`;
-refresh();
-autoAdvance(3);
-});
-});
-
-// Step 3: service (single button for now)
-const serviceBtn = $(".serviceBtn");
-const step3Status = $("#step3Status");
-serviceBtn.addEventListener("click", () => {
-serviceBtn.classList.toggle("selected");
-state.service = serviceBtn.classList.contains("selected")
-? serviceBtn.dataset.service
-: "";
-step3Status.textContent = state.service ? `Selected: ${state.service}` : "Not selected";
-refresh();
-if (state.service) autoAdvance(4);
-});
-
-// Step 4: business details
-const bizName = $("#bizName");
-const bizPhone = $("#bizPhone");
-const bizDesc = $("#bizDesc");
-const step4Status = $("#step4Status");
-
-function updateBiz() {
-state.bizName = bizName.value.trim();
-state.bizPhone = bizPhone.value.trim();
-state.bizDesc = bizDesc.value.trim();
-
-const ok = isStep4Complete();
-step4Status.textContent = ok ? "Completed" : "Not completed";
-refresh();
-if (ok) autoAdvance(5);
+// Helpers
+function setStatus(el, good, text) {
+el.textContent = text;
+el.classList.toggle("good", good);
+el.classList.toggle("bad", !good);
 }
 
-[bizName, bizPhone, bizDesc].forEach((el) => {
-el.addEventListener("input", updateBiz);
-el.addEventListener("blur", updateBiz);
-});
-
-// Step 5: demo
-const demoDone = $("#demoDone");
-const step5Status = $("#step5Status");
-demoDone.addEventListener("click", () => {
-state.demoDone = !state.demoDone;
-demoDone.classList.toggle("done", state.demoDone);
-demoDone.textContent = state.demoDone ? "Demo call completed ✓" : "Mark demo call completed";
-step5Status.textContent = state.demoDone ? "Completed" : "Not completed";
-refresh();
-if (state.demoDone) autoAdvance(6);
-});
-
-// Step 6: activation
-const agree = $("#agree");
-const activateBtn = $("#activateBtn");
-const activateMsg = $("#activateMsg");
-
-agree.addEventListener("change", () => {
-state.agreed = agree.checked;
-refresh();
-});
-
-activateBtn.addEventListener("click", () => {
-// Final validation
-const missing = missingSteps();
-if (missing.length) {
-activateMsg.textContent = `Please complete: ${missing.join(", ")}.`;
-activateMsg.classList.remove("ok");
-return;
-}
-activateMsg.textContent =
-"Activation request prepared ✅ (Demo only). Connect this button to your backend/payment to go live.";
-activateMsg.classList.add("ok");
-});
-
-function isStep4Complete() {
-return state.bizName.length >= 2 && state.bizPhone.length >= 7 && state.bizDesc.length >= 5;
+function validateStep4() {
+const ok =
+state.bizName.trim().length >= 2 &&
+state.bizPhone.trim().length >= 7 &&
+state.bizDesc.trim().length >= 10;
+setStatus(status4, ok, ok ? "Completed" : "Not completed");
+return ok;
 }
 
-function missingSteps() {
-const miss = [];
-if (!state.country) miss.push("Step 1");
-if (!state.industry) miss.push("Step 2");
-if (!state.service) miss.push("Step 3");
-if (!isStep4Complete()) miss.push("Step 4");
-if (!state.demoDone) miss.push("Step 5");
-if (!state.agreed) miss.push("checkbox");
-return miss;
-}
+function validateAll() {
+const ok1 = !!state.country;
+const ok2 = !!state.industry;
+const ok3 = !!state.service;
+const ok4 = validateStep4();
+const ok5 = !!state.demoDone;
 
-function refresh() {
-const ready =
-!!state.country &&
-!!state.industry &&
-!!state.service &&
-isStep4Complete() &&
-state.demoDone &&
-state.agreed;
+setStatus(status1, ok1, ok1 ? "Selected" : "Not selected");
+setStatus(status2, ok2, ok2 ? `Selected: ${state.industry}` : "Not selected");
+setStatus(status3, ok3, ok3 ? `Selected` : "Not selected");
+setStatus(status5, ok5, ok5 ? "Completed" : "Not completed");
 
-activateBtn.disabled = !ready;
+const canActivate = ok1 && ok2 && ok3 && ok4 && ok5 && state.agree;
+activateBtn.disabled = !canActivate;
 
-if (!ready) {
-const miss = missingSteps();
-activateMsg.textContent = miss.length
-? `To activate, complete: ${miss.join(", ")}.`
-: "";
-activateMsg.classList.remove("ok");
+if (!canActivate) {
+activateMsg.textContent = "Complete steps 1–5 and check the box to activate.";
 } else {
 activateMsg.textContent = "Ready to activate.";
-activateMsg.classList.add("ok");
-}
 }
 
-function autoAdvance(stepNumber) {
-const target = document.querySelector(`.stepCard[data-step="${stepNumber}"]`);
-if (!target) return;
-const head = target.querySelector(".stepHead");
-head.click();
-target.scrollIntoView({ behavior: "smooth", block: "center" });
+// Auto-advance to next incomplete step (nice UX)
+if (!ok1) return 1;
+if (!ok2) return 2;
+if (!ok3) return 3;
+if (!ok4) return 4;
+if (!ok5) return 5;
+return 6;
 }
 
-refresh();
+// Step 1
+country.addEventListener("change", () => {
+state.country = country.value;
+openStep(validateAll());
+});
+
+// Step 2
+chips.forEach((btn) => {
+btn.addEventListener("click", () => {
+chips.forEach((b) => b.classList.remove("isActive"));
+btn.classList.add("isActive");
+state.industry = btn.dataset.industry || "";
+openStep(validateAll());
+});
+});
+
+// Step 3
+serviceRadios.forEach((r) => {
+r.addEventListener("change", () => {
+state.service = r.value;
+openStep(validateAll());
+});
+});
+
+// Step 4
+function syncBiz() {
+state.bizName = bizName.value;
+state.bizPhone = bizPhone.value;
+state.bizDesc = bizDesc.value;
+validateAll();
+}
+bizName.addEventListener("input", syncBiz);
+bizPhone.addEventListener("input", syncBiz);
+bizDesc.addEventListener("input", syncBiz);
+
+// Step 5
+markDemo.addEventListener("click", () => {
+state.demoDone = true;
+markDemo.textContent = "Demo call completed ✅";
+markDemo.disabled = true;
+openStep(validateAll());
+});
+
+// Step 6
+agree.addEventListener("change", () => {
+state.agree = agree.checked;
+validateAll();
+});
+
+activateBtn.addEventListener("click", async () => {
+// This is where you connect Stripe / your backend later.
+activateBtn.disabled = true;
+activateMsg.textContent = "Activating… (demo)";
+
+// Simulate request
+await new Promise((r) => setTimeout(r, 800));
+
+activateMsg.textContent =
+"✅ Activation demo complete. Next step: connect billing + backend API.";
+});
+
+// Start with Step 1 open
+steps[0].classList.add("isOpen");
+steps[0].querySelector(".stepHead")?.setAttribute("aria-expanded", "true");
+validateAll();
 })();
