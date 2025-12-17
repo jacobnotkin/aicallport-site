@@ -1,58 +1,184 @@
+(function () {
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+const state = {
+country: "",
+industry: "",
+service: "",
+bizName: "",
+bizPhone: "",
+bizDesc: "",
+demoDone: false,
+agreed: false
+};
+
 // Accordion
-document.querySelectorAll("[data-acc]").forEach(btn => {
+const cards = $$(".stepCard");
+cards.forEach((card) => {
+const head = card.querySelector(".stepHead");
+const body = card.querySelector(".stepBody");
+
+// default open step 1 (already open in HTML)
+if (body.classList.contains("open")) card.dataset.open = "true";
+else card.dataset.open = "false";
+
+head.addEventListener("click", () => {
+const isOpen = card.dataset.open === "true";
+cards.forEach((c) => {
+c.dataset.open = "false";
+c.querySelector(".stepHead").setAttribute("aria-expanded", "false");
+c.querySelector(".stepBody").classList.remove("open");
+});
+
+if (!isOpen) {
+card.dataset.open = "true";
+head.setAttribute("aria-expanded", "true");
+body.classList.add("open");
+}
+});
+});
+
+// Step 1: country
+const countrySelect = $("#countrySelect");
+const step1Status = $("#step1Status");
+countrySelect.addEventListener("change", () => {
+state.country = countrySelect.value;
+step1Status.textContent = `Selected: ${countrySelect.options[countrySelect.selectedIndex].text}`;
+refresh();
+autoAdvance(2);
+});
+
+// Step 2: industry
+const chips = $$(".chip");
+const step2Status = $("#step2Status");
+chips.forEach((btn) => {
+btn.setAttribute("aria-pressed", "false");
 btn.addEventListener("click", () => {
-const id = btn.getAttribute("data-acc");
-const body = document.getElementById(id);
-body.classList.toggle("open");
+chips.forEach((b) => b.setAttribute("aria-pressed", "false"));
+btn.setAttribute("aria-pressed", "true");
+state.industry = btn.dataset.industry || "";
+step2Status.textContent = `Selected: ${state.industry}`;
+refresh();
+autoAdvance(3);
 });
 });
 
-// Industry chips
-let selectedIndustry = "";
-document.querySelectorAll(".chip").forEach(chip => {
-chip.addEventListener("click", () => {
-document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-chip.classList.add("active");
-selectedIndustry = chip.getAttribute("data-chip");
-updateActivate();
-});
-});
-
-const country = document.getElementById("country");
-const service = document.getElementById("service");
-const bizName = document.getElementById("bizName");
-const bizPhone = document.getElementById("bizPhone");
-const noContract = document.getElementById("noContract");
-const activateBtn = document.getElementById("activateBtn");
-const activateMsg = document.getElementById("activateMsg");
-
-[country, service, bizName, bizPhone, noContract].forEach(el => {
-el.addEventListener("input", updateActivate);
-el.addEventListener("change", updateActivate);
+// Step 3: service (single button for now)
+const serviceBtn = $(".serviceBtn");
+const step3Status = $("#step3Status");
+serviceBtn.addEventListener("click", () => {
+serviceBtn.classList.toggle("selected");
+state.service = serviceBtn.classList.contains("selected")
+? serviceBtn.dataset.service
+: "";
+step3Status.textContent = state.service ? `Selected: ${state.service}` : "Not selected";
+refresh();
+if (state.service) autoAdvance(4);
 });
 
-function updateActivate(){
-const ok =
-country.value &&
-selectedIndustry &&
-service.value &&
-bizName.value.trim().length >= 2 &&
-bizPhone.value.trim().length >= 7 &&
-noContract.checked;
+// Step 4: business details
+const bizName = $("#bizName");
+const bizPhone = $("#bizPhone");
+const bizDesc = $("#bizDesc");
+const step4Status = $("#step4Status");
 
-activateBtn.disabled = !ok;
-activateMsg.textContent = ok
-? "Ready to activate."
-: "Complete steps 1–4 and confirm “No contract” to enable activation.";
+function updateBiz() {
+state.bizName = bizName.value.trim();
+state.bizPhone = bizPhone.value.trim();
+state.bizDesc = bizDesc.value.trim();
+
+const ok = isStep4Complete();
+step4Status.textContent = ok ? "Completed" : "Not completed";
+refresh();
+if (ok) autoAdvance(5);
 }
 
-document.getElementById("demoBtn").addEventListener("click", () => {
-const el = document.getElementById("demoStatus");
-el.textContent = "Demo started (placeholder). We’ll connect this to a real number next.";
+[bizName, bizPhone, bizDesc].forEach((el) => {
+el.addEventListener("input", updateBiz);
+el.addEventListener("blur", updateBiz);
+});
+
+// Step 5: demo
+const demoDone = $("#demoDone");
+const step5Status = $("#step5Status");
+demoDone.addEventListener("click", () => {
+state.demoDone = !state.demoDone;
+demoDone.classList.toggle("done", state.demoDone);
+demoDone.textContent = state.demoDone ? "Demo call completed ✓" : "Mark demo call completed";
+step5Status.textContent = state.demoDone ? "Completed" : "Not completed";
+refresh();
+if (state.demoDone) autoAdvance(6);
+});
+
+// Step 6: activation
+const agree = $("#agree");
+const activateBtn = $("#activateBtn");
+const activateMsg = $("#activateMsg");
+
+agree.addEventListener("change", () => {
+state.agreed = agree.checked;
+refresh();
 });
 
 activateBtn.addEventListener("click", () => {
-// This is the “real working” hook point.
-// Next step: connect this button to your backend/payment/agent provisioning.
-alert("Activation request received (demo). Next: connect to billing + provisioning.");
+// Final validation
+const missing = missingSteps();
+if (missing.length) {
+activateMsg.textContent = `Please complete: ${missing.join(", ")}.`;
+activateMsg.classList.remove("ok");
+return;
+}
+activateMsg.textContent =
+"Activation request prepared ✅ (Demo only). Connect this button to your backend/payment to go live.";
+activateMsg.classList.add("ok");
 });
+
+function isStep4Complete() {
+return state.bizName.length >= 2 && state.bizPhone.length >= 7 && state.bizDesc.length >= 5;
+}
+
+function missingSteps() {
+const miss = [];
+if (!state.country) miss.push("Step 1");
+if (!state.industry) miss.push("Step 2");
+if (!state.service) miss.push("Step 3");
+if (!isStep4Complete()) miss.push("Step 4");
+if (!state.demoDone) miss.push("Step 5");
+if (!state.agreed) miss.push("checkbox");
+return miss;
+}
+
+function refresh() {
+const ready =
+!!state.country &&
+!!state.industry &&
+!!state.service &&
+isStep4Complete() &&
+state.demoDone &&
+state.agreed;
+
+activateBtn.disabled = !ready;
+
+if (!ready) {
+const miss = missingSteps();
+activateMsg.textContent = miss.length
+? `To activate, complete: ${miss.join(", ")}.`
+: "";
+activateMsg.classList.remove("ok");
+} else {
+activateMsg.textContent = "Ready to activate.";
+activateMsg.classList.add("ok");
+}
+}
+
+function autoAdvance(stepNumber) {
+const target = document.querySelector(`.stepCard[data-step="${stepNumber}"]`);
+if (!target) return;
+const head = target.querySelector(".stepHead");
+head.click();
+target.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+refresh();
+})();
