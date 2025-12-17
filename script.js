@@ -1,27 +1,4 @@
-(function () {
-const stepsEl = document.getElementById("steps");
-const steps = Array.from(document.querySelectorAll(".step"));
-
-const country = document.getElementById("country");
-const status1 = document.getElementById("status1");
-
-const chips = Array.from(document.querySelectorAll(".chip"));
-const status2 = document.getElementById("status2");
-
-const serviceRadios = Array.from(document.querySelectorAll('input[name="service"]'));
-const status3 = document.getElementById("status3");
-
-const bizName = document.getElementById("bizName");
-const bizPhone = document.getElementById("bizPhone");
-const bizDesc = document.getElementById("bizDesc");
-const status4 = document.getElementById("status4");
-
-const markDemo = document.getElementById("markDemo");
-const status5 = document.getElementById("status5");
-
-const agree = document.getElementById("agree");
-const activateBtn = document.getElementById("activateBtn");
-const activateMsg = document.getElementById("activateMsg");
+const $ = (sel) => document.querySelector(sel);
 
 const state = {
 country: "",
@@ -30,144 +7,156 @@ service: "",
 bizName: "",
 bizPhone: "",
 bizDesc: "",
-demoDone: false,
-agree: false,
+demoDone: false
 };
 
-// Accordion behavior
-function openStep(n) {
-steps.forEach((s) => {
-const isTarget = Number(s.dataset.step) === n;
-s.classList.toggle("isOpen", isTarget);
-const btn = s.querySelector(".stepHead");
-if (btn) btn.setAttribute("aria-expanded", String(isTarget));
-});
+function load() {
+try {
+const saved = JSON.parse(localStorage.getItem("aicallport_state") || "{}");
+Object.assign(state, saved);
+} catch {}
 }
 
-steps.forEach((s) => {
-const btn = s.querySelector(".stepHead");
-btn?.addEventListener("click", () => {
-const alreadyOpen = s.classList.contains("isOpen");
-steps.forEach(x => {
-x.classList.remove("isOpen");
-x.querySelector(".stepHead")?.setAttribute("aria-expanded", "false");
-});
-if (!alreadyOpen) {
-s.classList.add("isOpen");
-btn.setAttribute("aria-expanded", "true");
+function save() {
+localStorage.setItem("aicallport_state", JSON.stringify(state));
 }
-});
-});
 
-// Helpers
-function setStatus(el, good, text) {
+function setStatus(id, ok, text) {
+const el = $(id);
+if (!el) return;
 el.textContent = text;
-el.classList.toggle("good", good);
-el.classList.toggle("bad", !good);
+el.classList.remove("good", "warn");
+el.classList.add(ok ? "good" : "warn");
 }
 
-function validateStep4() {
-const ok =
-state.bizName.trim().length >= 2 &&
-state.bizPhone.trim().length >= 7 &&
-state.bizDesc.trim().length >= 10;
-setStatus(status4, ok, ok ? "Completed" : "Not completed");
-return ok;
-}
-
-function validateAll() {
-const ok1 = !!state.country;
-const ok2 = !!state.industry;
-const ok3 = !!state.service;
-const ok4 = validateStep4();
-const ok5 = !!state.demoDone;
-
-setStatus(status1, ok1, ok1 ? "Selected" : "Not selected");
-setStatus(status2, ok2, ok2 ? `Selected: ${state.industry}` : "Not selected");
-setStatus(status3, ok3, ok3 ? `Selected` : "Not selected");
-setStatus(status5, ok5, ok5 ? "Completed" : "Not completed");
-
-const canActivate = ok1 && ok2 && ok3 && ok4 && ok5 && state.agree;
-activateBtn.disabled = !canActivate;
-
-if (!canActivate) {
-activateMsg.textContent = "Complete steps 1–5 and check the box to activate.";
-} else {
-activateMsg.textContent = "Ready to activate.";
-}
-
-// Auto-advance to next incomplete step (nice UX)
-if (!ok1) return 1;
-if (!ok2) return 2;
-if (!ok3) return 3;
-if (!ok4) return 4;
-if (!ok5) return 5;
-return 6;
-}
-
+function updateStatuses() {
 // Step 1
-country.addEventListener("change", () => {
-state.country = country.value;
-openStep(validateAll());
-});
+if (state.country) setStatus("#status1", true, "Status: Selected");
+else setStatus("#status1", false, "Status: Not selected");
 
 // Step 2
-chips.forEach((btn) => {
-btn.addEventListener("click", () => {
-chips.forEach((b) => b.classList.remove("isActive"));
-btn.classList.add("isActive");
-state.industry = btn.dataset.industry || "";
-openStep(validateAll());
-});
-});
+if (state.industry) setStatus("#status2", true, `Status: Selected (${state.industry})`);
+else setStatus("#status2", false, "Status: Not selected");
 
 // Step 3
-serviceRadios.forEach((r) => {
-r.addEventListener("change", () => {
-state.service = r.value;
-openStep(validateAll());
-});
-});
+if (state.service) setStatus("#status3", true, "Status: Selected");
+else setStatus("#status3", false, "Status: Not selected");
 
 // Step 4
-function syncBiz() {
-state.bizName = bizName.value;
-state.bizPhone = bizPhone.value;
-state.bizDesc = bizDesc.value;
-validateAll();
-}
-bizName.addEventListener("input", syncBiz);
-bizPhone.addEventListener("input", syncBiz);
-bizDesc.addEventListener("input", syncBiz);
+const detailsOk = Boolean(state.bizName.trim() && state.bizPhone.trim() && state.bizDesc.trim());
+if (detailsOk) setStatus("#status4", true, "Status: Completed");
+else setStatus("#status4", false, "Status: Not completed");
 
 // Step 5
-markDemo.addEventListener("click", () => {
+if (state.demoDone) setStatus("#status5", true, "Status: Completed");
+else setStatus("#status5", false, "Status: Not completed");
+
+// Activation button
+const allOk = Boolean(state.country && state.industry && state.service && detailsOk && state.demoDone);
+const btn = $("#activateBtn");
+const msg = $("#activateMsg");
+btn.disabled = !allOk;
+msg.textContent = allOk
+? "Ready. Click Activate AI Agent."
+: "Complete steps 1–5 to enable activation.";
+
+// Visual selected states
+// industry pills
+document.querySelectorAll("[data-industry]").forEach((b) => {
+b.classList.toggle("isOn", b.dataset.industry === state.industry);
+});
+
+// service card
+$("#serviceBtn")?.classList.toggle("isOn", Boolean(state.service));
+}
+
+function goNextStep(currentStep) {
+const current = document.querySelector(`details.step[data-step="${currentStep}"]`);
+const next = document.querySelector(`details.step[data-step="${currentStep + 1}"]`);
+if (current) current.open = false;
+if (next) next.open = true;
+next?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function wire() {
+// Country
+const country = $("#country");
+if (country) {
+country.value = state.country || "";
+country.addEventListener("change", () => {
+state.country = country.value;
+save();
+updateStatuses();
+if (state.country) goNextStep(1);
+});
+}
+
+// Industry
+document.querySelectorAll("[data-industry]").forEach((btn) => {
+btn.addEventListener("click", () => {
+state.industry = btn.dataset.industry;
+save();
+updateStatuses();
+goNextStep(2);
+});
+});
+
+// Service
+$("#serviceBtn")?.addEventListener("click", () => {
+state.service = "AI Inbound Receptionist";
+save();
+updateStatuses();
+goNextStep(3);
+});
+
+// Business details
+const name = $("#bizName");
+const phone = $("#bizPhone");
+const desc = $("#bizDesc");
+
+if (name) name.value = state.bizName || "";
+if (phone) phone.value = state.bizPhone || "";
+if (desc) desc.value = state.bizDesc || "";
+
+[name, phone, desc].forEach((el) => {
+if (!el) return;
+el.addEventListener("input", () => {
+state.bizName = name?.value || "";
+state.bizPhone = phone?.value || "";
+state.bizDesc = desc?.value || "";
+save();
+updateStatuses();
+});
+el.addEventListener("blur", () => {
+const detailsOk = Boolean(state.bizName.trim() && state.bizPhone.trim() && state.bizDesc.trim());
+if (detailsOk) goNextStep(4);
+});
+});
+
+// Demo done
+$("#demoDone")?.addEventListener("click", () => {
 state.demoDone = true;
-markDemo.textContent = "Demo call completed ✅";
-markDemo.disabled = true;
-openStep(validateAll());
+save();
+updateStatuses();
+goNextStep(5);
 });
 
-// Step 6
-agree.addEventListener("change", () => {
-state.agree = agree.checked;
-validateAll();
+// Activate
+$("#activateBtn")?.addEventListener("click", () => {
+// This is where you will later connect Stripe / backend / provisioning.
+alert("Activated! (Demo) Next step: connect billing + provision phone agent.");
 });
 
-activateBtn.addEventListener("click", async () => {
-// This is where you connect Stripe / your backend later.
-activateBtn.disabled = true;
-activateMsg.textContent = "Activating… (demo)";
-
-// Simulate request
-await new Promise((r) => setTimeout(r, 800));
-
-activateMsg.textContent =
-"✅ Activation demo complete. Next step: connect billing + backend API.";
+// Footer links (placeholders)
+["loginLink", "supportLink", "billingLink", "termsLink", "privacyLink"].forEach((id) => {
+const a = document.getElementById(id);
+if (a) a.addEventListener("click", (e) => {
+e.preventDefault();
+alert("Placeholder link. We can connect real pages next.");
 });
+});
+}
 
-// Start with Step 1 open
-steps[0].classList.add("isOpen");
-steps[0].querySelector(".stepHead")?.setAttribute("aria-expanded", "true");
-validateAll();
-})();
+load();
+wire();
+updateStatuses();
