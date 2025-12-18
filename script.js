@@ -1,83 +1,38 @@
-// ===== Helpers
-const $ = (sel, root=document) => root.querySelector(sel);
+// Mobile nav toggle
+const burger = document.getElementById("burger");
+const mobileNav = document.getElementById("mobileNav");
 
-function smoothScrollToHash(hash) {
-  if (!hash) return;
-  const el = document.querySelector(hash);
+function setMobile(open) {
+  burger.setAttribute("aria-expanded", String(open));
+  mobileNav.setAttribute("aria-hidden", String(!open));
+  mobileNav.classList.toggle("show", open);
+}
+
+burger?.addEventListener("click", () => {
+  const open = burger.getAttribute("aria-expanded") === "true";
+  setMobile(!open);
+});
+
+mobileNav?.querySelectorAll("a").forEach(a => {
+  a.addEventListener("click", () => setMobile(false));
+});
+
+// Optional: subtle “focus” on pricing card when arriving at #pricing
+function pulsePricing() {
+  const el = document.querySelector("#pricing [data-price-card]");
   if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  el.animate(
+    [
+      { transform: "translateY(0)", boxShadow: "0 18px 45px rgba(12,20,36,.12)" },
+      { transform: "translateY(-2px)", boxShadow: "0 22px 60px rgba(201,119,28,.20)" },
+      { transform: "translateY(0)", boxShadow: "0 18px 45px rgba(12,20,36,.12)" }
+    ],
+    { duration: 520, iterations: 1, easing: "ease-out" }
+  );
 }
 
-// ===== Make pricing banner identical everywhere (Hero + Pricing)
-function mountPricingCards() {
-  const tpl = $("#pricingCardTemplate");
-  const heroMount = $("#pricingCardMountHero");
-  const pricingMount = $("#pricingCardMountPricing");
+window.addEventListener("hashchange", () => {
+  if (location.hash === "#pricing") pulsePricing();
+});
 
-  if (!tpl || !heroMount || !pricingMount) return;
-
-  heroMount.innerHTML = "";
-  pricingMount.innerHTML = "";
-
-  const card1 = tpl.content.cloneNode(true);
-  const card2 = tpl.content.cloneNode(true);
-
-  heroMount.appendChild(card1);
-  pricingMount.appendChild(card2);
-}
-
-// ===== Mobile menu toggle
-function setupMobileMenu() {
-  const toggle = $(".navToggle");
-  const menu = $("#mobileMenu");
-  if (!toggle || !menu) return;
-
-  toggle.addEventListener("click", () => {
-    const expanded = toggle.getAttribute("aria-expanded") === "true";
-    toggle.setAttribute("aria-expanded", String(!expanded));
-    menu.hidden = expanded;
-  });
-
-  // Close menu when clicking a link
-  menu.querySelectorAll("a").forEach(a => {
-    a.addEventListener("click", () => {
-      toggle.setAttribute("aria-expanded", "false");
-      menu.hidden = true;
-    });
-  });
-}
-
-// ===== Smooth anchor scroll
-function setupAnchors() {
-  document.addEventListener("click", (e) => {
-    const a = e.target.closest("a[href^='#']");
-    if (!a) return;
-
-    const hash = a.getAttribute("href");
-    if (!hash || hash === "#") return;
-
-    const target = document.querySelector(hash);
-    if (!target) return;
-
-    e.preventDefault();
-    history.pushState(null, "", hash);
-    smoothScrollToHash(hash);
-  });
-
-  // If loaded with hash
-  window.addEventListener("load", () => {
-    if (location.hash) smoothScrollToHash(location.hash);
-  });
-}
-
-// ===== Footer year
-function setYear() {
-  const y = $("#year");
-  if (y) y.textContent = String(new Date().getFullYear());
-}
-
-// Init
-mountPricingCards();
-setupMobileMenu();
-setupAnchors();
-setYear();
+if (location.hash === "#pricing") pulsePricing();
