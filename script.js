@@ -1,2 +1,5 @@
-// Reserved for future interactivity
-console.log("AI CallPort loaded");
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    alert('Demo / activation flow goes here');
+  });
+});
