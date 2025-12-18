@@ -1,2 +1,4 @@
-// Minimal JS (safe). You can add step expand/collapse later if you want.
-console.log("AI CallPort loaded");
+(function () {
+  const y = document.getElementById("year");
+  if (y) y.textContent = new Date().getFullYear();
+})();
