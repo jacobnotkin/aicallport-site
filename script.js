@@ -1,34 +1,27 @@
-(function () {
-  const yearEl = document.getElementById("year");
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
+(() => {
+  const year = document.getElementById("year");
+  if (year) year.textContent = String(new Date().getFullYear());
 
-  const hamburger = document.getElementById("hamburger");
-  const nav = document.getElementById("nav");
+  const toggle = document.querySelector(".nav-toggle");
+  const mobile = document.querySelector(".mobile-menu");
+  if (!toggle || !mobile) return;
 
-  if (hamburger && nav) {
-    hamburger.addEventListener("click", () => {
-      const isOpen = nav.classList.toggle("open");
-      hamburger.setAttribute("aria-expanded", String(isOpen));
-    });
+  toggle.addEventListener("click", () => {
+    const isOpen = mobile.hasAttribute("hidden") === false;
+    if (isOpen) {
+      mobile.setAttribute("hidden", "");
+      toggle.setAttribute("aria-expanded", "false");
+    } else {
+      mobile.removeAttribute("hidden");
+      toggle.setAttribute("aria-expanded", "true");
+    }
+  });
 
-    // Close menu when clicking a link (mobile)
-    nav.querySelectorAll("a").forEach(a => {
-      a.addEventListener("click", () => {
-        nav.classList.remove("open");
-        hamburger.setAttribute("aria-expanded", "false");
-      });
-    });
-  }
-
-  // Smooth scroll for in-page anchors
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener("click", (e) => {
-      const id = a.getAttribute("href");
-      if (!id || id === "#") return;
-      const el = document.querySelector(id);
-      if (!el) return;
-      e.preventDefault();
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Close mobile menu when clicking a link
+  mobile.querySelectorAll("a").forEach(a => {
+    a.addEventListener("click", () => {
+      mobile.setAttribute("hidden", "");
+      toggle.setAttribute("aria-expanded", "false");
     });
   });
 })();
