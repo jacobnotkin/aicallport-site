@@ -1,2 +1,2 @@
-// Placeholder for future interactivity
+// Placeholder for future JS
 console.log("AI CallPort loaded");
