@@ -1,2 +1,1 @@
-// Placeholder for future JS
-console.log("AI CallPort loaded");
+console.log("AI CallPort landing page loaded");
