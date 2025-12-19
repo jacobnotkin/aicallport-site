@@ -1,1 +1,1 @@
-document.getElementById("year").textContent = new Date().getFullYear();
+// reserved for future JS
