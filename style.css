@@ -1,224 +1,317 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI CallPort — Instant AI phone agents</title>
-  <meta name="description" content="Instant AI phone agents for businesses worldwide. Activate in minutes. English • Spanish • French." />
-  <link rel="stylesheet" href="style.css" />
-</head>
+:root{
+  --bg1:#070b1a;
+  --bg2:#0b1a4a;
+  --glass: rgba(255,255,255,.08);
+  --glass2: rgba(255,255,255,.06);
+  --stroke: rgba(255,255,255,.12);
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.72);
+  --muted2: rgba(255,255,255,.6);
+  --orange1:#ff7a18;
+  --orange2:#ffb34a;
+  --shadow: 0 18px 60px rgba(0,0,0,.45);
+  --radius: 18px;
+}
 
-<body>
-  <!-- Background layers -->
-  <div class="bg" aria-hidden="true">
-    <div class="stars"></div>
-    <div class="nebula"></div>
-    <div class="horizon"></div>
-  </div>
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 30% 20%, rgba(58,120,255,.22), transparent 60%),
+    radial-gradient(900px 650px at 75% 25%, rgba(255,122,24,.10), transparent 65%),
+    linear-gradient(180deg, var(--bg1), var(--bg2));
+  overflow-x:hidden;
+}
 
-  <header class="site-header">
-    <nav class="nav">
-      <a class="brand" href="#top" aria-label="AI CallPort home">
-        <!-- IMPORTANT: expects asset/logo.png -->
-        <img class="brand__logo" src="asset/logo.png" alt="AI CallPort logo" />
-        <span class="brand__name">AI CallPort</span>
-        <span class="brand__beta">BETA</span>
-      </a>
+.container{width:min(1120px, 92vw); margin:0 auto;}
+.section{padding:34px 0;}
+h1,h2,h3{margin:0 0 10px 0; letter-spacing:-0.02em}
+h1{font-size: clamp(34px, 4.6vw, 56px); line-height:1.02}
+h2{font-size: clamp(22px, 2.6vw, 30px)}
+h3{font-size: 18px}
+p{margin:0}
 
-      <button class="nav__toggle" type="button" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+.sub{color:var(--muted); line-height:1.5}
+.fine{margin-top:10px; color:var(--muted2); font-size:13px}
+.tiny{margin-top:10px; color:var(--muted2); font-size:12px}
+.kicker{color: rgba(255,255,255,.75); font-weight:600; margin-bottom:8px}
 
-      <div class="nav__links" data-nav-links>
-        <a href="#how-it-works">How it works</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#support">Support</a>
-        <a href="#login" class="muted">Log in</a>
-        <a class="btn btn--small btn--primary" href="#activate">Activate</a>
-      </div>
-    </nav>
-  </header>
+.bg-stars{
+  position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.35), transparent 60%),
+    radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,.25), transparent 60%),
+    radial-gradient(1px 1px at 55% 70%, rgba(255,255,255,.22), transparent 60%),
+    radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,.18), transparent 60%),
+    radial-gradient(1px 1px at 90% 65%, rgba(255,255,255,.22), transparent 60%);
+  opacity:.8;
+}
 
-  <main id="top" class="container">
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero__left">
-        <h1>Instant AI phone agents<br />for businesses worldwide.</h1>
+/* NAV */
+.nav{
+  position:sticky; top:0; z-index:20;
+  backdrop-filter: blur(14px);
+  background: linear-gradient(180deg, rgba(0,0,0,.28), rgba(0,0,0,.10));
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+.nav-inner{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 0;
+}
 
-        <p class="hero__sub">
-          Activate in minutes. Any industry.<br />
-          <strong>English • Spanish • French</strong>
-        </p>
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text)}
+.brand-logo{
+  width:36px; height:36px; object-fit:contain;
+  /* important: no white box behind logo */
+  background: transparent;
+}
+.brand-text{font-weight:800; letter-spacing:-0.02em}
+.beta{font-size:11px; font-weight:800; color:#ff6a3d; opacity:.9; margin-left:2px}
 
-        <div class="hero__cta">
-          <a class="btn btn--primary" href="#activate">Activate your AI Agent</a>
-          <a class="btn btn--ghost" href="#how-it-works">See how it works</a>
-        </div>
+.nav-links{display:flex; align-items:center; gap:18px}
+.nav-links a{
+  color: rgba(255,255,255,.78);
+  text-decoration:none;
+  font-weight:600;
+  font-size:13px;
+}
+.nav-links a:hover{color:rgba(255,255,255,.95)}
+.nav-links a.active{color:rgba(255,255,255,.95)}
+.nav-links.always{display:flex}
 
-        <p class="hero__fine">No sales calls. No setup fees. Cancel anytime.</p>
-      </div>
+.nav-burger{
+  display:none;
+  width:42px; height:40px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;
+  background: rgba(255,255,255,.06);
+  cursor:pointer;
+}
+.nav-burger span{display:block; height:2px; margin:7px 10px; background: rgba(255,255,255,.75); border-radius:2px}
 
-      <aside class="hero__right" id="pricing">
-        <div class="card card--pricing">
-          <div class="pill">Beta Special</div>
-          <div class="price">
-            <span class="price__amount">$199</span>
-            <span class="price__unit">/month</span>
-          </div>
+/* HERO */
+.hero{
+  padding: 34px 0 12px;
+  display:grid;
+  grid-template-columns: 1.25fr .85fr;
+  gap: 26px;
+  align-items: start;
+}
 
-          <ul class="checks">
-            <li>Locked for 2 years</li>
-            <li>Unlimited calls (fair use)</li>
-            <li>No setup fees</li>
-            <li>Cancel anytime</li>
-          </ul>
+.hero-actions{display:flex; gap:12px; margin-top:16px; flex-wrap:wrap}
 
-          <a class="btn btn--primary btn--full" href="#activate">Activate your AI Agent</a>
-          <div class="note">Monthly billing starts on activation date.</div>
-        </div>
-      </aside>
-    </section>
+/* GLASS */
+.glass{
+  background: linear-gradient(180deg, var(--glass), var(--glass2));
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
 
-    <!-- PROBLEM + 3 CARDS -->
-    <section class="section">
-      <div class="section__head">
-        <h2>The problem AI CallPort solves</h2>
-        <div class="chips">
-          <span class="chip">Benefits</span>
-          <span class="chip">11 countries</span>
-          <span class="chip">3 languages</span>
-          <span class="chip">Built for business</span>
-        </div>
-      </div>
+.hero-card{
+  padding:18px 18px 16px;
+  position:relative;
+}
+.pill{
+  display:inline-flex;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  background: rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.85);
+}
+.price-row{display:flex; align-items:baseline; gap:8px; margin-top:12px}
+.price{font-size:44px; font-weight:900; letter-spacing:-0.03em}
+.per{color:rgba(255,255,255,.7); font-weight:700}
+.locked{margin-top:6px; color:rgba(255,255,255,.7); font-weight:700; font-size:13px}
 
-      <div class="grid3">
-        <article class="card card--feature">
-          <div class="icon">📞</div>
-          <h3>Missed calls = lost revenue</h3>
-          <p>Customers call after hours or during peak times — and no one answers.</p>
-        </article>
+.check{margin:12px 0 14px; padding:0; list-style:none}
+.check li{
+  padding-left:22px; position:relative;
+  margin:8px 0;
+  color: rgba(255,255,255,.78);
+  font-weight:600;
+  font-size:13px;
+}
+.check li::before{
+  content:"✓";
+  position:absolute; left:0; top:0;
+  color: rgba(255,255,255,.92);
+}
 
-        <article class="card card--feature">
-          <div class="icon">👤</div>
-          <h3>Staffing phones is expensive</h3>
-          <p>Human receptionists cost thousands and don’t scale or cover 24/7.</p>
-        </article>
+/* BUTTONS */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  text-decoration:none;
+  font-weight:800;
+  font-size:13px;
+  border:1px solid rgba(255,255,255,.14);
+  color: rgba(255,255,255,.9);
+  background: rgba(255,255,255,.06);
+  transition: transform .12s ease, filter .12s ease;
+}
+.btn:hover{transform: translateY(-1px); filter: brightness(1.03)}
+.btn.full{width:100%}
 
-        <article class="card card--feature">
-          <div class="icon">⚙️</div>
-          <h3>Existing systems are complex</h3>
-          <p>Long setups, contracts, and outdated phone software slow you down.</p>
-        </article>
-      </div>
-    </section>
+.btn-primary{
+  border:none;
+  color: #1a1208;
+  background: linear-gradient(180deg, var(--orange2), var(--orange1));
+  box-shadow: 0 10px 30px rgba(255,122,24,.20);
+}
+.btn-ghost{
+  background: rgba(255,255,255,.06);
+}
+.btn-cta{
+  border:none;
+  color:#1a1208 !important;
+  background: linear-gradient(180deg, rgba(255,210,140,.92), rgba(255,122,24,.92));
+}
 
-    <!-- INDUSTRIES + MINI STRIP -->
-    <section class="section split">
-      <div class="card card--list">
-        <h3>Supported industries</h3>
-        <ul class="bullets">
-          <li>Auto Repair</li>
-          <li>Beauty Salon</li>
-          <li>Dental</li>
-          <li>Plumbing</li>
-          <li>HVAC</li>
-          <li>Real Estate</li>
-          <li>Legal Intake</li>
-          <li>Medical Clinic</li>
-        </ul>
-        <p class="muted small">More industries can be added quickly without changing your activation flow.</p>
-      </div>
+/* SECTION HEAD */
+.section-head{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:14px; flex-wrap:wrap;
+  margin-bottom: 14px;
+}
+.chips{display:flex; gap:8px; flex-wrap:wrap}
+.chip{
+  font-size:12px; font-weight:800;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.75);
+}
 
-      <div class="card card--flags">
-        <div class="flags__head">
-          <h3>Live in 11 countries • 3 languages</h3>
-          <p class="muted small">Start with a demo call, then activate instantly. Add integration when needed.</p>
-        </div>
+/* GRIDS */
+.grid-3{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.grid-2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
 
-        <div class="flags__grid">
-          <div class="flag">🇺🇸 United States</div>
-          <div class="flag">🇨🇦 Canada</div>
-          <div class="flag">🇲🇽 Mexico</div>
-          <div class="flag">🇬🇧 United Kingdom</div>
-          <div class="flag">🇪🇸 Spain</div>
-          <div class="flag">🇫🇷 France</div>
-          <div class="flag">🇮🇪 Ireland</div>
-          <div class="flag">🇦🇺 Australia</div>
-          <div class="flag">🇸🇬 Singapore</div>
-          <div class="flag">🇦🇪 UAE (English support)</div>
-          <div class="flag">🇨🇱 Chile</div>
-        </div>
+.card{padding:16px}
+.card .icon{font-size:18px; opacity:.95; margin-bottom:8px}
+.card p{color:rgba(255,255,255,.68); line-height:1.45; font-weight:600; font-size:13px}
 
-        <div class="langs">
-          <span class="lang">✅ English</span>
-          <span class="lang">✅ Spanish</span>
-          <span class="lang">✅ French</span>
-        </div>
-      </div>
-    </section>
+.bullets{margin:10px 0 0; padding-left:18px; color:rgba(255,255,255,.78); font-weight:650; line-height:1.65}
+.bullets li{margin:3px 0}
 
-    <!-- BIG 2-COLUMN (COVERAGE + STEPS) -->
-    <section class="section split split--big" id="how-it-works">
-      <div class="card card--white">
-        <div class="card__kicker">Live coverage on:</div>
-        <h3>AI receptionist</h3>
+.warm{
+  background: linear-gradient(135deg, rgba(255,122,24,.22), rgba(255,255,255,.06));
+}
+.warm-grid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 10px;
+  margin-top: 6px;
+}
+.tag{
+  padding:10px 10px;
+  border-radius: 14px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.14);
+  font-weight:800;
+  font-size:12px;
+  color: rgba(255,255,255,.85);
+}
 
-        <ul class="coverage">
-          <li><span class="dot dot--us"></span> United States, Canada, Mexico</li>
-          <li><span class="dot dot--es"></span> Spain (Spanish)</li>
-          <li><span class="dot dot--fr"></span> France (French)</li>
-          <li><span class="dot dot--ie"></span> Ireland</li>
-          <li><span class="dot dot--ae"></span> UAE (English support)</li>
-          <li><span class="dot dot--cl"></span> Chile</li>
-        </ul>
+.light{
+  background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+}
 
-        <div class="logo-badge">
-          <img src="asset/logo.png" alt="AI CallPort logo large" />
-        </div>
-      </div>
+.flags{margin:10px 0 0; padding-left:18px; color:rgba(10,12,22,.88)}
+.light h3, .light p, .light li, .light .kicker{color: rgba(10,12,22,.92)}
+.light .btn{border-color: rgba(10,12,22,.18)}
+.light .btn-ghost{background: rgba(10,12,22,.06); color: rgba(10,12,22,.88)}
+.light .btn-primary{color:#1a1208}
 
-      <div class="card card--white">
-        <div class="card__kicker">Integrations</div>
-        <ol class="steps">
-          <li>Choose the country</li>
-          <li>Choose the industry</li>
-          <li>Choose the AI call service</li>
-          <li>Enter your business details</li>
-          <li>Call your company (live AI demo)</li>
-          <li>Activate your AI agent</li>
-        </ol>
+.logo-show{
+  margin-top: 12px;
+  display:flex;
+  justify-content:center;
+}
+.logo-show img{
+  width:min(260px, 70%);
+  height:auto;
+  filter: drop-shadow(0 18px 40px rgba(0,0,0,.25));
+  background: transparent; /* no white box */
+}
 
-        <a class="btn btn--primary btn--full" href="#activate">Activate your AI Agent</a>
-      </div>
-    </section>
+.steps{
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: rgba(10,12,22,.88);
+  font-weight:700;
+  line-height:1.8;
+}
+.steps li{margin:3px 0}
 
-    <!-- SUPPORT / FOOTER CTA -->
-    <section class="section" id="support">
-      <div class="card card--footer">
-        <div>
-          <h3>Need help or integration?</h3>
-          <p class="muted">We can connect your agent to your CRM, scheduler, or ticketing system.</p>
-        </div>
+/* CTA */
+.cta{
+  padding:18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.cta p{color:rgba(255,255,255,.72); font-weight:600}
+.cta-actions{display:flex; gap:10px; flex-wrap:wrap}
 
-        <div class="footer-actions">
-          <a class="btn btn--ghost" href="#login" id="login">Log in</a>
-          <a class="btn btn--primary" href="#activate" id="activate">Activate</a>
-        </div>
-      </div>
+.footer{
+  padding: 18px 0 26px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  color: rgba(255,255,255,.65);
+  font-size:12px;
+}
+.footer a{color: rgba(255,255,255,.7); text-decoration:none; font-weight:700}
+.footer a:hover{color: rgba(255,255,255,.92)}
+.footer-links{display:flex; gap:14px; flex-wrap:wrap}
 
-      <footer class="site-footer">
-        <div class="copyright">© <span id="year"></span> AI CallPort. All rights reserved.</div>
-        <div class="footer-links">
-          <a href="#login">Log in</a>
-          <a href="#support">Support</a>
-          <a href="#billing">Billing</a>
-          <a href="#terms">Terms</a>
-          <a href="#privacy">Privacy</a>
-        </div>
-      </footer>
-    </section>
-  </main>
+.pricing-title{font-size:42px; letter-spacing:-0.03em}
+.featured{
+  outline: 2px solid rgba(255,180,90,.35);
+  box-shadow: 0 18px 70px rgba(255,122,24,.16);
+}
 
-  <script src="script.js"></script>
-</body>
-</html>
+/* MOBILE */
+@media (max-width: 920px){
+  .hero{grid-template-columns: 1fr; }
+  .grid-3{grid-template-columns: 1fr}
+  .grid-2{grid-template-columns: 1fr}
+  .warm-grid{grid-template-columns: repeat(2, minmax(0,1fr))}
+  .nav-burger{display:block}
+  .nav-links{
+    position:absolute;
+    right: 4vw;
+    top: 64px;
+    display:none;
+    flex-direction:column;
+    gap:12px;
+    padding: 14px;
+    background: rgba(10,12,22,.88);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    width: min(260px, 92vw);
+  }
+  .nav-links.open{display:flex}
+  .nav-links.always{position:static; display:flex; flex-direction:row; background:none; border:none}
+}
