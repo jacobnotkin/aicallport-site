@@ -1,25 +1,17 @@
-(function () {
-  const hamburger = document.querySelector(".hamburger");
-  const mobileMenu = document.querySelector(".mobile-menu");
+(() => {
+  // Year in footer
+  const yearEl = document.getElementById("year");
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-  if (hamburger && mobileMenu) {
-    hamburger.addEventListener("click", () => {
-      const open = mobileMenu.hasAttribute("hidden") ? false : true;
-      if (open) {
-        mobileMenu.setAttribute("hidden", "");
-        hamburger.setAttribute("aria-expanded", "false");
-      } else {
-        mobileMenu.removeAttribute("hidden");
-        hamburger.setAttribute("aria-expanded", "true");
-      }
-    });
-  }
+  // Mobile nav toggle
+  const toggle = document.querySelector(".nav-toggle");
+  const mobile = document.querySelector(".nav-mobile");
 
-  const backToTop = document.getElementById("backToTop");
-  if (backToTop) {
-    backToTop.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+  if (toggle && mobile) {
+    toggle.addEventListener("click", () => {
+      const isOpen = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!isOpen));
+      mobile.hidden = isOpen;
     });
   }
 })();
