@@ -1,1 +1,2 @@
-// reserved for future JS
+// Reserved for future interactivity
+console.log("AI CallPort loaded");
