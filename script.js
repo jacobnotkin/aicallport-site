@@ -1,10 +1,11 @@
-// Small helpers only (kept minimal on purpose)
+// Small UI helpers (safe for static hosting)
+
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// Optional mobile menu toggle placeholder (since your screenshot shows a menu icon)
-const menuBtn = document.getElementById("menuBtn");
-if (menuBtn) {
-menuBtn.addEventListener("click", () => {
-alert("Menu (mobile) — tell me what links you want here and I’ll wire it up.");
+// Simple "chip" active state (visual only)
+document.querySelectorAll(".chip").forEach((btn) => {
+btn.addEventListener("click", () => {
+document.querySelectorAll(".chip").forEach((b) => b.classList.remove("is-active"));
+btn.classList.add("is-active");
 });
-}
+});
