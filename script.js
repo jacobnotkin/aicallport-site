@@ -1,25 +1,23 @@
-// Basic helpers (no heavy logic to avoid breaking layout)
+// Smooth scrolling for in-page anchors (works well on Cloudflare Pages)
+document.addEventListener("click", (e) => {
+const a = e.target.closest('a[href^="#"]');
+if (!a) return;
 
-function $(id){ return document.getElementById(id); }
+const id = a.getAttribute("href");
+if (!id || id === "#") return;
 
-function syncBanner(){
-// Ensures promo banner text stays consistent across pages
-const promo = document.querySelector("[data-promo]");
-if(!promo) return;
+const el = document.querySelector(id);
+if (!el) return;
 
-promo.innerHTML = `
-<span class="pill"><span class="beta">BETA</span> First 25 clients: <strong>$199/mo</strong> locked for 2 years</span>
-<span class="pill">Regular: <strong>$299/mo</strong></span>
-<span class="pill">No contract • Cancel anytime • No hidden costs</span>
-`;
-}
-
-function activatePrefill(){
-// If user clicks Activate from homepage, we can prefill nothing for now.
-// Future: read query params (country/industry/service) and select options.
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-syncBanner();
-activatePrefill();
+e.preventDefault();
+el.scrollIntoView({ behavior: "smooth", block: "start" });
 });
+
+// Placeholder: later you can point this to a real activation form/app route
+const goBtn = document.getElementById("goActivationBtn");
+if (goBtn) {
+goBtn.addEventListener("click", (e) => {
+// currently scrolls to top because it's href="#top"
+// if you later create a real form page, change link to: href="activate.html" (optional)
+});
+}
