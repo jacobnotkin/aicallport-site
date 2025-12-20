@@ -1,35 +1,25 @@
-// year
-document.getElementById("year").textContent = new Date().getFullYear();
+// Basic helpers (no heavy logic to avoid breaking layout)
 
-// mobile menu
-const burger = document.querySelector(".hamburger");
-const mobileNav = document.querySelector(".mobile-nav");
+function $(id){ return document.getElementById(id); }
 
-if (burger && mobileNav) {
-burger.addEventListener("click", () => {
-const open = mobileNav.classList.toggle("open");
-burger.setAttribute("aria-expanded", open ? "true" : "false");
-mobileNav.setAttribute("aria-hidden", open ? "false" : "true");
-});
+function syncBanner(){
+// Ensures promo banner text stays consistent across pages
+const promo = document.querySelector("[data-promo]");
+if(!promo) return;
 
-// close menu when clicking a link
-mobileNav.querySelectorAll("a").forEach((a) => {
-a.addEventListener("click", () => {
-mobileNav.classList.remove("open");
-burger.setAttribute("aria-expanded", "false");
-mobileNav.setAttribute("aria-hidden", "true");
-});
-});
+promo.innerHTML = `
+<span class="pill"><span class="beta">BETA</span> First 25 clients: <strong>$199/mo</strong> locked for 2 years</span>
+<span class="pill">Regular: <strong>$299/mo</strong></span>
+<span class="pill">No contract • Cancel anytime • No hidden costs</span>
+`;
 }
 
-// smooth scroll for in-page anchors
-document.querySelectorAll('a[href^="#"]').forEach((a) => {
-a.addEventListener("click", (e) => {
-const id = a.getAttribute("href");
-if (!id || id === "#") return;
-const el = document.querySelector(id);
-if (!el) return;
-e.preventDefault();
-el.scrollIntoView({ behavior: "smooth", block: "start" });
-});
+function activatePrefill(){
+// If user clicks Activate from homepage, we can prefill nothing for now.
+// Future: read query params (country/industry/service) and select options.
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+syncBanner();
+activatePrefill();
 });
