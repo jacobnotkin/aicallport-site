@@ -1,15 +1,13 @@
-// Smooth scrolling for same-page anchors
-document.addEventListener("click", (e) => {
-const a = e.target.closest("a[href^='#']");
-if (!a) return;
+/* Smooth scrolling for the whole page */
+html {
+scroll-behavior: smooth;
+}
 
-const id = a.getAttribute("href");
-const el = document.querySelector(id);
-if (!el) return;
+/* Custom button hover animation */
+button, a {
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-e.preventDefault();
-el.scrollIntoView({ behavior: "smooth", block: "start" });
-});
-
-// Current year in footer
-document.getElementById("year").textContent = new Date().getFullYear();
+button:hover {
+transform: translateY(-2px);
+}
