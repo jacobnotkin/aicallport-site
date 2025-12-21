@@ -1,16 +1,15 @@
-// Set footer year
-document.getElementById("year").textContent = new Date().getFullYear();
+// Smooth scrolling for same-page anchors
+document.addEventListener("click", (e) => {
+const a = e.target.closest("a[href^='#']");
+if (!a) return;
 
-// Smooth scroll for in-page anchors (Cloudflare Pages friendly)
-document.querySelectorAll('a[href^="#"]').forEach((a) => {
-a.addEventListener("click", (e) => {
 const id = a.getAttribute("href");
-if (!id || id === "#") return;
-
 const el = document.querySelector(id);
 if (!el) return;
 
 e.preventDefault();
 el.scrollIntoView({ behavior: "smooth", block: "start" });
 });
-});
+
+// Current year in footer
+document.getElementById("year").textContent = new Date().getFullYear();
