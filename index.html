@@ -10,16 +10,15 @@
         body { font-family: 'Inter', sans-serif; background-color: #0b0e1a; color: #5c96fa; scroll-behavior: smooth; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
         
-        /* --- PREMIUM 3D ROTATING GLOBE --- */
-        .globe-section { position: relative; width: 100%; height: 450px; display: flex; justify-content: center; align-items: center; }
+        /* --- 3D GLOBE --- */
+        .globe-section { position: relative; width: 100%; height: 400px; display: flex; justify-content: center; align-items: center; }
         .globe-canvas {
-            width: 350px; height: 350px;
+            width: 300px; height: 300px;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #1e40af, #000);
             box-shadow: inset -20px -20px 50px #000, 0 0 80px rgba(59, 130, 246, 0.4);
             position: relative;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.05);
         }
         .globe-world-map {
             position: absolute;
@@ -27,40 +26,27 @@
             background-image: url('https://www.transparenttextures.com/patterns/world-map.png');
             background-size: cover;
             filter: brightness(1.5) sepia(100%) saturate(400%) hue-rotate(170deg); 
-            opacity: 0.7;
             animation: move-map 20s linear infinite;
         }
-        @keyframes move-map {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
-        .globe-overlay {
-            position: absolute; inset: 0;
-            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
+        @keyframes move-map { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-        /* --- UI COMPONENTS --- */
-        .step-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; border-left: 4px solid #1e40af; }
-        .step-card:hover { transform: scale(1.05); background: rgba(255, 255, 255, 0.08); border-left-color: #f97316; }
+        /* --- WAVEFORM ANIMATION --- */
+        .waveform { display: flex; align-items: center; justify-content: center; gap: 4px; height: 60px; }
+        .bar { width: 4px; background: #f97316; border-radius: 2px; animation: bounce 1s infinite ease-in-out; }
+        .bar:nth-child(2) { animation-delay: 0.1s; height: 20px; }
+        .bar:nth-child(3) { animation-delay: 0.2s; height: 40px; }
+        .bar:nth-child(4) { animation-delay: 0.3s; height: 25px; }
+        .bar:nth-child(5) { animation-delay: 0.4s; height: 45px; }
+        @keyframes bounce { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.8); } }
+
+        /* --- STEP CARDS --- */
+        .step-card { transition: all 0.3s ease; cursor: pointer; border-left: 4px solid #1e40af; }
+        .step-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.08); border-left-color: #f97316; }
         .pulse { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.05); } }
-
-        .sync-bar { height: 4px; background: rgba(59, 130, 246, 0.2); border-radius: 2px; overflow: hidden; margin-top: 10px; }
-        .sync-progress { height: 100%; background: #3b82f6; width: 0%; animation: sync-anim 3s ease-out forwards; }
-        @keyframes sync-anim { to { width: 100%; } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         #setup-modal { display: none; }
         #setup-modal.active { display: flex; }
-
-        .calling-animation {
-            display: inline-block;
-            width: 10px; height: 10px;
-            background: #f97316; border-radius: 50%;
-            margin-left: 5px;
-            animation: dot-pulse 1.5s infinite;
-        }
-        @keyframes dot-pulse { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -68,188 +54,99 @@
     <nav class="sticky top-0 z-50 bg-[#0b0e1a]/90 backdrop-blur-xl border-b border-white/5">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center">
-                <div class="text-3xl md:text-5xl font-black tracking-tighter text-white">AI Call Port</div>
-                <span class="ml-4 text-[10px] bg-red-600 text-white px-2 py-1 rounded font-black pulse uppercase">Small Biz Beta</span>
+                <div class="text-3xl font-black tracking-tighter text-white">AI Call Port</div>
+                <span class="ml-4 text-[10px] bg-red-600 text-white px-2 py-1 rounded font-black uppercase">Small Biz Beta</span>
             </div>
-            <div class="hidden md:flex space-x-10 text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                <a href="#services" class="hover:text-blue-400 transition">Solutions</a>
-                <a href="#coverage" class="hover:text-blue-400 transition">Global Network</a>
-                <a href="#how-it-works" class="hover:text-blue-400 transition">7-Step Setup</a>
-            </div>
-            <button onclick="openModal(1)" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold text-xs uppercase transition shadow-lg shadow-blue-900/20">Instant Activate</button>
+            <button onclick="openModal(1)" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase transition shadow-lg">Activate AI</button>
         </div>
     </nav>
 
     <div class="max-w-7xl mx-auto px-6 mt-6">
-        <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 px-8 rounded-2xl flex justify-between items-center text-[11px] md:text-xs font-black uppercase tracking-tight shadow-xl">
-            <span>🚀 SMALL BIZ SPECIAL: Lock in $199/mo (Regular $499) — Two years price protection</span>
-            <span class="flex items-center gap-2"><span class="w-2 h-2 bg-green-400 rounded-full animate-ping"></span> CLOUD SYNC: ACTIVE FOR LOCAL BUSINESS</span>
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 px-8 rounded-2xl flex justify-between items-center text-[10px] md:text-xs font-black uppercase tracking-tight shadow-xl">
+            <span>🚀 SPECIAL: Lock in $199/mo (Regular $499) — Two years price protection</span>
+            <span class="hidden md:block">Status: Optimized for Local Nodes</span>
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 py-12 items-start">
+    <main class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 py-12">
         <div>
-            <div class="inline-block bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6">Optimized for Small Business Owners</div>
+            <div class="inline-block bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-6">For Small Business Owners</div>
             <h1 class="text-6xl lg:text-8xl font-black text-white leading-[0.9] tracking-tighter mb-6">
-                Global AI <br><span class="text-blue-500 italic">Instant</span> <br>Call Routing.
+                Instant AI <br><span class="text-blue-500 italic">Global</span> <br>Receptionist.
             </h1>
+            <p class="text-gray-400 text-lg mb-8 max-w-lg">Never miss a lead again. Deploy a specialized AI agent in 60 seconds that handles your bookings and customer calls while you work.</p>
             
-            <div class="glass border-white/10 p-8 rounded-[2rem] max-w-xl">
-                <div class="flex justify-between items-center mb-6">
-                    <h4 class="text-orange-500 font-black uppercase text-xs tracking-widest">Local Business Flow:</h4>
-                    <span class="text-[10px] font-bold text-blue-400 uppercase tracking-tighter border border-blue-400/30 px-2 py-1 rounded">No Contract Required</span>
+            <div class="glass p-6 rounded-3xl border-white/10 flex items-center gap-6">
+                <div class="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center text-3xl">🤖</div>
+                <div>
+                    <div class="text-white font-black uppercase text-sm">Real-Time Routing</div>
+                    <div class="text-[10px] text-blue-400 font-bold uppercase">Active in 40+ Countries</div>
                 </div>
-                
-                <div class="flex items-center justify-between mb-8 text-white text-center">
-                    <div class="flex flex-col items-center gap-2">
-                        <div class="w-12 h-12 rounded-full bg-blue-600/20 border border-blue-500 flex items-center justify-center text-xl">📞</div>
-                        <span class="text-[9px] font-bold uppercase">Customer Calls</span>
-                    </div>
-                    <div class="h-[2px] flex-1 bg-gradient-to-r from-blue-500 to-white/20 mx-2"></div>
-                    <div class="flex flex-col items-center gap-2">
-                        <div class="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-2xl">🤖</div>
-                        <span class="text-[9px] font-bold uppercase italic">AI Answers</span>
-                    </div>
-                    <div class="h-[2px] flex-1 bg-gradient-to-r from-white/20 to-green-500 mx-2"></div>
-                    <div class="flex flex-col items-center gap-2">
-                        <div class="w-12 h-12 rounded-full bg-green-600/20 border border-green-500 flex items-center justify-center text-xl">✅</div>
-                        <span class="text-[9px] font-bold uppercase">Lead Secured</span>
-                    </div>
-                </div>
-
-                <p class="text-gray-300 text-sm leading-relaxed mb-4">
-                    Stop losing money on missed calls. Connect instantly to an AI agent that speaks to your customers, books your calendar, and saves you 40+ hours of office work every month.
-                </p>
-                
-                <div class="sync-bar"><div class="sync-progress"></div></div>
-                <p class="text-[9px] text-blue-400 font-bold uppercase mt-2 animate-pulse">● System Status: AI Nodes Ready for Deployment</p>
             </div>
         </div>
         
-        <div id="pricing-card" class="glass p-12 rounded-[3rem] border-white/10 shadow-2xl relative overflow-hidden flex flex-col">
-            <div class="absolute top-0 right-0 bg-blue-600 text-white px-6 py-2 font-black text-[10px] uppercase rounded-bl-2xl">Small Biz Plan</div>
+        <div class="glass p-10 rounded-[3rem] border-white/10 shadow-2xl relative overflow-hidden flex flex-col">
+            <div class="absolute top-0 right-0 bg-blue-600 text-white px-6 py-2 font-black text-[10px] uppercase rounded-bl-2xl">Small Biz Exclusive</div>
             
-            <div class="mb-10 text-center">
-                <div class="text-gray-400 font-bold uppercase text-xs mb-2">Exclusive Beta Rate</div>
+            <div class="mb-8 text-center">
                 <div class="flex justify-center items-baseline gap-2 text-7xl font-black text-white">$199<span class="text-xl text-blue-400">/mo</span></div>
-                <div class="text-gray-500 font-bold mt-2 text-sm uppercase tracking-widest italic line-through decoration-red-500/50">Regular price $499/mo</div>
+                <div class="text-gray-500 font-bold mt-2 text-xs uppercase line-through decoration-red-500/50">Retail $499/mo</div>
             </div>
 
-            <div class="space-y-4 mb-10 text-white font-bold uppercase text-[11px]">
-                <div class="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5"> 
-                    <span class="text-green-500 font-black">✔</span> 
-                    <span>Unlimited incoming calls</span>
+            <div class="space-y-4 mb-8 text-white font-bold uppercase text-[11px]">
+                <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5"> 
+                    <span class="text-green-500">✔</span> <span>Unlimited incoming calls</span>
                 </div>
-                <div class="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5"> 
-                    <span class="text-green-500 font-black">✔</span> 
-                    <span>Price locked for 2 years</span>
+                <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5"> 
+                    <span class="text-green-500">✔</span> <span>Price locked for 2 years</span>
                 </div>
-                <div class="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5"> 
-                    <span class="text-green-500 font-black">✔</span> 
-                    <span>Cancel anytime</span>
+                <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5"> 
+                    <span class="text-green-500">✔</span> <span>Cancel anytime</span>
                 </div>
             </div>
 
-            <div class="mt-auto border-t border-white/5 pt-8">
-                <p class="text-red-500 text-center text-xs font-black uppercase mb-6 flex items-center justify-center gap-3">
-                    <span class="w-8 h-0.5 bg-red-500/30"></span> 60 Seconds to Instant Deployment
-                </p>
-                <button onclick="openModal(1)" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-7 rounded-2xl font-black uppercase text-xl shadow-2xl shadow-orange-900/40 transition-all hover:scale-[1.03] active:scale-95">Connect Instantly</button>
-                <div class="flex justify-center items-center gap-2 mt-4 opacity-50 grayscale hover:grayscale-0 transition cursor-default">
-                    <span class="text-[8px] font-bold text-white uppercase tracking-widest">Small Business Verified</span>
-                    <div class="w-4 h-4 bg-white/20 rounded-full flex items-center justify-center text-[8px]">⭐</div>
-                </div>
-            </div>
+            <button onclick="openModal(1)" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-6 rounded-2xl font-black uppercase text-lg shadow-xl transition-all hover:scale-[1.02]">Test Your Agent Now</button>
         </div>
     </main>
 
     <section id="how-it-works" class="max-w-7xl mx-auto px-6 py-24 border-t border-white/5">
-        <h2 class="text-center text-4xl font-black text-white uppercase mb-20 tracking-widest italic">Setup Your AI Employee</h2>
+        <h2 class="text-center text-4xl font-black text-white uppercase mb-16 italic">7 Steps to Freedom</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             <div onclick="openModal(1)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-blue-500 uppercase mb-3 opacity-50">Step 01</div>
+                <div class="text-[9px] font-black text-blue-500 uppercase mb-2">01</div>
                 <div id="step-txt-1" class="text-[10px] font-black text-white uppercase">Region</div>
             </div>
             <div onclick="openModal(2)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-blue-500 uppercase mb-3 opacity-50">Step 02</div>
-                <div id="step-txt-2" class="text-[10px] font-black text-white uppercase">Biz Type</div>
+                <div class="text-[9px] font-black text-blue-500 uppercase mb-2">02</div>
+                <div id="step-txt-2" class="text-[10px] font-black text-white uppercase">Industry</div>
             </div>
             <div onclick="openModal(3)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-blue-500 uppercase mb-3 opacity-50">Step 03</div>
-                <div id="step-txt-3" class="text-[10px] font-black text-white uppercase">AI Talent</div>
+                <div class="text-[9px] font-black text-blue-500 uppercase mb-2">03</div>
+                <div id="step-txt-3" class="text-[10px] font-black text-white uppercase">Role</div>
             </div>
             <div onclick="openModal(4)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-blue-500 uppercase mb-3 opacity-50">Step 04</div>
-                <div id="step-txt-4" class="text-[10px] font-black text-white uppercase">Office Details</div>
+                <div class="text-[9px] font-black text-blue-500 uppercase mb-2">04</div>
+                <div id="step-txt-4" class="text-[10px] font-black text-white uppercase">Details</div>
             </div>
             <div onclick="openModal(5)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-blue-500 uppercase mb-3 opacity-50">Step 05</div>
-                <div id="step-txt-5" class="text-[10px] font-black text-white uppercase">Voice Profile</div>
+                <div class="text-[9px] font-black text-blue-500 uppercase mb-2">05</div>
+                <div id="step-txt-5" class="text-[10px] font-black text-white uppercase">Voice</div>
             </div>
-            <div onclick="openModal(6)" class="glass p-6 rounded-[2rem] step-card text-center border-orange-500/50">
-                <div class="text-[9px] font-black text-orange-500 uppercase mb-3">Step 06</div>
-                <div id="step-txt-6" class="text-[10px] font-black text-white uppercase">Live Demo Call</div>
+            <div onclick="openModal(6)" class="glass p-6 rounded-[2rem] step-card text-center border-orange-500 shadow-lg shadow-orange-900/20">
+                <div class="text-[9px] font-black text-orange-500 uppercase mb-2">06</div>
+                <div id="step-txt-6" class="text-[10px] font-black text-white uppercase">Live Demo</div>
             </div>
             <div onclick="openModal(7)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-green-500 uppercase mb-3 opacity-50">Step 07</div>
-                <div id="step-txt-7" class="text-[10px] font-black text-green-400 uppercase italic underline">Activation</div>
+                <div class="text-[9px] font-black text-green-500 uppercase mb-2">07</div>
+                <div id="step-txt-7" class="text-[10px] font-black text-green-400 uppercase">Go Live</div>
             </div>
         </div>
     </section>
-
-    <section id="services" class="max-w-7xl mx-auto px-6 py-24 border-t border-white/5">
-        <h2 class="text-center text-4xl font-black text-white uppercase mb-16 tracking-widest italic">Built for Local Industry</h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-            <div class="glass p-10 rounded-3xl text-center border-white/5 hover:border-blue-500/40 transition group">
-                <div class="text-red-500 font-black text-sm uppercase tracking-widest group-hover:text-white transition">Medical & Dental</div>
-            </div>
-            <div class="glass p-10 rounded-3xl text-center border-white/5 hover:border-blue-500/40 transition group">
-                <div class="text-red-500 font-black text-sm uppercase tracking-widest group-hover:text-white transition">Contractors & Trades</div>
-            </div>
-            <div class="glass p-10 rounded-3xl text-center border-white/5 hover:border-blue-500/40 transition group">
-                <div class="text-red-500 font-black text-sm uppercase tracking-widest group-hover:text-white transition">Professional Services</div>
-            </div>
-        </div>
-    </section>
-
-    <section id="coverage" class="max-w-7xl mx-auto px-6 py-24 border-t border-white/5 text-center">
-        <div class="globe-section">
-            <div class="globe-canvas">
-                <div class="globe-world-map"></div>
-                <div class="globe-overlay"></div>
-            </div>
-        </div>
-        <h2 class="text-5xl font-black text-white uppercase mb-4">Small Biz Global Reach</h2>
-        <p class="text-blue-400 font-bold uppercase tracking-widest mb-16 italic text-xl">Local Presence • Global Connectivity</p>
-        <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
-            <span class="glass px-8 py-4 rounded-2xl font-black text-white text-sm">🇺🇸 USA</span>
-            <span class="glass px-8 py-4 rounded-2xl font-black text-white text-sm">🇨🇦 Canada</span>
-            <span class="glass px-8 py-4 rounded-2xl font-black text-white text-sm">🇬🇧 UK</span>
-            <span class="glass px-8 py-4 rounded-2xl font-black text-white text-sm">🇦🇺 Australia</span>
-        </div>
-    </section>
-
-    <footer class="py-24 bg-black/60 border-t border-white/5 mt-10">
-        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-12 items-center text-center md:text-left">
-            <div>
-                <div class="text-3xl font-black text-white tracking-tighter mb-4">AI Call Port</div>
-                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">The World's Fastest AI Agent Connector for Small Business.</p>
-            </div>
-            <div class="flex justify-center space-x-12 text-[10px] font-black uppercase text-gray-400">
-                <a href="#" class="hover:text-white transition">Privacy</a>
-                <a href="#" class="hover:text-white transition">Terms</a>
-                <a href="#" class="hover:text-white transition">Contact</a>
-            </div>
-            <div class="md:text-right">
-                <p class="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em]">© 2025 AI CALL PORT TECHNOLOGY GROUP</p>
-            </div>
-        </div>
-    </footer>
 
     <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-4">
-        <div class="glass max-w-md w-full p-10 rounded-[3rem] border-white/20 relative">
+        <div class="glass max-w-md w-full p-10 rounded-[3rem] border-white/20 relative shadow-2xl">
             <button onclick="closeModal()" class="absolute top-8 right-10 text-white/50 text-4xl hover:text-white transition">&times;</button>
-            <h3 id="modal-title" class="text-2xl font-black text-white uppercase mb-8 text-center tracking-tighter border-b border-white/10 pb-4"></h3>
+            <h3 id="modal-title" class="text-2xl font-black text-white uppercase mb-6 text-center tracking-tighter"></h3>
             <div id="modal-content" class="space-y-3"></div>
         </div>
     </div>
@@ -259,15 +156,16 @@
         const mTitle = document.getElementById('modal-title');
         const mContent = document.getElementById('modal-content');
         let activeStep = 1;
+        let bizName = "Your Business";
 
         const config = {
-            1: { title: "Global Region", type: "select", options: ["🇺🇸 United States", "🇨🇦 Canada", "🇬🇧 United Kingdom", "🇦🇺 Australia"] },
-            2: { title: "Industry", type: "select", options: ["Medical/Dental", "HVAC/Plumbing", "Auto Repair", "Real Estate", "Law Firm"] },
-            3: { title: "AI Agent Role", type: "select", options: ["Front Desk Receptionist", "Sales & Booking Agent", "24/7 Support"] },
-            4: { title: "Office Details", type: "form", fields: ["Business Name", "Your Company Phone"] },
-            5: { title: "AI Voice Audition", type: "select", options: ["Warm Professional", "Friendly Assistant", "Corporate Neutral"] },
-            6: { title: "Step 6: Live Demo Call", type: "demo" },
-            7: { title: "Final Activation", type: "select", options: ["Confirm & Sync ($199/mo)"] }
+            1: { title: "Select Region", type: "select", options: ["🇺🇸 United States", "🇨🇦 Canada", "🇬🇧 UK", "🇦🇺 Australia"] },
+            2: { title: "Industry", type: "select", options: ["Plumbing/HVAC", "Dental/Medical", "Law Firm", "Real Estate"] },
+            3: { title: "AI Role", type: "select", options: ["Receptionist", "Sales Agent", "After-Hours Support"] },
+            4: { title: "Company Details", type: "form", fields: ["Business Name", "Cell Phone to Call"] },
+            5: { title: "Voice Profile", type: "select", options: ["Professional Male", "Warm Female", "Friendly Assistant"] },
+            6: { title: "Step 6: Live Test", type: "demo" },
+            7: { title: "Final Activation", type: "select", options: ["Lock in $199/mo (2-Year Protection)"] }
         };
 
         function openModal(num) {
@@ -285,43 +183,61 @@
                     mContent.appendChild(b);
                 });
             } else if (step.type === "demo") {
-                const p = document.createElement('div');
-                p.className = 'text-gray-300 text-center text-sm mb-6 leading-relaxed';
-                p.innerHTML = "Dialing your company phone number now... <span class='calling-animation'></span><br><br> <strong class='text-white'>Pick up and talk to your new AI Agent.</strong> <br><br> Experience the speed and accuracy first-hand.";
-                mContent.appendChild(p);
-                
-                const b = document.createElement('button');
-                b.className = 'w-full bg-orange-500 p-5 rounded-2xl text-white font-black uppercase tracking-widest mt-4 shadow-xl shadow-orange-900/40 hover:scale-105 transition-transform';
-                b.innerText = 'I Liked the Demo - Proceed';
-                b.onclick = () => finishStep("Demo Verified");
-                mContent.appendChild(b);
+                showDemoPhase();
             } else {
-                step.fields.forEach(f => {
+                step.fields.forEach((f, idx) => {
                     const i = document.createElement('input');
-                    i.className = 'w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none mb-4 focus:border-orange-500 transition';
+                    i.id = `input-${idx}`;
+                    i.className = 'w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none mb-4 focus:border-orange-500';
                     i.placeholder = f;
                     mContent.appendChild(i);
                 });
                 const sub = document.createElement('button');
-                sub.className = 'w-full bg-blue-600 p-5 rounded-2xl text-white font-black uppercase tracking-widest mt-4';
-                sub.innerText = 'Save & Route Call';
-                sub.onclick = () => finishStep("Details Saved");
+                sub.className = 'w-full bg-blue-600 p-5 rounded-2xl text-white font-black uppercase mt-4';
+                sub.innerText = 'Sync Details';
+                sub.onclick = () => {
+                    bizName = document.getElementById('input-0').value || "Your Business";
+                    finishStep("Synced");
+                };
                 mContent.appendChild(sub);
             }
             modal.classList.add('active');
         }
 
+        function showDemoPhase() {
+            mContent.innerHTML = `
+                <div class="text-center">
+                    <div class="text-blue-400 text-[10px] font-black uppercase mb-4 animate-pulse">Neural Sync in Progress...</div>
+                    <div class="text-gray-300 text-sm mb-6">Teaching the AI about <strong>${bizName}</strong>. This takes about 5 seconds.</div>
+                    <div class="h-1 bg-white/10 rounded-full overflow-hidden mb-8">
+                        <div class="h-full bg-blue-500" style="animation: sync-load 5s forwards"></div>
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                mContent.innerHTML = `
+                    <div class="text-center">
+                        <div class="waveform mb-6">
+                            <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                        </div>
+                        <h4 class="text-white font-black uppercase mb-2">Dialing Your Number Now</h4>
+                        <p class="text-gray-400 text-xs mb-8">Pick up and say: <br> <span class="text-orange-400 italic">"Hi, who is this?"</span></p>
+                        <button onclick="finishStep('Verified')" class="w-full bg-green-600 p-5 rounded-2xl text-white font-black uppercase">I Liked the Call - Proceed</button>
+                    </div>
+                `;
+            }, 5000);
+        }
+
         function finishStep(val) {
-            const el = document.getElementById(`step-txt-${activeStep}`);
-            el.innerText = val;
-            el.classList.add('text-orange-400');
+            document.getElementById(`step-txt-${activeStep}`).innerText = val;
+            document.getElementById(`step-txt-${activeStep}`).classList.add('text-orange-400');
             closeModal();
-            if(activeStep < 7) {
-                setTimeout(() => openModal(activeStep + 1), 500);
-            }
+            if(activeStep < 7) setTimeout(() => openModal(activeStep + 1), 400);
         }
 
         function closeModal() { modal.classList.remove('active'); }
     </script>
+    <style> @keyframes sync-load { from { width: 0%; } to { width: 100%; } } </style>
 </body>
 </html>
