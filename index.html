@@ -10,59 +10,53 @@
         body { font-family: 'Inter', sans-serif; background-color: #181926; color: #5c96fa; scroll-behavior: smooth; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
         .header-logo { width: 200px !important; height: auto; margin-left: -25px; }
-        
-        /* Step Highlights */
-        .step-card { transition: all 0.3s ease; cursor: pointer; }
-        .step-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.1); }
-        .step-1 { border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.05); }
-        .step-2 { border-left: 4px solid #8b5cf6; background: rgba(139, 92, 246, 0.05); }
-        .step-3 { border-left: 4px solid #ec4899; background: rgba(236, 72, 153, 0.05); }
-        .step-4 { border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.05); }
-        .step-5 { border-left: 4px solid #f97316; background: rgba(249, 115, 22, 0.05); }
-        .step-6 { border-left: 4px solid #10b981; background: rgba(16, 185, 129, 0.1); color: #10b981; }
 
-        .pulse { animation: pulse-animation 2s infinite; }
-        @keyframes pulse-animation { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
-
-        /* --- HIGHLIGHTED ROTATING GLOBE --- */
-        .globe-wrapper {
-            position: relative; width: 320px; height: 320px; margin: 0 auto 40px;
-            perspective: 1000px;
-        }
-        .globe-sphere {
-            position: relative; width: 100%; height: 100%;
+        /* --- STABLE CSS GLOBE (NO EXTERNAL IMAGES) --- */
+        .globe-container {
+            position: relative; width: 300px; height: 300px; margin: 0 auto 40px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #1e3a8a, #030712);
-            box-shadow: inset -30px -30px 60px #000, 0 0 50px rgba(59, 130, 246, 0.4);
+            background: radial-gradient(circle at 30% 30%, #2563eb, #0f172a);
+            box-shadow: inset -20px -20px 50px #000, 0 0 50px rgba(37, 99, 235, 0.3);
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center;
         }
-        /* Rotating Highlighted Landmass */
-        .globe-map {
-            position: absolute; width: 200%; height: 100%;
-            background-image: url('https://www.transparenttextures.com/patterns/world-map.png');
-            background-size: contain;
-            filter: invert(80%) sepia(50%) saturate(500%) hue-rotate(350deg); /* Highlighting countries in Gold/Orange */
-            opacity: 0.8;
-            animation: rotateMap 15s linear infinite;
+
+        .globe-map-svg {
+            width: 200%; height: 80%;
+            fill: #f97316; /* Highlighting land in Orange */
+            opacity: 0.9;
+            animation: rotateGlobe 12s linear infinite;
         }
-        /* Atmosphere Glow */
-        .globe-sphere::after {
-            content: ""; position: absolute; inset: 0;
-            box-shadow: inset 10px 10px 30px rgba(255,255,255,0.1);
-            border-radius: 50%;
-        }
-        @keyframes rotateMap {
+
+        @keyframes rotateGlobe {
             from { transform: translateX(0); }
             to { transform: translateX(-50%); }
         }
 
-        /* Form Controls */
+        /* Scanline effect for tech look */
+        .globe-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 100% 4px;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        /* Interactive Steps */
+        .step-card { transition: all 0.3s ease; cursor: pointer; border-left: 4px solid transparent; }
+        .step-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.1); }
+        .step-1 { border-color: #3b82f6; } .step-2 { border-color: #8b5cf6; } 
+        .step-3 { border-color: #ec4899; } .step-4 { border-color: #f59e0b; }
+        .step-5 { border-color: #f97316; } .step-6 { border-color: #10b981; }
+
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
         #setup-modal { display: none; }
         #setup-modal.active { display: flex; }
-        .option-btn { width: 100%; padding: 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; text-align: left; color: white; transition: all 0.2s; font-size: 14px; margin-bottom: 8px; }
-        .option-btn:hover { background: rgba(255,255,255,0.1); border-color: #3b82f6; }
-        input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; color: white; outline: none; margin-bottom: 12px; }
+        .option-btn { width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; text-align: left; color: white; margin-bottom: 8px; transition: 0.2s; }
+        .option-btn:hover { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; }
+        input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; color: white; margin-bottom: 10px; outline: none; }
     </style>
 </head>
 <body>
@@ -70,119 +64,108 @@
     <nav class="sticky top-0 z-50 bg-[#160c45]/90 backdrop-blur-md border-b border-white/5">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center">
-                <img src="assets/logo.png" alt="Logo" class="header-logo">
-                <div class="flex items-center ml-1">
-                    <div class="text-x1 md:text-5xl font-extrabold tracking-tighter text-white">AI Call Port</div>
-                    <span class="ml-3 text-[10px] bg-red-800 text-white px-2 py-0.5 rounded font-black uppercase tracking-tighter pulse">Beta</span>
-                </div>
+                <div class="text-3xl md:text-5xl font-extrabold tracking-tighter text-white">AI Call Port</div>
+                <span class="ml-3 text-[10px] bg-red-700 text-white px-2 py-0.5 rounded font-black pulse">BETA</span>
             </div>
-            <div class="hidden md:flex space-x-10 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300">
-                <a href="#services" class="hover:text-white transition">Services</a>
-                <a href="#how-it-works" class="hover:text-white transition">How it works</a>
-                <a href="#coverage" class="hover:text-white transition">Coverage</a>
+            <div class="hidden md:flex space-x-8 text-[10px] font-bold uppercase tracking-widest text-gray-300">
+                <a href="#services">Services</a>
+                <a href="#how-it-works">How it works</a>
+                <a href="#coverage">Coverage</a>
             </div>
-            <button onclick="openModal(1)" class="bg-white/5 border border-white/10 px-8 py-4 rounded-xl font-bold text-sm uppercase hover:bg-white/10 transition text-white">Activate Your AI Agent</button>
+            <button onclick="openModal(1)" class="bg-blue-600 px-6 py-3 rounded-lg font-bold text-xs uppercase text-white hover:bg-blue-700 transition">Activate Now</button>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-6 mt-6">
-        <div class="bg-blue-500 text-black py-3 px-6 rounded-xl flex flex-wrap justify-center items-center gap-2 text-[11px] md:text-xs font-bold shadow-xl uppercase">
-            <span>BETA SPECIAL: First 100 clients locked in $199/mo (reg $399/mo), zero setup fees for 1 year</span>
-            <span class="flex items-center gap-2"><span class="w-2 h-2 bg-red-600 rounded-full pulse"></span> LIVE: 42 / 58 SPOTS REMAINING</span>
+    <div class="max-w-7xl mx-auto px-6 mt-4">
+        <div class="bg-blue-500 text-black py-2 px-6 rounded-lg text-center text-[10px] md:text-xs font-black uppercase shadow-lg">
+            BETA SPECIAL: FIRST 100 CLIENTS LOCKED AT $199/MO • 42/58 SPOTS LEFT
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-16 lg:py-24 items-center">
+    <main class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-16">
         <div>
-            <h1 class="hero-title text-5xl lg:text-7xl font-extrabold mb-8 text-white">AI Call Port <span class="text-blue-400">is an instant connector for small businesses.</span></h1>
-            <p class="text-red-500 text-lg mb-10 leading-relaxed max-w-xl font-bold uppercase tracking-tight">Connect your business phone in <a href="#how-it-works" class="text-orange-400 border-b-2 border-orange-400/30">SIX EASY STEPS</a>. Answer every lead 24/7.</p>
-            <button onclick="openModal(1)" class="bg-orange-500 text-white px-10 py-5 rounded-xl font-black text-sm uppercase hover:bg-orange-600 shadow-2xl transition">Start Now</button>
+            <h1 class="text-5xl lg:text-7xl font-extrabold mb-6 text-white leading-tight">AI Call Port <span class="text-blue-500">Global AI Agent Connector.</span></h1>
+            <p class="text-red-500 text-xl font-bold uppercase mb-10">Connect in <span class="text-orange-500">6 Easy Steps</span>. Answer every call 24/7.</p>
+            <button onclick="openModal(1)" class="bg-orange-500 text-white px-10 py-5 rounded-xl font-black uppercase hover:bg-orange-600 transition">Start Activation</button>
         </div>
-        <div class="glass p-10 rounded-[2.5rem] border-white/10 shadow-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <span class="text-red-500 font-bold uppercase text-[20px] pulse">Limited Beta Offer</span>
-                <span class="text-red-500 text-[17px] font-extrabold">58 LEFT</span>
-            </div>
-            <div class="mb-8 border-b border-white/10 pb-6">
-                <div class="flex items-baseline gap-2"><span class="text-7xl font-extrabold text-white">$199</span><span class="text-white font-bold text-xl">/ mo</span></div>
-                <div class="text-gray-400 line-through text-lg font-bold mt-1">$399 Regular Price</div>
-            </div>
-            <ul class="space-y-4 mb-10 text-sm font-semibold text-white uppercase">
-                <li>✅ Price locked for 1 year</li>
-                <li>✅ Unlimited incoming calls</li>
+        <div class="glass p-8 rounded-[2rem] border-white/10">
+            <div class="flex justify-between items-center mb-6"><span class="text-red-500 font-bold uppercase pulse text-xl">Beta Offer</span><span class="text-white font-bold">58 LEFT</span></div>
+            <div class="text-6xl font-black text-white mb-2">$199<span class="text-xl">/mo</span></div>
+            <div class="text-gray-400 line-through mb-8">$399 Regular Price</div>
+            <ul class="space-y-3 mb-8 text-white font-semibold">
+                <li>✅ Price locked for life</li>
                 <li>✅ Zero setup fees</li>
+                <li>✅ Unlimited incoming leads</li>
             </ul>
-            <button onclick="openModal(1)" class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl uppercase tracking-widest text-sm hover:bg-orange-600 transition">Activate Now</button>
+            <button onclick="openModal(1)" class="w-full bg-blue-600 py-4 rounded-xl font-black uppercase text-white hover:bg-blue-700 transition">Get Started</button>
         </div>
     </main>
 
-    <section id="services" class="max-w-7xl mx-auto px-6 py-20 border-t border-white/5">
-        <h2 class="text-3xl lg:text-5xl font-extrabold text-center mb-16 uppercase text-[#3b82f6]">AI Agent Services</h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
-            <div class="glass p-10 rounded-3xl border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">AI Receptionist</div></div>
-            <div class="glass p-10 rounded-3xl border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">AI Booking Agent</div></div>
-            <div class="glass p-10 rounded-3xl border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">AI Sales Agent</div></div>
-            <div class="glass p-10 rounded-3xl border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">AI Support Agent</div></div>
-            <div class="glass p-10 rounded-3xl border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">AI After-Hours</div></div>
-            <div class="glass p-10 rounded-3xl border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">Lead Qualification</div></div>
-        </div>
-    </section>
-
-    <section id="coverage" class="max-w-7xl mx-auto px-12 py-24 border-t border-white/5 text-center">
-        <div class="globe-wrapper">
-            <div class="globe-sphere">
-                <div class="globe-map"></div>
-            </div>
-        </div>
-        <h3 class="text-4xl font-bold uppercase text-[#2d95f7] mb-7">World-Wide Coverage</h3>
-        <div class="inline-block bg-orange-500/10 border border-orange-500/20 text-orange-300 text-[15px] font-black px-8 py-3 rounded-full uppercase mb-12 italic">11 Countries • 4 Continents</div>
-        <div class="flex flex-wrap justify-center gap-4 text-white">
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇺🇸 USA</span>
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇨🇦 Canada</span>
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇲🇽 Mexico</span>
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇬🇧 UK</span>
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇪🇸 Spain</span>
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇫🇷 France</span>
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇮🇪 Ireland</span>
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇦🇺 Australia</span>
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇸🇬 Singapore</span>
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇦🇪 UAE</span>
-            <span class="glass px-6 py-4 rounded-xl font-bold">🇨🇱 Chile</span>
-        </div>
-    </section>
-
-    <section id="how-it-works" class="max-w-7xl mx-auto px-6 py-24 border-t border-white/5">
-        <h2 class="text-3xl lg:text-5xl font-extrabold text-center mb-16 uppercase text-[#3b82f6]">6 Easy Activation Steps</h2>
+    <section id="services" class="max-w-7xl mx-auto px-6 py-16 border-t border-white/5">
+        <h2 class="text-3xl font-black text-center mb-12 uppercase text-blue-500">AI Services</h2>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div onclick="openModal(1)" class="glass p-8 rounded-2xl text-center step-card step-1"><div class="text-[10px] font-bold opacity-60 mb-2 uppercase text-white">Step 01</div><div id="step-txt-1" class="text-xs font-black uppercase text-white">Select Country</div></div>
-            <div onclick="openModal(2)" class="glass p-8 rounded-2xl text-center step-card step-2"><div class="text-[10px] font-bold opacity-60 mb-2 uppercase text-white">Step 02</div><div id="step-txt-2" class="text-xs font-black uppercase text-white">Select Industry</div></div>
-            <div onclick="openModal(3)" class="glass p-8 rounded-2xl text-center step-card step-3"><div class="text-[10px] font-bold opacity-60 mb-2 uppercase text-white">Step 03</div><div id="step-txt-3" class="text-xs font-black uppercase text-white">Select AI Agent</div></div>
-            <div onclick="openModal(4)" class="glass p-8 rounded-2xl text-center step-card step-4"><div class="text-[10px] font-bold opacity-60 mb-2 uppercase text-white">Step 04</div><div id="step-txt-4" class="text-xs font-black uppercase text-white">Company Details</div></div>
-            <div onclick="openModal(5)" class="glass p-8 rounded-2xl text-center step-card step-5"><div class="text-[10px] font-bold opacity-60 mb-2 uppercase text-white">Step 05</div><div id="step-txt-5" class="text-xs font-black uppercase text-white">Live AI Demo</div></div>
-            <div onclick="openModal(6)" class="glass p-8 rounded-2xl text-center step-card step-6"><div class="text-[10px] font-bold opacity-60 mb-2 uppercase text-white">Step 06</div><div id="step-txt-6" class="text-xs font-black uppercase italic text-[#10b981]">Activate Now</div></div>
+            <div class="glass p-6 rounded-xl text-center text-[10px] font-black uppercase text-red-500">Receptionist</div>
+            <div class="glass p-6 rounded-xl text-center text-[10px] font-black uppercase text-red-500">Booking</div>
+            <div class="glass p-6 rounded-xl text-center text-[10px] font-black uppercase text-red-500">Sales</div>
+            <div class="glass p-6 rounded-xl text-center text-[10px] font-black uppercase text-red-500">Support</div>
+            <div class="glass p-6 rounded-xl text-center text-[10px] font-black uppercase text-red-500">After-Hours</div>
+            <div class="glass p-6 rounded-xl text-center text-[10px] font-black uppercase text-red-500">Qualification</div>
         </div>
     </section>
 
-    <footer class="py-20 bg-black/40 border-t border-white/5">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
-            <div class="flex items-center">
-                <img src="assets/logo.png" alt="Logo" class="header-logo">
-                <span class="text-4xl font-extrabold tracking-tighter text-white">AI Call Port</span>
+    <section id="coverage" class="max-w-7xl mx-auto px-6 py-20 border-t border-white/5 text-center">
+        <div class="globe-container">
+            <svg class="globe-map-svg" viewBox="0 0 2000 1000" xmlns="http://www.w3.org/2000/svg">
+                <path d="M150,200 L180,180 L220,200 L250,250 L200,300 L150,280 Z M400,100 L450,80 L500,120 L480,200 L400,180 Z M600,300 L700,280 L750,350 L700,450 L600,400 Z M1150,200 L1180,180 L1220,200 L1250,250 L1200,300 L1150,280 Z M1400,100 L1450,80 L1500,120 L1480,200 L1400,180 Z M1600,300 L1700,280 L1750,350 L1700,450 L1600,400 Z" />
+                <rect x="0" y="400" width="2000" height="2" fill="rgba(255,255,255,0.1)" /> </svg>
+            <div class="globe-overlay"></div>
+        </div>
+        <h3 class="text-4xl font-black uppercase text-blue-400 mb-6">World-Wide Coverage</h3>
+        <div class="text-orange-500 font-black mb-12 uppercase tracking-tighter italic">11 Countries • 4 Continents</div>
+        <div class="flex flex-wrap justify-center gap-3">
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇺🇸 USA</span>
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇨🇦 Canada</span>
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇲🇽 Mexico</span>
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇬🇧 UK</span>
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇪🇸 Spain</span>
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇫🇷 France</span>
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇮🇪 Ireland</span>
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇦🇺 Australia</span>
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇸🇬 Singapore</span>
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇦🇪 UAE</span>
+            <span class="glass px-5 py-3 rounded-lg font-bold text-white text-xs">🇨🇱 Chile</span>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="max-w-7xl mx-auto px-6 py-20 border-t border-white/5">
+        <h2 class="text-3xl font-black text-center mb-12 uppercase text-blue-500">6 Easy Activation Steps</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div onclick="openModal(1)" class="glass p-6 rounded-xl step-card step-1 text-center"><div class="text-[8px] opacity-50 mb-2 uppercase text-white">Step 01</div><div id="step-txt-1" class="text-[10px] font-black text-white uppercase">Country</div></div>
+            <div onclick="openModal(2)" class="glass p-6 rounded-xl step-card step-2 text-center"><div class="text-[8px] opacity-50 mb-2 uppercase text-white">Step 02</div><div id="step-txt-2" class="text-[10px] font-black text-white uppercase">Industry</div></div>
+            <div onclick="openModal(3)" class="glass p-6 rounded-xl step-card step-3 text-center"><div class="text-[8px] opacity-50 mb-2 uppercase text-white">Step 03</div><div id="step-txt-3" class="text-[10px] font-black text-white uppercase">AI Agent</div></div>
+            <div onclick="openModal(4)" class="glass p-6 rounded-xl step-card step-4 text-center"><div class="text-[8px] opacity-50 mb-2 uppercase text-white">Step 04</div><div id="step-txt-4" class="text-[10px] font-black text-white uppercase">Details</div></div>
+            <div onclick="openModal(5)" class="glass p-6 rounded-xl step-card step-5 text-center"><div class="text-[8px] opacity-50 mb-2 uppercase text-white">Step 05</div><div id="step-txt-5" class="text-[10px] font-black text-white uppercase">Demo</div></div>
+            <div onclick="openModal(6)" class="glass p-6 rounded-xl step-card step-6 text-center"><div class="text-[8px] opacity-50 mb-2 uppercase text-white">Step 06</div><div id="step-txt-6" class="text-[10px] font-black text-green-400 uppercase">Activate</div></div>
+        </div>
+    </section>
+
+    <footer class="bg-black/40 py-16 border-t border-white/5 mt-10">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-3xl font-black text-white">AI Call Port</div>
+            <div class="flex gap-8 text-[10px] font-bold uppercase text-gray-500">
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Support</a>
             </div>
-            <div class="flex flex-wrap justify-center gap-10 text-[11px] font-black uppercase text-gray-400">
-                <a href="#" class="hover:text-blue-400">Privacy</a>
-                <a href="#" class="hover:text-blue-400">Terms</a>
-                <a href="#" class="hover:text-blue-400">Contact</a>
-            </div>
-            <p class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">© 2025 AI CALL PORT. ALL RIGHTS RESERVED.</p>
+            <p class="text-[10px] text-gray-700 font-bold uppercase">© 2025 AI CALL PORT TECHNOLOGY</p>
         </div>
     </footer>
 
-    <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4">
-        <div class="glass max-w-lg w-full p-10 rounded-[3rem] border-white/20 relative">
-            <button onclick="closeModal()" class="absolute top-8 right-8 text-white/50 text-3xl">×</button>
-            <h3 id="modal-title" class="text-2xl font-black text-white uppercase mb-8 text-center tracking-tighter"></h3>
-            <div id="modal-content" class="max-h-[60vh] overflow-y-auto px-2"></div>
+    <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4">
+        <div class="glass max-w-md w-full p-8 rounded-3xl border-white/20 relative">
+            <button onclick="closeModal()" class="absolute top-6 right-6 text-white/50 text-2xl">×</button>
+            <h3 id="modal-title" class="text-xl font-black text-white uppercase mb-6 text-center"></h3>
+            <div id="modal-content"></div>
         </div>
     </div>
 
@@ -194,11 +177,11 @@
 
         const config = {
             1: { title: "Select Country", type: "select", options: ["🇺🇸 USA", "🇨🇦 Canada", "🇲🇽 Mexico", "🇬🇧 UK", "🇪🇸 Spain", "🇫🇷 France", "🇮🇪 Ireland", "🇦🇺 Australia", "🇸🇬 Singapore", "🇦🇪 UAE", "🇨🇱 Chile"] },
-            2: { title: "Your Industry", type: "select", options: ["Auto Repair", "Beauty Salon", "Dental", "Plumbing", "Real Estate", "Law Firm"] },
-            3: { title: "Your AI Agent", type: "select", options: ["AI Receptionist", "AI Booking Agent", "AI Sales Closer"] },
-            4: { title: "Company Details", type: "form", fields: ["Company Name", "Business Hours", "Phone Number"] },
-            5: { title: "Voice Demo", type: "select", options: ["Male Voice", "Female Voice", "Request Test Call"] },
-            6: { title: "Final Activation", type: "select", options: ["Pay $199 & Activate"] }
+            2: { title: "Your Industry", type: "select", options: ["Auto Repair", "Beauty Salon", "Dental", "Plumbing", "Law Firm"] },
+            3: { title: "Your AI Agent", type: "select", options: ["Receptionist", "Booking", "Sales"] },
+            4: { title: "Company Details", type: "form", fields: ["Business Name", "Phone Number"] },
+            5: { title: "Voice Demo", type: "select", options: ["Male Voice", "Female Voice"] },
+            6: { title: "Activate", type: "select", options: ["Pay $199 & Launch"] }
         };
 
         function openModal(num) {
@@ -206,12 +189,12 @@
             const step = config[num];
             mTitle.innerText = step.title;
             mContent.innerHTML = '';
-            if (step.type === "select") {
+            if(step.type === "select") {
                 step.options.forEach(opt => {
                     const b = document.createElement('button');
                     b.className = 'option-btn';
                     b.innerText = opt;
-                    b.onclick = () => { finishStep(opt); };
+                    b.onclick = () => finishStep(opt);
                     mContent.appendChild(b);
                 });
             } else {
@@ -221,9 +204,9 @@
                     mContent.appendChild(i);
                 });
                 const sub = document.createElement('button');
-                sub.className = 'w-full bg-orange-500 text-white font-bold py-5 rounded-xl mt-4 uppercase';
-                sub.innerText = 'Save & Continue';
-                sub.onclick = () => { finishStep(mContent.querySelector('input').value); };
+                sub.className = 'w-full bg-blue-600 py-4 rounded-xl font-bold uppercase text-white mt-2';
+                sub.innerText = 'Next';
+                sub.onclick = () => finishStep(mContent.querySelector('input').value);
                 mContent.appendChild(sub);
             }
             modal.classList.add('active');
@@ -234,7 +217,7 @@
             el.innerText = val;
             el.classList.add('text-orange-400');
             closeModal();
-            if(activeStep < 6) setTimeout(() => openModal(activeStep + 1), 500);
+            if(activeStep < 6) setTimeout(() => openModal(activeStep + 1), 400);
         }
 
         function closeModal() { modal.classList.remove('active'); }
