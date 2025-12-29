@@ -7,120 +7,157 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0b0e1a; color: #5c96fa; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
+        body { font-family: 'Inter', sans-serif; background-color: #0b0e1a; color: #5c96fa; margin: 0; }
+        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px); }
         
         /* --- ORBITAL ICON --- */
-        .orbital-global { display: inline-flex; align-items: center; justify-content: center; position: relative; width: 45px; height: 45px; vertical-align: middle; }
-        .orbit-ring { position: absolute; border: 1px solid #3b82f6; border-radius: 50%; width: 100%; height: 40%; transform: rotateX(75deg) rotateY(15deg); animation: orbit-spin 4s linear infinite; }
-        .orbit-ring-alt { position: absolute; border: 1px solid #60a5fa; border-radius: 50%; width: 100%; height: 40%; transform: rotateX(75deg) rotateY(-15deg); animation: orbit-spin 4s linear infinite reverse; }
-        .core-sphere { width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; box-shadow: 0 0 15px #3b82f6; z-index: 2; }
-        @keyframes orbit-spin { 0% { transform: rotateX(75deg) rotateZ(0deg); } 100% { transform: rotateX(75deg) rotateZ(360deg); } }
+        .orbital-global { display: inline-flex; align-items: center; justify-content: center; position: relative; width: 40px; height: 40px; vertical-align: middle; }
+        .orbit-ring { position: absolute; border: 1px solid #3b82f6; border-radius: 50%; width: 100%; height: 40%; transform: rotateX(75deg); animation: orbit-spin 4s linear infinite; }
+        .core-sphere { width: 10px; height: 10px; background: #3b82f6; border-radius: 50%; box-shadow: 0 0 10px #3b82f6; }
+        @keyframes orbit-spin { from { transform: rotateX(75deg) rotateZ(0deg); } to { transform: rotateX(75deg) rotateZ(360deg); } }
 
-        /* --- STRETCH PIPELINE (30% LARGER) --- */
-        .pipeline-track { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; width: 100%; }
-        .step-node { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; border-top: 4px solid rgba(255,255,255,0.1); }
-        .step-node.active-step { border-top-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
-        .step-header { font-size: 13px !important; }
-        .step-value { font-size: 16px !important; }
+        /* --- PIPELINE --- */
+        .pipeline-track { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; width: 100%; }
+        .step-node { border-top: 4px solid rgba(255,255,255,0.1); transition: 0.3s; cursor: pointer; }
+        .active-step { border-top-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        
+        /* --- BUTTONS & TAGS --- */
+        .select-btn { width: 100%; text-align: left; padding: 1.2rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 8px; position: relative; transition: 0.2s; }
+        .select-btn:hover:not(.dev-mode) { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .dev-mode { opacity: 0.3; cursor: not-allowed; }
+        .tag { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; position: absolute; right: 12px; top: 1.2rem; }
+        .tag-active { background: #166534; color: #4ade80; }
+        .tag-dev { background: #334155; color: #94a3b8; }
 
-        /* --- GEMINI BADGE --- */
-        .gemini-badge {
-            background: linear-gradient(90deg, #4285F4, #9B72CB);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 900;
-        }
-
-        /* --- DASHBOARD PREVIEW --- */
-        .dash-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 2rem; }
+        #setup-modal { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; background: rgba(0,0,0,0.9); padding: 20px; }
+        #setup-modal.active { display: flex; }
     </style>
 </head>
-<body class="pb-20">
+<body>
 
-    <nav class="border-b border-white/5 px-8 py-4 flex justify-between items-center sticky top-0 bg-[#0b0e1a]/80 backdrop-blur-md z-50">
+    <nav class="border-b border-white/5 px-8 py-4 flex justify-between items-center bg-[#0b0e1a]">
         <div class="flex items-center gap-3">
-            <div class="text-2xl font-black text-white italic tracking-tighter uppercase">AI CALL PORT</div>
-            <div class="bg-blue-600/20 text-blue-400 text-[9px] px-2 py-1 rounded-md font-bold uppercase tracking-widest border border-blue-500/30">V.2.0 Active</div>
+            <div class="text-xl font-black text-white italic uppercase tracking-tighter">AI CALL PORT</div>
+            <div class="text-[9px] text-blue-400 font-bold border border-blue-500/30 px-2 py-0.5 rounded uppercase">V.2.0 Active</div>
         </div>
-        <div class="hidden md:block text-[10px] font-black uppercase tracking-widest text-gray-500">
-            Powered by <span class="gemini-badge">Google Gemini</span>
+        <div class="text-[10px] font-black uppercase text-gray-500 tracking-widest">
+            Built with <span class="text-white">Google Gemini</span>
         </div>
-        <button onclick="openModal(1)" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase transition-all">Activation Node</button>
     </nav>
 
-    <div class="max-w-[1400px] mx-auto px-8 pt-12">
-        <div class="grid lg:grid-cols-12 gap-12 items-center mb-16">
+    <div class="max-w-[1400px] mx-auto px-8 py-16">
+        <div class="grid lg:grid-cols-12 gap-12 items-center">
             <div class="lg:col-span-8">
-                <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1 rounded-full mb-6">
-                    <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                    <span class="text-[10px] font-black text-white uppercase tracking-widest">Next-Generation Google AI Architecture</span>
+                <div class="inline-block bg-white/5 border border-white/10 px-3 py-1 rounded-full mb-6">
+                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Next-Generation Google AI</span>
                 </div>
-                
-                <h1 class="text-7xl font-black text-white leading-none tracking-tighter mb-6 uppercase">
-                    DEPLOY GLOBAL <br> 
-                    <span class="text-blue-500 italic">AI VOICE AGENTS</span> 
-                    <span class="orbital-global ml-4">
-                        <span class="orbit-ring"></span><span class="orbit-ring-alt"></span><span class="core-sphere"></span>
-                    </span>
+                <h1 class="text-6xl font-black text-white leading-tight uppercase mb-6">
+                    GLOBAL AI <br> <span class="text-blue-500 italic">VOICE AGENTS</span>
+                    <span class="orbital-global ml-2"><span class="orbit-ring"></span><span class="core-sphere"></span></span>
                 </h1>
-                
-                <p class="text-gray-400 text-lg max-w-xl mb-6">Built with Google Gemini. Enterprise-level autonomous reception for trade services and local businesses.</p>
-                
-                <div class="flex items-center gap-6">
-                    <div class="text-green-400 font-black text-xs uppercase tracking-widest flex items-center gap-2">
-                        <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Unlimited Call Volume
-                    </div>
-                    <div class="text-blue-400 font-black text-xs uppercase tracking-widest flex items-center gap-2">
-                        <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span> Zero Latency Path
-                    </div>
+                <p class="text-gray-400 text-lg max-w-xl mb-8">Deploy autonomous receptionists built with Google Gemini. Unlimited call volume for local businesses.</p>
+                <div class="flex gap-4 text-[10px] font-black uppercase text-green-400 tracking-widest">
+                    <span>● Unlimited Volume Activated</span>
+                    <span class="text-blue-400">● Zero Latency Path</span>
                 </div>
             </div>
 
-            <div class="lg:col-span-4 glass p-8 rounded-[2.5rem] border-white/10 text-center relative">
-                <div class="text-[10px] font-black text-blue-400 mb-2 uppercase tracking-widest">Small Biz Fixed Rate</div>
+            <div class="lg:col-span-4 glass p-10 rounded-[2rem] text-center">
+                <div class="text-[10px] font-black text-blue-400 mb-2 uppercase">Business License</div>
                 <div class="text-6xl font-black text-white mb-2">$199<span class="text-xl text-blue-500">/mo</span></div>
-                <p class="text-gray-500 text-[11px] font-bold uppercase mb-6 italic">Built with Google Gemini Models</p>
-                <button onclick="openModal(1)" class="w-full bg-orange-500 p-4 rounded-xl text-white font-black uppercase text-sm shadow-xl hover:scale-105 transition-transform">Start Activation</button>
+                <p class="text-gray-500 text-[10px] font-bold uppercase mb-8">No Contract • Gemini Pro Models</p>
+                <button onclick="openModal(1)" class="w-full bg-orange-600 p-4 rounded-xl text-white font-black uppercase text-sm shadow-xl">Start Activation</button>
             </div>
         </div>
 
-        <div class="mb-20">
+        <div class="mt-20">
             <div class="pipeline-track">
-                <div onclick="openModal(1)" class="step-node p-6 text-center"><div class="step-header font-black text-blue-500 mb-2 uppercase">01. REGION</div><div id="step-txt-1" class="step-value font-bold text-white uppercase">Awaiting</div></div>
-                <div onclick="openModal(2)" class="step-node p-6 text-center"><div class="step-header font-black text-blue-500 mb-2 uppercase">02. INDUSTRY</div><div id="step-txt-2" class="step-value font-bold text-white uppercase">Pending</div></div>
-                <div onclick="openModal(3)" class="step-node p-6 text-center"><div class="step-header font-black text-blue-500 mb-2 uppercase">03. ROLE</div><div id="step-txt-3" class="step-value font-bold text-white uppercase">Pending</div></div>
-                <div onclick="openModal(4)" class="step-node p-6 text-center"><div class="step-header font-black text-blue-500 mb-2 uppercase">04. IDENTITY</div><div id="step-txt-4" class="step-value font-bold text-white uppercase">Pending</div></div>
-                <div onclick="openModal(5)" class="step-node p-6 text-center"><div class="step-header font-black text-blue-500 mb-2 uppercase">05. VOICE</div><div id="step-txt-5" class="step-value font-bold text-white uppercase">Pending</div></div>
-                <div onclick="openModal(6)" class="step-node p-6 text-center border-orange-500/30"><div class="step-header font-black text-orange-500 mb-2 uppercase">06. TEST</div><div id="step-txt-6" class="step-value font-bold text-white uppercase italic">Offline</div></div>
-                <div onclick="openModal(7)" class="step-node p-6 text-center"><div class="step-header font-black text-green-500 mb-2 uppercase">07. DEPLOY</div><div id="step-txt-7" class="step-value font-bold text-green-400 uppercase">Offline</div></div>
+                <div onclick="openModal(1)" class="step-node p-6 text-center"><div class="text-[13px] font-black text-blue-500 mb-1">01. REGION</div><div id="step-txt-1" class="text-[16px] font-bold text-white">Awaiting</div></div>
+                <div onclick="openModal(2)" class="step-node p-6 text-center"><div class="text-[13px] font-black text-blue-500 mb-1">02. INDUSTRY</div><div id="step-txt-2" class="text-[16px] font-bold text-white">Pending</div></div>
+                <div onclick="openModal(3)" class="step-node p-6 text-center"><div class="text-[13px] font-black text-blue-500 mb-1">03. ROLE</div><div id="step-txt-3" class="text-[16px] font-bold text-white">Pending</div></div>
+                <div onclick="openModal(4)" class="step-node p-6 text-center"><div class="text-[13px] font-black text-blue-500 mb-1">04. IDENTITY</div><div id="step-txt-4" class="text-[16px] font-bold text-white">Pending</div></div>
+                <div onclick="openModal(5)" class="step-node p-6 text-center"><div class="text-[13px] font-black text-blue-500 mb-1">05. VOICE</div><div id="step-txt-5" class="text-[16px] font-bold text-white">Pending</div></div>
+                <div onclick="openModal(6)" class="step-node p-6 text-center"><div class="text-[13px] font-black text-orange-500 mb-1">06. TEST</div><div id="step-txt-6" class="text-[16px] font-bold text-white">Offline</div></div>
+                <div onclick="openModal(7)" class="step-node p-6 text-center"><div class="text-[13px] font-black text-green-500 mb-1">07. DEPLOY</div><div id="step-txt-7" class="text-[16px] font-bold text-white">Offline</div></div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-[1400px] mx-auto px-8">
-        <div class="dash-card p-12 border-blue-500/20 bg-blue-500/5 relative overflow-hidden">
-            <div class="absolute inset-0 z-10 bg-[#0b0e1a]/40 backdrop-blur-[2px] flex items-center justify-center flex-col text-center">
-                <div class="bg-blue-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-2xl mb-4">Post-Activation Management</div>
-                <p class="text-white text-sm font-bold opacity-80 italic">Dashboards are custom-tuned to your Industry selection.</p>
-            </div>
-            <div class="grid lg:grid-cols-4 gap-4 opacity-20">
-                <div class="h-32 bg-white/5 border border-white/10 rounded-2xl"></div>
-                <div class="h-32 bg-white/5 border border-white/10 rounded-2xl"></div>
-                <div class="h-32 bg-white/5 border border-white/10 rounded-2xl"></div>
-                <div class="h-32 bg-white/5 border border-white/10 rounded-2xl"></div>
-            </div>
+    <div id="setup-modal">
+        <div class="glass max-w-lg w-full p-10 rounded-[2rem] border-white/20 relative shadow-2xl">
+            <button onclick="closeModal()" class="absolute top-6 right-8 text-white text-2xl hover:opacity-50">&times;</button>
+            <h3 id="modal-title" class="text-xl font-black text-white uppercase mb-8 text-center"></h3>
+            <div id="modal-content" class="max-h-[400px] overflow-y-auto pr-2"></div>
         </div>
     </div>
 
-    <footer class="mt-20 pb-10 text-center border-t border-white/5 pt-10">
-        <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em]">
-            Infrastructure built with <span class="gemini-badge">Google Gemini</span> &bull; Next-Gen AI
-        </p>
-    </footer>
+    <script>
+        const modal = document.getElementById('setup-modal');
+        const mTitle = document.getElementById('modal-title');
+        const mContent = document.getElementById('modal-content');
+        let activeStep = 1;
 
-    <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-4">
-        </div>
+        const config = {
+            1: { title: "Region Selection", data: [
+                {n:"USA", s:"Active"}, {n:"UK", s:"Active"}, {n:"Canada", s:"Active"}, {n:"Australia", s:"Active"},
+                {n:"Germany", s:"Dev"}, {n:"France", s:"Dev"}, {n:"Japan", s:"Dev"}, {n:"Brazil", s:"Dev"}
+            ]},
+            2: { title: "Business Industry", data: [
+                {n:"HVAC & Plumbing", s:"Active"}, {n:"Law Firms", s:"Active"}, {n:"Dental Clinics", s:"Active"}, {n:"Real Estate", s:"Active"},
+                {n:"Retail", s:"Dev"}, {n:"Restaurants", s:"Dev"}, {n:"E-commerce", s:"Dev"}, {n:"Fitness", s:"Dev"}
+            ]},
+            3: { title: "Agent Role", data: ["Receptionist", "Appointment Booker", "Lead Qualifier"] },
+            4: { title: "Identity", type: "form", fields: ["Business Name", "Cell Number"] },
+            5: { title: "Voice Profile", data: ["Warm Professional", "Friendly Assistant", "Clear Corporate"] },
+            6: { title: "Live Test", type: "demo" },
+            7: { title: "Activation", type: "activation" }
+        };
 
+        function openModal(num) {
+            activeStep = num;
+            const step = config[num];
+            mTitle.innerText = step.title;
+            mContent.innerHTML = '';
+
+            if (activeStep <= 2) {
+                step.data.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = `select-btn ${item.s === 'Dev' ? 'dev-mode' : ''}`;
+                    btn.innerHTML = `
+                        <span class="text-white font-bold text-sm uppercase">${item.n}</span>
+                        <span class="tag ${item.s === 'Dev' ? 'tag-dev' : 'tag-active'}">${item.s === 'Dev' ? 'IN DEV' : 'ACTIVE'}</span>
+                    `;
+                    if(item.s !== 'Dev') btn.onclick = () => finishStep(item.n);
+                    mContent.appendChild(btn);
+                });
+            } else if (Array.isArray(step.data)) {
+                step.data.forEach(opt => {
+                    const b = document.createElement('button');
+                    b.className = 'select-btn';
+                    b.innerHTML = `<span class="text-white font-bold text-sm uppercase">${opt}</span>`;
+                    b.onclick = () => finishStep(opt);
+                    mContent.appendChild(b);
+                });
+            } else if (step.type === "form") {
+                step.fields.forEach(f => {
+                    mContent.innerHTML += `<input type="text" placeholder="${f}" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 outline-none">`;
+                });
+                mContent.innerHTML += `<button onclick="finishStep('Synced')" class="w-full bg-blue-600 p-4 rounded-xl text-white font-black uppercase text-xs">Verify Identity</button>`;
+            } else {
+                mContent.innerHTML = `<button onclick="finishStep('Live')" class="w-full bg-green-600 p-4 rounded-xl text-white font-black uppercase text-xs">Activate Node</button>`;
+            }
+            modal.classList.add('active');
+        }
+
+        function finishStep(val) {
+            const el = document.getElementById(`step-txt-${activeStep}`);
+            el.innerText = val;
+            el.parentElement.classList.add('active-step');
+            closeModal();
+            if(activeStep < 7) setTimeout(() => openModal(activeStep + 1), 300);
+        }
+
+        function closeModal() { modal.classList.remove('active'); }
+    </script>
 </body>
 </html>
