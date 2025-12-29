@@ -25,21 +25,38 @@
         .pulse { animation: pulse-animation 2s infinite; }
         @keyframes pulse-animation { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* Globe Animation */
-        .globe-container { position: relative; width: 280px; height: 280px; margin: 0 auto; perspective: 1000px; }
-        .globe { 
-            width: 100%; height: 100%; border-radius: 50%; 
-            background: radial-gradient(circle at 30% 30%, #3b82f6, #0c0e1a);
-            box-shadow: inset -20px -20px 50px #000, 0 0 40px rgba(59, 130, 246, 0.4);
-            position: relative; overflow: hidden;
+        /* --- NEW 3D ANIMATED GLOBE --- */
+        .globe-wrapper {
+            position: relative; width: 300px; height: 300px; margin: 0 auto 50px;
+            perspective: 1000px;
         }
-        .globe::before {
-            content: ""; position: absolute; width: 200%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/world-map.png');
-            background-size: contain; opacity: 0.4;
-            animation: rotateGlobe 20s linear infinite;
+        .globe-sphere {
+            position: relative; width: 100%; height: 100%;
+            border-radius: 50%;
+            background: #0f172a;
+            box-shadow: inset -30px -30px 50px #000, 0 0 60px rgba(59, 130, 246, 0.3);
+            overflow: hidden;
         }
-        @keyframes rotateGlobe { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        /* The rotating map layer */
+        .globe-map {
+            position: absolute; width: 200%; height: 100%;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/1024px-Blue_Marble_2002.png'); /* High-res backup */
+            background-size: cover;
+            opacity: 0.4;
+            animation: rotateMap 20s linear infinite;
+        }
+        /* Grid overlay for tech look */
+        .globe-grid {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(59, 130, 246, 0.2) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(59, 130, 246, 0.2) 1px, transparent 1px);
+            background-size: 20px 20px;
+            border-radius: 50%;
+        }
+        @keyframes rotateMap {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
 
         /* Modal & Form Styling */
         #setup-modal { display: none; }
@@ -47,7 +64,6 @@
         .option-btn { width: 100%; padding: 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; text-align: left; color: white; transition: all 0.2s; font-size: 14px; margin-bottom: 8px; }
         .option-btn:hover { background: rgba(255,255,255,0.1); border-color: #3b82f6; }
         input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; color: white; outline: none; margin-bottom: 12px; }
-        input:focus { border-color: #f97316; }
     </style>
 </head>
 <body>
@@ -79,15 +95,11 @@
 
     <main class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 py-16 lg:py-24 items-center">
         <div>
-            <h1 class="hero-title text-5xl lg:text-7xl font-extrabold mb-8 text-white">
-                AI Call Port <span class="text-blue-400">is an instant connector for small businesses.</span>
-            </h1>
-            <p class="text-red-500 text-lg mb-10 leading-relaxed max-w-xl font-bold uppercase">
-                Connect your business phone in <a href="#how-it-works" class="text-orange-400 border-b-2 border-orange-400/30">SIX EASY STEPS</a>. Answer every lead 24/7.
-            </p>
+            <h1 class="hero-title text-5xl lg:text-7xl font-extrabold mb-8 text-white">AI Call Port <span class="text-blue-400">is an instant connector for small businesses.</span></h1>
+            <p class="text-red-500 text-lg mb-10 leading-relaxed max-w-xl font-bold uppercase">Connect your business phone in <a href="#how-it-works" class="text-orange-400 border-b-2 border-orange-400/30">SIX EASY STEPS</a>.</p>
             <button onclick="openModal(1)" class="bg-orange-500 text-white px-10 py-5 rounded-xl font-black text-sm uppercase hover:bg-orange-600 shadow-2xl transition">Get Started Now</button>
         </div>
-        <div id="pricing" class="glass p-10 rounded-[2.5rem] border-white/10 relative">
+        <div class="glass p-10 rounded-[2.5rem] border-white/10">
             <div class="flex justify-between items-center mb-6">
                 <span class="text-red-500 font-bold uppercase text-[20px] pulse">Limited Beta Offer</span>
                 <span class="text-red-500 text-[17px] font-extrabold">58 LEFT</span>
@@ -97,28 +109,31 @@
                 <div class="text-gray-400 line-through text-lg font-bold mt-1">$399 Regular Price</div>
             </div>
             <ul class="space-y-4 mb-10 text-sm font-semibold text-white uppercase"><li>✅ Price locked for 1 year</li><li>✅ Unlimited incoming calls</li><li>✅ Zero setup fees</li></ul>
-            <button onclick="openModal(1)" class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl uppercase tracking-widest text-sm hover:bg-orange-600 transition shadow-xl">Activate Now</button>
+            <button onclick="openModal(1)" class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl uppercase tracking-widest text-sm hover:bg-orange-600 transition">Activate Now</button>
         </div>
     </main>
 
     <section id="services" class="max-w-7xl mx-auto px-6 py-20 border-t border-white/5">
         <h2 class="text-3xl lg:text-5xl font-extrabold text-center mb-16 uppercase text-[#3b82f6]">AI Agent Services</h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-            <div class="glass p-10 rounded-3xl text-center border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">AI Receptionist</div></div>
-            <div class="glass p-10 rounded-3xl text-center border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">AI Booking Agent</div></div>
-            <div class="glass p-10 rounded-3xl text-center border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">AI Sales Agent</div></div>
-            <div class="glass p-10 rounded-3xl text-center border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">AI Support Agent</div></div>
-            <div class="glass p-10 rounded-3xl text-center border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">AI After-Hours Agent</div></div>
-            <div class="glass p-10 rounded-3xl text-center border-white/5 hover:border-blue-500/50 transition"><div class="text-red-500 font-black text-sm uppercase">Lead Qualification</div></div>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
+            <div class="glass p-10 rounded-3xl border-white/5"><div class="text-red-500 font-black text-sm uppercase">AI Receptionist</div></div>
+            <div class="glass p-10 rounded-3xl border-white/5"><div class="text-red-500 font-black text-sm uppercase">AI Booking Agent</div></div>
+            <div class="glass p-10 rounded-3xl border-white/5"><div class="text-red-500 font-black text-sm uppercase">AI Sales Agent</div></div>
+            <div class="glass p-10 rounded-3xl border-white/5"><div class="text-red-500 font-black text-sm uppercase">AI Support Agent</div></div>
+            <div class="glass p-10 rounded-3xl border-white/5"><div class="text-red-500 font-black text-sm uppercase">AI After-Hours</div></div>
+            <div class="glass p-10 rounded-3xl border-white/5"><div class="text-red-500 font-black text-sm uppercase">Lead Qualification</div></div>
         </div>
     </section>
 
     <section id="coverage" class="max-w-7xl mx-auto px-12 py-24 border-t border-white/5 text-center">
-        <div class="globe-container mb-12">
-            <div class="globe"></div>
+        <div class="globe-wrapper">
+            <div class="globe-sphere">
+                <div class="globe-map"></div>
+                <div class="globe-grid"></div>
+            </div>
         </div>
         <h3 class="text-4xl font-bold uppercase text-[#2d95f7] mb-7">World-Wide Coverage</h3>
-        <div class="inline-block bg-orange-500/10 border border-orange-500/20 text-orange-300 text-[15px] font-black px-8 py-3 rounded-full uppercase mb-12 italic tracking-tighter">11 Countries • 4 Continents</div>
+        <div class="inline-block bg-orange-500/10 border border-orange-500/20 text-orange-300 text-[15px] font-black px-8 py-3 rounded-full uppercase mb-12">11 Countries • 4 Continents</div>
         <div class="flex flex-wrap justify-center gap-4 text-white">
             <span class="glass px-6 py-4 rounded-xl font-bold">🇺🇸 USA</span>
             <span class="glass px-6 py-4 rounded-xl font-bold">🇨🇦 Canada</span>
@@ -147,30 +162,25 @@
     </section>
 
     <footer class="py-20 bg-black/40 border-t border-white/5">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-10">
-                <div class="flex items-center">
-                    <img src="assets/logo.png" alt="Logo" class="header-logo">
-                    <span class="text-4xl font-extrabold tracking-tighter text-white">AI Call Port</span>
-                </div>
-                <div class="flex flex-wrap justify-center gap-10 text-[11px] font-black uppercase tracking-widest text-gray-400">
-                    <a href="#" class="hover:text-blue-400 transition">Privacy</a>
-                    <a href="#" class="hover:text-blue-400 transition">Terms</a>
-                    <a href="#" class="hover:text-blue-400 transition">Cookies</a>
-                    <a href="#" class="hover:text-blue-400 transition">Contact</a>
-                </div>
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
+            <div class="flex items-center">
+                <img src="assets/logo.png" alt="Logo" class="header-logo">
+                <span class="text-4xl font-extrabold tracking-tighter text-white">AI Call Port</span>
             </div>
-            <div class="mt-12 pt-8 border-t border-white/5 text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">
-                © 2025 AI CALL PORT TECHNOLOGY GROUP. ALL RIGHTS RESERVED.
+            <div class="flex flex-wrap justify-center gap-10 text-[11px] font-black uppercase text-gray-400">
+                <a href="#" class="hover:text-blue-400">Privacy</a>
+                <a href="#" class="hover:text-blue-400">Terms</a>
+                <a href="#" class="hover:text-blue-400">Contact</a>
             </div>
+            <p class="text-[10px] text-gray-600 font-bold uppercase">© 2025 AI CALL PORT. ALL RIGHTS RESERVED.</p>
         </div>
     </footer>
 
     <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4">
-        <div class="glass max-w-lg w-full p-10 rounded-[3rem] border-white/20 relative shadow-2xl">
-            <button onclick="closeModal()" class="absolute top-8 right-8 text-white/50 text-3xl hover:text-white transition">×</button>
-            <h3 id="modal-title" class="text-2xl font-black text-white uppercase mb-8 text-center tracking-tighter"></h3>
-            <div id="modal-content" class="max-h-[60vh] overflow-y-auto px-2"></div>
+        <div class="glass max-w-lg w-full p-10 rounded-[3rem] border-white/20 relative">
+            <button onclick="closeModal()" class="absolute top-8 right-8 text-white/50 text-3xl">×</button>
+            <h3 id="modal-title" class="text-2xl font-black text-white uppercase mb-8 text-center"></h3>
+            <div id="modal-content" class="max-h-[60vh] overflow-y-auto"></div>
         </div>
     </div>
 
@@ -182,11 +192,11 @@
 
         const config = {
             1: { title: "Select Country", type: "select", options: ["🇺🇸 USA", "🇨🇦 Canada", "🇲🇽 Mexico", "🇬🇧 UK", "🇪🇸 Spain", "🇫🇷 France", "🇮🇪 Ireland", "🇦🇺 Australia", "🇸🇬 Singapore", "🇦🇪 UAE", "🇨🇱 Chile"] },
-            2: { title: "Your Industry", type: "select", options: ["Auto Repair", "Beauty Salon", "Dental", "Plumbing", "Real Estate", "Law Firm", "E-commerce"] },
-            3: { title: "Your AI Agent", type: "select", options: ["AI Receptionist", "AI Booking Agent", "AI Sales Closer", "AI Customer Support"] },
-            4: { title: "Company Info", type: "form", fields: ["Company Name", "Business Hours (e.g. 9-5)", "Phone Number"] },
-            5: { title: "Voice Demo", type: "select", options: ["Listen to Male Voice", "Listen to Female Voice", "Get a Test Call"] },
-            6: { title: "Final Activation", type: "select", options: ["Lock In Beta Pricing ($199)", "Contact Sales"] }
+            2: { title: "Your Industry", type: "select", options: ["Auto Repair", "Beauty Salon", "Dental", "Plumbing", "Real Estate", "Law Firm"] },
+            3: { title: "Your AI Agent", type: "select", options: ["AI Receptionist", "AI Booking Agent", "AI Sales Closer"] },
+            4: { title: "Company Info", type: "form", fields: ["Company Name", "Business Hours", "Phone Number"] },
+            5: { title: "Voice Demo", type: "select", options: ["Male Voice", "Female Voice"] },
+            6: { title: "Activation", type: "select", options: ["Lock In $199"] }
         };
 
         function openModal(num) {
@@ -194,7 +204,6 @@
             const step = config[num];
             mTitle.innerText = step.title;
             mContent.innerHTML = '';
-
             if (step.type === "select") {
                 step.options.forEach(opt => {
                     const b = document.createElement('button');
@@ -207,33 +216,25 @@
                 step.fields.forEach(f => {
                     const i = document.createElement('input');
                     i.placeholder = f;
-                    i.id = `input-${f.replace(/\s+/g, '')}`;
                     mContent.appendChild(i);
                 });
                 const sub = document.createElement('button');
-                sub.className = 'w-full bg-orange-500 text-white font-bold py-5 rounded-xl mt-4 uppercase shadow-lg';
-                sub.innerText = 'Continue to Next Step';
-                sub.onclick = () => {
-                    const val = mContent.querySelector('input').value;
-                    if(!val) return alert("Please complete the form");
-                    finishStep(val);
-                };
+                sub.className = 'w-full bg-orange-500 text-white font-bold py-5 rounded-xl mt-4 uppercase';
+                sub.innerText = 'Save & Continue';
+                sub.onclick = () => { finishStep(mContent.querySelector('input').value); };
                 mContent.appendChild(sub);
             }
             modal.classList.add('active');
         }
 
         function finishStep(val) {
-            const label = document.getElementById(`step-txt-${activeStep}`);
-            label.innerText = val;
-            label.classList.add('text-orange-400');
+            document.getElementById(`step-txt-${activeStep}`).innerText = val;
+            document.getElementById(`step-txt-${activeStep}`).classList.add('text-orange-400');
             closeModal();
             if(activeStep < 6) setTimeout(() => openModal(activeStep + 1), 500);
-            else alert("Configuration saved! Redirecting to payment...");
         }
 
         function closeModal() { modal.classList.remove('active'); }
-        window.onclick = (e) => { if(e.target == modal) closeModal(); }
     </script>
 </body>
 </html>
