@@ -3,163 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Call Port | Dashboard Active</title>
+    <title>AI Call Port | Google Gemini Designed</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0b0e1a; color: #5c96fa; margin: 0; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
-        .gemini-gradient { background: linear-gradient(90deg, #4285F4, #9B72CB); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* --- PIPELINE ANIMATION --- */
-        .pipeline-track { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
-        .step-node { border-top: 4px solid rgba(255,255,255,0.1); transition: 0.4s; cursor: pointer; }
-        .active-step { border-top-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
+        /* --- GEMINI NEURAL WAVE ICON --- */
+        .neural-container { display: flex; align-items: center; gap: 8px; height: 30px; }
+        .wave-bar { width: 3px; height: 100%; background: linear-gradient(to bottom, #4285F4, #9B72CB); border-radius: 10px; animation: neural-wave 1.2s ease-in-out infinite; }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        @keyframes neural-wave { 0%, 100% { height: 10px; } 50% { height: 30px; } }
 
-        /* --- DASHBOARD ELEMENTS --- */
-        #main-dashboard { display: none; opacity: 0; transition: opacity 1s ease-in; }
-        #main-dashboard.visible { display: block; opacity: 1; }
-        .stat-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1.5rem; }
-        .pulse { animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse-ring { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        /* --- PIPELINE (30% LARGER) --- */
+        .pipeline-track { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; width: 100%; }
+        .step-node { transition: 0.4s; cursor: pointer; border-top: 4px solid rgba(255,255,255,0.1); padding: 24px 10px; text-align: center; }
+        .step-node.active-step { border-top-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
+        .step-header { font-size: 13px !important; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; }
+        .step-value { font-size: 16px !important; font-weight: 700; color: white; text-transform: uppercase; }
 
         /* --- MODAL --- */
-        #setup-modal { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; background: rgba(0,0,0,0.9); padding: 20px; }
+        #setup-modal { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); padding: 20px; }
         #setup-modal.active { display: flex; }
-        .select-btn { width: 100%; text-align: left; padding: 1rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 8px; position: relative; }
-        .dev-mode { opacity: 0.3; cursor: not-allowed; }
+        .select-btn { width: 100%; text-align: left; padding: 1.25rem; border: 1px solid rgba(255,255,255,0.05); border-radius: 1rem; margin-bottom: 0.5rem; position: relative; }
+        .tag-active { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; background: #166534; color: #4ade80; position: absolute; right: 12px; top: 1.25rem; }
+        .tag-dev { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; background: #334155; color: #94a3b8; position: absolute; right: 12px; top: 1.25rem; opacity: 0.6; }
     </style>
 </head>
-<body class="pb-20">
+<body>
 
-    <nav class="border-b border-white/5 px-8 py-4 flex justify-between items-center sticky top-0 bg-[#0b0e1a]/80 backdrop-blur-md z-50">
+    <nav class="border-b border-white/5 px-8 py-4 flex justify-between items-center bg-[#0b0e1a]">
         <div class="flex items-center gap-3">
-            <div class="text-xl font-black text-white italic uppercase tracking-tighter">AI CALL PORT</div>
-            <div id="status-tag" class="text-[9px] text-orange-400 font-bold border border-orange-500/30 px-2 py-0.5 rounded uppercase">Setup Mode</div>
+            <div class="text-2xl font-black text-white italic tracking-tighter uppercase">AI CALL PORT</div>
+            <div class="bg-blue-600/20 text-blue-400 text-[9px] px-2 py-1 rounded-md font-bold uppercase tracking-widest border border-blue-500/30">V.2.0 Active</div>
         </div>
         <div class="text-[10px] font-black uppercase tracking-widest text-gray-500">
-            System: <span class="gemini-gradient">Google Gemini Next-Gen</span>
+            Google Gemini <span class="text-white">Designed</span>
         </div>
     </nav>
 
-    <div id="setup-section" class="max-w-[1400px] mx-auto px-8 py-12">
+    <div class="max-w-[1400px] mx-auto px-8 pt-16">
         <div class="grid lg:grid-cols-12 gap-12 items-center mb-16">
             <div class="lg:col-span-8">
+                <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full mb-6">
+                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Next-Generation Google AI Architecture</span>
+                </div>
                 <h1 class="text-7xl font-black text-white leading-none tracking-tighter mb-6 uppercase">
-                    ACTIVATE YOUR <br> <span class="text-blue-500 italic">AI OPERATOR</span>
+                    GLOBAL AI <br> <span class="text-blue-500 italic">VOICE AGENTS</span>
                 </h1>
-                <p class="text-gray-400 text-lg max-w-xl">Complete the 7-step neural handshake to deploy your Gemini-powered agent.</p>
+                <p class="text-gray-400 text-lg max-w-xl">Fully autonomous reception and appointment booking. Built on Google Gemini for enterprise-grade intelligence.</p>
             </div>
-            <div class="lg:col-span-4 glass p-8 rounded-[2.5rem] text-center">
-                <div class="text-5xl font-black text-white mb-2">$199<span class="text-xl text-blue-500">/mo</span></div>
-                <button onclick="openModal(1)" class="w-full bg-blue-600 p-4 rounded-xl text-white font-black uppercase text-sm mt-4">Begin Handshake</button>
+            
+            <div class="lg:col-span-4 glass p-10 rounded-[2.5rem] text-center border-white/10">
+                <div class="text-6xl font-black text-white mb-2">$199<span class="text-xl text-blue-500">/mo</span></div>
+                <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-6">Gemini Pro • Unlimited Volume</p>
+                <button onclick="openModal(1)" class="w-full bg-orange-600 p-4 rounded-xl text-white font-black uppercase text-sm shadow-xl hover:scale-105 transition-transform">Begin Activation</button>
             </div>
         </div>
 
-        <div class="pipeline-track mb-20">
-            <div onclick="openModal(1)" id="step-1" class="step-node p-6 text-center"><div class="text-[11px] font-black text-blue-500 uppercase">Region</div><div id="txt-1" class="text-white font-bold">---</div></div>
-            <div onclick="openModal(2)" id="step-2" class="step-node p-6 text-center"><div class="text-[11px] font-black text-blue-500 uppercase">Industry</div><div id="txt-2" class="text-white font-bold">---</div></div>
-            <div onclick="openModal(3)" id="step-3" class="step-node p-6 text-center"><div class="text-[11px] font-black text-blue-500 uppercase">Role</div><div id="txt-3" class="text-white font-bold">---</div></div>
-            <div onclick="openModal(4)" id="step-4" class="step-node p-6 text-center"><div class="text-[11px] font-black text-blue-500 uppercase">Identity</div><div id="txt-4" class="text-white font-bold">---</div></div>
-            <div onclick="openModal(5)" id="step-5" class="step-node p-6 text-center"><div class="text-[11px] font-black text-blue-500 uppercase">Voice</div><div id="txt-5" class="text-white font-bold">---</div></div>
-            <div onclick="openModal(6)" id="step-6" class="step-node p-6 text-center"><div class="text-[11px] font-black text-orange-500 uppercase">Test</div><div id="txt-6" class="text-white font-bold">---</div></div>
-            <div onclick="openModal(7)" id="step-7" class="step-node p-6 text-center"><div class="text-[11px] font-black text-green-500 uppercase">Deploy</div><div id="txt-7" class="text-white font-bold">---</div></div>
+        <div class="pipeline-track mb-24">
+            <div onclick="openModal(1)" id="step-1" class="step-node"><div class="step-header text-blue-500">01. Region</div><div id="txt-1" class="step-value">Awaiting</div></div>
+            <div onclick="openModal(2)" id="step-2" class="step-node"><div class="step-header text-blue-500">02. Industry</div><div id="txt-2" class="step-value">Pending</div></div>
+            <div onclick="openModal(3)" id="step-3" class="step-node"><div class="step-header text-blue-500">03. Role</div><div id="txt-3" class="step-value">Pending</div></div>
+            <div onclick="openModal(4)" id="step-4" class="step-node"><div class="step-header text-blue-500">04. Identity</div><div id="txt-4" class="step-value">Pending</div></div>
+            <div onclick="openModal(5)" id="step-5" class="step-node"><div class="step-header text-blue-500">05. Voice</div><div id="txt-5" class="step-value">Pending</div></div>
+            <div onclick="openModal(6)" id="step-6" class="step-node"><div class="step-header text-orange-500">06. Test</div><div id="txt-6" class="step-value">Offline</div></div>
+            <div onclick="openModal(7)" id="step-7" class="step-node"><div class="step-header text-green-500">07. Deploy</div><div id="txt-7" class="step-value">Offline</div></div>
         </div>
-    </div>
 
-    <div id="main-dashboard" class="max-w-[1400px] mx-auto px-8 py-12">
-        <div class="flex justify-between items-end mb-10">
-            <div>
-                <h2 class="text-4xl font-black text-white uppercase tracking-tighter">Command Center</h2>
-                <p class="text-blue-400 font-bold text-xs uppercase tracking-widest">Live Gemini Neural Feed</p>
-            </div>
-            <div class="flex gap-4">
-                <div class="glass px-4 py-2 rounded-xl text-[10px] font-bold text-green-400 uppercase flex items-center gap-2">
-                    <span class="w-2 h-2 bg-green-500 rounded-full pulse"></span> Agent Online
+        <div class="glass p-12 rounded-[3rem] border-white/5 relative overflow-hidden mb-20">
+            <div class="flex items-center gap-6 mb-8">
+                <div class="neural-container">
+                    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                </div>
+                <div>
+                    <h3 class="text-white font-black uppercase text-sm">Gemini Neural Interface</h3>
+                    <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Awaiting System Deployment...</p>
                 </div>
             </div>
-        </div>
-
-        <div class="grid md:grid-cols-4 gap-6 mb-10">
-            <div class="stat-card">
-                <div class="text-[10px] font-black text-gray-500 uppercase mb-2">Total Calls (24h)</div>
-                <div class="text-4xl font-black text-white">1,284</div>
-                <div class="text-[10px] text-green-400 mt-2">↑ 12% vs yesterday</div>
-            </div>
-            <div class="stat-card">
-                <div class="text-[10px] font-black text-gray-500 uppercase mb-2">Resolution Rate</div>
-                <div class="text-4xl font-black text-white">94.2%</div>
-                <div class="text-[10px] text-blue-400 mt-2">Gemini Optimized</div>
-            </div>
-            <div class="stat-card">
-                <div class="text-[10px] font-black text-gray-500 uppercase mb-2">Avg. Latency</div>
-                <div class="text-4xl font-black text-white">240<span class="text-lg">ms</span></div>
-                <div class="text-[10px] text-purple-400 mt-2">Global Edge Node</div>
-            </div>
-            <div class="stat-card border-blue-500/30 bg-blue-500/5">
-                <div class="text-[10px] font-black text-blue-400 uppercase mb-2">Current Cost</div>
-                <div class="text-4xl font-black text-white">$199</div>
-                <div class="text-[10px] text-gray-500 mt-2 italic">Unlimited Volume Plan</div>
-            </div>
-        </div>
-
-        <div class="grid lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 glass rounded-[2rem] p-8">
-                <h3 class="text-white font-black uppercase text-sm mb-6">Live Interception Log</h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5">
-                        <div>
-                            <div class="text-white font-bold text-sm">+1 (555) 0192</div>
-                            <div class="text-[10px] text-gray-500 uppercase">Appointment Booked • 2m 14s</div>
-                        </div>
-                        <div class="text-[10px] font-black text-green-400 uppercase">Success</div>
-                    </div>
-                    <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5 opacity-60">
-                        <div>
-                            <div class="text-white font-bold text-sm">+1 (555) 0843</div>
-                            <div class="text-[10px] text-gray-500 uppercase">Inquiry Resolved • 1m 05s</div>
-                        </div>
-                        <div class="text-[10px] font-black text-green-400 uppercase">Success</div>
-                    </div>
-                </div>
-            </div>
-            <div class="glass rounded-[2rem] p-8">
-                <h3 class="text-white font-black uppercase text-sm mb-6">Agent Configuration</h3>
-                <div class="space-y-6">
-                    <div>
-                        <div class="text-[9px] text-gray-500 uppercase font-black">Active Region</div>
-                        <div id="dash-region" class="text-blue-400 font-bold uppercase">Not Set</div>
-                    </div>
-                    <div>
-                        <div class="text-[9px] text-gray-500 uppercase font-black">Industry Engine</div>
-                        <div id="dash-industry" class="text-blue-400 font-bold uppercase">Not Set</div>
-                    </div>
-                    <button class="w-full border border-blue-500/30 p-3 rounded-xl text-[10px] font-black text-blue-400 uppercase hover:bg-blue-500/10 transition">Update Script</button>
-                </div>
+            <div class="grid lg:grid-cols-3 gap-8 opacity-20">
+                <div class="h-32 bg-white/5 rounded-2xl border border-white/10"></div>
+                <div class="h-32 bg-white/5 rounded-2xl border border-white/10"></div>
+                <div class="h-32 bg-white/5 rounded-2xl border border-white/10"></div>
             </div>
         </div>
     </div>
 
     <div id="setup-modal">
         <div class="glass max-w-lg w-full p-10 rounded-[2.5rem] relative">
+            <button onclick="closeModal()" class="absolute top-6 right-8 text-white text-2xl hover:opacity-50">&times;</button>
             <h3 id="modal-title" class="text-white font-black uppercase text-center mb-8"></h3>
-            <div id="modal-content"></div>
+            <div id="modal-content" class="max-h-[400px] overflow-y-auto pr-2"></div>
         </div>
     </div>
 
     <script>
         const config = {
-            1: { title: "Region", data: [{n:"USA", s:"Active"}, {n:"UK", s:"Active"}, {n:"Germany", s:"Dev"}, {n:"Japan", s:"Dev"}] },
-            2: { title: "Industry", data: [{n:"HVAC", s:"Active"}, {n:"Law", s:"Active"}, {n:"Retail", s:"Dev"}] },
-            3: { title: "Role", data: ["Receptionist", "Lead Qualifier"] },
-            4: { title: "Identity", type: "form" },
-            5: { title: "Voice", data: ["Professional", "Friendly"] },
-            6: { title: "Test", type: "test" },
-            7: { title: "Deploy", type: "deploy" }
+            1: { title: "Global Region", data: [{n:"USA", s:"Active"}, {n:"UK", s:"Active"}, {n:"Canada", s:"Active"}, {n:"Australia", s:"Active"}, {n:"Germany", s:"Dev"}, {n:"France", s:"Dev"}] },
+            2: { title: "Business Industry", data: [{n:"HVAC & Plumbing", s:"Active"}, {n:"Law Firms", s:"Active"}, {n:"Dental Clinics", s:"Active"}, {n:"Real Estate", s:"Active"}, {n:"Restaurants", s:"Dev"}] },
+            3: { title: "Agent Role", data: ["Receptionist", "Appointment Booker", "Lead Qualifier"] },
+            4: { title: "Company Identity", type: "form" },
+            5: { title: "Voice Profile", data: ["Warm Professional", "Friendly Assistant", "Clear Corporate"] },
+            6: { title: "Live Test", type: "btn", text: "Simulate Signal" },
+            7: { title: "Final Activation", type: "btn", text: "Deploy Agent" }
         };
 
         let currentStep = 1;
-        let selections = {};
 
         function openModal(step) {
             currentStep = step;
@@ -173,38 +125,32 @@
                     const name = typeof item === 'string' ? item : item.n;
                     const isDev = item.s === 'Dev';
                     const btn = document.createElement('button');
-                    btn.className = `select-btn ${isDev ? 'dev-mode' : ''}`;
-                    btn.innerHTML = `<span class="text-white font-bold uppercase">${name}</span>`;
+                    btn.className = `select-btn ${isDev ? 'opacity-30 cursor-not-allowed' : ''}`;
+                    btn.innerHTML = `<span class="text-white font-bold uppercase text-sm">${name}</span>`;
+                    if(item.s) {
+                        btn.innerHTML += `<span class="${isDev ? 'tag-dev' : 'tag-active'}">${isDev ? 'IN DEV' : 'ACTIVE'}</span>`;
+                    }
                     if(!isDev) btn.onclick = () => saveStep(name);
                     container.appendChild(btn);
                 });
+            } else if(s.type === "form") {
+                container.innerHTML = `
+                    <input type="text" placeholder="Business Name" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-4 outline-none">
+                    <button onclick="saveStep('Synced')" class="w-full bg-blue-600 p-5 rounded-xl text-white font-black uppercase text-xs">Verify Identity</button>`;
             } else {
-                container.innerHTML = `<button onclick="saveStep('Confirmed')" class="w-full bg-blue-600 p-4 rounded-xl text-white font-black uppercase">Complete Step</button>`;
+                container.innerHTML = `<button onclick="saveStep('Live')" class="w-full bg-green-600 p-5 rounded-xl text-white font-black uppercase text-xs">${s.text}</button>`;
             }
             document.getElementById('setup-modal').classList.add('active');
         }
 
         function saveStep(val) {
-            selections[currentStep] = val;
             document.getElementById(`txt-${currentStep}`).innerText = val;
             document.getElementById(`step-${currentStep}`).classList.add('active-step');
-            document.getElementById('setup-modal').classList.remove('active');
-            
-            if(currentStep === 7) activateDashboard();
-            else setTimeout(() => openModal(currentStep + 1), 400);
+            closeModal();
+            if(currentStep < 7) setTimeout(() => openModal(currentStep + 1), 400);
         }
 
-        function activateDashboard() {
-            document.getElementById('setup-section').style.display = 'none';
-            document.getElementById('status-tag').innerText = 'System Live';
-            document.getElementById('status-tag').className = 'text-[9px] text-green-400 font-bold border border-green-500/30 px-2 py-0.5 rounded uppercase';
-            
-            document.getElementById('dash-region').innerText = selections[1];
-            document.getElementById('dash-industry').innerText = selections[2];
-            
-            document.getElementById('main-dashboard').classList.add('visible');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        function closeModal() { document.getElementById('setup-modal').classList.remove('active'); }
     </script>
 </body>
 </html>
