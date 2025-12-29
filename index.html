@@ -10,7 +10,7 @@
         body { font-family: 'Inter', sans-serif; background-color: #0b0e1a; color: #5c96fa; scroll-behavior: smooth; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
         
-        /* --- FUTURISTIC ORBITAL GLOBAL ICON --- */
+        /* --- ORBITAL ICON --- */
         .orbital-global {
             display: inline-flex; align-items: center; justify-content: center;
             position: relative; width: 60px; height: 60px; vertical-align: middle; margin: 0 10px;
@@ -37,8 +37,13 @@
         
         #setup-modal { display: none; }
         #setup-modal.active { display: flex; }
-        .scroll-area { max-height: 400px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #1e40af transparent; }
-        @keyframes sync-load { from { width: 0%; } to { width: 100%; } }
+        .scroll-area { max-height: 450px; overflow-y: auto; padding-right: 10px; }
+        .scroll-area::-webkit-scrollbar { width: 4px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: #1e40af; border-radius: 10px; }
+        
+        /* Service Info Pop-over */
+        #service-detail { display: none; position: absolute; inset: 0; background: #0b0e1a; z-index: 10; border-radius: 3rem; padding: 2.5rem; }
+        #service-detail.active { display: block; }
     </style>
 </head>
 <body>
@@ -47,7 +52,7 @@
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center">
                 <div class="text-3xl font-black tracking-tighter text-white">AI Call Port</div>
-                <span class="ml-4 text-[10px] bg-red-600 text-white px-2 py-1 rounded font-black uppercase">Small Biz Beta</span>
+                <span class="ml-4 text-[10px] bg-red-600 text-white px-2 py-1 rounded font-black uppercase tracking-widest">Small Biz Beta</span>
             </div>
             <button onclick="openModal(1)" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase transition shadow-lg">Start Activation</button>
         </div>
@@ -55,14 +60,14 @@
 
     <div class="max-w-7xl mx-auto px-6 mt-6">
         <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 px-8 rounded-2xl flex justify-between items-center text-[10px] md:text-xs font-black uppercase tracking-tight shadow-xl">
-            <span>🚀 SMALL BIZ SPECIAL: Lock in $199/mo — Two years price protection</span>
+            <span>🚀 SMALL BIZ SPECIAL: Lock in $199/mo — Pay monthly with no contract</span>
             <span class="hidden md:block">● GLOBAL NODE NETWORK: ONLINE</span>
         </div>
     </div>
 
     <main class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 py-12 items-center">
         <div>
-            <div class="inline-block bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-6">Global Small Biz Routing</div>
+            <div class="inline-block bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 tracking-widest">Global Small Biz Routing</div>
             <h1 class="text-6xl lg:text-7xl font-black text-white leading-[0.9] tracking-tighter mb-8">
                 INSTANT AI <br>
                 GLOBAL 
@@ -73,7 +78,7 @@
                 </span><br>
                 RECEPTIONIST.
             </h1>
-            <p class="text-gray-400 text-lg mb-8 max-w-lg leading-relaxed">Deploy a specialized AI agent in 60 seconds that handles your bookings, qualifying, and support. Never miss a customer while you're on the job.</p>
+            <p class="text-gray-400 text-lg mb-8 max-w-lg leading-relaxed">The only AI designed to replace manual phone handling for trade and local services. Capture every lead while you're on-site.</p>
         </div>
         
         <div class="glass p-10 rounded-[3rem] border-white/10 shadow-2xl relative flex flex-col">
@@ -90,9 +95,6 @@
                 <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5"> 
                     <span class="text-green-500 font-black text-lg">✔</span> <span>Price locked for 2 years</span>
                 </div>
-                <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5"> 
-                    <span class="text-green-500 font-black text-lg">✔</span> <span>Cancel any time without penalty</span>
-                </div>
             </div>
             <button onclick="openModal(1)" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-6 rounded-2xl font-black uppercase text-xl shadow-xl transition-all hover:scale-[1.03]">Test Your Agent Now</button>
         </div>
@@ -101,69 +103,33 @@
     <section class="max-w-7xl mx-auto px-6 py-24 border-t border-white/5">
         <h2 class="text-center text-4xl font-black text-white uppercase mb-16 italic tracking-tight">Activation Pipeline</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-            <div onclick="openModal(1)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-blue-500 uppercase mb-2">01</div>
-                <div id="step-txt-1" class="text-[10px] font-black text-white uppercase">Region</div>
-            </div>
-            <div onclick="openModal(2)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-blue-500 uppercase mb-2">02</div>
-                <div id="step-txt-2" class="text-[10px] font-black text-white uppercase">Industry</div>
-            </div>
-            <div onclick="openModal(3)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-blue-500 uppercase mb-2">03</div>
-                <div id="step-txt-3" class="text-[10px] font-black text-white uppercase">Role</div>
-            </div>
-            <div onclick="openModal(4)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-blue-500 uppercase mb-2">04</div>
-                <div id="step-txt-4" class="text-[10px] font-black text-white uppercase">Identity</div>
-            </div>
-            <div onclick="openModal(5)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-blue-500 uppercase mb-2">05</div>
-                <div id="step-txt-5" class="text-[10px] font-black text-white uppercase">Voice</div>
-            </div>
-            <div onclick="openModal(6)" class="glass p-6 rounded-[2rem] step-card text-center border-orange-500 shadow-xl shadow-orange-900/20">
-                <div class="text-[9px] font-black text-orange-500 uppercase mb-2">06</div>
-                <div id="step-txt-6" class="text-[10px] font-black text-white uppercase">Live Demo</div>
-            </div>
-            <div onclick="openModal(7)" class="glass p-6 rounded-[2rem] step-card text-center">
-                <div class="text-[9px] font-black text-green-500 uppercase mb-2">07</div>
-                <div id="step-txt-7" class="text-[10px] font-black text-green-400 uppercase">Live</div>
-            </div>
-        </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto px-6 py-24 border-t border-white/5">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-                <h2 class="text-4xl font-black text-white uppercase italic mb-6">Automated Lead Capture</h2>
-                <p class="text-gray-400 mb-8">Every call handled by your AI is instantly logged, transcribed, and summarized. You'll get a notification with the caller's intent before you even pick up your phone.</p>
-                <div class="space-y-4">
-                    <div class="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/5">
-                        <span class="w-10 h-10 bg-blue-600/20 rounded-full flex items-center justify-center text-blue-400 text-xs">AI</span>
-                        <div>
-                            <div class="text-white text-xs font-bold">New Booking: Residential HVAC Repair</div>
-                            <div class="text-gray-500 text-[10px]">Caller: John Smith • (555) 0123</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="glass p-8 rounded-[2rem] border-white/10">
-                <div class="text-[10px] font-black text-blue-400 uppercase mb-6 tracking-widest">Dashboard Preview</div>
-                <div class="space-y-3">
-                    <div class="h-8 bg-white/5 rounded-lg w-full"></div>
-                    <div class="h-8 bg-white/5 rounded-lg w-3/4"></div>
-                    <div class="h-8 bg-white/5 rounded-lg w-full"></div>
-                    <div class="h-8 bg-white/5 rounded-lg w-1/2"></div>
-                </div>
-            </div>
+            <div onclick="openModal(1)" class="glass p-6 rounded-[2rem] step-card text-center"><div class="text-[9px] font-black text-blue-500 mb-2 uppercase">01</div><div id="step-txt-1" class="text-[10px] font-black text-white uppercase">Region</div></div>
+            <div onclick="openModal(2)" class="glass p-6 rounded-[2rem] step-card text-center"><div class="text-[9px] font-black text-blue-500 mb-2 uppercase">02</div><div id="step-txt-2" class="text-[10px] font-black text-white uppercase">Industry</div></div>
+            <div onclick="openModal(3)" class="glass p-6 rounded-[2rem] step-card text-center"><div class="text-[9px] font-black text-blue-500 mb-2 uppercase">03</div><div id="step-txt-3" class="text-[10px] font-black text-white uppercase">Role</div></div>
+            <div onclick="openModal(4)" class="glass p-6 rounded-[2rem] step-card text-center"><div class="text-[9px] font-black text-blue-500 mb-2 uppercase">04</div><div id="step-txt-4" class="text-[10px] font-black text-white uppercase">Identity</div></div>
+            <div onclick="openModal(5)" class="glass p-6 rounded-[2rem] step-card text-center"><div class="text-[9px] font-black text-blue-500 mb-2 uppercase">05</div><div id="step-txt-5" class="text-[10px] font-black text-white uppercase">Voice</div></div>
+            <div onclick="openModal(6)" class="glass p-6 rounded-[2rem] step-card text-center border-orange-500 shadow-xl shadow-orange-900/10"><div class="text-[9px] font-black text-orange-500 mb-2 uppercase">06</div><div id="step-txt-6" class="text-[10px] font-black text-white uppercase">Demo Call</div></div>
+            <div onclick="openModal(7)" class="glass p-6 rounded-[2rem] step-card text-center"><div class="text-[9px] font-black text-green-500 mb-2 uppercase">07</div><div id="step-txt-7" class="text-[10px] font-black text-green-400 uppercase">Live</div></div>
         </div>
     </section>
 
     <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-4">
-        <div class="glass max-w-lg w-full p-10 rounded-[3rem] border-white/20 relative shadow-2xl">
-            <button onclick="closeModal()" class="absolute top-8 right-10 text-white/50 text-4xl hover:text-white transition">&times;</button>
+        <div class="glass max-w-lg w-full p-10 rounded-[3rem] border-white/20 relative shadow-2xl overflow-hidden">
+            <button onclick="closeModal()" class="absolute top-8 right-10 text-white/50 text-4xl hover:text-white transition z-20">&times;</button>
             <h3 id="modal-title" class="text-2xl font-black text-white uppercase mb-4 text-center tracking-tighter"></h3>
-            <div id="modal-content" class="scroll-area space-y-3 pr-2"></div>
+            
+            <div id="modal-content" class="scroll-area space-y-3"></div>
+
+            <div id="service-detail">
+                <div id="detail-body" class="h-full flex flex-col">
+                    <button onclick="closeDetail()" class="text-blue-400 text-[10px] font-black uppercase mb-6 flex items-center gap-2">← Back to Roles</button>
+                    <h4 id="detail-title" class="text-2xl font-black text-white uppercase mb-4 tracking-tighter"></h4>
+                    <p id="detail-text" class="text-gray-400 text-sm leading-relaxed mb-10"></p>
+                    <div class="mt-auto">
+                        <button id="detail-submit" class="w-full bg-blue-600 p-5 rounded-2xl text-white font-black uppercase text-xs shadow-xl shadow-blue-900/30">Select This Role</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -171,62 +137,61 @@
         const modal = document.getElementById('setup-modal');
         const mTitle = document.getElementById('modal-title');
         const mContent = document.getElementById('modal-content');
+        const sDetail = document.getElementById('service-detail');
+        const dTitle = document.getElementById('detail-title');
+        const dText = document.getElementById('detail-text');
+        const dBtn = document.getElementById('detail-submit');
         let activeStep = 1;
 
-        // DATASETS
+        const roleData = {
+            "24/7 Virtual Receptionist": "Automatically answers every call with your business name. Provides hours, location, and basics while transferring urgent matters to you.",
+            "Sales & Appointment Booker": "Syncs with your calendar. Qualifies the lead and schedules them directly into your workflow without you lifting a finger.",
+            "Lead Qualification Specialist": "Asks high-value questions to filter out window shoppers. Ensures you only spend time on serious quotes.",
+            "After-Hours Emergency Dispatch": "Specialized for trades. Identifies emergencies (e.g., floods/outages) and escalates them to your on-call team instantly.",
+            "Customer Support Agent": "Handles basic troubleshooting, order status updates, and FAQs using your custom business knowledge base.",
+            "Google Review Manager": "Calls your happy customers after a job is completed to solicit 5-star Google and Yelp reviews."
+        };
+
         const countries = [
             {n:"USA", a:true}, {n:"UK", a:true}, {n:"Canada", a:true}, {n:"Australia", a:true},
             {n:"Germany", a:false}, {n:"France", a:false}, {n:"Japan", a:false}, {n:"India", a:false},
-            {n:"Mexico", a:false}, {n:"South Africa", a:false}, {n:"Spain", a:false}, {n:"UAE", a:false}
+            {n:"Mexico", a:false}, {n:"Brazil", a:false}
         ];
 
-        const industries = [
-            "HVAC & Plumbing", "Dental Offices", "Law Firms", "Auto Repair", "Real Estate", 
-            "Medical Clinics", "Roofing", "Accounting/CPA", "Personal Training", "Pet Grooming",
-            "Landscape Design", "Electrical Contractors", "Hair Salons", "Locksmiths", "Pool Service"
-        ];
-
-        const roles = [
-            "24/7 Virtual Receptionist", "Sales & Appointment Booker", "Lead Qualification Specialist",
-            "After-Hours Emergency Dispatch", "Customer Support Agent", "Google Review Manager"
-        ];
-
-        const config = {
-            1: { title: "Select Region", type: "country" },
-            2: { title: "Business Industry", type: "list", data: industries },
-            3: { title: "AI Agent Role", type: "list", data: roles },
-            4: { title: "Company Identity", type: "form", fields: ["Business Name", "Cell Number"] },
-            5: { title: "Voice Profile", type: "list", data: ["Warm Professional", "Friendly Assistant", "Clear Corporate"] },
-            6: { title: "Step 6: Live Demo", type: "demo" },
-            7: { title: "Activation", type: "list", data: ["Activate $199/mo (No Contract)"] }
-        };
+        const industries = ["HVAC & Plumbing", "Dental Offices", "Law Firms", "Auto Repair", "Real Estate", "Medical Clinics", "Roofing", "Accounting/CPA", "Personal Training", "Pet Grooming", "Landscape Design", "Locksmiths"];
 
         function openModal(num) {
             activeStep = num;
-            const step = config[num];
-            mTitle.innerText = step.title;
+            mTitle.innerText = getTitle(num);
             mContent.innerHTML = '';
+            closeDetail();
             
-            if (step.type === "country") {
+            if (num === 1) { // Countries
                 countries.forEach(c => {
                     const b = document.createElement('button');
                     b.className = `w-full text-left p-4 border rounded-2xl font-bold text-xs flex justify-between items-center transition ${c.a ? 'border-blue-500/40 text-white hover:bg-blue-600/20' : 'border-white/5 text-gray-600 cursor-not-allowed'}`;
-                    b.innerHTML = `<span>${c.n}</span> <span class="text-[8px] uppercase font-black">${c.a ? '● Active' : 'Future Dev'}</span>`;
+                    b.innerHTML = `<span>${c.n}</span> <span class="text-[8px] uppercase font-black">${c.a ? '● Active' : 'Future'}</span>`;
                     if(c.a) b.onclick = () => finishStep(c.n);
                     mContent.appendChild(b);
                 });
-            } else if (step.type === "list") {
-                step.data.forEach(opt => {
+            } else if (num === 2) { // Industry
+                industries.forEach(opt => {
                     const b = document.createElement('button');
                     b.className = 'w-full text-left p-4 border border-white/10 rounded-2xl text-white font-bold text-xs hover:bg-blue-600/20 transition';
                     b.innerText = opt;
                     b.onclick = () => finishStep(opt);
                     mContent.appendChild(b);
                 });
-            } else if (step.type === "demo") {
-                mContent.innerHTML = `<div class="text-center py-10"><div class="waveform mb-6"><div class="bar" style="height:30px"></div><div class="bar" style="height:50px"></div><div class="bar" style="height:20px"></div><div class="bar" style="height:45px"></div></div><h4 class="text-white font-black uppercase text-sm mb-4">Calling Your Phone Now...</h4><button onclick="finishStep('Verified')" class="w-full bg-orange-500 p-5 rounded-2xl text-white font-black uppercase text-xs">I Liked the Call - Continue</button></div>`;
-            } else {
-                step.fields.forEach(f => {
+            } else if (num === 3) { // Role (THE NEW LOGIC)
+                Object.keys(roleData).forEach(role => {
+                    const b = document.createElement('button');
+                    b.className = 'w-full text-left p-4 border border-white/10 rounded-2xl text-white font-bold text-xs hover:bg-blue-600/20 flex justify-between items-center group transition';
+                    b.innerHTML = `<span>${role}</span> <span class="text-blue-500 opacity-0 group-hover:opacity-100">View Info →</span>`;
+                    b.onclick = () => showDetail(role);
+                    mContent.appendChild(b);
+                });
+            } else if (num === 4) { // Identity Form
+                ["Business Name", "Cell Number"].forEach(f => {
                     const i = document.createElement('input');
                     i.className = 'w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none mb-4 focus:border-blue-500 text-sm';
                     i.placeholder = f;
@@ -237,16 +202,42 @@
                 sub.innerText = 'Verify & Sync';
                 sub.onclick = () => finishStep("Synced");
                 mContent.appendChild(sub);
+            } else if (num === 5) { // Voice
+                ["Warm Professional", "Friendly Assistant", "Clear Corporate"].forEach(v => {
+                    const b = document.createElement('button');
+                    b.className = 'w-full text-left p-4 border border-white/10 rounded-2xl text-white font-bold text-xs hover:bg-blue-600/20';
+                    b.innerText = v;
+                    b.onclick = () => finishStep(v);
+                    mContent.appendChild(b);
+                });
+            } else if (num === 6) { // Demo
+                mContent.innerHTML = `<div class="text-center py-10"><div class="waveform mb-6"><div class="bar" style="height:30px"></div><div class="bar" style="height:50px"></div><div class="bar" style="height:20px"></div><div class="bar" style="height:45px"></div></div><h4 class="text-white font-black uppercase text-sm mb-4">Connecting Call Path...</h4><button onclick="finishStep('Verified')" class="w-full bg-orange-500 p-5 rounded-2xl text-white font-black uppercase text-xs">Verified - Move to Activation</button></div>`;
+            } else if (num === 7) { // Final
+                mContent.innerHTML = `<button onclick="finishStep('Finalized')" class="w-full bg-green-600 p-6 rounded-2xl text-white font-black uppercase text-sm">Activate $199/mo (No Contract)</button>`;
             }
             modal.classList.add('active');
         }
+
+        function showDetail(role) {
+            dTitle.innerText = role;
+            dText.innerText = roleData[role];
+            dBtn.onclick = () => finishStep(role);
+            sDetail.classList.add('active');
+        }
+
+        function closeDetail() { sDetail.classList.remove('active'); }
 
         function finishStep(val) {
             const el = document.getElementById(`step-txt-${activeStep}`);
             el.innerText = val.length > 15 ? val.substring(0,12) + "..." : val;
             el.classList.add('text-orange-400');
             closeModal();
-            if(activeStep < 7) setTimeout(() => openModal(activeStep + 1), 500);
+            if(activeStep < 7) setTimeout(() => openModal(activeStep + 1), 400);
+        }
+
+        function getTitle(num) {
+            const titles = ["", "Global Region", "Your Industry", "Agent Role", "Company Identity", "Voice Profile", "Live Test", "Final Step"];
+            return titles[num];
         }
 
         function closeModal() { modal.classList.remove('active'); }
