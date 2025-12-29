@@ -7,11 +7,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #181926; color: #5c96fa; scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: #181926; color: #5c96fa; scroll-behavior: smooth; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
+        
+        /* Logo & Hero Tweaks */
         .header-logo { width: 200px !important; height: auto; margin-left: -25px; }
         .hero-title { line-height: 1.1; letter-spacing: -0.04em; }
-        .step-card { transition: all 0.3s ease; cursor: pointer; display: block; }
+
+        /* Steps Styling */
+        .step-card { transition: all 0.3s ease; cursor: pointer; }
         .step-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.1); }
         .step-1 { border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.05); }
         .step-2 { border-left: 4px solid #8b5cf6; background: rgba(139, 92, 246, 0.05); }
@@ -19,17 +23,36 @@
         .step-4 { border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.05); }
         .step-5 { border-left: 4px solid #f97316; background: rgba(249, 115, 22, 0.05); }
         .step-6 { border-left: 4px solid #10b981; background: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+        /* Animations */
         .pulse { animation: pulse-animation 2s infinite; }
         @keyframes pulse-animation { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* Globe CSS */
+        .globe-container { position: relative; width: 300px; height: 300px; margin: 0 auto; perspective: 1000px; }
+        .globe { 
+            width: 100%; height: 100%; border-radius: 50%; 
+            background: radial-gradient(circle at 30% 30%, #3b82f6, #160c45);
+            box-shadow: inset -20px -20px 50px #000, 0 0 50px rgba(59, 130, 246, 0.4);
+            position: relative; overflow: hidden;
+        }
+        .globe::before {
+            content: ""; position: absolute; width: 200%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/world-map.png');
+            background-size: contain; opacity: 0.3;
+            animation: rotateGlobe 15s linear infinite;
+        }
+        @keyframes rotateGlobe { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        /* Modal */
         #setup-modal { display: none; }
         #setup-modal.active { display: flex; }
         .option-btn { width: 100%; padding: 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; text-align: left; color: white; transition: all 0.2s; font-size: 14px; margin-bottom: 8px; }
         .option-btn:hover { background: rgba(255,255,255,0.1); border-color: #3b82f6; }
         input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 16px; color: white; outline: none; margin-bottom: 12px; }
-        input:focus { border-color: #f97316; }
     </style>
 </head>
-<body class="selection:bg-orange-500">
+<body>
 
     <nav class="sticky top-0 z-50 bg-[#160c45]/90 backdrop-blur-md border-b border-white/5">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -78,7 +101,22 @@
         </div>
     </main>
 
-    <section id="coverage" class="max-w-5xl mx-auto px-12 py-24 border-t border-white/5 text-center">
+    <section id="services" class="max-w-7xl mx-auto px-6 py-20 border-t border-white/5">
+        <h2 class="text-3xl lg:text-5xl font-extrabold text-center mb-16 uppercase text-[#3b82f6]">AI Agent Services</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+            <div class="glass p-8 rounded-3xl text-center"><div class="text-red-500 font-bold text-sm uppercase">AI Receptionist</div></div>
+            <div class="glass p-8 rounded-3xl text-center"><div class="text-red-500 font-bold text-sm uppercase">AI Booking Agent</div></div>
+            <div class="glass p-8 rounded-3xl text-center"><div class="text-red-500 font-bold text-sm uppercase">AI Sales Agent</div></div>
+            <div class="glass p-8 rounded-3xl text-center"><div class="text-red-500 font-bold text-sm uppercase">AI Support Agent</div></div>
+            <div class="glass p-8 rounded-3xl text-center"><div class="text-red-500 font-bold text-sm uppercase">AI After-Hours Agent</div></div>
+            <div class="glass p-8 rounded-3xl text-center"><div class="text-red-500 font-bold text-sm uppercase">AI Lead Qualification</div></div>
+        </div>
+    </section>
+
+    <section id="coverage" class="max-w-7xl mx-auto px-12 py-24 border-t border-white/5 text-center">
+        <div class="globe-container mb-12">
+            <div class="globe"></div>
+        </div>
         <h3 class="text-4xl font-bold uppercase text-[#2d95f7] mb-7">World-Wide Coverage</h3>
         <div class="inline-block bg-orange-500/10 border border-orange-500/20 text-orange-300 text-[15px] font-black px-8 py-3 rounded-full uppercase mb-12">👉 11 Countries • 4 Continents</div>
         <div class="flex flex-wrap justify-center gap-4 text-white">
@@ -107,6 +145,21 @@
             <div onclick="openModal(6)" class="glass p-8 rounded-2xl text-center step-card step-6"><div class="text-[10px] font-bold opacity-60 mb-2 uppercase text-white">Step 06</div><div id="step-txt-6" class="text-xs font-black uppercase italic text-[#10b981]">Activate Your AI</div></div>
         </div>
     </section>
+
+    <footer class="py-16 text-center border-t border-white/5 bg-black/20">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center">
+                <img src="assets/logo.png" alt="Logo" class="header-logo">
+                <div class="text-xl md:text-5xl font-extrabold tracking-tighter text-white">AI Call Port</div>
+            </div>
+            <div class="flex space-x-10 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+                <a href="#" class="hover:text-white transition">Contact Support</a>
+            </div>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest">© 2025 AI CALL PORT. ALL RIGHTS RESERVED.</p>
+        </div>
+    </footer>
 
     <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
         <div class="glass max-w-lg w-full p-10 rounded-[2.5rem] border-white/20 relative">
@@ -176,6 +229,7 @@
         function nextStep() {
             closeModal();
             if(activeStep < 6) setTimeout(() => openModal(activeStep + 1), 400);
+            else alert("Configuration Complete! Processing Activation...");
         }
 
         function closeModal() { modal.classList.remove('active'); }
