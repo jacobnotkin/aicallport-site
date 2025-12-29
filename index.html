@@ -41,9 +41,14 @@
         .scroll-area::-webkit-scrollbar { width: 4px; }
         .scroll-area::-webkit-scrollbar-thumb { background: #1e40af; border-radius: 10px; }
         
-        /* Service Info Pop-over */
-        #service-detail { display: none; position: absolute; inset: 0; background: #0b0e1a; z-index: 10; border-radius: 3rem; padding: 2.5rem; }
-        #service-detail.active { display: block; }
+        /* Service Info Overlay */
+        #service-detail { 
+            display: none; position: absolute; inset: 0; background: #0b0e1a; 
+            z-index: 50; border-radius: 3rem; padding: 2.5rem; 
+            box-shadow: 0 -20px 50px rgba(0,0,0,0.5);
+        }
+        #service-detail.active { display: block; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -67,7 +72,7 @@
 
     <main class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 py-12 items-center">
         <div>
-            <div class="inline-block bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 tracking-widest">Global Small Biz Routing</div>
+            <div class="inline-block bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-6">Global Small Biz Routing</div>
             <h1 class="text-6xl lg:text-7xl font-black text-white leading-[0.9] tracking-tighter mb-8">
                 INSTANT AI <br>
                 GLOBAL 
@@ -115,18 +120,22 @@
 
     <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-4">
         <div class="glass max-w-lg w-full p-10 rounded-[3rem] border-white/20 relative shadow-2xl overflow-hidden">
-            <button onclick="closeModal()" class="absolute top-8 right-10 text-white/50 text-4xl hover:text-white transition z-20">&times;</button>
+            <button onclick="closeModal()" class="absolute top-8 right-10 text-white/50 text-4xl hover:text-white transition z-[60]">&times;</button>
             <h3 id="modal-title" class="text-2xl font-black text-white uppercase mb-4 text-center tracking-tighter"></h3>
             
             <div id="modal-content" class="scroll-area space-y-3"></div>
 
             <div id="service-detail">
-                <div id="detail-body" class="h-full flex flex-col">
-                    <button onclick="closeDetail()" class="text-blue-400 text-[10px] font-black uppercase mb-6 flex items-center gap-2">← Back to Roles</button>
+                <div class="h-full flex flex-col">
+                    <button onclick="closeDetail()" class="w-fit text-blue-400 text-[10px] font-black uppercase mb-6 flex items-center gap-2 hover:text-white transition">
+                        <span class="text-lg">←</span> Back to Roles
+                    </button>
                     <h4 id="detail-title" class="text-2xl font-black text-white uppercase mb-4 tracking-tighter"></h4>
-                    <p id="detail-text" class="text-gray-400 text-sm leading-relaxed mb-10"></p>
+                    <p id="detail-text" class="text-gray-400 text-sm leading-relaxed mb-10 italic"></p>
                     <div class="mt-auto">
-                        <button id="detail-submit" class="w-full bg-blue-600 p-5 rounded-2xl text-white font-black uppercase text-xs shadow-xl shadow-blue-900/30">Select This Role</button>
+                        <button id="detail-submit" class="w-full bg-blue-600 p-5 rounded-2xl text-white font-black uppercase text-xs shadow-xl shadow-blue-900/30 hover:bg-blue-500 transition">
+                            Select This Role
+                        </button>
                     </div>
                 </div>
             </div>
@@ -154,11 +163,10 @@
 
         const countries = [
             {n:"USA", a:true}, {n:"UK", a:true}, {n:"Canada", a:true}, {n:"Australia", a:true},
-            {n:"Germany", a:false}, {n:"France", a:false}, {n:"Japan", a:false}, {n:"India", a:false},
-            {n:"Mexico", a:false}, {n:"Brazil", a:false}
+            {n:"Germany", a:false}, {n:"France", a:false}, {n:"Japan", a:false}, {n:"India", a:false}
         ];
 
-        const industries = ["HVAC & Plumbing", "Dental Offices", "Law Firms", "Auto Repair", "Real Estate", "Medical Clinics", "Roofing", "Accounting/CPA", "Personal Training", "Pet Grooming", "Landscape Design", "Locksmiths"];
+        const industries = ["HVAC & Plumbing", "Dental Offices", "Law Firms", "Auto Repair", "Real Estate", "Medical Clinics", "Roofing", "Accounting/CPA", "Personal Training", "Pet Grooming"];
 
         function openModal(num) {
             activeStep = num;
@@ -166,7 +174,7 @@
             mContent.innerHTML = '';
             closeDetail();
             
-            if (num === 1) { // Countries
+            if (num === 1) {
                 countries.forEach(c => {
                     const b = document.createElement('button');
                     b.className = `w-full text-left p-4 border rounded-2xl font-bold text-xs flex justify-between items-center transition ${c.a ? 'border-blue-500/40 text-white hover:bg-blue-600/20' : 'border-white/5 text-gray-600 cursor-not-allowed'}`;
@@ -174,7 +182,7 @@
                     if(c.a) b.onclick = () => finishStep(c.n);
                     mContent.appendChild(b);
                 });
-            } else if (num === 2) { // Industry
+            } else if (num === 2) {
                 industries.forEach(opt => {
                     const b = document.createElement('button');
                     b.className = 'w-full text-left p-4 border border-white/10 rounded-2xl text-white font-bold text-xs hover:bg-blue-600/20 transition';
@@ -182,15 +190,15 @@
                     b.onclick = () => finishStep(opt);
                     mContent.appendChild(b);
                 });
-            } else if (num === 3) { // Role (THE NEW LOGIC)
+            } else if (num === 3) {
                 Object.keys(roleData).forEach(role => {
                     const b = document.createElement('button');
                     b.className = 'w-full text-left p-4 border border-white/10 rounded-2xl text-white font-bold text-xs hover:bg-blue-600/20 flex justify-between items-center group transition';
-                    b.innerHTML = `<span>${role}</span> <span class="text-blue-500 opacity-0 group-hover:opacity-100">View Info →</span>`;
+                    b.innerHTML = `<span>${role}</span> <span class="text-blue-500 opacity-0 group-hover:opacity-100 transition text-[10px]">View Info →</span>`;
                     b.onclick = () => showDetail(role);
                     mContent.appendChild(b);
                 });
-            } else if (num === 4) { // Identity Form
+            } else if (num === 4) {
                 ["Business Name", "Cell Number"].forEach(f => {
                     const i = document.createElement('input');
                     i.className = 'w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white outline-none mb-4 focus:border-blue-500 text-sm';
@@ -202,17 +210,17 @@
                 sub.innerText = 'Verify & Sync';
                 sub.onclick = () => finishStep("Synced");
                 mContent.appendChild(sub);
-            } else if (num === 5) { // Voice
+            } else if (num === 5) {
                 ["Warm Professional", "Friendly Assistant", "Clear Corporate"].forEach(v => {
                     const b = document.createElement('button');
-                    b.className = 'w-full text-left p-4 border border-white/10 rounded-2xl text-white font-bold text-xs hover:bg-blue-600/20';
+                    b.className = 'w-full text-left p-4 border border-white/10 rounded-2xl text-white font-bold text-xs hover:bg-blue-600/20 transition';
                     b.innerText = v;
                     b.onclick = () => finishStep(v);
                     mContent.appendChild(b);
                 });
-            } else if (num === 6) { // Demo
+            } else if (num === 6) {
                 mContent.innerHTML = `<div class="text-center py-10"><div class="waveform mb-6"><div class="bar" style="height:30px"></div><div class="bar" style="height:50px"></div><div class="bar" style="height:20px"></div><div class="bar" style="height:45px"></div></div><h4 class="text-white font-black uppercase text-sm mb-4">Connecting Call Path...</h4><button onclick="finishStep('Verified')" class="w-full bg-orange-500 p-5 rounded-2xl text-white font-black uppercase text-xs">Verified - Move to Activation</button></div>`;
-            } else if (num === 7) { // Final
+            } else if (num === 7) {
                 mContent.innerHTML = `<button onclick="finishStep('Finalized')" class="w-full bg-green-600 p-6 rounded-2xl text-white font-black uppercase text-sm">Activate $199/mo (No Contract)</button>`;
             }
             modal.classList.add('active');
@@ -221,11 +229,16 @@
         function showDetail(role) {
             dTitle.innerText = role;
             dText.innerText = roleData[role];
-            dBtn.onclick = () => finishStep(role);
+            dBtn.onclick = (e) => {
+                e.stopPropagation();
+                finishStep(role);
+            };
             sDetail.classList.add('active');
         }
 
-        function closeDetail() { sDetail.classList.remove('active'); }
+        function closeDetail() { 
+            sDetail.classList.remove('active'); 
+        }
 
         function finishStep(val) {
             const el = document.getElementById(`step-txt-${activeStep}`);
