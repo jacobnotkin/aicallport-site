@@ -11,38 +11,30 @@
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
         
         /* --- ORBITAL ICON --- */
-        .orbital-global {
-            display: inline-flex; align-items: center; justify-content: center;
-            position: relative; width: 45px; height: 45px; vertical-align: middle;
-        }
-        .orbit-ring {
-            position: absolute; border: 1px solid #3b82f6; border-radius: 50%; width: 100%; height: 40%;
-            transform: rotateX(75deg) rotateY(15deg); animation: orbit-spin 4s linear infinite;
-        }
-        .orbit-ring-alt {
-            position: absolute; border: 1px solid #60a5fa; border-radius: 50%; width: 100%; height: 40%;
-            transform: rotateX(75deg) rotateY(-15deg); animation: orbit-spin 4s linear infinite reverse;
-        }
+        .orbital-global { display: inline-flex; align-items: center; justify-content: center; position: relative; width: 45px; height: 45px; vertical-align: middle; }
+        .orbit-ring { position: absolute; border: 1px solid #3b82f6; border-radius: 50%; width: 100%; height: 40%; transform: rotateX(75deg) rotateY(15deg); animation: orbit-spin 4s linear infinite; }
+        .orbit-ring-alt { position: absolute; border: 1px solid #60a5fa; border-radius: 50%; width: 100%; height: 40%; transform: rotateX(75deg) rotateY(-15deg); animation: orbit-spin 4s linear infinite reverse; }
         .core-sphere { width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; box-shadow: 0 0 15px #3b82f6; z-index: 2; }
         @keyframes orbit-spin { 0% { transform: rotateX(75deg) rotateZ(0deg); } 100% { transform: rotateX(75deg) rotateZ(360deg); } }
 
-        /* --- STRETCH PIPELINE (30% Larger Font) --- */
+        /* --- STRETCH PIPELINE --- */
         .pipeline-track { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; width: 100%; }
         .step-node { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; border-top: 4px solid rgba(255,255,255,0.1); }
-        .step-node:hover { background: rgba(59, 130, 246, 0.1); border-top-color: #f97316; }
         .step-node.active-step { border-top-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
-        
-        /* Scaling font by 30%: 9px -> 12px | 11px -> 15px */
         .step-header { font-size: 12px !important; }
         .step-value { font-size: 15px !important; }
 
-        /* --- DASHBOARD ELEMENTS --- */
-        .dash-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; transition: 0.3s; }
+        /* --- DASHBOARD --- */
+        .dash-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; }
         .pulse-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
 
         #setup-modal { display: none; }
         #setup-modal.active { display: flex; }
+        #tos-overlay { display: none; position: absolute; inset: 0; background: #0b0e1a; z-index: 100; padding: 2rem; border-radius: 2.5rem; }
+        #tos-overlay.active { display: block; }
+
+        .legal-scroll { max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 1rem; font-size: 11px; line-height: 1.6; color: #94a3b8; }
     </style>
 </head>
 <body class="pb-20">
@@ -65,20 +57,17 @@
                         <span class="orbit-ring"></span><span class="orbit-ring-alt"></span><span class="core-sphere"></span>
                     </span>
                 </h1>
-                <p class="text-gray-400 text-lg max-w-xl">Fully autonomous customer reception and lead routing. Custom-built for trade services and local businesses.</p>
+                <p class="text-gray-400 text-lg max-w-xl">Autonomous lead capture and business routing. Unlimited volume, zero human maintenance.</p>
                 <div class="mt-4 flex items-center gap-4 text-green-400 font-black text-xs uppercase tracking-widest">
                     <span class="flex h-2 w-2 rounded-full bg-green-500"></span>
-                    Unlimited Call Volume Included
+                    Unlimited Call Volume Active
                 </div>
             </div>
             <div class="lg:col-span-4 glass p-8 rounded-[2.5rem] border-white/10 text-center relative overflow-hidden">
-                <div class="text-[10px] font-black text-blue-400 mb-2 uppercase tracking-widest">Small Biz Pricing</div>
+                <div class="text-[10px] font-black text-blue-400 mb-2 uppercase tracking-widest">Fixed Business Rate</div>
                 <div class="text-6xl font-black text-white mb-2">$199<span class="text-xl text-blue-500">/mo</span></div>
-                <p class="text-gray-500 text-[11px] font-bold uppercase mb-4 italic">No Contract • Monthly Billing</p>
-                <div class="bg-white/5 p-3 rounded-xl mb-6 text-[10px] text-white font-black uppercase border border-white/5">
-                    Unlimited Call Volume
-                </div>
-                <button onclick="openModal(1)" class="w-full bg-orange-500 p-4 rounded-xl text-white font-black uppercase text-sm shadow-xl shadow-orange-900/20 hover:scale-105 transition-transform">Get Started</button>
+                <p class="text-gray-500 text-[11px] font-bold uppercase mb-6 italic">No Contract • Cancel Anytime</p>
+                <button onclick="openModal(1)" class="w-full bg-orange-500 p-4 rounded-xl text-white font-black uppercase text-sm shadow-xl hover:scale-105 transition-transform">Begin Activation</button>
             </div>
         </div>
 
@@ -86,37 +75,16 @@
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xs font-black text-white uppercase tracking-[0.3em]">Activation Pipeline</h2>
                 <div class="h-[1px] flex-grow mx-6 bg-white/10"></div>
-                <span class="text-[10px] text-blue-400 font-bold uppercase">Ready for Deployment</span>
+                <span class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">System Status: Online</span>
             </div>
             <div class="pipeline-track">
-                <div onclick="openModal(1)" class="step-node p-6 text-center">
-                    <div class="step-header font-black text-blue-500 mb-2 uppercase">01. REGION</div>
-                    <div id="step-txt-1" class="step-value font-bold text-white uppercase">Awaiting Selection</div>
-                </div>
-                <div onclick="openModal(2)" class="step-node p-6 text-center">
-                    <div class="step-header font-black text-blue-500 mb-2 uppercase">02. INDUSTRY</div>
-                    <div id="step-txt-2" class="step-value font-bold text-white uppercase">Not Assigned</div>
-                </div>
-                <div onclick="openModal(3)" class="step-node p-6 text-center">
-                    <div class="step-header font-black text-blue-500 mb-2 uppercase">03. ROLE</div>
-                    <div id="step-txt-3" class="step-value font-bold text-white uppercase">Unconfigured</div>
-                </div>
-                <div onclick="openModal(4)" class="step-node p-6 text-center">
-                    <div class="step-header font-black text-blue-500 mb-2 uppercase">04. IDENTITY</div>
-                    <div id="step-txt-4" class="step-value font-bold text-white uppercase">Awaiting Sync</div>
-                </div>
-                <div onclick="openModal(5)" class="step-node p-6 text-center">
-                    <div class="step-header font-black text-blue-500 mb-2 uppercase">05. VOICE</div>
-                    <div id="step-txt-5" class="step-value font-bold text-white uppercase">Not Loaded</div>
-                </div>
-                <div onclick="openModal(6)" class="step-node p-6 text-center border-orange-500/30">
-                    <div class="step-header font-black text-orange-500 mb-2 uppercase">06. LIVE TEST</div>
-                    <div id="step-txt-6" class="step-value font-bold text-white uppercase italic">Pending</div>
-                </div>
-                <div onclick="openModal(7)" class="step-node p-6 text-center">
-                    <div class="step-header font-black text-green-500 mb-2 uppercase">07. DEPLOY</div>
-                    <div id="step-txt-7" class="step-value font-bold text-green-400 uppercase">Offline</div>
-                </div>
+                <div onclick="openModal(1)" class="step-node p-6 text-center"><div class="step-header font-black text-blue-500 mb-2 uppercase">01. REGION</div><div id="step-txt-1" class="step-value font-bold text-white uppercase">Awaiting</div></div>
+                <div onclick="openModal(2)" class="step-node p-6 text-center"><div class="step-header font-black text-blue-500 mb-2 uppercase">02. INDUSTRY</div><div id="step-txt-2" class="step-value font-bold text-white uppercase">Pending</div></div>
+                <div onclick="openModal(3)" class="step-node p-6 text-center"><div class="step-header font-black text-blue-500 mb-2 uppercase">03. ROLE</div><div id="step-txt-3" class="step-value font-bold text-white uppercase">Pending</div></div>
+                <div onclick="openModal(4)" class="step-node p-6 text-center"><div class="step-header font-black text-blue-500 mb-2 uppercase">04. IDENTITY</div><div id="step-txt-4" class="step-value font-bold text-white uppercase">Pending</div></div>
+                <div onclick="openModal(5)" class="step-node p-6 text-center"><div class="step-header font-black text-blue-500 mb-2 uppercase">05. VOICE</div><div id="step-txt-5" class="step-value font-bold text-white uppercase">Pending</div></div>
+                <div onclick="openModal(6)" class="step-node p-6 text-center border-orange-500/30"><div class="step-header font-black text-orange-500 mb-2 uppercase">06. TEST</div><div id="step-txt-6" class="step-value font-bold text-white uppercase italic">Offline</div></div>
+                <div onclick="openModal(7)" class="step-node p-6 text-center"><div class="step-header font-black text-green-500 mb-2 uppercase">07. DEPLOY</div><div id="step-txt-7" class="step-value font-bold text-green-400 uppercase">Offline</div></div>
             </div>
         </div>
     </div>
@@ -124,54 +92,33 @@
     <div class="max-w-[1400px] mx-auto px-8">
         <div class="dash-card p-10 border-blue-500/20 bg-blue-500/5 relative overflow-hidden">
             <div class="absolute inset-0 z-10 bg-[#0b0e1a]/40 backdrop-blur-[2px] flex items-center justify-center flex-col">
-                <div class="bg-blue-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-2xl mb-4">Dashboard Preview</div>
-                <p class="text-white text-sm font-bold opacity-80">This interface will customize instantly upon Activation Step 07</p>
+                <div class="bg-blue-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-2xl mb-4">Post-Activation Dashboard</div>
+                <p class="text-white text-sm font-bold opacity-80">Full access unlocks after Step 07 deployment</p>
             </div>
-
-            <div class="grid lg:grid-cols-12 gap-8 opacity-40">
-                <div class="lg:col-span-3 space-y-6">
-                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="pulse-dot"></div>
-                            <span class="text-[10px] font-black text-white uppercase tracking-widest">Agent Status</span>
-                        </div>
-                        <div class="text-xl font-bold text-white uppercase">Live Ops Ready</div>
-                    </div>
-                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-                        <span class="text-[10px] font-black text-gray-500 uppercase block mb-2 tracking-widest">Data Routing</span>
-                        <div class="text-white font-bold" id="dash-region">Unlimited Volume Active</div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-9">
-                    <div class="bg-white/5 rounded-2xl border border-white/10 p-6 h-full">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-white font-black text-sm uppercase italic tracking-wider">Intelligent Call Infrastructure</h3>
-                            <span class="text-blue-400 text-[10px] font-bold">SECURE CHANNEL</span>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-8 h-8 bg-blue-600/30 rounded-lg flex items-center justify-center text-blue-400 font-black text-[10px]">AI</div>
-                                    <div>
-                                        <div class="text-white text-xs font-bold uppercase tracking-tight">Call Analysis Node</div>
-                                        <div class="text-gray-500 text-[10px]">Your business intelligence will stream here in real-time.</div>
-                                    </div>
-                                </div>
-                                <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Ready</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="grid lg:grid-cols-12 gap-8 opacity-30">
+                <div class="lg:col-span-4 h-40 bg-white/5 rounded-2xl border border-white/10"></div>
+                <div class="lg:col-span-8 h-40 bg-white/5 rounded-2xl border border-white/10"></div>
             </div>
         </div>
     </div>
 
-    <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4">
-        <div class="glass max-w-lg w-full p-8 rounded-[2.5rem] border-white/20 relative shadow-2xl">
-            <button onclick="closeModal()" class="absolute top-6 right-8 text-white/50 text-3xl hover:text-white transition z-[60]">&times;</button>
+    <div id="setup-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-4">
+        <div class="glass max-w-xl w-full p-10 rounded-[2.5rem] border-white/20 relative shadow-2xl overflow-hidden">
+            <button onclick="closeModal()" class="absolute top-6 right-8 text-white/50 text-3xl hover:text-white transition z-[110]">&times;</button>
             <h3 id="modal-title" class="text-xl font-black text-white uppercase mb-6 text-center tracking-tighter"></h3>
             <div id="modal-content" class="max-h-[400px] overflow-y-auto pr-2 space-y-3"></div>
+
+            <div id="tos-overlay">
+                <h4 class="text-white font-black uppercase text-lg mb-4">Service Agreement</h4>
+                <div class="legal-scroll mb-6">
+                    <p class="mb-4"><strong>1. AI Voice Compliance:</strong> By activating AI Call Port, you agree to comply with the Telephone Consumer Protection Act (TCPA). The AI must identify itself as an assistant if requested.</p>
+                    <p class="mb-4"><strong>2. Unlimited Volume Policy:</strong> "Unlimited" refers to standard business lead volume. Use for robocalling, spamming, or high-frequency automated polling is prohibited and results in instant termination.</p>
+                    <p class="mb-4"><strong>3. Subscription & Billing:</strong> $199/mo is billed in advance. There are no long-term contracts. You may cancel at any time, but partial months are not refunded.</p>
+                    <p class="mb-4"><strong>4. Data Privacy:</strong> We transcribe and store call audio for your dashboard access. We do not sell your lead data to third parties.</p>
+                    <p><strong>5. Liability:</strong> AI Call Port is an assistant tool. We are not liable for any missed bookings or technical downtime affecting business operations.</p>
+                </div>
+                <button onclick="closeTOS()" class="w-full bg-blue-600 p-4 rounded-xl text-white font-black uppercase text-[11px]">I Have Read The Terms</button>
+            </div>
         </div>
     </div>
 
@@ -179,6 +126,7 @@
         const modal = document.getElementById('setup-modal');
         const mTitle = document.getElementById('modal-title');
         const mContent = document.getElementById('modal-content');
+        const tosOverlay = document.getElementById('tos-overlay');
         let activeStep = 1;
 
         const config = {
@@ -188,7 +136,7 @@
             4: { title: "Company Identity", type: "form", fields: ["Business Name", "Cell Number"] },
             5: { title: "Voice Profile", type: "list", data: ["Warm Professional", "Friendly Assistant", "Clear Corporate"] },
             6: { title: "Live Test", type: "demo" },
-            7: { title: "Activation", type: "list", data: ["Deploy AI Agent ($199/mo)"] }
+            7: { title: "Final Activation", type: "activation" }
         };
 
         function openModal(num) {
@@ -213,25 +161,49 @@
                     mContent.appendChild(i);
                 });
                 const sub = document.createElement('button');
-                sub.className = 'w-full bg-blue-600 p-4 rounded-xl text-white font-black uppercase text-xs shadow-lg';
+                sub.className = 'w-full bg-blue-600 p-4 rounded-xl text-white font-black uppercase text-xs';
                 sub.innerText = 'Verify & Sync';
                 sub.onclick = () => finishStep("Synced");
                 mContent.appendChild(sub);
+            } else if (step.type === "activation") {
+                mContent.innerHTML = `
+                    <div class="bg-blue-500/10 p-6 rounded-2xl border border-blue-500/20 mb-6 text-center">
+                        <div class="text-white font-black text-2xl mb-1">$199.00</div>
+                        <div class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">Monthly Auto-Pay</div>
+                    </div>
+                    <div class="flex items-start gap-3 mb-6">
+                        <input type="checkbox" id="tos-check" class="mt-1 h-4 w-4 rounded border-gray-300">
+                        <label for="tos-check" class="text-[11px] text-gray-400 leading-tight">
+                            I agree to the <button onclick="openTOS()" class="text-blue-400 underline">Terms of Service</button> and authorize the $199/mo subscription.
+                        </label>
+                    </div>
+                    <button onclick="deployAgent()" class="w-full bg-green-600 p-5 rounded-xl text-white font-black uppercase text-sm shadow-xl shadow-green-900/20">Deploy AI Agent</button>
+                `;
             } else {
-                mContent.innerHTML = `<div class="text-center py-6 text-white font-black uppercase text-xs">Connecting Secure AI Path...<br><br><button onclick="finishStep('Verified')" class="bg-orange-500 p-4 rounded-xl w-full hover:scale-105 transition">Verified</button></div>`;
+                mContent.innerHTML = `<button onclick="finishStep('Verified')" class="bg-orange-500 p-4 rounded-xl w-full text-white font-black uppercase text-xs">Simulate Demo Call</button>`;
             }
             modal.classList.add('active');
         }
 
+        function openTOS() { tosOverlay.classList.add('active'); }
+        function closeTOS() { tosOverlay.classList.remove('active'); }
+        function closeModal() { modal.classList.remove('active'); }
+
+        function deployAgent() {
+            if(document.getElementById('tos-check').checked) {
+                finishStep('Live');
+            } else {
+                alert("Please agree to the Terms of Service to proceed.");
+            }
+        }
+
         function finishStep(val) {
             const el = document.getElementById(`step-txt-${activeStep}`);
-            el.innerText = val.length > 15 ? val.substring(0,12) + "..." : val;
+            el.innerText = val.length > 12 ? val.substring(0,10) + "..." : val;
             el.parentElement.classList.add('active-step');
             closeModal();
             if(activeStep < 7) setTimeout(() => openModal(activeStep + 1), 400);
         }
-
-        function closeModal() { modal.classList.remove('active'); }
     </script>
 </body>
 </html>
