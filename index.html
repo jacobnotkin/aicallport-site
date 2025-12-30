@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Call Port | Interface</title>
+    <title>AI Call Port | High-Scale Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -15,7 +15,7 @@
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
         
         /* PIPELINE NODES */
-        .pipeline-track { display: grid; width: 100%; gap: 8px; }
+        .pipeline-track { display: grid; width: 100%; gap: 10px; }
         .step-node { position: relative; transition: all 0.3s ease; cursor: pointer; background: rgba(255, 255, 255, 0.02); }
         .step-node:hover { background: rgba(59, 130, 246, 0.1); transform: translateY(-2px); border-top-color: #3b82f6 !important; }
         .step-node:not(.active-step):first-child { animation: pulse-border 2s infinite; }
@@ -28,41 +28,49 @@
 
         @media (min-width: 1024px) {
             .pipeline-track { grid-template-columns: repeat(7, 1fr); }
-            .step-node { border-top: 4px solid rgba(255,255,255,0.1); padding: 16px 8px; text-align: center; }
+            .step-node { border-top: 4px solid rgba(255,255,255,0.1); padding: 20px 10px; text-align: center; }
         }
         @media (max-width: 1023px) {
             .pipeline-track { grid-template-columns: 1fr; }
-            .step-node { border-left: 4px solid rgba(255,255,255,0.1); padding: 12px 16px; text-align: left; }
+            .step-node { border-left: 4px solid rgba(255,255,255,0.1); padding: 15px 20px; text-align: left; }
             body { overflow-y: auto; }
         }
 
         .active-step { border-color: #3b82f6 !important; background: rgba(59, 130, 246, 0.1) !important; }
 
-        /* WAVE ICON */
-        .neural-container { display: flex; align-items: center; gap: 6px; height: 20px; }
-        .wave-bar { width: 3px; height: 100%; background: linear-gradient(to bottom, #4285F4, #9B72CB); border-radius: 10px; animation: neural-wave 1.2s ease-in-out infinite; }
-        @keyframes neural-wave { 0%, 100% { height: 8px; } 50% { height: 20px; } }
-
-        /* MODAL & BIG BUTTONS */
+        /* MODAL & 50% LARGER BUTTONS */
         #setup-modal { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); padding: 20px; }
         #setup-modal.active { display: flex; }
         
-        /* 20% ENLARGEMENT LOGIC */
+        /* 50% ENLARGEMENT LOGIC */
         .step-btn { 
             width: 100%; 
             text-align: left; 
-            padding: 1.5rem; /* Increased padding vertically */
-            margin-bottom: 0.75rem; 
-            border-radius: 1rem; 
+            padding: 2.25rem 2rem; /* 50% Vertical Increase */
+            margin-bottom: 1rem; 
+            border-radius: 1.25rem; 
             border: 1px solid rgba(255,255,255,0.1); 
             background: rgba(255,255,255,0.05); 
             color: white; 
             font-weight: 900; 
             text-transform: uppercase; 
-            font-size: 1.05rem; /* ~20% larger than previous text-xs/sm base */
+            font-size: 1.4rem; /* 50% larger font */
+            letter-spacing: 0.05em;
             transition: all 0.2s;
         }
-        .step-btn:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .step-btn:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.15); transform: scale(1.01); }
+
+        .voice-card { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            width: 100%; 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            padding: 2rem; 
+            border-radius: 1.25rem; 
+            margin-bottom: 1rem; 
+        }
     </style>
 </head>
 <body>
@@ -104,26 +112,28 @@
             </div>
 
             <div class="pipeline-track mb-10">
-                <div onclick="openModal(1)" id="step-1" class="step-node"><div class="text-[10px] font-black text-blue-500 uppercase">01. Region</div><div id="txt-1" class="text-white font-bold text-xs uppercase">Select</div></div>
-                <div onclick="openModal(2)" id="step-2" class="step-node"><div class="text-[10px] font-black text-blue-500 uppercase">02. Industry</div><div id="txt-2" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
-                <div onclick="openModal(3)" id="step-3" class="step-node"><div class="text-[10px] font-black text-blue-500 uppercase">03. Role</div><div id="txt-3" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
-                <div onclick="openModal(4)" id="step-4" class="step-node"><div class="text-[10px] font-black text-blue-500 uppercase">04. Identity</div><div id="txt-4" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
-                <div onclick="openModal(5)" id="step-5" class="step-node"><div class="text-[10px] font-black text-blue-500 uppercase">05. Voice</div><div id="txt-5" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
-                <div onclick="openModal(6)" id="step-6" class="step-node"><div class="text-[10px] font-black text-orange-500 uppercase">06. Test</div><div id="txt-6" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
-                <div onclick="openModal(7)" id="step-7" class="step-node"><div class="text-[10px] font-black text-green-500 uppercase">07. Deploy</div><div id="txt-7" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
+                <div onclick="openModal(1)" id="step-1" class="step-node"><div class="text-[10px] font-black text-blue-500 uppercase">01. Region</div><div id="txt-1" class="text-white font-bold text-sm uppercase">Select</div></div>
+                <div onclick="openModal(2)" id="step-2" class="step-node"><div class="text-[10px] font-black text-blue-500 uppercase">02. Industry</div><div id="txt-2" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
+                <div onclick="openModal(3)" id="step-3" class="step-node"><div class="text-[10px] font-black text-blue-500 uppercase">03. Role</div><div id="txt-3" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
+                <div onclick="openModal(4)" id="step-4" class="step-node"><div class="text-[10px] font-black text-blue-500 uppercase">04. Identity</div><div id="txt-4" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
+                <div onclick="openModal(5)" id="step-5" class="step-node"><div class="text-[10px] font-black text-blue-500 uppercase">05. Voice</div><div id="txt-5" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
+                <div onclick="openModal(6)" id="step-6" class="step-node"><div class="text-[10px] font-black text-orange-500 uppercase">06. Test</div><div id="txt-6" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
+                <div onclick="openModal(7)" id="step-7" class="step-node"><div class="text-[10px] font-black text-green-500 uppercase">07. Deploy</div><div id="txt-7" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
             </div>
 
             <div class="glass p-6 rounded-[2rem] border-white/5 relative overflow-hidden">
                 <div class="grid md:grid-cols-2 gap-8 items-center">
                     <div class="flex items-center gap-4">
-                        <div class="neural-container"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+                        <div class="flex gap-1.5 h-6">
+                            <div class="w-1 bg-blue-500 rounded-full"></div><div class="w-1 bg-purple-500 rounded-full h-full opacity-50"></div><div class="w-1 bg-blue-400 rounded-full"></div>
+                        </div>
                         <div>
                             <h3 class="text-white font-black uppercase text-xs">Owner Management Portal</h3>
                             <p class="text-gray-500 text-[9px] uppercase font-bold tracking-widest italic">Ongoing Info & Editing</p>
                         </div>
                     </div>
                     <div class="bg-[#0b0e1a]/80 backdrop-blur-md p-4 rounded-2xl border border-white/10 text-center">
-                        <p class="text-gray-400 text-[10px] leading-relaxed">Secure dashboard activates instantly post-deployment for script edits and real-time monitoring.</p>
+                        <p class="text-gray-400 text-[10px] leading-relaxed italic">Dashboard activates instantly upon final deployment.</p>
                     </div>
                 </div>
             </div>
@@ -131,10 +141,10 @@
     </div>
 
     <div id="setup-modal">
-        <div class="glass max-w-lg w-full p-8 rounded-[2rem] relative">
-            <button onclick="closeModal()" class="absolute top-6 right-8 text-white text-2xl hover:opacity-50">&times;</button>
-            <h3 id="modal-title" class="text-white font-black uppercase text-center mb-8 tracking-widest"></h3>
-            <div id="modal-content" class="max-h-[60vh] overflow-y-auto"></div>
+        <div class="glass max-w-2xl w-full p-10 rounded-[2.5rem] relative">
+            <button onclick="closeModal()" class="absolute top-8 right-10 text-white text-3xl hover:opacity-50">&times;</button>
+            <h3 id="modal-title" class="text-white font-black uppercase text-center mb-10 text-2xl tracking-[0.2em] border-b border-white/10 pb-6"></h3>
+            <div id="modal-content" class="max-h-[60vh] overflow-y-auto pr-2"></div>
         </div>
     </div>
 
@@ -165,8 +175,15 @@
             if(s.type === "voice") {
                 s.data.forEach(item => {
                     const row = document.createElement('div');
-                    row.className = 'flex items-center justify-between w-full bg-white/5 border border-white/10 p-5 rounded-xl mb-3';
-                    row.innerHTML = `<div class="flex-1 cursor-pointer" onclick="saveStep('${item.n}')"><div class="text-white font-black uppercase text-base">${item.n}</div><div class="text-gray-500 text-[10px] uppercase font-bold">${item.d}</div></div><button class="w-10 h-10 rounded-full bg-blue-600 text-white shadow-lg" onclick="previewVoice(this)">▶</button>`;
+                    row.className = 'voice-card cursor-pointer hover:border-blue-500 transition-all';
+                    row.onclick = () => saveStep(item.n);
+                    row.innerHTML = `
+                        <div class="flex-1">
+                            <div class="text-white font-black uppercase text-xl">${item.n}</div>
+                            <div class="text-gray-500 text-xs uppercase font-bold tracking-widest">${item.d}</div>
+                        </div>
+                        <div class="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-white text-xl">▶</div>
+                    `;
                     container.appendChild(row);
                 });
             } else if(s.data) {
@@ -178,14 +195,13 @@
                     container.appendChild(btn);
                 });
             } else if(s.type === "form") {
-                container.innerHTML = `<input type="text" placeholder="Business Name" class="w-full bg-white/5 border border-white/10 p-6 rounded-xl text-white mb-4 outline-none text-lg font-bold"><button onclick="saveStep('Synced')" class="w-full bg-blue-600 p-6 rounded-xl text-white font-black uppercase text-base shadow-xl">Verify Identity</button>`;
+                container.innerHTML = `<input type="text" placeholder="Business Name" class="w-full bg-white/5 border border-white/10 p-8 rounded-2xl text-white mb-6 outline-none text-2xl font-bold"><button onclick="saveStep('Synced')" class="w-full bg-blue-600 p-8 rounded-2xl text-white font-black uppercase text-xl shadow-xl">Verify Identity</button>`;
             } else {
-                container.innerHTML = `<button onclick="saveStep('Live')" class="w-full bg-green-600 p-6 rounded-xl text-white font-black uppercase text-base shadow-xl">${s.text}</button>`;
+                container.innerHTML = `<button onclick="saveStep('Live')" class="w-full bg-green-600 p-8 rounded-2xl text-white font-black uppercase text-xl shadow-xl">${s.text}</button>`;
             }
             document.getElementById('setup-modal').classList.add('active');
         }
 
-        function previewVoice(btn) { btn.innerText = '||'; setTimeout(() => { btn.innerText = '▶'; }, 2000); }
         function closeModal() { document.getElementById('setup-modal').classList.remove('active'); }
         function saveStep(val) {
             document.getElementById(`txt-${currentStep}`).innerText = val;
