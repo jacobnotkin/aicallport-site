@@ -15,17 +15,9 @@
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); }
         .app-container { width: 94%; max-width: 1400px; margin: 0 auto; padding: 2rem 0; }
         
-        /* RESPONSIVE PIPELINE: 4+3 on Mobile, 7 on Desktop */
-        .pipeline-grid { 
-            display: grid; 
-            width: 100%; 
-            gap: 12px; 
-            grid-template-columns: repeat(4, 1fr); /* Mobile: 2 rows (4 then 3) */
-            margin: 2.5rem 0; 
-        }
-        @media (min-width: 1024px) {
-            .pipeline-grid { grid-template-columns: repeat(7, 1fr); } /* Desktop: 1 row */
-        }
+        /* PIPELINE GRID */
+        .pipeline-grid { display: grid; width: 100%; gap: 12px; grid-template-columns: repeat(4, 1fr); margin: 2.5rem 0; }
+        @media (min-width: 1024px) { .pipeline-grid { grid-template-columns: repeat(7, 1fr); } }
 
         .step-card { background: rgba(255, 255, 255, 0.02); border-top: 4px solid rgba(255,255,255,0.1); padding: 1.25rem 0.5rem; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.3s ease; }
         .step-card:hover { background: rgba(59, 130, 246, 0.08); border-top-color: var(--accent); }
@@ -35,7 +27,6 @@
         .step-value { color: white; font-weight: 800; font-size: 12px; text-transform: uppercase; }
 
         .modal-btn { width: 100%; min-height: 100px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: white; font-weight: 900; text-transform: uppercase; font-size: 1.5rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-        .modal-btn:hover { background: var(--accent); }
         
         #setup-modal { display: none; position: fixed; inset: 0; z-index: 5000; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); }
         #setup-modal.active { display: flex; }
@@ -43,6 +34,15 @@
         .v-badge { background: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
         .value-tag { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 9px; font-weight: 900; text-transform: uppercase; }
         
+        /* CHAT SYSTEM */
+        #support-chat { position: fixed; bottom: 2rem; right: 2rem; z-index: 6000; }
+        .chat-btn { width: 64px; height: 64px; border-radius: 50%; background: #3b82f6; box-shadow: 0 8px 32px rgba(59, 130, 246, 0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; animation: pulse-blue 2s infinite; }
+        .chat-btn:hover { transform: scale(1.1); background: #2563eb; }
+        
+        #chat-window { display: none; position: fixed; bottom: 7rem; right: 2rem; width: 350px; height: 500px; z-index: 6000; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        #chat-window.active { display: flex; flex-direction: column; }
+
+        @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
         .loader { width: 20px; height: 20px; border: 3px solid #FFF; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -60,7 +60,10 @@
                 <span class="value-tag">No Contracts</span>
             </div>
         </div>
-        <div class="text-[10px] uppercase text-gray-400 font-black hidden sm:block">NODE: <span class="text-green-500">FULLY AUTOMATED</span></div>
+        <div class="flex items-center gap-6">
+            <button onclick="toggleChat()" class="text-[10px] font-black uppercase text-blue-400 hover:text-white transition-colors border-b border-blue-400/30 pb-1">AI CUSTOMER SUPPORT</button>
+            <div class="text-[10px] uppercase text-gray-400 font-black hidden sm:block border-l border-white/10 pl-6">NODE: <span class="text-green-500">FULLY AUTOMATED</span></div>
+        </div>
     </nav>
 
     <div class="app-container">
@@ -109,54 +112,71 @@
                     <span id="indicator-text" class="text-[10px] text-green-500 font-black uppercase">Active</span>
                 </div>
             </div>
-            <div id="live-feed" class="font-mono text-xs text-blue-400/80 space-y-2 h-32 overflow-y-auto">
-                > AUTOMATED ENGINE STANDBY: V.2.0 Ready...
+            <div id="live-feed" class="font-mono text-xs text-blue-400/80 space-y-2 h-32 overflow-y-auto">> SYSTEM READY...</div>
+        </div>
+    </div>
+
+    <div id="support-chat">
+        <div id="chat-window" class="glass bg-[#0b0e1a] flex-col">
+            <div class="bg-blue-600 p-4 flex justify-between items-center">
+                <span class="text-white font-black text-xs uppercase italic tracking-widest">AI Support Agent</span>
+                <button onclick="toggleChat()" class="text-white text-xl leading-none">&times;</button>
             </div>
+            <div id="chat-body" class="flex-1 p-4 overflow-y-auto space-y-3 font-mono text-[11px] text-blue-400">
+                <div class="bg-white/5 p-3 rounded-lg border border-white/10 text-white">
+                    Hello! I am your V.2.0 Support Assistant. How can I help you deploy your Global AI Voice Agent today?
+                </div>
+            </div>
+            <div class="p-3 border-t border-white/10 bg-black/40">
+                <input type="text" placeholder="Type message..." class="w-full bg-white/5 border border-white/10 rounded-full px-4 py-2 text-white text-xs outline-none focus:border-blue-500">
+            </div>
+        </div>
+        <div class="chat-btn" onclick="toggleChat()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
         </div>
     </div>
 
     <div id="setup-modal">
         <div class="glass p-10 md:p-16 rounded-[48px] w-full max-w-2xl text-center relative border-white/20">
             <button onclick="closeModal()" class="absolute top-6 right-8 text-white text-3xl opacity-30 hover:opacity-100">&times;</button>
-            <h2 id="modal-title" class="text-white font-black text-2xl uppercase mb-8 border-b-4 border-blue-600 pb-3 inline-block"></h2>
+            <h2 id="modal-title" class="text-white font-black text-2xl uppercase mb-8 border-b-4 border-blue-600 pb-3 inline-block tracking-tighter italic"></h2>
             <div id="modal-content" class="grid gap-3"></div>
         </div>
     </div>
 
     <script>
         const VAPI_PUBLIC_KEY = 'YOUR_PUBLIC_KEY_HERE'; 
-        const config = {
-            1: { title: "Select Region", data: ["North America", "Europe", "UK / Australia"] },
-            2: { title: "Select Industry", data: ["Medical/Dental", "Law Firm", "Home Services", "Retail"] },
-            3: { title: "Assign Role", data: ["Receptionist", "Sales Agent", "Support"] },
-            4: { title: "Business Name", type: "form" },
-            5: { title: "Select Voice", data: ["Professional", "Authority"] },
-            7: { title: "Automated Setup", type: "payment" }
-        };
-
         let currentStep = 1; let bizName = "Local Business";
 
+        function toggleChat() { document.getElementById('chat-window').classList.toggle('active'); }
+
+        const config = {
+            1: { title: "Region", data: ["North America", "Europe", "Global"] },
+            2: { title: "Industry", data: ["Medical", "Law", "Trade", "Retail"] },
+            3: { title: "Role", data: ["Receptionist", "Sales", "Support"] },
+            4: { title: "Business Name", type: "form" },
+            5: { title: "Voice", data: ["Professional", "Authority"] },
+            7: { title: "Setup V.2.0", type: "payment" }
+        };
+
         function openModal(s) {
-            currentStep = s; const c = config[s];
-            if(!c) return;
+            currentStep = s; const c = config[s]; if(!c) return;
             document.getElementById('modal-title').innerText = c.title;
             const container = document.getElementById('modal-content'); container.innerHTML = '';
-
             if(c.data) {
                 c.data.forEach(d => {
                     const b = document.createElement('button'); b.className = 'modal-btn'; b.innerText = d;
                     b.onclick = () => saveStep(d); container.appendChild(b);
                 });
             } else if(c.type === "form") {
-                container.innerHTML = `<input id="b-in" placeholder="ENTER BUSINESS NAME" class="modal-btn !text-xl !p-6 bg-white/5 outline-none mb-3 border-dashed border-white/20"><button onclick="bizName=document.getElementById('b-in').value;saveStep(bizName)" class="modal-btn !min-h-[70px] bg-blue-600 !text-base">SAVE DATA</button>`;
+                container.innerHTML = `<input id="b-in" placeholder="BUSINESS NAME" class="modal-btn !text-xl !p-6 bg-white/5 outline-none mb-3 border-dashed border-white/20"><button onclick="bizName=document.getElementById('b-in').value;saveStep(bizName)" class="modal-btn !min-h-[70px] bg-blue-600 !text-base">SECURE DATA</button>`;
             } else if(c.type === "payment") {
-                container.innerHTML = `<div class="mb-6"><h3 class="text-white text-4xl font-black">$199.00/mo</h3><p class="text-blue-400 text-[10px] font-black uppercase mt-2">Unlimited Calling • No Contract</p></div><button id="final-btn" onclick="startAutomatedProvisioning()" class="modal-btn bg-green-600 !min-h-[80px] !text-xl shadow-xl">DEPLOY V.2.0</button>`;
+                container.innerHTML = `<div class="mb-6"><h3 class="text-white text-4xl font-black">$199.00/mo</h3><p class="text-blue-400 text-[10px] font-black uppercase mt-2">Unlimited Volume • No Contract</p></div><button id="final-btn" onclick="startAutomatedProvisioning()" class="modal-btn bg-green-600 !min-h-[80px] !text-xl">DEPLOY NOW</button>`;
             }
             document.getElementById('setup-modal').classList.add('active');
         }
 
         function closeModal() { document.getElementById('setup-modal').classList.remove('active'); }
-
         function saveStep(v) {
             const displayVal = v.length > 10 ? v.substring(0,8) + ".." : v;
             document.getElementById(`txt-${currentStep}`).innerText = displayVal;
@@ -167,41 +187,22 @@
         }
 
         function startAutomatedProvisioning() {
-            const btn = document.getElementById('final-btn');
-            btn.innerHTML = `<span class="loader mr-3"></span> DEPLOYING...`;
+            const btn = document.getElementById('final-btn'); btn.innerHTML = `<span class="loader mr-3"></span> DEPLOYING...`;
             btn.disabled = true;
-
-            const logs = [
-                `> AUTH PAYMENT... OK.`,
-                `> PROVISIONING LOCAL NUMBER...`,
-                `> LINKING V.2.0 NEURAL BRAIN TO ${bizName.toUpperCase()}...`,
-                `> SYSTEM DEPLOYED. AGENT LIVE.`
-            ];
-
-            logs.forEach((text, i) => {
-                setTimeout(() => {
-                    const log = document.createElement('div'); log.innerText = text;
-                    document.getElementById('live-feed').prepend(log);
-                    if(i === logs.length - 1) finishActivation();
-                }, i * 1000);
-            });
-        }
-
-        function finishActivation() {
-            saveStep('LIVE');
-            document.getElementById('live-indicator').classList.remove('hidden');
-            document.getElementById('indicator-text').innerText = "LIVE V.2.0";
-            closeModal();
+            setTimeout(() => {
+                const log = document.createElement('div'); log.innerText = `> SYSTEM DEPLOYED. AGENT LIVE.`;
+                document.getElementById('live-feed').prepend(log);
+                saveStep('LIVE'); document.getElementById('live-indicator').classList.remove('hidden'); closeModal();
+            }, 3000);
         }
 
         function startLiveDemo() {
-            if(!window.vapiSDK) { alert("Voice Engine Loading..."); return; }
-            const role = document.getElementById('txt-3').innerText;
+            if(!window.vapiSDK) { alert("Loading..."); return; }
             window.vapiSDK.run({
                 apiKey: VAPI_PUBLIC_KEY,
                 assistant: {
-                    firstMessage: `Hello, thank you for calling ${bizName}! I am your AI ${role}. How can I assist you?`,
-                    model: { provider: "openai", model: "gpt-3.5-turbo", systemPrompt: `Professional AI ${role} for ${bizName}.` },
+                    firstMessage: `Hi, thank you for calling ${bizName}! How can I assist you?`,
+                    model: { provider: "openai", model: "gpt-3.5-turbo", systemPrompt: `AI Agent for ${bizName}.` },
                     voice: { provider: "11labs", voiceId: "jennifer" }
                 }
             });
