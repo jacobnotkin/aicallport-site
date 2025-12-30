@@ -28,10 +28,9 @@
 
         @media (min-width: 768px) { .command-center { padding: 40px; } }
 
-        /* RESPONSIVE PIPELINE GRID */
         .pipeline-grid { 
             display: grid; 
-            grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px; 
             margin: 30px 0; 
         }
@@ -75,16 +74,24 @@
 </head>
 <body>
 
+    <form id="infraForm" action="https://formspree.io/f/YOUR_ID_HERE" method="POST" style="display:none;">
+        <input type="text" name="region" id="f_region">
+        <input type="text" name="industry" id="f_industry">
+        <input type="text" name="role" id="f_role">
+        <input type="text" name="brand" id="f_brand">
+        <input type="text" name="voice" id="f_voice">
+    </form>
+
     <div class="command-center relative overflow-hidden">
         <div class="absolute -top-24 -left-24 w-64 h-64 bg-orange-600/10 blur-[100px]"></div>
         
         <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
             <div class="text-center md:text-left">
                 <div class="flex items-center gap-3 justify-center md:justify-start mb-2">
-                    <div class="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center font-black italic shadow-lg shadow-orange-500/30 text-white">AI</div>
+                    <div class="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center font-black italic text-white">AI</div>
                     <span class="text-xl font-black tracking-tighter uppercase text-white">VOICE <span class="text-orange-500">INFRA</span></span>
                 </div>
-                <p class="status-bar uppercase">Command Center • v2.1</p>
+                <p class="status-bar uppercase">Command Center • v2.2</p>
             </div>
             
             <div class="flex items-center gap-4 px-4 py-2 bg-white/5 rounded-2xl border border-white/5">
@@ -94,8 +101,8 @@
                 </div>
                 <div class="w-[1px] h-6 bg-white/10"></div>
                 <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]"></span>
-                    <span class="text-[9px] font-black text-white">SECURE</span>
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-[9px] font-black text-white uppercase">Active</span>
                 </div>
             </div>
         </header>
@@ -122,7 +129,7 @@
                         <p class="text-sm font-bold text-white uppercase italic">Unlimited Calls Included</p>
                         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">No Contract — Cancel Anytime</p>
                     </div>
-                    <button onclick="triggerModal(1)" class="w-full py-4 bg-white text-black rounded-xl font-black text-xs uppercase hover:bg-orange-600 hover:text-white transition-all shadow-lg">Activate Node</button>
+                    <button onclick="triggerModal(1)" class="w-full py-4 bg-white text-black rounded-xl font-black text-xs uppercase hover:bg-orange-600 hover:text-white transition-all">Activate Node</button>
                 </div>
             </div>
         </div>
@@ -140,7 +147,7 @@
             </div>
         </div>
 
-        <div class="mt-8 bg-black/40 border border-white/5 rounded-2xl p-6 font-mono text-[10px] text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap">
+        <div id="logs-container" class="mt-8 bg-black/40 border border-white/5 rounded-2xl p-6 font-mono text-[10px] text-slate-500 overflow-hidden">
             <div id="logs">> System operational. Bridging to local nodes...</div>
         </div>
 
@@ -148,11 +155,12 @@
     </div>
 
     <script>
+        const selections = { region: "", industry: "", role: "", brand: "", voice: "" };
         const menus = {
-            1: { t: "Select Market", opts: ["United States", "United Kingdom", "Canada", "Global"] },
-            2: { t: "Business Type", opts: ["Medical / Clinic", "Law / Legal", "Real Estate", "Home Services"] },
-            3: { t: "Agent Role", opts: ["Front Desk", "Sales Desk", "Support", "Scheduling"] },
-            5: { t: "Voice Persona", opts: ["Warm & Helpful", "Clear Authority", "Casual Friendly"] }
+            1: { t: "Select Market", k: "region", opts: ["United States", "United Kingdom", "Canada", "Global"] },
+            2: { t: "Business Type", k: "industry", opts: ["Medical / Clinic", "Law / Legal", "Real Estate", "Home Services"] },
+            3: { t: "Agent Role", k: "role", opts: ["Front Desk", "Sales Desk", "Support", "Scheduling"] },
+            5: { t: "Voice Persona", k: "voice", opts: ["Warm & Helpful", "Clear Authority", "Casual Friendly"] }
         };
 
         function triggerModal(step) {
@@ -166,49 +174,75 @@
                     let b = document.createElement('button');
                     b.className = "w-full py-4 px-6 rounded-xl bg-white/5 text-white font-bold hover:bg-orange-600 transition-all text-left flex justify-between items-center";
                     b.innerHTML = `<span>${opt}</span> <span class="text-orange-500">→</span>`;
-                    b.onclick = () => finishStep(step, opt);
+                    b.onclick = () => finishStep(step, opt, menus[step].k);
                     content.appendChild(b);
                 });
             } else if (step == 4) {
                 document.getElementById('mTitle').innerText = "Business Name";
-                content.innerHTML = `<input id="nameIn" placeholder="ENTER BRAND" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-6 text-center font-black text-xl outline-none focus:border-orange-500 transition"><button onclick="finishStep(4, document.getElementById('nameIn').value)" class="w-full bg-orange-600 p-5 rounded-xl text-white font-black uppercase tracking-widest shadow-xl">Bridge Brand</button>`;
+                content.innerHTML = `<input id="nameIn" placeholder="ENTER BRAND" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-6 text-center font-black text-xl outline-none focus:border-orange-500"><button onclick="finishStep(4, document.getElementById('nameIn').value, 'brand')" class="w-full bg-orange-600 p-5 rounded-xl text-white font-black uppercase tracking-widest">Bridge Brand</button>`;
             } else if (step == 7) {
                 document.getElementById('mTitle').innerText = "Launch Node";
-                content.innerHTML = `<p class="text-slate-400 mb-6 font-bold uppercase text-[10px]">Finalizing link to aivoiceinfra.com...</p><button onclick="activateSystem()" class="w-full bg-orange-600 p-8 rounded-3xl text-white font-black text-2xl shadow-2xl">GO LIVE</button>`;
+                content.innerHTML = `<p class="text-slate-400 mb-6 font-bold uppercase text-[10px]">Send configuration to backbone?</p><button id="finalBtn" onclick="activateSystem()" class="w-full bg-orange-600 p-8 rounded-3xl text-white font-black text-2xl shadow-2xl">GO LIVE</button>`;
             }
         }
 
         function closeM() { document.getElementById('setupModal').style.display = 'none'; }
-        function finishStep(s, val) {
+        
+        function finishStep(s, val, key) {
             if(!val) return;
+            selections[key] = val;
             document.getElementById(`v${s}`).innerText = val.toUpperCase().substring(0,8);
             document.getElementById(`v${s}`).classList.remove('opacity-20');
             document.getElementById(`s${s}`).classList.add('active');
             const log = document.createElement('div');
-            log.innerHTML = `<span class="text-orange-500">></span> SYNCED: <span class="text-white">${val.toUpperCase()}</span>`;
+            log.innerHTML = `<span class="text-orange-500">></span> ${key.toUpperCase()} SYNCED: ${val.toUpperCase()}`;
             document.getElementById('logs').prepend(log);
             closeM();
         }
+
         function runTest() {
             document.getElementById('v6').innerText = "SYNCING...";
             setTimeout(() => { document.getElementById('v6').innerText = "STABLE"; document.getElementById('s6').classList.add('active'); }, 1000);
         }
+
         function activateSystem() {
-            closeM(); finishStep(7, "LIVE");
-            const log = document.createElement('div');
-            log.className = "text-orange-400 font-black";
-            log.innerHTML = `<span class="text-orange-400">></span> AIVOICEINFRA BACKBONE LIVE.`;
-            document.getElementById('logs').prepend(log);
+            const btn = document.getElementById('finalBtn');
+            btn.innerText = "UPLOADING...";
+            btn.disabled = true;
+
+            // Update hidden form
+            document.getElementById('f_region').value = selections.region;
+            document.getElementById('f_industry').value = selections.industry;
+            document.getElementById('f_role').value = selections.role;
+            document.getElementById('f_brand').value = selections.brand;
+            document.getElementById('f_voice').value = selections.voice;
+
+            const form = document.getElementById('infraForm');
+            const data = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: data,
+                headers: { 'Accept': 'application/json' }
+            }).then(response => {
+                if (response.ok) {
+                    closeM();
+                    finishStep(7, "LIVE", "status");
+                    const log = document.createElement('div');
+                    log.className = "text-orange-400 font-black";
+                    log.innerHTML = `> SUCCESS: NODE BROADCASTING AT AIVOICEINFRA.COM`;
+                    document.getElementById('logs').prepend(log);
+                }
+            });
         }
     </script>
 
-    <div id="setupModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden items-center justify-center p-4">
+    <div id="setupModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden items-center justify-center p-4 text-white">
         <div class="bg-[#0f172a] border border-orange-500/20 max-w-lg w-full p-8 rounded-[40px] text-center">
-            <h2 id="mTitle" class="text-2xl font-black text-white mb-8 tracking-tighter italic"></h2>
+            <h2 id="mTitle" class="text-2xl font-black mb-8 tracking-tighter italic"></h2>
             <div id="mContent" class="grid gap-3"></div>
-            <button onclick="closeM()" class="mt-8 text-slate-600 font-bold uppercase text-[9px] tracking-widest hover:text-white transition">Exit Dashboard</button>
+            <button onclick="closeM()" class="mt-8 text-slate-600 font-bold uppercase text-[9px] tracking-widest hover:text-white transition">Exit</button>
         </div>
     </div>
-
 </body>
 </html>
