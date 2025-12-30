@@ -17,14 +17,13 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             cursor: pointer; 
             overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
         }
-        /* Hover effect to show it's clickable */
         .step-node:hover {
             background: rgba(59, 130, 246, 0.1);
             transform: translateY(-2px);
             border-top-color: #3b82f6 !important;
         }
-        /* Glow pulse for the "Awaiting" step */
         .step-node:not(.active-step):first-child {
             animation: pulse-border 2s infinite;
         }
@@ -42,26 +41,25 @@
         @media (max-width: 1023px) {
             .pipeline-track { grid-template-columns: 1fr; }
             .step-node { border-left: 4px solid rgba(255,255,255,0.1); padding: 15px 20px; text-align: left; }
-            .step-node:hover { border-left-color: #3b82f6 !important; }
         }
 
-        .active-step { border-color: #3b82f6 !important; background: rgba(59, 130, 246, 0.05); }
+        .active-step { border-color: #3b82f6 !important; background: rgba(59, 130, 246, 0.1) !important; }
 
-        /* --- DASHBOARD ELEMENTS --- */
+        /* --- DASHBOARD WAVE --- */
         .neural-container { display: flex; align-items: center; gap: 8px; height: 30px; }
         .wave-bar { width: 3px; height: 100%; background: linear-gradient(to bottom, #4285F4, #9B72CB); border-radius: 10px; animation: neural-wave 1.2s ease-in-out infinite; }
         .wave-bar:nth-child(2) { animation-delay: 0.1s; }
         .wave-bar:nth-child(3) { animation-delay: 0.2s; }
         @keyframes neural-wave { 0%, 100% { height: 10px; } 50% { height: 30px; } }
 
-        /* --- VOICE PREVIEW --- */
+        /* --- MODAL --- */
+        #setup-modal { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); padding: 20px; }
+        #setup-modal.active { display: flex; }
+        
         .voice-row { display: flex; align-items: center; justify-content: space-between; width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 1rem; margin-bottom: 0.75rem; }
         .play-trigger { background: #3b82f6; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; border: none; }
         .play-trigger.playing { background: #9B72CB; animation: pulse-audio 1s infinite; }
         @keyframes pulse-audio { 0% { box-shadow: 0 0 0 0 rgba(155, 114, 203, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(155, 114, 203, 0); } 100% { box-shadow: 0 0 0 0 rgba(155, 114, 203, 0); } }
-
-        #setup-modal { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); padding: 20px; }
-        #setup-modal.active { display: flex; }
     </style>
 </head>
 <body>
@@ -86,10 +84,23 @@
                     GLOBAL AI <br> <span class="text-blue-500 italic">VOICE AGENTS</span>
                 </h1>
                 <p class="text-gray-400 text-md md:text-lg max-w-xl">Built on Google Gemini. Enterprise-grade autonomous reception for local business owners.</p>
+                
+                <div class="flex flex-wrap gap-4 mt-8">
+                    <div class="flex items-center gap-2 text-green-400 font-black text-[10px] uppercase tracking-widest bg-green-400/10 border border-green-400/20 px-4 py-2 rounded-lg">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 111.414 1.414z"></path></svg>
+                        Unlimited Call Volume
+                    </div>
+                    <div class="flex items-center gap-2 text-blue-400 font-black text-[10px] uppercase tracking-widest bg-blue-400/10 border border-blue-400/20 px-4 py-2 rounded-lg">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path></svg>
+                        Pay Monthly • No Contract
+                    </div>
+                </div>
             </div>
-            <div class="lg:col-span-4 glass p-8 rounded-[2rem] text-center border-white/10">
+
+            <div class="lg:col-span-4 glass p-8 rounded-[2rem] text-center border-white/20">
                 <div class="text-5xl font-black text-white mb-2">$199<span class="text-xl text-blue-500">/mo</span></div>
-                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-6">Owner Management Portal Included</p>
+                <div class="bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase py-2 rounded-lg mb-6 border border-blue-500/20">Cancel Anytime</div>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-6 leading-relaxed">Secure Owner Portal &<br>Ongoing Script Management</p>
                 <button onclick="openModal(1)" class="w-full bg-orange-600 p-4 rounded-xl text-white font-black uppercase text-sm shadow-xl hover:bg-orange-500 transition-colors">Start Activation</button>
             </div>
         </div>
@@ -112,7 +123,7 @@
                     </div>
                     <div>
                         <h3 class="text-white font-black uppercase text-sm">Owner Command Center</h3>
-                        <p class="text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em] italic">Encrypted Secure Access</p>
+                        <p class="text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em] italic">Unlimited Call Flow Active</p>
                     </div>
                 </div>
                 <div class="bg-blue-600/20 border border-blue-500/40 px-4 py-1 rounded text-[10px] font-black text-blue-400 uppercase tracking-widest">Ongoing Information & Editing</div>
@@ -123,11 +134,11 @@
                     <div class="h-32 bg-white/10 rounded-3xl"></div><div class="h-32 bg-white/10 rounded-3xl"></div><div class="h-32 bg-white/10 rounded-3xl"></div>
                 </div>
                 <div class="relative z-10 bg-[#0b0e1a]/90 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 text-center max-w-lg shadow-2xl">
-                    <p class="text-white font-black text-sm uppercase mb-3">Post-Activation Management</p>
-                    <p class="text-gray-400 text-xs leading-relaxed">
-                        After the 7-step deployment, this dashboard activates for the business owner to monitor live calls, 
-                        edit AI scripts, and view daily lead metrics.
+                    <p class="text-white font-black text-sm uppercase mb-3 italic underline decoration-blue-500 underline-offset-4">Secure Owner Management</p>
+                    <p class="text-gray-400 text-xs leading-relaxed mb-4">
+                        Monitor your <span class="text-white font-bold">Unlimited Calls</span> in real-time. This portal allows you to adjust your AI scripts and lead-routing anytime.
                     </p>
+                    <div class="text-[9px] font-black text-blue-400 uppercase tracking-[0.3em]">No Long-Term Contracts Required</div>
                 </div>
             </div>
         </div>
@@ -153,7 +164,7 @@
                 {n: "Clear Corporate", d: "Articulate, precise, neutral."}
             ]},
             6: { title: "Live Test", type: "btn", text: "Simulate Signal" },
-            7: { title: "Deploy", type: "btn", text: "Deploy Agent" }
+            7: { title: "Deploy", type: "btn", text: "Activate Unlimited Calls" }
         };
 
         let currentStep = 1;
