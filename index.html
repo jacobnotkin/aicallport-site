@@ -25,7 +25,6 @@
             .step-node { border-left: 4px solid rgba(255,255,255,0.1); padding: 15px 20px; }
         }
 
-        /* MASSIVE BUTTONS */
         .massive-step-btn { 
             width: 100%; min-height: 220px !important; margin-bottom: 25px; border-radius: 40px; 
             border: 4px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.07); 
@@ -34,7 +33,6 @@
         }
         .massive-step-btn:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.3); transform: scale(1.01); }
 
-        /* MODAL */
         #setup-modal { display: none; position: fixed; inset: 0; z-index: 1000; align-items: center; justify-content: center; background: rgba(0,0,0,0.98); padding: 40px; }
         #setup-modal.active { display: flex; }
         .modal-inner { width: 95% !important; max-width: 1800px; max-height: 90vh; overflow-y: auto; }
@@ -54,7 +52,7 @@
             <div class="text-3xl font-black text-white italic tracking-tighter uppercase">AI CALL PORT</div>
             <div class="bg-blue-600/20 text-blue-400 text-xs px-3 py-1 rounded-md font-bold uppercase border border-blue-500/30">V.2.0 ACTIVE</div>
         </div>
-        <div class="text-xs font-black uppercase tracking-widest text-gray-500 italic">SYSTEM STATUS: <span id="sys-status" class="text-orange-500">AWAITING CONFIGURATION</span></div>
+        <div class="text-xs font-black uppercase tracking-widest text-gray-500 italic">SYSTEM STATUS: <span id="sys-status" class="text-orange-500">AWAITING SETUP</span></div>
     </nav>
 
     <div class="main-interface-container">
@@ -88,7 +86,13 @@
                 <div onclick="openModal(4)" id="step-4" class="step-node"><div class="text-[12px] font-black text-blue-500 uppercase">04. Identity</div><div id="txt-4" class="text-white font-bold text-lg uppercase opacity-40">---</div></div>
                 <div onclick="openModal(5)" id="step-5" class="step-node"><div class="text-[12px] font-black text-blue-500 uppercase">05. Voice</div><div id="txt-5" class="text-white font-bold text-lg uppercase opacity-40">---</div></div>
                 <div onclick="openModal(6)" id="step-6" class="step-node"><div class="text-[12px] font-black text-orange-500 uppercase">06. Test</div><div id="txt-6" class="text-white font-bold text-lg uppercase opacity-40">---</div></div>
-                <div onclick="openModal(7)" id="step-7" class="step-node"><div class="text-[12px] font-black text-green-500 uppercase">07. ACTIVATE</div><div id="txt-7" class="text-white font-bold text-lg uppercase opacity-40">LOCKED</div></div>
+                <div onclick="openModal(7)" id="step-7" class="step-node">
+                    <div class="flex justify-center items-center gap-1">
+                        <svg id="lock-icon" class="w-3 h-3 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 13H7v-6h10v6z"/></svg>
+                        <div class="text-[12px] font-black text-green-500 uppercase">07. ACTIVATE</div>
+                    </div>
+                    <div id="txt-7" class="text-white font-bold text-lg uppercase opacity-40">LOCKED</div>
+                </div>
             </div>
 
             <div id="dashboard-portal" class="glass p-8 rounded-[2.5rem] border-white/10 transition-all duration-1000">
@@ -100,7 +104,7 @@
                     </div>
                     <div class="flex-1">
                         <h3 id="dash-title" class="text-white font-black uppercase text-lg leading-none">Owner Management Portal</h3>
-                        <p id="dash-desc" class="text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em] mt-1">LOCKED: COMPLETE STEP 07 TO ACTIVATE AI AGENT</p>
+                        <p id="dash-desc" class="text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em] mt-1">LOCKED: COMPLETE STEP 07 TO RELEASE NEURAL STREAM</p>
                     </div>
                 </div>
                 <div id="live-feed"></div>
@@ -124,7 +128,7 @@
             4: { title: "IDENTITY", type: "form" },
             5: { title: "VOICE PROFILE", data: ["WARM PROFESSIONAL", "FRIENDLY ASSISTANT"] },
             6: { title: "LIVE TEST", type: "btn", text: "LINK NEURAL SYSTEM" },
-            7: { title: "ACTIVATE AGENT", type: "payment" }
+            7: { title: "SECURE ACTIVATION", type: "payment" }
         };
 
         let currentStep = 1;
@@ -145,18 +149,21 @@
                     container.appendChild(btn);
                 });
             } else if(s.type === "form") {
-                container.innerHTML = `<input type="text" id="biz-name" placeholder="ENTER BUSINESS NAME" class="giant-input"><button onclick="saveStep(document.getElementById('biz-name').value || 'SYNCED')" class="massive-step-btn" style="background: #3b82f6; border-color: #60a5fa">VERIFY IDENTITY</button>`;
+                container.innerHTML = `<input type="text" id="biz-name" placeholder="BUSINESS NAME" class="giant-input"><button onclick="saveStep(document.getElementById('biz-name').value || 'SYNCED')" class="massive-step-btn" style="background: #3b82f6; border-color: #60a5fa">VERIFY IDENTITY</button>`;
             } else if(s.type === "payment") {
                 container.innerHTML = `
                     <div class="payment-card w-full max-w-4xl">
-                        <div class="text-white text-3xl font-black mb-8 italic uppercase tracking-widest">Payment Required to Activate</div>
-                        <div class="text-blue-400 text-5xl font-black mb-10">$199.00 USD / MONTH</div>
+                        <div class="text-white text-3xl font-black mb-8 italic uppercase tracking-widest">Final Step: Unlock Neural Agent</div>
+                        <div class="text-blue-400 text-5xl font-black mb-10">$199.00 / MONTH</div>
                         <input type="text" placeholder="CARD NUMBER" class="giant-input !text-3xl !p-8 !mb-4">
                         <div class="flex gap-4 w-full">
                             <input type="text" placeholder="MM/YY" class="giant-input !text-3xl !p-8 !mb-8 flex-1">
                             <input type="text" placeholder="CVC" class="giant-input !text-3xl !p-8 !mb-8 flex-1">
                         </div>
-                        <button onclick="processPayment()" class="massive-step-btn !min-height-[150px] !text-4xl" style="background: #16a34a; border-color: #4ade80">CONFIRM & ACTIVATE</button>
+                        <button onclick="processPayment()" class="massive-step-btn !min-height-[150px] !text-4xl" style="background: #16a34a; border-color: #4ade80">AUTHORIZE & ACTIVATE</button>
+                        <div class="flex items-center justify-center gap-4 mt-6 opacity-40 text-white font-bold text-xs uppercase tracking-widest">
+                            <span>SECURE STRIPE GATEWAY</span> • <span>256-BIT SSL</span> • <span>PCI COMPLIANT</span>
+                        </div>
                     </div>
                 `;
             } else {
@@ -179,7 +186,7 @@
             document.getElementById('modal-content').innerHTML = `
                 <div class="text-white text-5xl font-black flex flex-col items-center gap-8">
                     <div class="w-20 h-20 border-8 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    AUTHORIZING TRANSACTION...
+                    VERIFYING WITH BANK...
                 </div>`;
             setTimeout(() => {
                 saveStep('PAID');
@@ -194,11 +201,13 @@
             document.getElementById('dash-desc').innerText = "Real-time AI interaction logs streaming below";
             document.getElementById('live-feed').style.display = 'block';
             document.getElementById('dashboard-portal').style.borderColor = 'rgba(74, 222, 128, 0.3)';
-            document.getElementById('main-act-btn').innerText = "AGENT DEPLOYED";
+            document.getElementById('main-act-btn').innerText = "AGENT ACTIVE";
             document.getElementById('main-act-btn').style.background = "#16a34a";
+            document.getElementById('lock-icon').classList.remove('text-gray-500');
+            document.getElementById('lock-icon').classList.add('text-green-500');
 
             const logs = [
-                "Neural Link Established...", "Payment Verified: Stripe_TX_9921",
+                "Neural Link Established...", "Payment Token: ST_4492 Accepted",
                 "Incoming Call: (555) 012-4432", "AI: Greeting Caller (Receptionist Mode)", 
                 "AI: Appointment Scheduled for Tuesday 2PM", "Syncing Lead with Owner Email..."
             ];
