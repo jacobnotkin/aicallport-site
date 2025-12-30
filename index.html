@@ -10,41 +10,58 @@
         body { font-family: 'Inter', sans-serif; background-color: #0b0e1a; color: #5c96fa; margin: 0; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
         
-        /* --- GEMINI NEURAL WAVE ICON --- */
-        .neural-container { display: flex; align-items: center; gap: 8px; height: 30px; }
-        .wave-bar { width: 3px; height: 100%; background: linear-gradient(to bottom, #4285F4, #9B72CB); border-radius: 10px; animation: neural-wave 1.2s ease-in-out infinite; }
-        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
-        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
-        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
-        @keyframes neural-wave { 0%, 100% { height: 10px; } 50% { height: 30px; } }
-
-        /* --- RESPONSIVE PIPELINE --- */
+        /* --- CLICKABLE PIPELINE NODES --- */
         .pipeline-track { display: grid; width: 100%; gap: 10px; }
+        .step-node { 
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            cursor: pointer; 
+            overflow: hidden;
+        }
+        /* Hover effect to show it's clickable */
+        .step-node:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+            border-top-color: #3b82f6 !important;
+        }
+        /* Glow pulse for the "Awaiting" step */
+        .step-node:not(.active-step):first-child {
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { border-top-color: rgba(59, 130, 246, 0.2); }
+            50% { border-top-color: rgba(59, 130, 246, 1); }
+            100% { border-top-color: rgba(59, 130, 246, 0.2); }
+        }
+
         @media (min-width: 1024px) {
             .pipeline-track { grid-template-columns: repeat(7, 1fr); }
             .step-node { border-top: 4px solid rgba(255,255,255,0.1); padding: 24px 10px; text-align: center; }
-            .step-node.active-step { border-top-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
         }
         @media (max-width: 1023px) {
             .pipeline-track { grid-template-columns: 1fr; }
             .step-node { border-left: 4px solid rgba(255,255,255,0.1); padding: 15px 20px; text-align: left; }
-            .step-node.active-step { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
+            .step-node:hover { border-left-color: #3b82f6 !important; }
         }
-        .step-header { font-size: 13px !important; font-weight: 900; text-transform: uppercase; margin-bottom: 4px; }
-        .step-value { font-size: 16px !important; font-weight: 700; color: white; text-transform: uppercase; }
 
-        /* --- VOICE PREVIEW STYLES --- */
-        .voice-row { display: flex; align-items: center; justify-content: space-between; width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 1rem; margin-bottom: 0.75rem; transition: 0.3s; }
-        .voice-row:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
-        .play-trigger { background: #3b82f6; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; transition: 0.2s; border: none; }
+        .active-step { border-color: #3b82f6 !important; background: rgba(59, 130, 246, 0.05); }
+
+        /* --- DASHBOARD ELEMENTS --- */
+        .neural-container { display: flex; align-items: center; gap: 8px; height: 30px; }
+        .wave-bar { width: 3px; height: 100%; background: linear-gradient(to bottom, #4285F4, #9B72CB); border-radius: 10px; animation: neural-wave 1.2s ease-in-out infinite; }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        @keyframes neural-wave { 0%, 100% { height: 10px; } 50% { height: 30px; } }
+
+        /* --- VOICE PREVIEW --- */
+        .voice-row { display: flex; align-items: center; justify-content: space-between; width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 1rem; margin-bottom: 0.75rem; }
+        .play-trigger { background: #3b82f6; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; border: none; }
         .play-trigger.playing { background: #9B72CB; animation: pulse-audio 1s infinite; }
         @keyframes pulse-audio { 0% { box-shadow: 0 0 0 0 rgba(155, 114, 203, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(155, 114, 203, 0); } 100% { box-shadow: 0 0 0 0 rgba(155, 114, 203, 0); } }
 
-        /* --- MODAL --- */
         #setup-modal { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); padding: 20px; }
         #setup-modal.active { display: flex; }
-        .select-btn { width: 100%; text-align: left; padding: 1.25rem; border: 1px solid rgba(255,255,255,0.05); border-radius: 1rem; margin-bottom: 0.5rem; position: relative; }
-        .tag-active { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; background: #166534; color: #4ade80; position: absolute; right: 12px; top: 1.25rem; }
     </style>
 </head>
 <body>
@@ -59,7 +76,7 @@
         </div>
     </nav>
 
-    <div class="max-w-[1400px] mx-auto px-6 md:px-8 pt-10 md:pt-16">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-8 pt-10">
         <div class="grid lg:grid-cols-12 gap-12 items-center mb-16">
             <div class="lg:col-span-8">
                 <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full mb-6">
@@ -68,28 +85,56 @@
                 <h1 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter mb-6 uppercase">
                     GLOBAL AI <br> <span class="text-blue-500 italic">VOICE AGENTS</span>
                 </h1>
-                <p class="text-gray-400 text-md md:text-lg max-w-xl">Autonomous reception and appointment booking. Built on Google Gemini for enterprise-grade intelligence.</p>
+                <p class="text-gray-400 text-md md:text-lg max-w-xl">Built on Google Gemini. Enterprise-grade autonomous reception for local business owners.</p>
             </div>
-            <div class="lg:col-span-4 glass p-8 md:p-10 rounded-[2rem] text-center border-white/10">
-                <div class="text-5xl md:text-6xl font-black text-white mb-2">$199<span class="text-xl text-blue-500">/mo</span></div>
-                <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-6 italic">Secure Owner Control Access</p>
-                <button onclick="openModal(1)" class="w-full bg-orange-600 p-4 rounded-xl text-white font-black uppercase text-sm shadow-xl">Begin Activation</button>
+            <div class="lg:col-span-4 glass p-8 rounded-[2rem] text-center border-white/10">
+                <div class="text-5xl font-black text-white mb-2">$199<span class="text-xl text-blue-500">/mo</span></div>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-6">Owner Management Portal Included</p>
+                <button onclick="openModal(1)" class="w-full bg-orange-600 p-4 rounded-xl text-white font-black uppercase text-sm shadow-xl hover:bg-orange-500 transition-colors">Start Activation</button>
             </div>
         </div>
 
-        <div class="pipeline-track mb-24">
-            <div onclick="openModal(1)" id="step-1" class="step-node"><div class="step-header text-blue-500">01. Region</div><div id="txt-1" class="step-value">Awaiting</div></div>
-            <div onclick="openModal(2)" id="step-2" class="step-node"><div class="step-header text-blue-500">02. Industry</div><div id="txt-2" class="step-value">Pending</div></div>
-            <div onclick="openModal(3)" id="step-3" class="step-node"><div class="step-header text-blue-500">03. Role</div><div id="txt-3" class="step-value">Pending</div></div>
-            <div onclick="openModal(4)" id="step-4" class="step-node"><div class="step-header text-blue-500">04. Identity</div><div id="txt-4" class="step-value">Pending</div></div>
-            <div onclick="openModal(5)" id="step-5" class="step-node"><div class="step-header text-blue-500">05. Voice</div><div id="txt-5" class="step-value">Pending</div></div>
-            <div onclick="openModal(6)" id="step-6" class="step-node"><div class="step-header text-orange-500">06. Test</div><div id="txt-6" class="step-value">Offline</div></div>
-            <div onclick="openModal(7)" id="step-7" class="step-node"><div class="step-header text-green-500">07. Deploy</div><div id="txt-7" class="step-value">Offline</div></div>
+        <div class="pipeline-track mb-20">
+            <div onclick="openModal(1)" id="step-1" class="step-node"><div class="text-[11px] font-black text-blue-500 uppercase mb-1">01. Region</div><div id="txt-1" class="text-white font-bold text-sm uppercase">Click to Select</div></div>
+            <div onclick="openModal(2)" id="step-2" class="step-node"><div class="text-[11px] font-black text-blue-500 uppercase mb-1">02. Industry</div><div id="txt-2" class="text-white font-bold text-sm uppercase italic opacity-40">---</div></div>
+            <div onclick="openModal(3)" id="step-3" class="step-node"><div class="text-[11px] font-black text-blue-500 uppercase mb-1">03. Role</div><div id="txt-3" class="text-white font-bold text-sm uppercase italic opacity-40">---</div></div>
+            <div onclick="openModal(4)" id="step-4" class="step-node"><div class="text-[11px] font-black text-blue-500 uppercase mb-1">04. Identity</div><div id="txt-4" class="text-white font-bold text-sm uppercase italic opacity-40">---</div></div>
+            <div onclick="openModal(5)" id="step-5" class="step-node"><div class="text-[11px] font-black text-blue-500 uppercase mb-1">05. Voice</div><div id="txt-5" class="text-white font-bold text-sm uppercase italic opacity-40">---</div></div>
+            <div onclick="openModal(6)" id="step-6" class="step-node"><div class="text-[11px] font-black text-orange-500 uppercase mb-1">06. Test</div><div id="txt-6" class="text-white font-bold text-sm uppercase italic opacity-40">---</div></div>
+            <div onclick="openModal(7)" id="step-7" class="step-node"><div class="text-[11px] font-black text-green-500 uppercase mb-1">07. Deploy</div><div id="txt-7" class="text-white font-bold text-sm uppercase italic opacity-40">---</div></div>
+        </div>
+
+        <div class="glass p-8 md:p-12 rounded-[2.5rem] border-white/5 relative overflow-hidden mb-20">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+                <div class="flex items-center gap-6">
+                    <div class="neural-container">
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-black uppercase text-sm">Owner Command Center</h3>
+                        <p class="text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em] italic">Encrypted Secure Access</p>
+                    </div>
+                </div>
+                <div class="bg-blue-600/20 border border-blue-500/40 px-4 py-1 rounded text-[10px] font-black text-blue-400 uppercase tracking-widest">Ongoing Information & Editing</div>
+            </div>
+
+            <div class="relative min-h-[250px] flex items-center justify-center">
+                <div class="absolute inset-0 grid grid-cols-1 md:grid-cols-3 gap-6 opacity-10">
+                    <div class="h-32 bg-white/10 rounded-3xl"></div><div class="h-32 bg-white/10 rounded-3xl"></div><div class="h-32 bg-white/10 rounded-3xl"></div>
+                </div>
+                <div class="relative z-10 bg-[#0b0e1a]/90 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 text-center max-w-lg shadow-2xl">
+                    <p class="text-white font-black text-sm uppercase mb-3">Post-Activation Management</p>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        After the 7-step deployment, this dashboard activates for the business owner to monitor live calls, 
+                        edit AI scripts, and view daily lead metrics.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="setup-modal">
-        <div class="glass max-w-lg w-full p-8 md:p-10 rounded-[2rem] relative">
+        <div class="glass max-w-lg w-full p-8 rounded-[2rem] relative">
             <button onclick="closeModal()" class="absolute top-6 right-8 text-white text-2xl hover:opacity-50">&times;</button>
             <h3 id="modal-title" class="text-white font-black uppercase text-center mb-8"></h3>
             <div id="modal-content" class="max-h-[60vh] overflow-y-auto pr-2"></div>
@@ -98,17 +143,17 @@
 
     <script>
         const config = {
-            1: { title: "Global Region", data: [{n:"USA", s:"Active"}, {n:"UK", s:"Active"}, {n:"Canada", s:"Active"}] },
-            2: { title: "Business Industry", data: [{n:"HVAC", s:"Active"}, {n:"Law Firms", s:"Active"}, {n:"Dental", s:"Active"}] },
+            1: { title: "Region", data: [{n:"USA", s:"Active"}, {n:"UK", s:"Active"}, {n:"Canada", s:"Active"}] },
+            2: { title: "Industry", data: [{n:"HVAC", s:"Active"}, {n:"Law Firms", s:"Active"}, {n:"Dental", s:"Active"}] },
             3: { title: "Agent Role", data: ["Receptionist", "Appointment Booker"] },
-            4: { title: "Company Identity", type: "form" },
+            4: { title: "Identity", type: "form" },
             5: { title: "Voice Profile", type: "voice", data: [
                 {n: "Warm Professional", d: "Deep, trustworthy, calm."},
                 {n: "Friendly Assistant", d: "Energetic, helpful, upbeat."},
                 {n: "Clear Corporate", d: "Articulate, precise, neutral."}
             ]},
             6: { title: "Live Test", type: "btn", text: "Simulate Signal" },
-            7: { title: "Final Activation", type: "btn", text: "Deploy Agent" }
+            7: { title: "Deploy", type: "btn", text: "Deploy Agent" }
         };
 
         let currentStep = 1;
@@ -127,7 +172,7 @@
                     row.innerHTML = `
                         <div class="flex-1 cursor-pointer" onclick="saveStep('${item.n}')">
                             <div class="text-white font-bold uppercase text-sm">${item.n}</div>
-                            <div class="text-gray-500 text-[10px] uppercase tracking-widest">${item.d}</div>
+                            <div class="text-gray-500 text-[9px] uppercase">${item.d}</div>
                         </div>
                         <button class="play-trigger" onclick="previewVoice(this, '${item.n}')">▶</button>
                     `;
@@ -137,9 +182,8 @@
                 s.data.forEach(item => {
                     const name = typeof item === 'string' ? item : item.n;
                     const btn = document.createElement('button');
-                    btn.className = 'select-btn';
+                    btn.className = 'w-full text-left p-4 mb-2 rounded-xl border border-white/10 hover:border-blue-500 bg-white/5 transition-all';
                     btn.innerHTML = `<span class="text-white font-bold uppercase text-sm">${name}</span>`;
-                    if(item.s) btn.innerHTML += `<span class="tag-active">ACTIVE</span>`;
                     btn.onclick = () => saveStep(name);
                     container.appendChild(btn);
                 });
@@ -153,15 +197,13 @@
         }
 
         function previewVoice(btn, name) {
-            const all = document.querySelectorAll('.play-trigger');
-            all.forEach(t => { t.classList.remove('playing'); t.innerText = '▶'; });
-            btn.classList.add('playing');
-            btn.innerText = '||';
+            btn.classList.add('playing'); btn.innerText = '||';
             setTimeout(() => { btn.classList.remove('playing'); btn.innerText = '▶'; }, 3000);
         }
 
         function saveStep(val) {
             document.getElementById(`txt-${currentStep}`).innerText = val;
+            document.getElementById(`txt-${currentStep}`).classList.remove('opacity-40', 'italic');
             document.getElementById(`step-${currentStep}`).classList.add('active-step');
             closeModal();
             if(currentStep < 7) setTimeout(() => openModal(currentStep + 1), 400);
