@@ -56,7 +56,7 @@
         <div class="flex flex-col lg:flex-row justify-between items-end gap-8 mb-10">
             <div class="max-w-4xl">
                 <div class="mb-3 flex items-center gap-3">
-                    <p class="text-blue-500 font-black uppercase tracking-[0.4em] text-xs">DESIGNED BY GOOGLE GEMINI</p>
+                    <p class="text-blue-500 font-black uppercase tracking-[0.4em] text-xs leading-none">DESIGNED BY GOOGLE GEMINI</p>
                     <svg class="w-4 h-4" viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#4285F4"/></svg>
                 </div>
                 <h1 class="text-3xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-tight">
@@ -72,19 +72,11 @@
                     </div>
                     <button onclick="openModal(1)" class="bg-blue-600 px-6 py-4 rounded-xl text-white font-black text-sm uppercase">Setup Agent</button>
                 </div>
-                
-                <div class="text-[9px] font-black text-green-500 uppercase tracking-widest text-center py-1 border-y border-white/5">ACTIVATION-FULLY AUTOMATED</div>
-                
+                <div class="text-[9px] font-black text-green-500 uppercase tracking-widest text-center py-1 border-y border-white/5 animate-pulse">ACTIVATION-FULLY AUTOMATED</div>
                 <div class="grid grid-cols-3 gap-1 pt-2">
-                    <div class="text-[8px] font-black text-blue-400/80 uppercase text-center flex flex-col">
-                        <span>Unlimited</span><span>Calling</span>
-                    </div>
-                    <div class="text-[8px] font-black text-blue-400/80 uppercase text-center border-x border-white/10 flex flex-col">
-                        <span>No</span><span>Contract</span>
-                    </div>
-                    <div class="text-[8px] font-black text-blue-400/80 uppercase text-center flex flex-col">
-                        <span>Cancel</span><span>Anytime</span>
-                    </div>
+                    <div class="text-[8px] font-black text-blue-400/80 uppercase text-center flex flex-col"><span>Unlimited</span><span>Calling</span></div>
+                    <div class="text-[8px] font-black text-blue-400/80 uppercase text-center border-x border-white/10 flex flex-col"><span>No</span><span>Contract</span></div>
+                    <div class="text-[8px] font-black text-blue-400/80 uppercase text-center flex flex-col"><span>Cancel</span><span>Anytime</span></div>
                 </div>
             </div>
         </div>
@@ -112,9 +104,9 @@
                 <span class="text-[9px] font-black text-white uppercase tracking-widest">Health: Optimal</span>
             </div>
             <div class="flex gap-4 mt-1">
-                <div class="flex flex-col"><span class="text-[7px] text-gray-500 font-black uppercase">Lat</span><span class="text-[10px] text-blue-400 font-mono">18ms</span></div>
-                <div class="flex flex-col border-x border-white/10 px-4"><span class="text-[7px] text-gray-500 font-black uppercase">Node</span><span class="text-[10px] text-blue-400 font-mono">G-102</span></div>
-                <div class="flex flex-col"><span class="text-[7px] text-gray-500 font-black uppercase">Up</span><span class="text-[10px] text-blue-400 font-mono">99%</span></div>
+                <div class="flex flex-col"><span class="text-[7px] text-gray-500 font-black uppercase">Lat</span><span id="hud-lat" class="text-[10px] text-blue-400 font-mono">18ms</span></div>
+                <div class="flex flex-col border-x border-white/10 px-4"><span class="text-[7px] text-gray-500 font-black uppercase">Node</span><span id="hud-node" class="text-[10px] text-blue-400 font-mono uppercase">USA</span></div>
+                <div class="flex flex-col"><span class="text-[7px] text-gray-500 font-black uppercase">Up</span><span class="text-[10px] text-blue-400 font-mono">99.9%</span></div>
             </div>
         </div>
     </div>
@@ -129,7 +121,7 @@
                 <button onclick="toggleChat()">&times;</button>
             </div>
             <div id="chat-body" class="flex-1 p-4 font-mono text-[11px] text-blue-400 overflow-y-auto">
-                <div class="bg-white/5 p-3 rounded-lg text-white">How can I assist with your automated setup?</div>
+                <div class="bg-white/5 p-3 rounded-lg text-white">V.2.0 Systems Online. How can I assist?</div>
             </div>
         </div>
         <div onclick="toggleChat()" class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center cursor-pointer shadow-xl hover:scale-110 transition-transform">
@@ -150,6 +142,14 @@
         function toggleChat() { document.getElementById('chat-window').classList.toggle('active'); }
         function closeModal() { document.getElementById('setup-modal').classList.remove('active'); }
         
+        const nodes = ["USA", "Canada", "Mexico", "UK", "Germany", "France", "Ireland", "Japan", "Singapore", "India", "Australia"];
+        let nodeIdx = 0;
+        setInterval(() => {
+            nodeIdx = (nodeIdx + 1) % nodes.length;
+            document.getElementById('hud-node').innerText = nodes[nodeIdx];
+            document.getElementById('hud-lat').innerText = Math.floor(Math.random() * (45 - 12) + 12) + "ms";
+        }, 4000);
+
         const config = {
             1: { title: "Region", data: ["North America", "Europe", "Global"] },
             2: { title: "Industry", data: ["Medical", "Law", "Trade", "Retail"] },
@@ -173,21 +173,21 @@
             } else if(c.type === "form") {
                 container.innerHTML = `<input id="b-in" placeholder="NAME" class="w-full p-5 bg-white/5 border border-white/10 rounded-xl text-white mb-3 outline-none"><button onclick="bizName=document.getElementById('b-in').value;saveStep(4, bizName);closeModal()" class="w-full bg-blue-600 p-5 rounded-xl text-white font-black">SAVE</button>`;
             } else if(c.type === "payment") {
-                container.innerHTML = `<div class="text-white mb-6"><h3 class="text-4xl font-black">$199</h3><p class="text-xs text-blue-400">FULLY AUTOMATED DEPLOYMENT</p></div><button onclick="startAutomatedProvisioning()" class="w-full bg-green-600 p-6 rounded-xl text-white font-black">ACTIVATE V.2.0</button>`;
+                container.innerHTML = `<div class="text-white mb-6"><h3 class="text-4xl font-black">$199</h3><p class="text-xs text-blue-400 font-black">FULLY AUTOMATED DEPLOYMENT</p></div><button onclick="startAutomatedProvisioning()" class="w-full bg-green-600 p-6 rounded-xl text-white font-black">ACTIVATE V.2.0</button>`;
             }
             document.getElementById('setup-modal').classList.add('active');
         }
 
         function saveStep(s, v) {
-            document.getElementById(`txt-${s}`).innerText = v.substring(0,8);
-            document.getElementById(`txt-${s}`).classList.remove('opacity-30');
+            const el = document.getElementById(`txt-${s}`);
+            el.innerText = v.substring(0,8);
+            el.classList.remove('opacity-30');
             document.getElementById(`step-${s}`).classList.add('active');
         }
 
         function startAutomatedProvisioning() {
             closeModal();
-            const log = document.createElement('div'); log.innerText = `> NEXT-GEN AI NODE LIVE.`;
-            document.getElementById('live-feed').prepend(log);
+            document.getElementById('live-feed').prepend(document.createElement('div')).innerText = `> NEXT-GEN AI NODE LIVE.`;
             saveStep(7, 'LIVE');
         }
         
