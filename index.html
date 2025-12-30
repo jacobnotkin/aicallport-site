@@ -9,11 +9,8 @@
     <style>
         html, body { height: 100%; margin: 0; background-color: #0b0e1a; overflow: hidden; }
         body { display: flex; flex-direction: column; font-family: 'Inter', sans-serif; color: #5c96fa; }
-        
         .main-interface-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
-        
-        /* PIPELINE NODES */
         .pipeline-track { display: grid; width: 100%; gap: 10px; }
         .step-node { position: relative; transition: all 0.3s ease; cursor: pointer; background: rgba(255, 255, 255, 0.02); }
         .step-node:hover { background: rgba(59, 130, 246, 0.1); border-top-color: #3b82f6 !important; }
@@ -28,37 +25,25 @@
             .step-node { border-left: 4px solid rgba(255,255,255,0.1); padding: 15px 20px; }
         }
 
-        /* MASSIVE BUTTONS */
         .massive-step-btn { 
-            width: 100%; 
-            min-height: 220px !important; 
-            margin-bottom: 25px; 
-            border-radius: 40px; 
-            border: 4px solid rgba(255,255,255,0.15); 
-            background: rgba(255,255,255,0.07); 
-            color: white; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            font-size: 60px !important; 
-            line-height: 1;
-            letter-spacing: -0.02em;
-            transition: all 0.2s ease-out;
-            display: flex;
-            align-items: center;
-            padding-left: 60px;
+            width: 100%; min-height: 220px !important; margin-bottom: 25px; border-radius: 40px; 
+            border: 4px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.07); 
+            color: white; font-weight: 900; text-transform: uppercase; font-size: 60px !important; 
+            line-height: 1; letter-spacing: -0.02em; transition: all 0.2s ease-out; display: flex; align-items: center; padding-left: 60px;
         }
         .massive-step-btn:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.3); transform: scale(1.01); }
 
-        /* MODAL */
         #setup-modal { display: none; position: fixed; inset: 0; z-index: 1000; align-items: center; justify-content: center; background: rgba(0,0,0,0.98); padding: 40px; }
         #setup-modal.active { display: flex; }
         .modal-inner { width: 95% !important; max-width: 1800px; max-height: 90vh; overflow-y: auto; }
 
-        /* LIVE FEED LOG */
-        #live-feed { display: none; margin-top: 15px; border-top: 1px solid rgba(59, 130, 246, 0.2); padding-top: 15px; max-height: 100px; overflow: hidden; }
-        .log-entry { font-family: monospace; font-size: 10px; color: #4ade80; margin-bottom: 4px; text-transform: uppercase; opacity: 0.7; }
-        
         .giant-input { width: 100%; background: rgba(255,255,255,0.05); border: 4px solid rgba(255,255,255,0.1); padding: 60px; border-radius: 40px; font-size: 50px; color: white; font-weight: 900; margin-bottom: 30px; outline: none; }
+        
+        #live-feed { display: none; margin-top: 15px; border-top: 1px solid rgba(59, 130, 246, 0.2); padding-top: 15px; max-height: 150px; overflow-y: auto; }
+        .log-entry { font-family: monospace; font-size: 11px; color: #4ade80; margin-bottom: 4px; text-transform: uppercase; }
+        
+        /* Payment UI Specifics */
+        .payment-card { background: #1a1f2e; border: 2px solid #3b82f6; border-radius: 30px; padding: 40px; }
     </style>
 </head>
 <body>
@@ -68,7 +53,7 @@
             <div class="text-3xl font-black text-white italic tracking-tighter uppercase">AI CALL PORT</div>
             <div class="bg-blue-600/20 text-blue-400 text-xs px-3 py-1 rounded-md font-bold uppercase border border-blue-500/30">V.2.0 ACTIVE</div>
         </div>
-        <div class="text-xs font-black uppercase tracking-widest text-gray-500 italic">SYSTEM STATUS: <span id="sys-status" class="text-white">OPTIMIZED</span></div>
+        <div class="text-xs font-black uppercase tracking-widest text-gray-500 italic">SYSTEM STATUS: <span id="sys-status" class="text-orange-500">AWAITING PAYMENT</span></div>
     </nav>
 
     <div class="main-interface-container">
@@ -90,8 +75,8 @@
 
                 <div class="lg:col-span-3 glass p-6 rounded-3xl text-center border-white/20">
                     <div class="text-3xl font-black text-white">$199<span class="text-sm text-blue-500 font-bold ml-1">/mo</span></div>
-                    <p class="text-[9px] text-gray-500 uppercase font-black tracking-widest mb-3">Instant Setup</p>
-                    <button onclick="openModal(1)" class="w-full bg-orange-600 py-3 rounded-xl text-white font-black uppercase text-xs shadow-xl hover:bg-orange-500 transition-colors tracking-widest">ACTIVATE</button>
+                    <p class="text-[9px] text-gray-500 uppercase font-black tracking-widest mb-3 italic">Billed Now</p>
+                    <button id="main-act-btn" onclick="openModal(1)" class="w-full bg-orange-600 py-3 rounded-xl text-white font-black uppercase text-xs shadow-xl hover:bg-orange-500 transition-colors tracking-widest">START ACTIVATION</button>
                 </div>
             </div>
 
@@ -102,7 +87,7 @@
                 <div onclick="openModal(4)" id="step-4" class="step-node"><div class="text-[12px] font-black text-blue-500 uppercase">04. Identity</div><div id="txt-4" class="text-white font-bold text-lg uppercase opacity-40">---</div></div>
                 <div onclick="openModal(5)" id="step-5" class="step-node"><div class="text-[12px] font-black text-blue-500 uppercase">05. Voice</div><div id="txt-5" class="text-white font-bold text-lg uppercase opacity-40">---</div></div>
                 <div onclick="openModal(6)" id="step-6" class="step-node"><div class="text-[12px] font-black text-orange-500 uppercase">06. Test</div><div id="txt-6" class="text-white font-bold text-lg uppercase opacity-40">---</div></div>
-                <div onclick="openModal(7)" id="step-7" class="step-node"><div class="text-[12px] font-black text-green-500 uppercase">07. Deploy</div><div id="txt-7" class="text-white font-bold text-lg uppercase opacity-40">---</div></div>
+                <div onclick="openModal(7)" id="step-7" class="step-node"><div class="text-[12px] font-black text-green-500 uppercase">07. Payment</div><div id="txt-7" class="text-white font-bold text-lg uppercase opacity-40">---</div></div>
             </div>
 
             <div id="dashboard-portal" class="glass p-8 rounded-[2.5rem] border-white/10 transition-all duration-1000">
@@ -114,24 +99,19 @@
                     </div>
                     <div class="flex-1">
                         <h3 id="dash-title" class="text-white font-black uppercase text-lg leading-none">Owner Management Portal</h3>
-                        <p id="dash-desc" class="text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em] mt-1">Encrypted Cloud Dashboard Active Post-Activation</p>
-                    </div>
-                    <div id="live-indicator" class="hidden flex items-center gap-2">
-                        <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
-                        <span class="text-green-500 font-black text-xs uppercase tracking-tighter">Live & Processing</span>
+                        <p id="dash-desc" class="text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em] mt-1">LOCKED: COMPLETE STEP 07 PAYMENT TO RELEASE NEURAL STREAM</p>
                     </div>
                 </div>
-                
                 <div id="live-feed"></div>
             </div>
         </div>
     </div>
 
     <div id="setup-modal">
-        <div class="modal-inner glass p-20 rounded-[50px] relative">
+        <div class="modal-inner glass p-20 rounded-[50px] relative text-center">
             <button onclick="closeModal()" class="absolute top-12 right-16 text-white text-6xl font-thin hover:opacity-50">&times;</button>
-            <h3 id="modal-title" class="text-white font-black uppercase mb-16 text-6xl tracking-[0.4em] italic text-center border-b-8 border-blue-500 pb-10 inline-block"></h3>
-            <div id="modal-content"></div>
+            <h3 id="modal-title" class="text-white font-black uppercase mb-12 text-6xl tracking-[0.4em] italic border-b-8 border-blue-500 pb-10 inline-block"></h3>
+            <div id="modal-content" class="flex flex-col items-center"></div>
         </div>
     </div>
 
@@ -143,7 +123,7 @@
             4: { title: "IDENTITY", type: "form" },
             5: { title: "VOICE PROFILE", data: ["WARM PROFESSIONAL", "FRIENDLY ASSISTANT"] },
             6: { title: "LIVE TEST", type: "btn", text: "LINK NEURAL SYSTEM" },
-            7: { title: "FINAL DEPLOY", type: "btn", text: "ACTIVATE UNLIMITED" }
+            7: { title: "SECURE PAYMENT", type: "payment" }
         };
 
         let currentStep = 1;
@@ -165,8 +145,18 @@
                 });
             } else if(s.type === "form") {
                 container.innerHTML = `<input type="text" id="biz-name" placeholder="ENTER BUSINESS NAME" class="giant-input"><button onclick="saveStep(document.getElementById('biz-name').value || 'SYNCED')" class="massive-step-btn" style="background: #3b82f6; border-color: #60a5fa">VERIFY IDENTITY</button>`;
+            } else if(s.type === "payment") {
+                container.innerHTML = `
+                    <div class="payment-card w-full max-w-4xl">
+                        <div class="text-white text-3xl font-black mb-8 italic">TOTAL DUE: $199.00</div>
+                        <input type="text" placeholder="CARDHOLDER NAME" class="giant-input !text-3xl !p-8 !mb-4">
+                        <input type="text" placeholder="0000 0000 0000 0000" class="giant-input !text-3xl !p-8 !mb-8">
+                        <button onclick="processPayment()" class="massive-step-btn !min-height-[150px] !text-4xl" style="background: #16a34a; border-color: #4ade80">AUTHORIZE & DEPLOY</button>
+                        <div class="text-gray-500 text-xs mt-4 uppercase tracking-widest font-bold">Encrypted via Google Cloud Security Layer</div>
+                    </div>
+                `;
             } else {
-                container.innerHTML = `<button onclick="saveStep('LIVE')" class="massive-step-btn" style="background: #16a34a; border-color: #4ade80">${s.text}</button>`;
+                container.innerHTML = `<button onclick="saveStep('READY')" class="massive-step-btn" style="background: #3b82f6; border-color: #60a5fa">${s.text}</button>`;
             }
             document.getElementById('setup-modal').classList.add('active');
         }
@@ -178,42 +168,38 @@
             document.getElementById(`txt-${currentStep}`).classList.remove('opacity-40');
             document.getElementById(`step-${currentStep}`).classList.add('active-step');
             closeModal();
-            
-            if(currentStep < 7) {
-                setTimeout(() => openModal(currentStep + 1), 400);
-            } else {
+            if(currentStep < 7) setTimeout(() => openModal(currentStep + 1), 400);
+        }
+
+        function processPayment() {
+            document.getElementById('modal-content').innerHTML = `<div class="text-white text-5xl font-black animate-pulse">PROCESSING TRANSACTION...</div>`;
+            setTimeout(() => {
+                saveStep('PAID');
                 activateSystem();
-            }
+            }, 2500);
         }
 
         function activateSystem() {
-            // UI Transformation
             document.getElementById('sys-status').innerText = "LIVE & BROADCASTING";
             document.getElementById('sys-status').className = "text-green-500 animate-pulse";
             document.getElementById('dash-title').innerText = "Neural Call Stream Active";
             document.getElementById('dash-desc').innerText = "Real-time AI interaction logs streaming below";
-            document.getElementById('live-indicator').classList.remove('hidden');
             document.getElementById('live-feed').style.display = 'block';
             document.getElementById('dashboard-portal').style.borderColor = 'rgba(74, 222, 128, 0.3)';
+            document.getElementById('main-act-btn').innerText = "AGENT ACTIVE";
+            document.getElementById('main-act-btn').style.background = "#16a34a";
 
-            // Simulated Call Trickle
             const logs = [
-                "Neural Link Established...",
-                "Scanning Local Area Codes...",
-                "Incoming Call: (555) 012-4432",
-                "AI: Greeting Caller (Receptionist Mode)",
-                "AI: Appointment Scheduled for Tuesday 2PM",
-                "Syncing Lead with Owner Email...",
-                "Waiting for next handshake..."
+                "Neural Link Established...", "Incoming Call: (555) 012-4432", 
+                "AI: Greeting Caller (Receptionist Mode)", "AI: Appointment Scheduled for Tuesday 2PM",
+                "Transaction ID: #PX-99281 Confirmed", "Syncing Lead with Owner Email..."
             ];
-            
             let i = 0;
             setInterval(() => {
                 const log = document.createElement('div');
                 log.className = "log-entry";
                 log.innerText = `[${new Date().toLocaleTimeString()}] ${logs[i % logs.length]}`;
-                const feed = document.getElementById('live-feed');
-                feed.prepend(log);
+                document.getElementById('live-feed').prepend(log);
                 i++;
             }, 3000);
         }
