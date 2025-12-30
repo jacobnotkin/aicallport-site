@@ -3,63 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIVoiceINFRA | Global AI Backbone</title>
+    <title>AIVoiceINFRA | Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --p-blue: #3b82f6; --dark-bg: #0b0e1a; }
-        body { background-color: var(--dark-bg); color: #5c96fa; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; display: flex; flex-direction: column; overflow-x: hidden; }
+        body { background-color: var(--dark-bg); color: #5c96fa; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; display: flex; flex-direction: column; }
         .glass-panel { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); }
-        .spark-svg { filter: drop-shadow(0 0 8px rgba(66, 133, 244, 0.7)); animation: spark-pulse 1.5s infinite alternate; }
-        @keyframes spark-pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
         
-        .system-hud-new { 
-            position: fixed; bottom: 30px; left: 30px; z-index: 100; 
-            border-left: 4px solid #10b981;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); 
-            padding: 15px 25px; border-radius: 0 20px 20px 0; 
-            background: rgba(11, 14, 26, 0.98); 
-        }
-
-        .pipeline-wrapper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 40px 0; }
+        /* UPDATED PIPELINE STYLING */
+        .pipeline-wrapper { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 40px 0; }
         @media (min-width: 1024px) { .pipeline-wrapper { grid-template-columns: repeat(7, 1fr); } }
         
-        .btn-step { background: rgba(255, 255, 255, 0.02); border-top: 3px solid rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .btn-step { 
+            background: rgba(255, 255, 255, 0.02); 
+            border-top: 4px solid rgba(255, 255, 255, 0.1); 
+            padding: 25px 15px; /* Increased Padding */
+            border-radius: 12px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+        }
+        .btn-step:hover { background: rgba(255, 255, 255, 0.05); transform: translateY(-3px); }
         .btn-step.active { border-top-color: var(--p-blue); background: rgba(59, 130, 246, 0.1); }
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; }
+        
+        /* FONT SIZE BOOSTS */
+        .step-label { font-size: 11px; font-weight: 900; letter-spacing: 0.15em; margin-bottom: 8px; }
+        .step-value { font-size: 16px; font-weight: 800; text-transform: uppercase; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; }
         .modal-overlay.show { display: flex; }
+        .system-hud-new { position: fixed; bottom: 30px; left: 30px; z-index: 100; border-left: 4px solid #3b82f6; padding: 15px 25px; border-radius: 0 20px 20px 0; background: rgba(11, 14, 26, 0.95); }
     </style>
 </head>
 <body>
 
     <nav class="border-b border-white/5 px-8 py-6 flex justify-between items-center sticky top-0 bg-[#0b0e1a]/95 backdrop-blur-md z-50">
         <div class="flex items-center gap-4">
-            <span class="text-xl font-black text-white italic tracking-tighter uppercase">AI VOICE <span class="text-blue-500">INFRA</span></span>
-            <div class="hidden md:flex items-center gap-2 border-l border-white/10 pl-6">
-                <span class="text-[9px] font-black tracking-[0.2em] text-blue-400 uppercase">ROOT: AIVOICEINFRA.COM</span>
-            </div>
+            <span class="text-xl font-black text-white italic uppercase tracking-tighter">AI VOICE <span class="text-blue-500">INFRA</span></span>
         </div>
-        <div class="flex gap-4 items-center">
-            <div class="hidden sm:flex flex-col items-end">
-                <span class="text-[8px] font-black text-white uppercase tracking-widest">DNS Status</span>
-                <span class="text-[9px] font-bold text-green-500 uppercase">Propagated</span>
-            </div>
-            <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center">
-                <svg class="spark-svg w-5 h-5" viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#3b82f6" /></svg>
-            </div>
-        </div>
+        <div class="text-[10px] font-bold text-green-500 bg-green-500/10 px-3 py-1 rounded border border-green-500/20 uppercase tracking-widest">AIVOICEINFRA.COM LIVE</div>
     </nav>
 
     <main class="max-w-[1400px] mx-auto w-[92%] py-12">
         <div class="flex flex-col lg:flex-row justify-between items-end gap-12 mb-12">
-            <div class="max-w-3xl">
-                <div class="flex items-center gap-3 mb-4">
-                    <span class="text-blue-500 font-black text-xs tracking-[0.3em] uppercase">Enterprise Domain License</span>
-                </div>
+            <div>
                 <h1 class="text-5xl md:text-7xl font-black text-white uppercase tracking-tighter leading-none mb-4">
                     AI VOICE <span class="text-blue-600 italic">INFRA</span>
                 </h1>
-                <p class="text-blue-400 font-black text-xs md:text-sm tracking-[0.15em] uppercase leading-relaxed">
+                <p class="text-blue-400 font-black text-sm md:text-base tracking-[0.15em] uppercase leading-relaxed">
                     AUTOMATIC AI VOICE AGENT CONNECTOR FOR SMALL BUSINESSES
                 </p>
             </div>
@@ -67,66 +59,86 @@
             <div class="glass-panel p-8 rounded-[35px] w-full lg:w-[450px] border-white/10">
                 <div class="flex justify-between items-start mb-6">
                     <div>
-                        <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Global Node Access</p>
                         <h2 class="text-5xl font-black text-white">$199<span class="text-lg text-gray-400">/mo</span></h2>
+                        <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-2">Unlimited Infra License</p>
                     </div>
-                    <button onclick="triggerModal(1)" class="bg-blue-600 text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase shadow-xl hover:bg-blue-500">Provision Node</button>
+                    <button onclick="triggerModal(1)" class="bg-blue-600 text-white px-6 py-4 rounded-xl font-black text-xs uppercase shadow-xl hover:bg-blue-500 transition">Deploy Agent</button>
                 </div>
                 <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4">
-                    <div class="text-[9px] font-black text-blue-400 uppercase">✓ AIVOICEINFRA CLOUD</div>
-                    <div class="text-[9px] font-black text-blue-400 uppercase">✓ UNLIMITED CALLING</div>
+                    <div class="text-[10px] font-black text-blue-400 uppercase">✓ NO CONTRACTS</div>
+                    <div class="text-[10px] font-black text-blue-400 uppercase">✓ SSL SECURE</div>
                 </div>
             </div>
         </div>
 
         <div class="pipeline-wrapper">
-            <div onclick="triggerModal(1)" id="s1" class="btn-step"><p class="text-[9px] font-black text-blue-500">01 REGION</p><p id="v1" class="text-white text-xs font-bold mt-1 opacity-20">---</p></div>
-            <div onclick="triggerModal(2)" id="s2" class="btn-step"><p class="text-[9px] font-black text-blue-500">02 INDUSTRY</p><p id="v2" class="text-white text-xs font-bold mt-1 opacity-20">---</p></div>
-            <div onclick="triggerModal(3)" id="s3" class="btn-step"><p class="text-[9px] font-black text-blue-500">03 ROLE</p><p id="v3" class="text-white text-xs font-bold mt-1 opacity-20">---</p></div>
-            <div onclick="triggerModal(4)" id="s4" class="btn-step"><p class="text-[9px] font-black text-blue-500">04 IDENTITY</p><p id="v4" class="text-white text-xs font-bold mt-1 opacity-20">---</p></div>
-            <div onclick="triggerModal(5)" id="s5" class="btn-step"><p class="text-[9px] font-black text-blue-500">05 VOICE</p><p id="v5" class="text-white text-xs font-bold mt-1 opacity-20">---</p></div>
-            <div onclick="runTest()" id="s6" class="btn-step border-orange-500/30"><p class="text-[9px] font-black text-orange-500">06 TEST</p><p id="v6" class="text-white text-xs font-bold mt-1">START</p></div>
-            <div onclick="triggerModal(7)" id="s7" class="btn-step"><p class="text-[9px] font-black text-green-500">07 ACTIVATE</p><p id="v7" class="text-white text-xs font-bold mt-1 opacity-20">LOCK</p></div>
+            <div onclick="triggerModal(1)" id="s1" class="btn-step">
+                <p class="step-label text-blue-500 uppercase">01 REGION</p>
+                <p id="v1" class="step-value text-white opacity-20">---</p>
+            </div>
+            <div onclick="triggerModal(2)" id="s2" class="btn-step">
+                <p class="step-label text-blue-500 uppercase">02 INDUSTRY</p>
+                <p id="v2" class="step-value text-white opacity-20">---</p>
+            </div>
+            <div onclick="triggerModal(3)" id="s3" class="btn-step">
+                <p class="step-label text-blue-500 uppercase">03 ROLE</p>
+                <p id="v3" class="step-value text-white opacity-20">---</p>
+            </div>
+            <div onclick="triggerModal(4)" id="s4" class="btn-step">
+                <p class="step-label text-blue-500 uppercase">04 IDENTITY</p>
+                <p id="v4" class="step-value text-white opacity-20">---</p>
+            </div>
+            <div onclick="triggerModal(5)" id="s5" class="btn-step">
+                <p class="step-label text-blue-500 uppercase">05 VOICE</p>
+                <p id="v5" class="step-value text-white opacity-20">---</p>
+            </div>
+            <div onclick="runTest()" id="s6" class="btn-step border-orange-500/40">
+                <p class="step-label text-orange-500 uppercase">06 TEST</p>
+                <p id="v6" class="step-value text-white">START</p>
+            </div>
+            <div onclick="triggerModal(7)" id="s7" class="btn-step">
+                <p class="step-label text-green-500 uppercase">07 ACTIVATE</p>
+                <p id="v7" class="step-value text-white opacity-20">LOCK</p>
+            </div>
         </div>
 
-        <div class="glass-panel p-8 rounded-[40px] min-h-[180px] relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-4 opacity-10 font-black text-4xl">AIVOICEINFRA</div>
-            <h3 class="text-white font-black text-lg border-b border-white/10 pb-3 mb-4 uppercase italic">Backbone Console</h3>
-            <div id="logs" class="font-mono text-[11px] text-blue-400/70 space-y-1">> Awaiting User Identity...</div>
+        <div class="glass-panel p-10 rounded-[40px] min-h-[200px]">
+            <h3 class="text-white font-black text-xl italic border-b border-white/10 pb-4 mb-4 uppercase">System Control Stream</h3>
+            <div id="logs" class="font-mono text-sm text-blue-400/80 space-y-2">> Ready for GoDaddy DNS Handshake...</div>
         </div>
     </main>
 
     <div class="system-hud-new hidden md:block">
-        <div class="flex items-center justify-between gap-8 mb-3">
+        <div class="flex items-center gap-8 mb-3">
             <div class="flex items-center gap-2">
-                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
-                <span class="text-[10px] font-black text-white uppercase">A-Record: Active</span>
+                <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                <span class="text-[10px] font-black text-white uppercase">AIVOICEINFRA.COM</span>
             </div>
-            <span class="text-[8px] font-black text-blue-400 uppercase tracking-widest">AIVOICEINFRA.COM</span>
+            <span class="text-[8px] font-black text-blue-400 uppercase">IP: 142.250.190.46</span>
         </div>
-        <div class="flex gap-6">
-            <div><p class="text-[7px] text-gray-500 font-black uppercase">Edge Node</p><p id="node-name" class="text-[11px] text-white font-black italic">LONDON, UK</p></div>
-            <div class="border-l border-white/10 pl-4"><p class="text-[7px] text-gray-500 font-black uppercase">Load Balancer</p><p id="node-lat" class="text-[11px] text-blue-400 font-mono font-bold">12ms</p></div>
+        <div class="flex gap-10">
+            <div><p class="text-[8px] text-gray-500 font-black uppercase">Active Node</p><p id="node-name" class="text-xs text-white font-black italic uppercase">LONDON, UK</p></div>
+            <div class="border-l border-white/10 pl-6"><p class="text-[8px] text-gray-500 font-black uppercase">Latency</p><p id="node-lat" class="text-xs text-blue-400 font-mono font-bold">12ms</p></div>
         </div>
     </div>
 
     <div id="setupModal" class="modal-overlay">
         <div class="glass-panel p-12 rounded-[50px] w-full max-w-xl text-center relative border-white/20">
-            <h2 id="mTitle" class="text-white font-black text-2xl uppercase mb-6"></h2>
-            <div id="mContent" class="grid gap-3"></div>
-            <button onclick="closeM()" class="mt-8 text-gray-600 text-[10px] font-black uppercase hover:text-white">Exit</button>
+            <h2 id="mTitle" class="text-white font-black text-3xl uppercase mb-8 tracking-tighter"></h2>
+            <div id="mContent" class="grid gap-4"></div>
+            <button onclick="closeM()" class="mt-10 text-gray-600 text-xs font-black uppercase hover:text-white">Cancel Operation</button>
         </div>
     </div>
 
     <script>
         let bizSlug = "";
-        const nodes = ["SILICON VALLEY, USA", "TORONTO, CANADA", "LONDON, UK", "TOKYO, JAPAN", "SINGAPORE, SG", "SYDNEY, AUSTRALIA"];
+        const nodes = ["SILICON VALLEY", "TORONTO", "LONDON", "TOKYO", "SINGAPORE", "SYDNEY"];
         let nIdx = 0;
         setInterval(() => {
             nIdx = (nIdx + 1) % nodes.length;
             document.getElementById('node-name').innerText = nodes[nIdx];
-            document.getElementById('node-lat').innerText = Math.floor(Math.random() * 20 + 4) + "ms";
-        }, 2500);
+            document.getElementById('node-lat').innerText = Math.floor(Math.random() * 15 + 5) + "ms";
+        }, 3000);
 
         const menus = {
             1: { t: "Select Region", opts: ["North America", "Europe", "Asia-Pacific", "Global"] },
@@ -145,16 +157,16 @@
             if (menus[step]) {
                 menus[step].opts.forEach(opt => {
                     let b = document.createElement('button');
-                    b.className = "bg-white/5 p-5 rounded-xl text-white font-bold hover:bg-blue-600 transition-all uppercase text-sm";
+                    b.className = "bg-white/5 p-6 rounded-xl text-white font-black hover:bg-blue-600 transition-all uppercase text-lg";
                     b.innerText = opt; b.onclick = () => finishStep(step, opt);
                     content.appendChild(b);
                 });
             } else if (step == 4) {
-                document.getElementById('mTitle').innerText = "Infrastructure ID";
-                content.innerHTML = `<input id="nameIn" placeholder="BUSINESS NAME" class="bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-4 text-center uppercase font-bold outline-none w-full"><button onclick="bizSlug = document.getElementById('nameIn').value; finishStep(4, bizSlug)" class="bg-blue-600 p-5 rounded-xl text-white font-black uppercase w-full">Point Domain</button>`;
+                document.getElementById('mTitle').innerText = "Identity";
+                content.innerHTML = `<input id="nameIn" placeholder="BUSINESS NAME" class="bg-white/5 border border-white/10 p-6 rounded-xl text-white mb-6 text-center uppercase font-black outline-none w-full text-2xl"><button onclick="bizSlug = document.getElementById('nameIn').value; finishStep(4, bizSlug)" class="bg-blue-600 p-6 rounded-xl text-white font-black uppercase w-full text-lg shadow-lg">Link to AIVoiceINFRA</button>`;
             } else if (step == 7) {
-                document.getElementById('mTitle').innerText = "Network Activation";
-                content.innerHTML = `<div class="text-blue-400 text-xs mb-4">Initializing DNS Handshake for AIVoiceINFRA.com...</div><button onclick="activateSystem()" class="bg-green-600 p-8 rounded-2xl text-white font-black text-2xl">GO LIVE</button>`;
+                document.getElementById('mTitle').innerText = "Activation";
+                content.innerHTML = `<div class="text-blue-400 text-sm mb-6 font-bold uppercase tracking-widest">Connect your business to the AIVoiceINFRA Backbone.</div><button onclick="activateSystem()" class="bg-green-600 p-10 rounded-2xl text-white font-black text-3xl shadow-2xl">ACTIVATE ENGINE</button>`;
             }
         }
 
@@ -162,30 +174,30 @@
 
         function finishStep(s, val) {
             if(!val) return;
-            document.getElementById(`v${s}`).innerText = val.toUpperCase().substring(0,10);
+            document.getElementById(`v${s}`).innerText = val.toUpperCase().substring(0,12);
             document.getElementById(`v${s}`).classList.remove('opacity-20');
             document.getElementById(`s${s}`).classList.add('active');
             
             const log = document.createElement('div');
-            log.innerText = s === 4 ? `> MAPPING: ${val.replace(/\s+/g, '').toLowerCase()}.aivoiceinfra.com` : `> PROVISIONED: ${val.toUpperCase()}`;
+            log.innerText = s === 4 ? `> IDENTITY_LOCKED: ${val.toUpperCase()}` : `> INFRA_PROVISIONED: ${val.toUpperCase()}`;
             document.getElementById('logs').prepend(log);
             closeM();
         }
 
         function runTest() {
-            document.getElementById('v6').innerText = "PINGING";
+            document.getElementById('v6').innerText = "RUNNING...";
             const log = document.createElement('div');
             log.className = "text-orange-400";
-            log.innerText = `> GLOBAL PING... A-RECORD VERIFIED... DOMAIN SECURE.`;
+            log.innerText = `> PINGING AIVOICEINFRA EDGE NODES... HANDSHAKE SUCCESSFUL.`;
             document.getElementById('logs').prepend(log);
-            setTimeout(() => { document.getElementById('v6').innerText = "PASSED"; document.getElementById('s6').classList.add('active'); }, 1200);
+            setTimeout(() => { document.getElementById('v6').innerText = "PASSED"; document.getElementById('s6').classList.add('active'); }, 1500);
         }
 
         function activateSystem() {
             closeM();
             const log = document.createElement('div');
             log.className = "text-green-400 font-black";
-            log.innerText = `> NETWORK ONLINE. ${bizSlug.toUpperCase()}.AIVOICEINFRA.COM IS NOW BROADCASTING.`;
+            log.innerText = `> SYSTEM LIVE. BROADCASTING FROM ${bizSlug.toUpperCase()}.AIVOICEINFRA.COM`;
             document.getElementById('logs').prepend(log);
             finishStep(7, "LIVE");
         }
