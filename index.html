@@ -3,145 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Call Port | Enterprise Scale</title>
+    <title>AI Call Port | Refined Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        html, body { height: 100%; margin: 0; background-color: #0b0e1a; overflow-x: hidden; }
-        body { display: flex; flex-direction: column; font-family: 'Inter', sans-serif; color: #5c96fa; }
-        .main-interface-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 60px 40px; }
-        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
+        :root { --accent: #3b82f6; --bg: #0b0e1a; }
+        html, body { height: 100%; margin: 0; background-color: var(--bg); color: #5c96fa; overflow-x: hidden; }
+        body { display: flex; flex-direction: column; font-family: 'Inter', sans-serif; }
         
-        /* WIDE PIPELINE GRID */
-        .pipeline-track { 
-            display: grid; width: 100%; gap: 15px; 
+        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); }
+        
+        /* REFINED CONTAINER */
+        .app-container { width: 92%; max-width: 1400px; margin: 0 auto; padding: 2rem 0; }
+
+        /* REFINED PIPELINE */
+        .pipeline-grid { 
+            display: grid; width: 100%; gap: 12px; 
             grid-template-columns: repeat(7, 1fr);
-            margin-bottom: 50px;
+            margin: 2.5rem 0;
         }
         
-        .step-node { 
-            background: rgba(255, 255, 255, 0.02); border-top: 4px solid rgba(255,255,255,0.1); 
-            padding: 25px 10px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.3s;
+        .step-card { 
+            background: rgba(255, 255, 255, 0.02); border-top: 3px solid rgba(255,255,255,0.1); 
+            padding: 1.25rem 0.5rem; text-align: center; border-radius: 6px; cursor: pointer; transition: 0.2s ease;
         }
-        .active-step { border-color: #3b82f6 !important; background: rgba(59, 130, 246, 0.1) !important; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1); }
+        .step-card:hover { background: rgba(59, 130, 246, 0.05); border-top-color: var(--accent); }
+        .step-card.active { border-top-color: var(--accent); background: rgba(59, 130, 246, 0.1); }
 
-        .massive-step-btn { 
-            width: 100%; min-height: 180px; border-radius: 30px; border: 4px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.05); color: white; font-weight: 900; text-transform: uppercase;
-            font-size: 36px; transition: 0.2s; display: flex; align-items: center; justify-content: center;
+        .modal-btn { 
+            width: 100%; min-height: 100px; border-radius: 16px; border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04); color: white; font-weight: 800; text-transform: uppercase;
+            font-size: 1.5rem; transition: 0.2s; display: flex; align-items: center; justify-content: center;
         }
+        .modal-btn:hover { border-color: var(--accent); background: rgba(59, 130, 246, 0.1); }
 
-        #setup-modal { display: none; position: fixed; inset: 0; z-index: 5000; align-items: center; justify-content: center; background: rgba(0,0,0,0.97); }
+        #setup-modal { display: none; position: fixed; inset: 0; z-index: 5000; align-items: center; justify-content: center; background: rgba(0,0,0,0.92); }
         #setup-modal.active { display: flex; }
 
-        .personality-pill { padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 900; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
-        .personality-pill.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+        .personality-pill { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+        .personality-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-        #ai-chat-widget { position: fixed; bottom: 85px; right: 30px; width: 360px; height: 480px; z-index: 2000; display: none; flex-direction: column; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        #ai-chat-widget { position: fixed; bottom: 80px; right: 30px; width: 320px; height: 420px; z-index: 2000; display: none; flex-direction: column; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         #ai-chat-widget.visible { display: flex; }
     </style>
 </head>
 <body>
 
-    <nav class="border-b border-white/5 px-10 py-6 flex justify-between items-center bg-[#0b0e1a]">
-        <div class="flex items-center gap-8">
-            <span class="text-3xl font-black text-white italic tracking-tighter uppercase">AI CALL PORT</span>
-            <span class="text-xs bg-blue-600/20 text-blue-400 px-4 py-1 rounded-full border border-blue-500/30 font-bold">CORE ENGINE V.2.5</span>
-        </div>
+    <nav class="border-b border-white/5 px-8 py-4 flex justify-between items-center sticky top-0 bg-[#0b0e1a]/80 backdrop-blur-md z-40">
         <div class="flex items-center gap-6">
-            <button onclick="toggleChat()" class="text-xs font-black uppercase text-blue-400 hover:text-white transition-all">Support Terminal</button>
-            <div class="h-6 w-[1px] bg-white/10"></div>
-            <div class="text-xs uppercase text-gray-500 font-bold">STATUS: <span id="sys-status" class="text-orange-500 animate-pulse">AWAITING NEURAL CONFIG</span></div>
+            <span class="text-xl font-black text-white italic tracking-tighter uppercase">AI CALL PORT</span>
+            <span class="text-[10px] bg-blue-600/20 text-blue-400 px-3 py-1 rounded-md border border-blue-500/20 font-bold">V.2.5 PRO</span>
+        </div>
+        <div class="flex items-center gap-5">
+            <button onclick="toggleChat()" class="text-[10px] font-black uppercase text-blue-400 hover:text-white">Support</button>
+            <div class="text-[10px] uppercase text-gray-500 font-bold">NODE: <span id="sys-status" class="text-orange-500">READY</span></div>
         </div>
     </nav>
 
-    <div class="main-interface-container">
-        <div class="max-w-[1600px] w-full">
-            <div class="grid lg:grid-cols-12 gap-12 mb-16 items-center">
-                <div class="lg:col-span-9">
-                    <p class="text-blue-500 font-black uppercase tracking-[0.5em] text-sm mb-2">Designed by Google Gemini</p>
-                    <h1 class="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter leading-none">AUTONOMOUS <br><span class="text-blue-500 italic">VOICE INFRASTRUCTURE</span></h1>
-                </div>
-                <div class="lg:col-span-3 glass p-10 rounded-[40px] text-center border-white/20">
-                    <div class="text-5xl font-black text-white mb-2">$199<span class="text-lg text-blue-500">/mo</span></div>
-                    <button onclick="openModal(1)" id="main-act-btn" class="w-full bg-orange-600 py-4 rounded-2xl text-white font-black text-sm uppercase hover:scale-105 transition-transform">START DEPLOYMENT</button>
-                </div>
+    <div class="app-container">
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
+            <div class="max-w-2xl">
+                <p class="text-blue-500 font-black uppercase tracking-widest text-xs mb-2">Neural Network Integrated</p>
+                <h1 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-tight">AUTONOMOUS <br><span class="text-blue-500 italic">VOICE AGENTS</span></h1>
             </div>
-
-            <div class="pipeline-track">
-                <div onclick="openModal(1)" id="step-1" class="step-node"><div class="text-xs font-black text-blue-500 mb-1 uppercase">01. Region</div><div id="txt-1" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
-                <div onclick="openModal(2)" id="step-2" class="step-node"><div class="text-xs font-black text-blue-500 mb-1 uppercase">02. Industry</div><div id="txt-2" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
-                <div onclick="openModal(3)" id="step-3" class="step-node"><div class="text-xs font-black text-blue-500 mb-1 uppercase">03. Role</div><div id="txt-3" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
-                <div onclick="openModal(4)" id="step-4" class="step-node"><div class="text-xs font-black text-blue-500 mb-1 uppercase">04. Identity</div><div id="txt-4" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
-                <div onclick="openModal(5)" id="step-5" class="step-node"><div class="text-xs font-black text-blue-500 mb-1 uppercase">05. Voice</div><div id="txt-5" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
-                <div onclick="openModal(6)" id="step-6" class="step-node"><div class="text-xs font-black text-orange-400 mb-1 uppercase">06. Test</div><div id="txt-6" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
-                <div onclick="openModal(7)" id="step-7" class="step-node">
-                    <div class="text-xs font-black text-green-500 uppercase flex justify-center items-center gap-2">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 13H7v-6h10v6z"/></svg> 07. ACTIVATE
-                    </div>
-                    <div id="txt-7" class="text-white font-bold text-sm uppercase opacity-40">LOCKED</div>
+            <div class="glass p-6 rounded-2xl flex items-center gap-8 min-w-[320px]">
+                <div>
+                    <div class="text-gray-500 text-[10px] font-black uppercase">Standard Plan</div>
+                    <div class="text-3xl font-black text-white">$199<span class="text-sm font-normal text-gray-400">/mo</span></div>
                 </div>
+                <button onclick="openModal(1)" id="main-act-btn" class="flex-1 bg-orange-600 h-12 rounded-xl text-white font-black text-xs uppercase hover:bg-orange-500 transition-colors">Setup Agent</button>
             </div>
+        </div>
 
-            <div id="dashboard-portal" class="glass p-12 rounded-[3rem] border-white/10 relative overflow-hidden">
-                <div class="flex flex-col md:flex-row justify-between items-start gap-8 mb-10">
-                    <div class="flex-1">
-                        <h3 class="text-white font-black uppercase text-2xl tracking-tighter">Neural Command Center</h3>
-                        <p id="dash-desc" class="text-gray-500 text-xs font-bold uppercase mt-1">Status: Restricted Access</p>
-                    </div>
-                    <div id="personality-controls" class="hidden flex gap-3 bg-black/40 p-2 rounded-full border border-white/10">
+        <div class="pipeline-grid">
+            <div onclick="openModal(1)" id="step-1" class="step-card"><div class="text-[9px] font-black text-blue-500/60 mb-1 uppercase">01 Region</div><div id="txt-1" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
+            <div onclick="openModal(2)" id="step-2" class="step-card"><div class="text-[9px] font-black text-blue-500/60 mb-1 uppercase">02 Industry</div><div id="txt-2" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
+            <div onclick="openModal(3)" id="step-3" class="step-card"><div class="text-[9px] font-black text-blue-500/60 mb-1 uppercase">03 Role</div><div id="txt-3" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
+            <div onclick="openModal(4)" id="step-4" class="step-card"><div class="text-[9px] font-black text-blue-500/60 mb-1 uppercase">04 Identity</div><div id="txt-4" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
+            <div onclick="openModal(5)" id="step-5" class="step-card"><div class="text-[9px] font-black text-blue-500/60 mb-1 uppercase">05 Voice</div><div id="txt-5" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
+            <div onclick="openModal(6)" id="step-6" class="step-card"><div class="text-[9px] font-black text-orange-400 mb-1 uppercase">06 Test</div><div id="txt-6" class="text-white font-bold text-xs uppercase opacity-40">---</div></div>
+            <div onclick="openModal(7)" id="step-7" class="step-card">
+                <div class="text-[9px] font-black text-green-500 uppercase flex justify-center items-center gap-1.5">
+                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 13H7v-6h10v6z"/></svg> 07 ACTIVATE
+                </div>
+                <div id="txt-7" class="text-white font-bold text-xs uppercase opacity-40">LOCKED</div>
+            </div>
+        </div>
+
+        <div id="dashboard-portal" class="glass p-8 rounded-3xl relative min-h-[400px]">
+            <div class="flex justify-between items-center border-b border-white/5 pb-6 mb-6">
+                <div>
+                    <h3 class="text-white font-black uppercase text-lg italic tracking-tight">Management Terminal</h3>
+                    <p id="dash-desc" class="text-gray-500 text-[10px] font-bold uppercase">Locked: Complete 7-Step configuration</p>
+                </div>
+                <div id="active-controls" class="hidden flex items-center gap-4">
+                    <div class="flex gap-2 bg-black/30 p-1.5 rounded-full border border-white/5">
                         <div onclick="setTone('Professional')" id="tone-prof" class="personality-pill active">PROFESSIONAL</div>
                         <div onclick="setTone('Friendly')" id="tone-friend" class="personality-pill">FRIENDLY</div>
                     </div>
-                    <button onclick="downloadLogs()" id="dl-btn" class="hidden bg-blue-600 hover:bg-blue-500 text-white text-xs font-black px-6 py-3 rounded-xl transition-all">EXPORT LOGS (CSV)</button>
+                    <button onclick="downloadLogs()" class="bg-blue-600/10 border border-blue-500/20 text-blue-400 text-[10px] font-black px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-all">EXPORT CSV</button>
                 </div>
-
-                <div id="training-center" class="hidden grid md:grid-cols-2 gap-10 pt-10 border-t border-white/5">
-                    <div onclick="document.getElementById('file-upload').click()" class="border-2 border-dashed border-blue-500/30 rounded-3xl p-10 text-center hover:bg-blue-500/5 transition-all cursor-pointer group">
-                        <input type="file" id="file-upload" class="hidden" onchange="simulateTraining()">
-                        <div class="text-white font-black text-xl mb-2 group-hover:text-blue-400">UPLOAD KNOWLEDGE ASSETS</div>
-                        <p class="text-gray-500 text-[10px] uppercase">Upload Manuals, Pricing sheets, or SOPs</p>
-                    </div>
-                    <div class="bg-black/30 p-8 rounded-3xl border border-white/5 flex flex-col justify-center">
-                        <div class="flex justify-between mb-3"><span class="text-[10px] font-black text-gray-500 uppercase">Neural Synapse Saturation</span><span id="sat-percent" class="text-[10px] font-black text-blue-400">12%</span></div>
-                        <div class="w-full bg-white/5 h-3 rounded-full overflow-hidden"><div id="brain-fill" class="bg-blue-500 h-full w-[12%] transition-all duration-1000"></div></div>
-                    </div>
-                </div>
-
-                <div id="live-feed" class="mt-8 max-h-60 overflow-y-auto font-mono text-xs text-green-400/80 space-y-2"></div>
             </div>
+
+            <div id="training-center" class="hidden grid md:grid-cols-2 gap-8 mb-8">
+                <div onclick="document.getElementById('file-upload').click()" class="border-2 border-dashed border-blue-500/20 rounded-2xl p-8 text-center hover:bg-blue-500/5 transition-all cursor-pointer">
+                    <input type="file" id="file-upload" class="hidden" onchange="simulateTraining()">
+                    <div class="text-white font-black text-sm uppercase">Train Neural Brain</div>
+                    <p class="text-gray-500 text-[9px] uppercase mt-1">Upload PDF Knowledge Base</p>
+                </div>
+                <div class="bg-black/20 p-6 rounded-2xl flex flex-col justify-center">
+                    <div class="flex justify-between mb-2"><span class="text-[9px] font-black text-gray-400 uppercase">Knowledge Sync</span><span id="sat-percent" class="text-[9px] font-black text-blue-500">0%</span></div>
+                    <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden"><div id="brain-fill" class="bg-blue-500 h-full w-[0%] transition-all duration-1000"></div></div>
+                </div>
+            </div>
+
+            <div id="live-feed" class="max-h-48 overflow-y-auto font-mono text-[10px] text-green-500/70 space-y-1"></div>
         </div>
     </div>
 
     <div id="setup-modal">
-        <div class="glass p-16 rounded-[50px] w-full max-w-4xl text-center relative shadow-2xl border-blue-500/20">
-            <button onclick="closeModal()" class="absolute top-10 right-10 text-white text-4xl hover:opacity-50 transition-opacity">&times;</button>
-            <h2 id="modal-title" class="text-white font-black text-5xl italic uppercase mb-12 border-b-8 border-blue-500 pb-6 inline-block tracking-widest"></h2>
-            <div id="modal-content" class="grid gap-4"></div>
+        <div class="glass p-10 rounded-3xl w-full max-w-2xl text-center relative border-white/10">
+            <button onclick="closeModal()" class="absolute top-6 right-8 text-white text-2xl opacity-40 hover:opacity-100">&times;</button>
+            <h2 id="modal-title" class="text-white font-black text-2xl uppercase mb-8 border-b-2 border-blue-500 pb-3 inline-block"></h2>
+            <div id="modal-content" class="grid gap-3"></div>
         </div>
     </div>
 
-    <div onclick="toggleChat()" class="fixed bottom-10 right-10 w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer shadow-[0_0_40px_rgba(59,130,246,0.4)] z-[2001] hover:scale-110 transition-transform"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg></div>
+    <div onclick="toggleChat()" class="fixed bottom-6 right-6 w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg z-[2001] hover:scale-105 transition-transform">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+    </div>
     <div id="ai-chat-widget" class="glass">
-        <div class="p-6 bg-blue-900/30 border-b border-white/10 flex justify-between items-center"><span class="text-white font-black text-xs uppercase tracking-widest">Autonomous Neural Agent</span><button onclick="toggleChat()" class="text-white opacity-40">&times;</button></div>
-        <div id="chat-body" class="flex-1 p-6 overflow-y-auto space-y-4"></div>
-        <div class="p-4 bg-black/60 flex gap-3 border-t border-white/10">
-            <input type="text" id="chat-in" class="bg-white/5 border border-white/10 p-3 rounded-xl flex-1 text-white text-sm outline-none focus:border-blue-500" placeholder="Query the AI...">
-            <button onclick="aiReply()" class="bg-blue-600 px-5 rounded-xl text-white font-black text-xs uppercase">SEND</button>
+        <div class="p-4 bg-blue-900/20 border-b border-white/5 flex justify-between items-center"><span class="text-white font-black text-[10px] uppercase">Neural Support</span><button onclick="toggleChat()" class="text-white opacity-40">&times;</button></div>
+        <div id="chat-body" class="flex-1 p-4 overflow-y-auto space-y-3"></div>
+        <div class="p-3 bg-black/40 flex gap-2 border-t border-white/5">
+            <input type="text" id="chat-in" class="bg-white/5 border border-white/10 p-2 rounded-lg flex-1 text-white text-xs outline-none" placeholder="Type query...">
+            <button onclick="aiReply()" class="bg-blue-600 px-4 rounded-lg text-white font-black text-[10px]">SEND</button>
         </div>
     </div>
 
     <script>
         const config = {
-            1: { title: "REGION", data: ["North America", "Europe", "Asia-Pacific"] },
-            2: { title: "INDUSTRY", data: ["HVAC & Trades", "Legal Services", "Healthcare", "E-Commerce"] },
-            3: { title: "ROLE", data: ["Front-Desk Reception", "Lead Sales Agent", "Technical Support"] },
-            4: { title: "IDENTITY", type: "form" },
-            5: { title: "VOICE", data: ["Echo-1 (Warm)", "Atlas-5 (Bold)", "Nova-9 (Professional)"] },
-            6: { title: "TEST", type: "btn", text: "STABILIZE NEURAL LINK" },
-            7: { title: "ACTIVATE", type: "payment" }
+            1: { title: "Region", data: ["North America", "Europe", "Asia-Pacific"] },
+            2: { title: "Industry", data: ["Service Trades", "Legal/Medical", "SaaS/Tech"] },
+            3: { title: "Role", data: ["Front-Desk Agent", "Sales Specialist", "Internal Support"] },
+            4: { title: "Identity", type: "form" },
+            5: { title: "Voice", data: ["Professional Warm", "Bold Authority"] },
+            6: { title: "Test", type: "btn", text: "STABILIZE LINK" },
+            7: { title: "Activate", type: "payment" }
         };
-        let currentStep = 1; let biz = "Your System"; let logsArray = []; let currentTone = "Professional";
+        let currentStep = 1; let biz = "Global System"; let logsArray = []; let currentTone = "Professional";
 
         function openModal(s) {
             currentStep = s; const c = config[s];
@@ -150,16 +160,16 @@
             if(c.data) {
                 c.data.forEach(d => {
                     const b = document.createElement('button');
-                    b.className = 'massive-step-btn hover:border-blue-500 hover:bg-blue-500/10'; b.innerText = d;
+                    b.className = 'modal-btn'; b.innerText = d;
                     b.onclick = () => saveStep(d);
                     container.appendChild(b);
                 });
             } else if(c.type === "form") {
-                container.innerHTML = `<input id="b-in" placeholder="ENTER BUSINESS NAME" class="massive-step-btn !text-2xl !p-10 bg-white/5 focus:border-blue-500 outline-none"><button onclick="biz=document.getElementById('b-in').value;saveStep(biz)" class="massive-step-btn !min-h-[80px] bg-blue-600 !text-xl">VERIFY IDENTITY</button>`;
+                container.innerHTML = `<input id="b-in" placeholder="COMPANY NAME" class="modal-btn !text-lg !p-4 bg-white/5 focus:border-blue-500 outline-none"><button onclick="biz=document.getElementById('b-in').value;saveStep(biz)" class="modal-btn !min-h-[50px] bg-blue-600 !text-sm">VERIFY</button>`;
             } else if(c.type === "payment") {
-                container.innerHTML = `<div class="p-10 bg-white/5 rounded-3xl"><h3 class="text-white text-5xl font-black mb-4">$199.00 / Month</h3><p class="text-blue-400 uppercase font-black text-xs mb-8">Unlimited Autonomous Minutes Included</p><button onclick="activate()" class="massive-step-btn bg-green-600 hover:bg-green-500">AUTHORIZE ACCESS</button></div>`;
+                container.innerHTML = `<h3 class="text-white text-2xl font-black mb-1">$199.00 / Month</h3><p class="text-blue-400 text-[10px] font-bold mb-6 uppercase">Cancel Anytime • No Setup Fees</p><button onclick="activate()" class="modal-btn bg-green-600 hover:bg-green-500 !min-h-[60px] !text-sm">COMPLETE ACTIVATION</button>`;
             } else {
-                container.innerHTML = `<button onclick="saveStep('SYNCED')" class="massive-step-btn bg-blue-600">START STABILIZATION</button>`;
+                container.innerHTML = `<button onclick="saveStep('STABLE')" class="modal-btn bg-blue-600 !text-sm">START NEURAL SYNC</button>`;
             }
             document.getElementById('setup-modal').classList.add('active');
         }
@@ -167,26 +177,24 @@
         function closeModal() { document.getElementById('setup-modal').classList.remove('active'); }
         
         function saveStep(v) {
-            const txt = document.getElementById(`txt-${currentStep}`);
-            txt.innerText = v; txt.classList.remove('opacity-40');
-            document.getElementById(`step-${currentStep}`).classList.add('active-step');
+            document.getElementById(`txt-${currentStep}`).innerText = v;
+            document.getElementById(`txt-${currentStep}`).classList.remove('opacity-40');
+            document.getElementById(`step-${currentStep}`).classList.add('active');
             closeModal();
             if(currentStep < 7) setTimeout(() => openModal(currentStep+1), 400);
         }
 
         function activate() {
             saveStep('LIVE');
-            document.getElementById('sys-status').innerText = "SYSTEM ONLINE - NEURAL STREAM ACTIVE";
-            document.getElementById('sys-status').className = "text-green-500 font-black";
+            document.getElementById('sys-status').innerText = "SYNCHRONIZED";
+            document.getElementById('sys-status').className = "text-green-500";
             document.getElementById('training-center').classList.remove('hidden');
-            document.getElementById('personality-controls').classList.remove('hidden');
-            document.getElementById('dl-btn').classList.remove('hidden');
-            document.getElementById('dash-desc').innerText = "Global Voice Port: Synchronized";
-            document.getElementById('main-act-btn').innerText = "SYSTEM ACTIVE";
-            document.getElementById('main-act-btn').style.background = "#16a34a";
+            document.getElementById('active-controls').classList.remove('hidden');
+            document.getElementById('dash-desc').innerText = `Active Agent: ${biz}`;
+            document.getElementById('main-act-btn').innerText = "MANAGE AGENT";
             
             setInterval(() => {
-                const l = `[${new Date().toLocaleTimeString()}] INCOMING CALL HANDLED: Customer query resolved for ${biz} (${currentTone} Mode)`;
+                const l = `[${new Date().toLocaleTimeString()}] CALL ROUTED: AI Agent handled inquiry for ${biz}`;
                 logsArray.push(l);
                 const div = document.createElement('div'); div.innerText = l;
                 document.getElementById('live-feed').prepend(div);
@@ -196,7 +204,7 @@
         function simulateTraining() {
             document.getElementById('brain-fill').style.width = "100%";
             document.getElementById('sat-percent').innerText = "100%";
-            const l = `[${new Date().toLocaleTimeString()}] KNOWLEDGE SYNC: Neural pathways updated with custom business assets.`;
+            const l = `[${new Date().toLocaleTimeString()}] DATA INGESTED: Brain pathways updated.`;
             logsArray.push(l);
             const div = document.createElement('div'); div.innerText = l;
             document.getElementById('live-feed').prepend(div);
@@ -212,7 +220,7 @@
         function downloadLogs() {
             const blob = new Blob([logsArray.join('\n')], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', 'Call_Port_Logs.csv');
+            const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', 'AI_Logs.csv');
             a.click();
         }
 
@@ -220,11 +228,11 @@
         function aiReply() {
             const i = document.getElementById('chat-in'); const t = i.value; if(!t) return;
             const b = document.getElementById('chat-body');
-            b.innerHTML += `<div class="flex justify-end"><div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none text-sm max-w-[80%]">${t}</div></div>`;
+            b.innerHTML += `<div class="flex justify-end"><div class="bg-blue-600 text-white p-2.5 rounded-xl rounded-tr-none text-[11px] max-w-[85%]">${t}</div></div>`;
             i.value = '';
             setTimeout(() => { 
-                const reply = currentTone === "Professional" ? `Neural Agent: Understood. I am processing your query for ${biz} using enterprise protocols.` : `Neural Agent: No problem! I'm taking care of that for ${biz} right now.`;
-                b.innerHTML += `<div class="flex justify-start"><div class="bg-white/10 text-white p-3 rounded-2xl rounded-tl-none text-sm max-w-[80%]">${reply}</div></div>`; 
+                const reply = `Neural Agent: Understood. Handling your request for ${biz} in ${currentTone} mode.`;
+                b.innerHTML += `<div class="flex justify-start"><div class="bg-white/5 text-white p-2.5 rounded-xl rounded-tl-none text-[11px] max-w-[85%] border border-white/5">${reply}</div></div>`; 
                 b.scrollTop = b.scrollHeight; 
             }, 800);
         }
