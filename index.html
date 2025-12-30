@@ -3,211 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Call Port | Absolute Control</title>
+    <title>AI Call Port | Enterprise Scale</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body { height: 100%; margin: 0; background-color: #0b0e1a; overflow-x: hidden; }
         body { display: flex; flex-direction: column; font-family: 'Inter', sans-serif; color: #5c96fa; }
-        .main-interface-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+        .main-interface-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 60px 40px; }
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
         
-        /* 7-COLUMN PIPELINE */
+        /* WIDE PIPELINE GRID */
         .pipeline-track { 
-            display: grid; width: 100%; gap: 10px; 
+            display: grid; width: 100%; gap: 15px; 
             grid-template-columns: repeat(7, 1fr);
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
         
         .step-node { 
             background: rgba(255, 255, 255, 0.02); border-top: 4px solid rgba(255,255,255,0.1); 
-            padding: 15px 5px; text-align: center; border-radius: 4px; cursor: pointer; transition: 0.3s;
+            padding: 25px 10px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.3s;
         }
-        .active-step { border-color: #3b82f6 !important; background: rgba(59, 130, 246, 0.1) !important; }
+        .active-step { border-color: #3b82f6 !important; background: rgba(59, 130, 246, 0.1) !important; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1); }
 
         .massive-step-btn { 
-            width: 100%; min-height: 140px; border-radius: 20px; border: 3px solid rgba(255,255,255,0.1);
+            width: 100%; min-height: 180px; border-radius: 30px; border: 4px solid rgba(255,255,255,0.1);
             background: rgba(255,255,255,0.05); color: white; font-weight: 900; text-transform: uppercase;
-            font-size: 28px; transition: 0.2s; display: flex; align-items: center; justify-content: center;
+            font-size: 36px; transition: 0.2s; display: flex; align-items: center; justify-content: center;
         }
 
-        #setup-modal { display: none; position: fixed; inset: 0; z-index: 5000; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); }
+        #setup-modal { display: none; position: fixed; inset: 0; z-index: 5000; align-items: center; justify-content: center; background: rgba(0,0,0,0.97); }
         #setup-modal.active { display: flex; }
 
-        /* CHAT */
-        #ai-chat-widget { position: fixed; bottom: 85px; right: 30px; width: 320px; height: 400px; z-index: 2000; display: none; flex-direction: column; border-radius: 15px; overflow: hidden; }
+        .personality-pill { padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 900; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+        .personality-pill.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+
+        #ai-chat-widget { position: fixed; bottom: 85px; right: 30px; width: 360px; height: 480px; z-index: 2000; display: none; flex-direction: column; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
         #ai-chat-widget.visible { display: flex; }
-        #chat-body { flex: 1; padding: 15px; overflow-y: auto; background: #0b0e1a; font-size: 12px; }
-        .msg-ai { background: #1e293b; color: white; padding: 8px; border-radius: 8px; margin-bottom: 8px; align-self: flex-start; }
-        .msg-user { background: #3b82f6; color: white; padding: 8px; border-radius: 8px; margin-bottom: 8px; align-self: flex-end; }
     </style>
 </head>
 <body>
 
-    <nav class="border-b border-white/5 px-8 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-4">
-            <span class="text-xl font-black text-white italic">AI CALL PORT</span>
-            <span class="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30">V.2.5</span>
+    <nav class="border-b border-white/5 px-10 py-6 flex justify-between items-center bg-[#0b0e1a]">
+        <div class="flex items-center gap-8">
+            <span class="text-3xl font-black text-white italic tracking-tighter uppercase">AI CALL PORT</span>
+            <span class="text-xs bg-blue-600/20 text-blue-400 px-4 py-1 rounded-full border border-blue-500/30 font-bold">CORE ENGINE V.2.5</span>
         </div>
-        <div class="text-[10px] uppercase text-gray-500">SYSTEM: <span id="sys-status" class="text-orange-500 italic font-bold">AWAITING NEURAL SYNC</span></div>
+        <div class="flex items-center gap-6">
+            <button onclick="toggleChat()" class="text-xs font-black uppercase text-blue-400 hover:text-white transition-all">Support Terminal</button>
+            <div class="h-6 w-[1px] bg-white/10"></div>
+            <div class="text-xs uppercase text-gray-500 font-bold">STATUS: <span id="sys-status" class="text-orange-500 animate-pulse">AWAITING NEURAL CONFIG</span></div>
+        </div>
     </nav>
 
     <div class="main-interface-container">
-        <div class="max-w-[1100px] w-full">
-            <div class="grid lg:grid-cols-12 gap-8 mb-10">
-                <div class="lg:col-span-8">
-                    <h1 class="text-5xl font-black text-white uppercase tracking-tighter">GLOBAL AI <span class="text-blue-500">VOICE AGENTS</span></h1>
-                    <p class="text-blue-400 font-bold uppercase text-xs tracking-widest mt-2">Zero-Human Involvement Infrastructure</p>
+        <div class="max-w-[1600px] w-full">
+            <div class="grid lg:grid-cols-12 gap-12 mb-16 items-center">
+                <div class="lg:col-span-9">
+                    <p class="text-blue-500 font-black uppercase tracking-[0.5em] text-sm mb-2">Designed by Google Gemini</p>
+                    <h1 class="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter leading-none">AUTONOMOUS <br><span class="text-blue-500 italic">VOICE INFRASTRUCTURE</span></h1>
                 </div>
-                <div class="lg:col-span-4 glass p-4 rounded-2xl flex justify-between items-center">
-                    <div><span class="text-white font-black text-2xl">$199</span><span class="text-xs text-gray-500">/mo</span></div>
-                    <button id="main-act-btn" onclick="openModal(1)" class="bg-orange-600 px-6 py-2 rounded-lg text-white font-black text-xs uppercase hover:bg-orange-500">INITIATE</button>
+                <div class="lg:col-span-3 glass p-10 rounded-[40px] text-center border-white/20">
+                    <div class="text-5xl font-black text-white mb-2">$199<span class="text-lg text-blue-500">/mo</span></div>
+                    <button onclick="openModal(1)" id="main-act-btn" class="w-full bg-orange-600 py-4 rounded-2xl text-white font-black text-sm uppercase hover:scale-105 transition-transform">START DEPLOYMENT</button>
                 </div>
             </div>
 
             <div class="pipeline-track">
-                <div onclick="openModal(1)" id="step-1" class="step-node"><div class="text-[9px] font-black text-blue-500">01. REGION</div><div id="txt-1" class="text-white font-bold text-xs opacity-40">---</div></div>
-                <div onclick="openModal(2)" id="step-2" class="step-node"><div class="text-[9px] font-black text-blue-500">02. INDUSTRY</div><div id="txt-2" class="text-white font-bold text-xs opacity-40">---</div></div>
-                <div onclick="openModal(3)" id="step-3" class="step-node"><div class="text-[9px] font-black text-blue-500">03. ROLE</div><div id="txt-3" class="text-white font-bold text-xs opacity-40">---</div></div>
-                <div onclick="openModal(4)" id="step-4" class="step-node"><div class="text-[9px] font-black text-blue-500">04. IDENTITY</div><div id="txt-4" class="text-white font-bold text-xs opacity-40">---</div></div>
-                <div onclick="openModal(5)" id="step-5" class="step-node"><div class="text-[9px] font-black text-blue-500">05. VOICE</div><div id="txt-5" class="text-white font-bold text-xs opacity-40">---</div></div>
-                <div onclick="openModal(6)" id="step-6" class="step-node"><div class="text-[9px] font-black text-orange-400">06. TEST</div><div id="txt-6" class="text-white font-bold text-xs opacity-40">---</div></div>
+                <div onclick="openModal(1)" id="step-1" class="step-node"><div class="text-xs font-black text-blue-500 mb-1 uppercase">01. Region</div><div id="txt-1" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
+                <div onclick="openModal(2)" id="step-2" class="step-node"><div class="text-xs font-black text-blue-500 mb-1 uppercase">02. Industry</div><div id="txt-2" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
+                <div onclick="openModal(3)" id="step-3" class="step-node"><div class="text-xs font-black text-blue-500 mb-1 uppercase">03. Role</div><div id="txt-3" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
+                <div onclick="openModal(4)" id="step-4" class="step-node"><div class="text-xs font-black text-blue-500 mb-1 uppercase">04. Identity</div><div id="txt-4" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
+                <div onclick="openModal(5)" id="step-5" class="step-node"><div class="text-xs font-black text-blue-500 mb-1 uppercase">05. Voice</div><div id="txt-5" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
+                <div onclick="openModal(6)" id="step-6" class="step-node"><div class="text-xs font-black text-orange-400 mb-1 uppercase">06. Test</div><div id="txt-6" class="text-white font-bold text-sm uppercase opacity-40">---</div></div>
                 <div onclick="openModal(7)" id="step-7" class="step-node">
-                    <div class="text-[9px] font-black text-green-500 flex justify-center items-center gap-1">
-                        <svg id="lock-icon" class="w-2 h-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 13H7v-6h10v6z"/></svg> 07. ACTIVATE
+                    <div class="text-xs font-black text-green-500 uppercase flex justify-center items-center gap-2">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 13H7v-6h10v6z"/></svg> 07. ACTIVATE
                     </div>
-                    <div id="txt-7" class="text-white font-bold text-xs opacity-40 italic">LOCKED</div>
+                    <div id="txt-7" class="text-white font-bold text-sm uppercase opacity-40">LOCKED</div>
                 </div>
             </div>
 
-            <div id="dashboard-portal" class="glass p-8 rounded-3xl">
-                <div class="flex justify-between items-start mb-6">
-                    <div>
-                        <h3 class="text-white font-black uppercase text-lg">NEURAL STREAM</h3>
-                        <p id="dash-desc" class="text-gray-500 text-[10px] font-bold uppercase">Locked: Waiting for Activation</p>
+            <div id="dashboard-portal" class="glass p-12 rounded-[3rem] border-white/10 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start gap-8 mb-10">
+                    <div class="flex-1">
+                        <h3 class="text-white font-black uppercase text-2xl tracking-tighter">Neural Command Center</h3>
+                        <p id="dash-desc" class="text-gray-500 text-xs font-bold uppercase mt-1">Status: Restricted Access</p>
                     </div>
-                    <button onclick="downloadLogs()" id="dl-btn" class="hidden bg-white/10 hover:bg-white/20 text-white text-[10px] font-black px-4 py-2 rounded-lg border border-white/10">EXPORT CSV</button>
+                    <div id="personality-controls" class="hidden flex gap-3 bg-black/40 p-2 rounded-full border border-white/10">
+                        <div onclick="setTone('Professional')" id="tone-prof" class="personality-pill active">PROFESSIONAL</div>
+                        <div onclick="setTone('Friendly')" id="tone-friend" class="personality-pill">FRIENDLY</div>
+                    </div>
+                    <button onclick="downloadLogs()" id="dl-btn" class="hidden bg-blue-600 hover:bg-blue-500 text-white text-xs font-black px-6 py-3 rounded-xl transition-all">EXPORT LOGS (CSV)</button>
                 </div>
 
-                <div id="training-center" class="hidden grid md:grid-cols-2 gap-6 pt-6 border-t border-white/5">
-                    <div onclick="document.getElementById('file-upload').click()" class="border-2 border-dashed border-blue-500/20 rounded-xl p-6 text-center hover:bg-blue-500/5 cursor-pointer">
+                <div id="training-center" class="hidden grid md:grid-cols-2 gap-10 pt-10 border-t border-white/5">
+                    <div onclick="document.getElementById('file-upload').click()" class="border-2 border-dashed border-blue-500/30 rounded-3xl p-10 text-center hover:bg-blue-500/5 transition-all cursor-pointer group">
                         <input type="file" id="file-upload" class="hidden" onchange="simulateTraining()">
-                        <div class="text-blue-400 font-black text-[10px] uppercase">Upload Knowledge PDF</div>
+                        <div class="text-white font-black text-xl mb-2 group-hover:text-blue-400">UPLOAD KNOWLEDGE ASSETS</div>
+                        <p class="text-gray-500 text-[10px] uppercase">Upload Manuals, Pricing sheets, or SOPs</p>
                     </div>
-                    <div class="bg-black/20 p-4 rounded-xl">
-                        <div class="text-[9px] font-black text-gray-500 mb-2 uppercase">Brain Saturation</div>
-                        <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden"><div id="brain-fill" class="bg-blue-500 h-full w-[10%] transition-all duration-1000"></div></div>
+                    <div class="bg-black/30 p-8 rounded-3xl border border-white/5 flex flex-col justify-center">
+                        <div class="flex justify-between mb-3"><span class="text-[10px] font-black text-gray-500 uppercase">Neural Synapse Saturation</span><span id="sat-percent" class="text-[10px] font-black text-blue-400">12%</span></div>
+                        <div class="w-full bg-white/5 h-3 rounded-full overflow-hidden"><div id="brain-fill" class="bg-blue-500 h-full w-[12%] transition-all duration-1000"></div></div>
                     </div>
                 </div>
 
-                <div id="live-feed" class="mt-4 max-h-40 overflow-y-auto font-mono text-[11px] text-green-400 space-y-1"></div>
+                <div id="live-feed" class="mt-8 max-h-60 overflow-y-auto font-mono text-xs text-green-400/80 space-y-2"></div>
             </div>
         </div>
     </div>
 
     <div id="setup-modal">
-        <div class="glass p-12 rounded-[40px] w-full max-w-xl text-center relative">
-            <button onclick="closeModal()" class="absolute top-6 right-8 text-white text-2xl">&times;</button>
-            <h2 id="modal-title" class="text-white font-black text-4xl italic uppercase mb-8 border-b-4 border-blue-500 inline-block"></h2>
-            <div id="modal-content" class="space-y-4"></div>
+        <div class="glass p-16 rounded-[50px] w-full max-w-4xl text-center relative shadow-2xl border-blue-500/20">
+            <button onclick="closeModal()" class="absolute top-10 right-10 text-white text-4xl hover:opacity-50 transition-opacity">&times;</button>
+            <h2 id="modal-title" class="text-white font-black text-5xl italic uppercase mb-12 border-b-8 border-blue-500 pb-6 inline-block tracking-widest"></h2>
+            <div id="modal-content" class="grid gap-4"></div>
         </div>
     </div>
 
-    <div onclick="toggleChat()" class="fixed bottom-6 right-6 w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer shadow-xl z-[2001]"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg></div>
+    <div onclick="toggleChat()" class="fixed bottom-10 right-10 w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer shadow-[0_0_40px_rgba(59,130,246,0.4)] z-[2001] hover:scale-110 transition-transform"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg></div>
     <div id="ai-chat-widget" class="glass">
-        <div class="p-4 bg-blue-900/20 border-b border-white/5 text-[10px] font-black text-white uppercase">Autonomous Support Agent</div>
-        <div id="chat-body" class="flex flex-col"></div>
-        <div class="p-2 bg-black/40 flex gap-2">
-            <input type="text" id="chat-in" class="bg-white/5 p-2 rounded flex-1 text-white text-xs outline-none" placeholder="Ask anything...">
-            <button onclick="aiReply()" class="bg-blue-600 px-3 py-1 rounded text-white text-[10px] font-bold">SEND</button>
+        <div class="p-6 bg-blue-900/30 border-b border-white/10 flex justify-between items-center"><span class="text-white font-black text-xs uppercase tracking-widest">Autonomous Neural Agent</span><button onclick="toggleChat()" class="text-white opacity-40">&times;</button></div>
+        <div id="chat-body" class="flex-1 p-6 overflow-y-auto space-y-4"></div>
+        <div class="p-4 bg-black/60 flex gap-3 border-t border-white/10">
+            <input type="text" id="chat-in" class="bg-white/5 border border-white/10 p-3 rounded-xl flex-1 text-white text-sm outline-none focus:border-blue-500" placeholder="Query the AI...">
+            <button onclick="aiReply()" class="bg-blue-600 px-5 rounded-xl text-white font-black text-xs uppercase">SEND</button>
         </div>
     </div>
 
     <script>
         const config = {
-            1: { title: "Region", data: ["USA", "UK", "CANADA"] },
-            2: { title: "Industry", data: ["HVAC", "LEGAL", "MEDICAL"] },
-            3: { title: "Role", data: ["RECEPTIONIST", "SALES"] },
-            4: { title: "Identity", type: "form" },
-            5: { title: "Voice", data: ["WARM", "BOLD"] },
-            6: { title: "Test", type: "btn", text: "TEST NEURAL LINK" },
-            7: { title: "Activate", type: "payment" }
+            1: { title: "REGION", data: ["North America", "Europe", "Asia-Pacific"] },
+            2: { title: "INDUSTRY", data: ["HVAC & Trades", "Legal Services", "Healthcare", "E-Commerce"] },
+            3: { title: "ROLE", data: ["Front-Desk Reception", "Lead Sales Agent", "Technical Support"] },
+            4: { title: "IDENTITY", type: "form" },
+            5: { title: "VOICE", data: ["Echo-1 (Warm)", "Atlas-5 (Bold)", "Nova-9 (Professional)"] },
+            6: { title: "TEST", type: "btn", text: "STABILIZE NEURAL LINK" },
+            7: { title: "ACTIVATE", type: "payment" }
         };
-        let currentStep = 1; let biz = "Your Biz"; let logsArray = [];
+        let currentStep = 1; let biz = "Your System"; let logsArray = []; let currentTone = "Professional";
 
         function openModal(s) {
             currentStep = s; const c = config[s];
             document.getElementById('modal-title').innerText = c.title;
-            const container = document.getElementById('modal-content');
-            container.innerHTML = '';
+            const container = document.getElementById('modal-content'); container.innerHTML = '';
             if(c.data) {
                 c.data.forEach(d => {
                     const b = document.createElement('button');
-                    b.className = 'massive-step-btn'; b.innerText = d;
+                    b.className = 'massive-step-btn hover:border-blue-500 hover:bg-blue-500/10'; b.innerText = d;
                     b.onclick = () => saveStep(d);
                     container.appendChild(b);
                 });
             } else if(c.type === "form") {
-                container.innerHTML = `<input id="b-in" placeholder="BIZ NAME" class="massive-step-btn !text-xl !p-4 bg-white/5"><button onclick="biz=document.getElementById('b-in').value;saveStep(biz)" class="massive-step-btn !min-h-[60px] bg-blue-600">VERIFY</button>`;
+                container.innerHTML = `<input id="b-in" placeholder="ENTER BUSINESS NAME" class="massive-step-btn !text-2xl !p-10 bg-white/5 focus:border-blue-500 outline-none"><button onclick="biz=document.getElementById('b-in').value;saveStep(biz)" class="massive-step-btn !min-h-[80px] bg-blue-600 !text-xl">VERIFY IDENTITY</button>`;
             } else if(c.type === "payment") {
-                container.innerHTML = `<h3 class="text-white text-2xl font-black">$199.00 / mo</h3><button onclick="activate()" class="massive-step-btn bg-green-600">AUTHORIZE</button>`;
+                container.innerHTML = `<div class="p-10 bg-white/5 rounded-3xl"><h3 class="text-white text-5xl font-black mb-4">$199.00 / Month</h3><p class="text-blue-400 uppercase font-black text-xs mb-8">Unlimited Autonomous Minutes Included</p><button onclick="activate()" class="massive-step-btn bg-green-600 hover:bg-green-500">AUTHORIZE ACCESS</button></div>`;
             } else {
-                container.innerHTML = `<button onclick="saveStep('SYNCED')" class="massive-step-btn bg-blue-600">INITIATE TEST</button>`;
+                container.innerHTML = `<button onclick="saveStep('SYNCED')" class="massive-step-btn bg-blue-600">START STABILIZATION</button>`;
             }
             document.getElementById('setup-modal').classList.add('active');
         }
 
         function closeModal() { document.getElementById('setup-modal').classList.remove('active'); }
+        
         function saveStep(v) {
-            document.getElementById(`txt-${currentStep}`).innerText = v;
-            document.getElementById(`txt-${currentStep}`).classList.remove('opacity-40');
+            const txt = document.getElementById(`txt-${currentStep}`);
+            txt.innerText = v; txt.classList.remove('opacity-40');
             document.getElementById(`step-${currentStep}`).classList.add('active-step');
             closeModal();
             if(currentStep < 7) setTimeout(() => openModal(currentStep+1), 400);
         }
 
         function activate() {
-            saveStep('PAID');
-            document.getElementById('sys-status').innerText = "LIVE & BROADCASTING";
-            document.getElementById('sys-status').className = "text-green-500 font-bold";
+            saveStep('LIVE');
+            document.getElementById('sys-status').innerText = "SYSTEM ONLINE - NEURAL STREAM ACTIVE";
+            document.getElementById('sys-status').className = "text-green-500 font-black";
             document.getElementById('training-center').classList.remove('hidden');
+            document.getElementById('personality-controls').classList.remove('hidden');
             document.getElementById('dl-btn').classList.remove('hidden');
-            document.getElementById('dash-desc').innerText = "Neural Connection: Stable";
-            document.getElementById('main-act-btn').innerText = "LIVE";
+            document.getElementById('dash-desc').innerText = "Global Voice Port: Synchronized";
+            document.getElementById('main-act-btn').innerText = "SYSTEM ACTIVE";
             document.getElementById('main-act-btn').style.background = "#16a34a";
-            document.getElementById('lock-icon').classList.add('text-green-500');
+            
             setInterval(() => {
-                const l = `[${new Date().toLocaleTimeString()}] AI HANDLED CALL: 00:42 SECS for ${biz}`;
+                const l = `[${new Date().toLocaleTimeString()}] INCOMING CALL HANDLED: Customer query resolved for ${biz} (${currentTone} Mode)`;
                 logsArray.push(l);
                 const div = document.createElement('div'); div.innerText = l;
                 document.getElementById('live-feed').prepend(div);
-            }, 5000);
+            }, 6000);
         }
 
         function simulateTraining() {
             document.getElementById('brain-fill').style.width = "100%";
-            const l = `[${new Date().toLocaleTimeString()}] NEURAL UPDATE: Knowledge Base Ingested.`;
+            document.getElementById('sat-percent').innerText = "100%";
+            const l = `[${new Date().toLocaleTimeString()}] KNOWLEDGE SYNC: Neural pathways updated with custom business assets.`;
             logsArray.push(l);
             const div = document.createElement('div'); div.innerText = l;
             document.getElementById('live-feed').prepend(div);
         }
 
+        function setTone(t) {
+            currentTone = t;
+            document.querySelectorAll('.personality-pill').forEach(p => p.classList.remove('active'));
+            if(t === 'Professional') document.getElementById('tone-prof').classList.add('active');
+            else document.getElementById('tone-friend').classList.add('active');
+        }
+
         function downloadLogs() {
-            const csv = "data:text/csv;charset=utf-8," + logsArray.join("\n");
-            const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", "AI_Call_Logs.csv");
-            document.body.appendChild(link);
-            link.click();
+            const blob = new Blob([logsArray.join('\n')], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', 'Call_Port_Logs.csv');
+            a.click();
         }
 
         function toggleChat() { document.getElementById('ai-chat-widget').classList.toggle('visible'); }
         function aiReply() {
             const i = document.getElementById('chat-in'); const t = i.value; if(!t) return;
             const b = document.getElementById('chat-body');
-            b.innerHTML += `<div class="msg-user">${t}</div>`;
+            b.innerHTML += `<div class="flex justify-end"><div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none text-sm max-w-[80%]">${t}</div></div>`;
             i.value = '';
-            setTimeout(() => { b.innerHTML += `<div class="msg-ai">Neural AI: Processing your query for ${biz} with zero human intervention.</div>`; b.scrollTop = b.scrollHeight; }, 800);
+            setTimeout(() => { 
+                const reply = currentTone === "Professional" ? `Neural Agent: Understood. I am processing your query for ${biz} using enterprise protocols.` : `Neural Agent: No problem! I'm taking care of that for ${biz} right now.`;
+                b.innerHTML += `<div class="flex justify-start"><div class="bg-white/10 text-white p-3 rounded-2xl rounded-tl-none text-sm max-w-[80%]">${reply}</div></div>`; 
+                b.scrollTop = b.scrollHeight; 
+            }, 800);
         }
     </script>
 </body>
