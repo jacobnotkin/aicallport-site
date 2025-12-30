@@ -3,207 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Call Port V.2.0 | Next-Gen Google AI</title>
+    <title>AI CALL PORT 2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --accent: #3b82f6; --bg: #0b0e1a; }
-        html, body { height: 100%; margin: 0; background-color: var(--bg); color: #5c96fa; overflow-x: hidden; }
-        body { display: flex; flex-direction: column; font-family: 'Inter', sans-serif; min-height: 100vh; }
-        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); }
-        .app-container { width: 94%; max-width: 1400px; margin: 0 auto; padding: 2rem 0; flex: 1; }
+        :root { --p-blue: #3b82f6; --dark-bg: #0b0e1a; }
+        body { background-color: var(--dark-bg); color: #5c96fa; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; display: flex; flex-direction: column; }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); }
         
-        .gemini-icon-svg { filter: drop-shadow(0 0 5px rgba(66, 133, 244, 0.6)); animation: pulse-glow 2s infinite alternate; }
-        @keyframes pulse-glow { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; } }
+        /* GEMINI SPARK SVG */
+        .spark-svg { filter: drop-shadow(0 0 8px rgba(66, 133, 244, 0.7)); animation: spark-pulse 1.5s infinite alternate; }
+        @keyframes spark-pulse { from { transform: scale(1); } to { transform: scale(1.15); } }
 
-        .pipeline-grid { display: grid; width: 100%; gap: 12px; grid-template-columns: repeat(4, 1fr); margin: 2.5rem 0; }
-        @media (min-width: 1024px) { .pipeline-grid { grid-template-columns: repeat(7, 1fr); } }
+        /* THE GLOBAL HUD (Bottom Left) */
+        .system-hud-new {
+            position: fixed; bottom: 30px; left: 30px; z-index: 100;
+            border: 1px solid rgba(59, 130, 246, 0.5); /* Blue glow border */
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+            padding: 15px 20px; border-radius: 20px; background: rgba(11, 14, 26, 0.9);
+        }
 
-        .step-card { background: rgba(255, 255, 255, 0.02); border-top: 4px solid rgba(255,255,255,0.1); padding: 1.25rem 0.5rem; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.3s ease; }
-        .step-card.active { border-top-color: var(--accent); background: rgba(59, 130, 246, 0.12); }
-        .step-label { font-size: 10px; font-weight: 900; color: #3b82f6; text-transform: uppercase; margin-bottom: 4px; }
-        .step-value { color: white; font-weight: 800; font-size: 12px; text-transform: uppercase; }
+        .pipeline-wrapper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 40px 0; }
+        @media (min-width: 1024px) { .pipeline-wrapper { grid-template-columns: repeat(7, 1fr); } }
 
-        .v-badge { background: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; }
-        #chat-window { display: none; position: fixed; bottom: 7rem; right: 2rem; width: 340px; height: 450px; z-index: 6000; border-radius: 24px; overflow: hidden; }
-        #chat-window.active { display: flex; flex-direction: column; }
-        #setup-modal { display: none; position: fixed; inset: 0; z-index: 7000; align-items: center; justify-content: center; background: rgba(0,0,0,0.9); }
-        #setup-modal.active { display: flex; }
+        .btn-step { background: rgba(255, 255, 255, 0.03); border-top: 3px solid rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .btn-step.active { border-top-color: var(--p-blue); background: rgba(59, 130, 246, 0.1); }
+        
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
     </style>
 </head>
 <body>
 
-    <nav class="border-b border-white/10 px-6 md:px-10 py-5 flex justify-between items-center sticky top-0 bg-[#0b0e1a]/95 backdrop-blur-xl z-40">
+    <nav class="border-b border-white/5 px-8 py-6 flex justify-between items-center sticky top-0 bg-[#0b0e1a]/90 backdrop-blur-md z-50">
         <div class="flex items-center gap-4">
-            <div class="flex items-center gap-3">
-                <span class="text-xl font-black text-white italic uppercase tracking-tighter">AI CALL PORT</span>
-                <span class="v-badge">V.2.0 ACTIVE</span>
-            </div>
-            <div class="hidden lg:flex items-center gap-2 border-l border-white/10 pl-6">
-                <svg class="gemini-icon-svg w-5 h-5" viewBox="0 0 24 24">
-                    <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="url(#grad1)" />
-                    <defs><linearGradient id="grad1"><stop offset="0%" stop-color="#4285F4"/><stop offset="100%" stop-color="#9B72CB"/></linearGradient></defs>
+            <span class="text-xl font-black text-white italic tracking-tighter">AI CALL PORT <span class="text-blue-500">V.2.0</span></span>
+            <div class="hidden md:flex items-center gap-2 border-l border-white/10 pl-6">
+                <svg class="spark-svg w-5 h-5" viewBox="0 0 24 24">
+                    <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="url(#g1)" />
+                    <defs><linearGradient id="g1"><stop offset="0%" stop-color="#4285F4"/><stop offset="100%" stop-color="#9B72CB"/></linearGradient></defs>
                 </svg>
-                <span class="text-[10px] font-black tracking-[0.2em] text-white">NEXT-GEN GOOGLE AI</span>
+                <span class="text-[9px] font-black tracking-widest text-white uppercase">Google Gemini Node</span>
             </div>
         </div>
-        <button onclick="toggleChat()" class="text-[10px] font-black uppercase text-blue-400 hover:text-white border-b border-blue-400/30 pb-1">AI CUSTOMER SUPPORT</button>
+        <div class="text-[10px] font-bold text-green-500 bg-green-500/10 px-3 py-1 rounded border border-green-500/20">SYSTEM ONLINE</div>
     </nav>
 
-    <div class="app-container">
-        <div class="flex flex-col lg:flex-row justify-between items-end gap-8 mb-10">
-            <div class="max-w-4xl">
-                <div class="mb-3 flex items-center gap-3">
-                    <p class="text-blue-500 font-black uppercase tracking-[0.4em] text-xs leading-none">DESIGNED BY GOOGLE GEMINI</p>
+    <main class="max-w-[1400px] mx-auto w-[92%] py-12">
+        <div class="flex flex-col lg:flex-row justify-between items-end gap-12 mb-12">
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-blue-500 font-black text-xs tracking-[0.3em] uppercase">Built with Google Gemini</span>
                     <svg class="w-4 h-4" viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#4285F4"/></svg>
                 </div>
-                <h1 class="text-3xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-tight">
-                    GLOBAL AI <span class="text-blue-500 italic">VOICE AGENTS</span>
+                <h1 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">
+                    GLOBAL AI <br><span class="text-blue-600 italic">VOICE INFRA</span>
                 </h1>
             </div>
-            
-            <div class="glass p-6 md:p-8 rounded-[32px] flex flex-col gap-4 min-w-full lg:min-w-[420px]">
-                <div class="flex justify-between items-center">
+
+            <div class="glass-panel p-8 rounded-[35px] w-full lg:w-[450px] border-white/10 relative overflow-hidden">
+                <div class="flex justify-between items-start mb-6">
                     <div>
-                        <div class="text-gray-500 text-[10px] font-black uppercase mb-1 tracking-widest">Global License</div>
-                        <div class="text-4xl font-black text-white">$199<span class="text-base font-bold text-gray-400">/mo</span></div>
+                        <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Monthly Subscription</p>
+                        <h2 class="text-5xl font-black text-white">$199<span class="text-lg text-gray-400">/mo</span></h2>
                     </div>
-                    <button onclick="openModal(1)" class="bg-blue-600 px-6 py-4 rounded-xl text-white font-black text-sm uppercase hover:bg-blue-500">Setup Agent</button>
+                    <button onclick="triggerModal(1)" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-900/40">Launch Agent</button>
                 </div>
-                <div class="text-[9px] font-black text-green-500 uppercase tracking-widest text-center py-2 border-y border-white/10 animate-pulse">ACTIVATION-FULLY AUTOMATED</div>
+                <div class="text-[9px] font-black text-center text-green-500 tracking-[0.2em] mb-4 border-y border-white/5 py-2 animate-pulse">AUTONOMOUS DEPLOYMENT READY</div>
                 
-                <div class="grid grid-cols-3 gap-1 pt-2">
-                    <div class="text-[8px] font-black text-blue-400 uppercase text-center flex flex-col"><span>Unlimited</span><span>Calling</span></div>
-                    <div class="text-[8px] font-black text-blue-400 uppercase text-center border-x border-white/10 flex flex-col"><span>No</span><span>Contract</span></div>
-                    <div class="text-[8px] font-black text-blue-400 uppercase text-center flex flex-col"><span>Cancel</span><span>Anytime</span></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-[9px] font-black text-blue-400 uppercase">✓ Unlimited Calling</div>
+                    <div class="text-[9px] font-black text-blue-400 uppercase">✓ No Contracts</div>
+                    <div class="text-[9px] font-black text-blue-400 uppercase">✓ Monthly Payments</div>
+                    <div class="text-[9px] font-black text-blue-400 uppercase">✓ Cancel Anytime</div>
                 </div>
             </div>
         </div>
 
-        <div class="pipeline-grid">
-            <div onclick="openModal(1)" id="step-1" class="step-card"><div class="step-label">01 Region</div><div id="txt-1" class="step-value opacity-30">---</div></div>
-            <div onclick="openModal(2)" id="step-2" class="step-card"><div class="step-label">02 Industry</div><div id="txt-2" class="step-value opacity-30">---</div></div>
-            <div onclick="openModal(3)" id="step-3" class="step-card"><div class="step-label">03 Role</div><div id="txt-3" class="step-value opacity-30">---</div></div>
-            <div onclick="openModal(4)" id="step-4" class="step-card"><div class="step-label">04 Identity</div><div id="txt-4" class="step-value opacity-30">---</div></div>
-            <div onclick="openModal(5)" id="step-5" class="step-card"><div class="step-label">05 Voice</div><div id="txt-5" class="step-value opacity-30">---</div></div>
-            <div onclick="alert('Initializing Voice...')" id="step-6" class="step-card border-orange-500/50"><div class="step-label text-orange-400">06 Test Call</div><div id="txt-6" class="step-value opacity-60">START</div></div>
-            <div onclick="openModal(7)" id="step-7" class="step-card"><div class="step-label text-green-500">07 ACTIVATE</div><div id="txt-7" class="step-value opacity-30">LOCK</div></div>
+        <div class="pipeline-wrapper">
+            <div onclick="triggerModal(1)" id="s1" class="btn-step"><p class="text-[9px] font-black text-blue-500">01 REGION</p><p id="v1" class="text-white text-xs font-bold mt-1 opacity-20">---</p></div>
+            <div onclick="triggerModal(2)" id="s2" class="btn-step"><p class="text-[9px] font-black text-blue-500">02 BIZ TYPE</p><p id="v2" class="text-white text-xs font-bold mt-1 opacity-20">---</p></div>
+            <div onclick="triggerModal(3)" id="s3" class="btn-step"><p class="text-[9px] font-black text-blue-500">03 ROLE</p><p id="v3" class="text-white text-xs font-bold mt-1 opacity-20">---</p></div>
+            <div onclick="triggerModal(4)" id="s4" class="btn-step"><p class="text-[9px] font-black text-blue-500">04 NAME</p><p id="v4" class="text-white text-xs font-bold mt-1 opacity-20">---</p></div>
+            <div onclick="triggerModal(5)" id="s5" class="btn-step"><p class="text-[9px] font-black text-blue-500">05 VOICE</p><p id="v5" class="text-white text-xs font-bold mt-1 opacity-20">---</p></div>
+            <div onclick="alert('Testing...')" id="s6" class="btn-step border-orange-500/30"><p class="text-[9px] font-black text-orange-500">06 TEST</p><p class="text-white text-xs font-bold mt-1">START</p></div>
+            <div onclick="triggerModal(7)" id="s7" class="btn-step"><p class="text-[9px] font-black text-green-500">07 ACTIVATE</p><p id="v7" class="text-white text-xs font-bold mt-1 opacity-20">LOCK</p></div>
         </div>
 
-        <div class="glass p-8 rounded-[40px] relative min-h-[200px] mb-24 border-white/10 shadow-2xl">
-            <h3 class="text-white font-black uppercase text-xl italic border-b border-white/10 pb-4 mb-4">Deployment Terminal</h3>
-            <div id="live-feed" class="font-mono text-xs text-blue-400/80 space-y-2">> SYSTEM SECURE: READY FOR INSTRUCTIONS...</div>
+        <div class="glass-panel p-8 rounded-[40px] min-h-[180px]">
+            <h3 class="text-white font-black text-lg italic border-b border-white/10 pb-3 mb-4 uppercase">Data Stream</h3>
+            <div id="logs" class="font-mono text-[11px] text-blue-400/70 space-y-1">> Awaiting configuration...</div>
+        </div>
+    </main>
+
+    <div class="system-hud-new hidden md:block">
+        <div class="flex items-center gap-2 mb-2">
+            <div class="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+            <span class="text-[10px] font-black text-white uppercase tracking-tighter">Live Network Status</span>
+        </div>
+        <div class="flex gap-6">
+            <div>
+                <p class="text-[7px] text-gray-500 font-black uppercase">Active Node</p>
+                <p id="node-name" class="text-[11px] text-white font-black italic uppercase">SILICON VALLEY, USA</p>
+            </div>
+            <div class="border-l border-white/10 pl-4">
+                <p class="text-[7px] text-gray-500 font-black uppercase">Latency</p>
+                <p id="node-lat" class="text-[11px] text-blue-400 font-mono font-bold">14ms</p>
+            </div>
         </div>
     </div>
 
-    <div class="fixed bottom-8 left-8 hidden md:block z-40">
-        <div class="glass px-6 py-4 rounded-3xl border-white/20 bg-[#0b0e1a]/80 shadow-2xl">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
-                <span class="text-[10px] font-black text-white uppercase tracking-widest">Network Health: Optimal</span>
-            </div>
-            <div class="flex gap-6">
-                <div class="flex flex-col">
-                    <span class="text-[8px] text-gray-500 font-black uppercase">Latency</span>
-                    <span id="hud-lat" class="text-xs text-blue-400 font-mono font-bold tracking-tighter">12ms</span>
-                </div>
-                <div class="flex flex-col border-l border-white/10 pl-6">
-                    <span class="text-[8px] text-gray-500 font-black uppercase">Active Node</span>
-                    <span id="hud-node" class="text-xs text-white font-black uppercase italic tracking-tight">SILICON VALLEY, USA</span>
-                </div>
-            </div>
-        </div>
+    <div onclick="toggleChat()" class="fixed bottom-8 right-8 w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer shadow-2xl z-[500] hover:scale-110 transition">
+        <svg class="w-8 h-8" viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="white" /></svg>
     </div>
 
-    <div class="fixed bottom-8 right-8 z-[6000]">
-        <div id="chat-window" class="glass bg-[#0b0e1a] shadow-2xl mb-4 border-white/10">
-            <div class="bg-blue-600 p-4 flex justify-between items-center text-white font-black text-xs uppercase italic">
-                <div class="flex items-center gap-2">
-                    <svg class="w-3 h-3" viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="white"/></svg>
-                    <span>Gemini Support</span>
-                </div>
-                <button onclick="toggleChat()" class="text-lg">&times;</button>
-            </div>
-            <div class="flex-1 p-4 font-mono text-[11px] text-blue-400 overflow-y-auto">
-                <div class="bg-white/5 p-3 rounded-lg text-white">I am your automated Gemini assistant. How can I help?</div>
-            </div>
-        </div>
-        <div onclick="toggleChat()" class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center cursor-pointer shadow-xl hover:scale-110 transition-transform">
-            <svg class="w-8 h-8" viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="white" /></svg>
-        </div>
-    </div>
-
-    <div id="setup-modal">
-        <div class="glass p-10 md:p-16 rounded-[48px] w-full max-w-2xl text-center relative border-white/20">
-            <button onclick="closeModal()" class="absolute top-6 right-8 text-white text-3xl opacity-30 hover:opacity-100">&times;</button>
-            <h2 id="modal-title" class="text-white font-black text-2xl uppercase mb-8 border-b-4 border-blue-600 pb-3 inline-block"></h2>
-            <div id="modal-content" class="grid gap-3"></div>
+    <div id="setupModal" class="modal-overlay">
+        <div class="glass-panel p-12 rounded-[50px] w-full max-w-xl text-center relative border-white/20">
+            <h2 id="mTitle" class="text-white font-black text-2xl uppercase mb-6"></h2>
+            <div id="mContent" class="grid gap-3"></div>
+            <button onclick="closeM()" class="mt-8 text-gray-500 text-xs font-black uppercase hover:text-white">Close Window</button>
         </div>
     </div>
 
     <script>
-        let bizName = "Local Business";
-        function toggleChat() { document.getElementById('chat-window').classList.toggle('active'); }
-        function closeModal() { document.getElementById('setup-modal').classList.remove('active'); }
-        
-        // GLOBAL NODE DATA (11 Countries, 4 Continents)
-        const globalNodes = [
+        const nodeData = [
             "SILICON VALLEY, USA", "TORONTO, CANADA", "MEXICO CITY, MEXICO",
             "LONDON, UK", "FRANKFURT, GERMANY", "PARIS, FRANCE", "DUBLIN, IRELAND",
             "TOKYO, JAPAN", "SINGAPORE, SG", "BENGALURU, INDIA", "SYDNEY, AUSTRALIA"
         ];
         
-        let nodeIdx = 0;
+        let nIdx = 0;
         setInterval(() => {
-            nodeIdx = (nodeIdx + 1) % globalNodes.length;
-            document.getElementById('hud-node').innerText = globalNodes[nodeIdx];
-            document.getElementById('hud-lat').innerText = Math.floor(Math.random() * (38 - 8) + 8) + "ms";
-        }, 3000);
+            nIdx = (nIdx + 1) % nodeData.length;
+            document.getElementById('node-name').innerText = nodeData[nIdx];
+            document.getElementById('node-lat').innerText = Math.floor(Math.random() * 30 + 5) + "ms";
+        }, 2500);
 
-        const config = {
-            1: { title: "Region", data: ["North America", "Europe", "Global"] },
-            2: { title: "Industry", data: ["Medical", "Law", "Trade", "Retail"] },
-            3: { title: "Role", data: ["Receptionist", "Sales", "Support"] },
-            4: { title: "Business Name", type: "form" },
-            5: { title: "Voice Profile", data: ["Professional", "Bold Authority"] },
-            7: { title: "Final Activation", type: "payment" }
-        };
+        function triggerModal(step) {
+            const m = document.getElementById('setupModal');
+            const title = document.getElementById('mTitle');
+            const content = document.getElementById('mContent');
+            m.classList.add('show');
+            content.innerHTML = "";
 
-        function openModal(s) {
-            const c = config[s]; if(!c) return;
-            document.getElementById('modal-title').innerText = c.title;
-            const container = document.getElementById('modal-content'); container.innerHTML = '';
-            if(c.data) {
-                c.data.forEach(d => {
-                    const b = document.createElement('button');
-                    b.className = 'w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white font-black uppercase hover:bg-blue-600 transition-all';
-                    b.innerText = d; b.onclick = () => { saveStep(s, d); closeModal(); };
-                    container.appendChild(b);
+            if(step == 1) {
+                title.innerText = "Select Region";
+                ["North America", "Europe", "Asia", "Global"].forEach(opt => {
+                    let b = document.createElement('button');
+                    b.className = "bg-white/5 p-4 rounded-xl text-white font-bold hover:bg-blue-600";
+                    b.innerText = opt; b.onclick = () => finishStep(1, opt);
+                    content.appendChild(b);
                 });
-            } else if(c.type === "form") {
-                container.innerHTML = `<input id="b-in" placeholder="NAME" class="w-full p-5 bg-white/5 border border-white/10 rounded-xl text-white mb-3 outline-none"><button onclick="bizName=document.getElementById('b-in').value;saveStep(4, bizName);closeModal()" class="w-full bg-blue-600 p-5 rounded-xl text-white font-black">SAVE IDENTITY</button>`;
-            } else if(c.type === "payment") {
-                container.innerHTML = `<div class="text-white mb-6"><h3 class="text-4xl font-black">$199</h3><p class="text-xs text-blue-400 font-black">FULLY AUTOMATED DEPLOYMENT</p></div><button onclick="startAutomatedProvisioning()" class="w-full bg-green-600 p-6 rounded-xl text-white font-black shadow-lg">ACTIVATE V.2.0</button>`;
+            } else if (step == 4) {
+                title.innerText = "Business Name";
+                content.innerHTML = `<input id="nameIn" class="bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4"><button onclick="finishStep(4, document.getElementById('nameIn').value)" class="bg-blue-600 p-4 rounded-xl text-white font-black">SAVE</button>`;
+            } else if (step == 7) {
+                title.innerText = "Final Activation";
+                content.innerHTML = `<button onclick="activateSystem()" class="bg-green-600 p-6 rounded-2xl text-white font-black text-xl">ACTIVATE ENGINE</button>`;
+            } else {
+                title.innerText = "Configure Agent";
+                ["Professional", "Friendly", "Direct"].forEach(opt => {
+                    let b = document.createElement('button');
+                    b.className = "bg-white/5 p-4 rounded-xl text-white font-bold hover:bg-blue-600";
+                    b.innerText = opt; b.onclick = () => finishStep(step, opt);
+                    content.appendChild(b);
+                });
             }
-            document.getElementById('setup-modal').classList.add('active');
         }
 
-        function saveStep(s, v) {
-            const el = document.getElementById(`txt-${s}`);
-            el.innerText = v.substring(0,10);
-            el.classList.remove('opacity-30');
-            document.getElementById(`step-${s}`).classList.add('active');
+        function closeM() { document.getElementById('setupModal').classList.remove('show'); }
+
+        function finishStep(s, val) {
+            document.getElementById(`v${s}`).innerText = val.toUpperCase().substring(0,10);
+            document.getElementById(`v${s}`).classList.remove('opacity-20');
+            document.getElementById(`s${s}`).classList.add('active');
+            closeM();
         }
 
-        function startAutomatedProvisioning() {
-            closeModal();
-            const log = document.createElement('div'); 
-            log.className = "text-green-400";
-            log.innerText = `> GLOBAL NODE ACTIVATED: SYSTEM LIVE.`;
-            document.getElementById('live-feed').prepend(log);
-            saveStep(7, 'LIVE');
+        function activateSystem() {
+            closeM();
+            document.getElementById('logs').innerHTML = `<div class="text-green-400">> GOOGLE GEMINI CORE: ONLINE. GLOBAL NODES SYNCED.</div>`;
+            finishStep(7, "LIVE");
         }
+
+        function toggleChat() { alert("Gemini Support: How can I help you today?"); }
     </script>
 </body>
 </html>
