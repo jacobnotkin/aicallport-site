@@ -145,7 +145,7 @@
     </div>
 
     <script>
-        // CONFIGURATION (VAPI CREDENTIALS)
+        // CONFIGURATION
         const VAPI_PUBLIC_KEY = 'd4fcbe60-643b-48c8-9d74-dfb8ff3236f3'; 
         const ASSISTANT_ID = 'acbbfa66-260e-48ff-bdc5-477b8fdda1e1'; 
 
@@ -219,16 +219,16 @@
                 title.innerText = "Operator Sync";
                 content.innerHTML = `
                     <input id="in_name" placeholder="COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-3 outline-none focus:border-orange-500 uppercase font-black text-center text-xs tracking-[0.2em]">
-                    <input id="in_phone" placeholder="PHONE (e.g. +15551234567)" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-6 outline-none focus:border-orange-500 text-center font-bold">
+                    <input id="in_phone" placeholder="+1234567890" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-6 outline-none focus:border-orange-500 text-center font-bold">
                     <button onclick="saveStep3()" class="orange-btn w-full p-5 rounded-xl font-black text-sm uppercase italic tracking-widest">Connect Operator Node</button>`;
             } else if (step === 5) {
                 title.innerText = "Voice Port Interaction";
                 content.innerHTML = `<div class="bg-orange-600/10 border border-orange-500/50 p-8 rounded-3xl mb-6 text-center">
-                    <p class="text-[9px] text-orange-500 font-black mb-2 uppercase tracking-[0.3em]">Dialing Port:</p>
-                    <p class="text-xl font-black text-white tracking-widest italic">${selections.phone || 'Enter Phone in Step 3'}</p>
+                    <p class="text-[9px] text-orange-500 font-black mb-2 uppercase tracking-[0.3em]">Ready to Call:</p>
+                    <p class="text-2xl font-black text-white tracking-widest italic">${selections.phone || 'Enter Phone in Step 3'}</p>
                 </div>
                 <button id="call_btn" onclick="initiateLiveCall()" class="orange-btn w-full p-5 rounded-xl font-black uppercase text-xs tracking-widest mb-4">Request Voice Port</button>
-                <button onclick="finishStep(5, 'VERIFIED', 'demo')" class="w-full bg-white/5 text-slate-500 p-3 rounded-xl font-bold uppercase text-[9px]">Manually Verify</button>`;
+                <button onclick="finishStep(5, 'VERIFIED', 'demo')" class="w-full bg-white/5 text-slate-500 p-3 rounded-xl font-bold uppercase text-[9px]">Manual Bypass</button>`;
             } else if (step === 6) {
                 title.innerText = "Activate System";
                 content.innerHTML = `
@@ -242,9 +242,9 @@
 
         async function initiateLiveCall() {
             const btn = document.getElementById('call_btn');
-            if(!selections.phone) return alert("Missing phone number. Please enter it in Step 3.");
+            if(!selections.phone) return alert("Please enter phone in Step 3");
             
-            btn.innerHTML = "BRIDGING...";
+            btn.innerHTML = "INITIALIZING...";
             btn.disabled = true;
 
             try {
@@ -261,16 +261,15 @@
                 });
 
                 if (response.ok) {
-                    btn.innerHTML = "CALL DISPATCHED";
+                    btn.innerHTML = "SYSTEM RINGING";
                     setTimeout(() => finishStep(5, 'VERIFIED', 'demo'), 2000);
                 } else {
-                    const errorData = await response.json();
-                    console.error("Vapi Error:", errorData);
+                    const err = await response.json();
+                    console.log(err);
                     btn.innerHTML = "OFFLINE";
                     btn.disabled = false;
                 }
-            } catch (err) {
-                console.error("Connection Error:", err);
+            } catch (e) {
                 btn.innerHTML = "OFFLINE";
                 btn.disabled = false;
             }
@@ -301,11 +300,7 @@
         function saveStep3() {
             const n = document.getElementById('in_name').value;
             const p = document.getElementById('in_phone').value;
-            if(n && p) { 
-                selections.business = n; 
-                selections.phone = p; 
-                finishStep(3, n, 'business'); 
-            }
+            if(n && p) { selections.business = n; selections.phone = p; finishStep(3, n, 'business'); }
         }
 
         function closeM() { document.getElementById('setupModal').style.display = 'none'; }
