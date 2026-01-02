@@ -1,188 +1,111 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>AI CALL PORT | Global Instant AI Voice Agent Connector</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
     <style>
+
+        :root { --p-orange: #f97316; }
+
         body { 
-            background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; 
-            min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow-x: hidden;
+
+            background: #06080f; background-image: radial-gradient(circle at 50% 50%, #111827 0%, #06080f 100%);
+
+            color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; padding: 10px;
+
+            display: flex; align-items: center; justify-content: center;
+
         }
+
         .command-center {
-            width: 100%; max-width: 1100px; padding: 40px; background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 40px;
-            position: relative; z-index: 10;
+
+            width: 100%; max-width: 1100px; padding: 20px; background: rgba(255, 255, 255, 0.02);
+
+            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px;
+
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
+
+            margin: 10px auto;
+
         }
+
+        @media (min-width: 768px) {
+
+            .command-center { padding: 40px; border-radius: 40px; }
+
+            body { padding: 20px; }
+
+        }
+
         .traditional-font { font-family: 'Playfair Display', serif; }
+
         .step-card {
+
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 15px 10px; border-radius: 16px; text-align: center; cursor: pointer; transition: 0.3s;
+
+            padding: 12px 6px; border-radius: 16px; text-align: center; cursor: pointer; transition: 0.3s;
+
         }
-        .step-card:hover { background: rgba(255, 255, 255, 0.08); border-color: #f97316; }
-        .step-card.active { background: linear-gradient(135deg, #f97316, #ea580c); }
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); color: white; font-weight: 800; cursor: pointer; }
+
+        .step-card.active { background: linear-gradient(135deg, #f97316, #ea580c); border-color: #ffedd5; }
+
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); color: white; font-weight: 800; transition: 0.3s; }
+
         
-        /* Modal Layering Fix */
-        #setupModal { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
-            backdrop-filter: blur(15px); z-index: 1000; align-items: center; justify-content: center; padding: 20px;
-        }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
-    </style>
-</head>
-<body>
 
-    <div id="app-container" class="command-center">
-        <header class="flex justify-between items-center mb-12">
-            <div>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center font-black italic text-white">AI</div>
-                    <span class="text-xl font-black uppercase text-white tracking-tighter">AI CALL <span class="text-orange-500">PORT</span></span>
-                </div>
-            </div>
-            <div class="flex items-center gap-3 px-4 py-2 bg-white/5 rounded-full border border-white/10">
-                <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                <span class="traditional-font italic text-sm text-white">Managed by Gemini</span>
-            </div>
-        </header>
+        .operator-tag-row {
 
-        <div id="hero-view">
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center mb-16">
-                <div class="lg:col-span-3">
-                    <h1 class="text-5xl font-black leading-tight tracking-tighter mb-6 text-white uppercase italic">
-                        GLOBAL INSTANT <span class="text-orange-500">AI VOICE</span> CONNECTOR.
-                    </h1>
-                    <p class="text-slate-400 text-lg mb-8 max-w-md">Deploy enterprise-grade voice intelligence. Build your operator pipeline below.</p>
-                    <button onclick="triggerModal(1)" class="orange-btn px-10 py-5 rounded-2xl shadow-xl uppercase text-xs tracking-widest italic">Initialize Global Port</button>
-                </div>
-                <div class="lg:col-span-2 bg-black/40 border-2 border-orange-500/30 rounded-[40px] p-8 text-center">
-                    <p class="text-slate-500 font-bold text-[10px] uppercase mb-2 italic">Monthly Infrastructure</p>
-                    <div class="text-5xl font-black tracking-tighter text-white mb-6">$199<span class="text-lg text-slate-500">/mo</span></div>
-                    <button onclick="triggerModal(6)" class="w-full py-4 bg-white text-black rounded-xl font-black text-xs uppercase hover:bg-orange-500 hover:text-white transition-all">Claim Access</button>
-                </div>
-            </div>
+            background: rgba(249, 115, 22, 0.1); border-left: 3px solid #f97316;
 
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <div onclick="triggerModal(1)" id="s1" class="step-card"><p class="text-[9px] font-bold text-orange-500 uppercase mb-1">01 Countries</p><p id="v1" class="font-black text-white text-[10px] opacity-20 italic">SELECT</p></div>
-                <div onclick="triggerModal(2)" id="s2" class="step-card"><p class="text-[9px] font-bold text-orange-500 uppercase mb-1">02 Industry</p><p id="v2" class="font-black text-white text-[10px] opacity-20 italic">SELECT</p></div>
-                <div onclick="triggerModal(3)" id="s3" class="step-card"><p class="text-[9px] font-bold text-orange-500 uppercase mb-1">03 Business</p><p id="v3" class="font-black text-white text-[10px] opacity-20 italic">INFO</p></div>
-                <div onclick="triggerModal(4)" id="s4" class="step-card"><p class="text-[9px] font-bold text-orange-500 uppercase mb-1">04 Agent</p><p id="v4" class="font-black text-white text-[10px] opacity-20 italic">CHOOSE</p></div>
-                <div onclick="triggerModal(5)" id="s5" class="step-card"><p class="text-[9px] font-bold text-blue-400 uppercase mb-1">05 Demo</p><p id="v5" class="font-black text-white text-[10px] opacity-20 italic">TEST</p></div>
-                <div onclick="triggerModal(6)" id="s6" class="step-card"><p class="text-[9px] font-bold text-green-500 uppercase mb-1">06 Launch</p><p id="v6" class="font-black text-white text-[10px] opacity-20 italic">ACTIVATE</p></div>
-            </div>
-        </div>
-    </div>
+            color: #f97316; padding: 10px 15px; font-size: 10px; font-weight: 800;
 
-    <div id="setupModal">
-        <div class="bg-[#0f172a] border border-orange-500/20 max-w-lg w-full p-8 rounded-[40px]">
-            <h2 id="mTitle" class="text-2xl font-black text-white mb-6 italic tracking-tighter text-center uppercase"></h2>
-            <div id="mContent" class="grid gap-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
-                </div>
-            <div class="text-center mt-8">
-                <button onclick="closeM()" class="text-slate-600 font-bold uppercase text-[9px] tracking-widest hover:text-white transition">Close</button>
-            </div>
-        </div>
-    </div>
+            text-transform: uppercase; letter-spacing: 0.15em; white-space: nowrap;
 
-    <script>
-        // DATA ARRAYS
-        const countries = ["United States", "United Kingdom", "Canada", "Australia", "Germany", "France", "UAE", "Singapore"];
-        const industries = ["Dental Office", "Roofing Company", "Real Estate", "Hair Salon", "Law Firm", "Auto Repair"];
-        const agents = ["AI Receptionist", "Appointment Booker", "Lead Qualifier", "Customer Support"];
+            display: inline-flex; align-items: center; width: auto;
 
-        const selections = { country: "", industry: "", business: "", agent: "" };
-
-        // VAPI CONFIG
-        const vapi = new Vapi('d4fcbe60-643b-48c8-9d74-dfb8ff3236f3');
-
-        function triggerModal(step) {
-            const m = document.getElementById('setupModal');
-            const content = document.getElementById('mContent');
-            const title = document.getElementById('mTitle');
-            
-            m.style.display = 'flex';
-            content.innerHTML = ""; // Clear previous
-
-            if (step === 1) {
-                title.innerText = "Select Country";
-                countries.forEach(c => {
-                    content.innerHTML += `<button onclick="finishStep(1, '${c}', 'country')" class="w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-bold uppercase text-xs transition">${c}</button>`;
-                });
-            } 
-            else if (step === 2) {
-                title.innerText = "Select Industry";
-                industries.forEach(i => {
-                    content.innerHTML += `<button onclick="finishStep(2, '${i}', 'industry')" class="w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-bold uppercase text-xs transition">${i}</button>`;
-                });
-            }
-            else if (step === 3) {
-                title.innerText = "Business Details";
-                content.innerHTML = `
-                    <input id="biz_name" placeholder="COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-4 outline-none text-center font-bold">
-                    <button onclick="saveStep3()" class="orange-btn w-full p-5 rounded-xl font-black text-sm uppercase italic">Save & Continue</button>`;
-            }
-            else if (step === 4) {
-                title.innerText = "Assign Agent Role";
-                agents.forEach(a => {
-                    content.innerHTML += `<button onclick="finishStep(4, '${a}', 'agent')" class="w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-bold uppercase text-xs transition">${a}</button>`;
-                });
-            }
-            else if (step === 5) {
-                title.innerText = "Live Voice Test";
-                content.innerHTML = `
-                    <div class="text-center py-6">
-                        <button id="vBtn" onclick="toggleCall()" class="orange-btn px-8 py-4 rounded-full font-black uppercase text-xs">Start Voice Demo</button>
-                        <p id="vStatus" class="mt-4 text-slate-500 text-[10px] uppercase font-bold">Ready to Connect</p>
-                    </div>`;
-            }
-            else if (step === 6) {
-                title.innerText = "System Activation";
-                content.innerHTML = `
-                    <div class="p-6 bg-white/5 rounded-2xl text-center mb-6">
-                        <p class="text-white font-bold italic mb-1">Finalizing Pipeline for:</p>
-                        <p class="text-orange-500 font-black uppercase">${selections.business || 'New Operator'}</p>
-                    </div>
-                    <button onclick="alert('Activation Success!')" class="orange-btn w-full p-5 rounded-xl font-black uppercase italic">Activate Node</button>`;
-            }
         }
 
-        function finishStep(step, value, key) {
-            selections[key] = value;
-            const label = document.getElementById(`v${step}`);
-            label.innerText = value.toUpperCase();
-            label.classList.remove('opacity-20');
-            document.getElementById(`s${step}`).classList.add('active');
-            closeM();
+
+
+        .gemini-badge {
+
+            display: flex; align-items: center; gap: 10px; padding: 10px 18px;
+
+            background: rgba(255,255,255,0.03); border-radius: 100px; border: 1px solid rgba(255,255,255,0.08);
+
         }
 
-        function saveStep3() {
-            const val = document.getElementById('biz_name').value;
-            if(val) finishStep(3, val, 'business');
+        .gemini-logo {
+
+            width: 18px; height: 18px; background: linear-gradient(135deg, #4285f4, #9b72cb, #d96570, #f4af42);
+
+            clip-path: polygon(50% 0%, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0% 50%, 35% 35%);
+
+            animation: pulse-gold 3s infinite;
+
         }
 
-        function closeM() { document.getElementById('setupModal').style.display = 'none'; }
+        @keyframes pulse-gold { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.2); filter: brightness(1.3); } }
 
-        function toggleCall() {
-            const btn = document.getElementById('vBtn');
-            const status = document.getElementById('vStatus');
-            if(btn.innerText.includes("START")) {
-                vapi.start('acbbfa66-260e-48ff-bdc5-477b8fdda1e1');
-                btn.innerText = "STOP CALL";
-                status.innerText = "PORT LIVE";
-                status.className = "mt-4 text-green-500 text-[10px] font-black";
-            } else {
-                vapi.stop();
-                btn.innerText = "START VOICE DEMO";
-                status.innerText = "PORT CLOSED";
-                status.className = "mt-4 text-red-500 text-[10px] font-black";
-                setTimeout(() => finishStep(5, "TESTED", "demo"), 1000);
-            }
+        
+
+        .beta-ribbon {
+
+            background: #f97316; color: white; font-weight: 900; font-size: 8px;
+
+            padding: 4px 35px; position: absolute; top: 15px; right: -30px;
+
+            transform: rotate(45deg); letter-spacing: 0.1em; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
         }
-    </script>
-</body>
-</html>
