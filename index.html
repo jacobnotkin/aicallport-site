@@ -6,172 +6,86 @@
     <title>AI CALL PORT | Global Instant AI Voice Agent Connector</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --p-orange: #f97316; }
         body { 
             background: #06080f; background-image: radial-gradient(circle at 50% 50%, #111827 0%, #06080f 100%);
-            color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; padding: 10px;
-            display: flex; align-items: center; justify-content: center;
+            color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center;
         }
-        .command-center {
-            width: 100%; max-width: 1100px; padding: 20px; background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px;
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8); margin: 10px auto;
-        }
-        .step-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 12px 6px; border-radius: 16px; text-align: center; cursor: pointer; transition: 0.3s;
-        }
-        .step-card.active { background: linear-gradient(135deg, #f97316, #ea580c); border-color: #ffedd5; }
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); color: white; font-weight: 800; transition: 0.3s; }
-        .pulse-red { animation: pulse-red 2s infinite; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .command-center { width: 100%; max-width: 600px; padding: 40px; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 40px; text-align: center; }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); color: white; font-weight: 800; padding: 20px; width: 100%; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.3s; }
+        .orange-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pulse { animation: pulse-red 2s infinite; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(249, 115, 22, 0); } 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); } }
     </style>
 </head>
 <body>
 
-    <div id="app-container" class="command-center relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full bg-orange-600/20 text-orange-500 text-[9px] font-black py-2 text-center uppercase tracking-[0.4em]">
-            GLOBAL INSTANT AI VOICE AGENT CONNECTOR • BETA 1.0
+    <div class="command-center">
+        <h1 class="text-3xl font-black mb-2 italic">LIVE VOICE PORT</h1>
+        <p class="text-slate-500 text-[10px] tracking-[0.3em] uppercase mb-10">Instant AI Connectivity</p>
+        
+        <div id="status-box" class="bg-white/5 border border-white/10 p-8 rounded-3xl mb-8">
+            <p id="status-text" class="text-orange-500 font-bold uppercase text-[9px] tracking-widest mb-2">Ready to Initialize</p>
+            <p id="sub-text" class="text-slate-400 text-sm italic">Connect via System Microphone</p>
         </div>
 
-        <header class="flex flex-col md:flex-row justify-between items-center mt-10 mb-8 gap-6">
-            <div class="flex flex-col items-center md:items-start">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center font-black italic text-white shadow-lg">AI</div>
-                    <span class="text-lg md:text-xl font-black tracking-tighter uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
-                </div>
-                <p class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1 italic">Voice Infrastructure Backbone</p>
-            </div>
-        </header>
-
-        <div id="hero-view">
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-center">
-                <div class="lg:col-span-3 text-center lg:text-left">
-                    <h1 class="text-3xl md:text-5xl font-black leading-tight tracking-tighter mb-4 text-white uppercase italic">
-                        INSTANT <span class="text-orange-500">AI VOICE</span> PORT.
-                    </h1>
-                    <p class="text-slate-400 text-sm md:text-lg mb-8 leading-relaxed max-w-md mx-auto lg:mx-0">
-                        Connect your business to global AI voice intelligence.
-                    </p>
-                    <button onclick="triggerModal(1)" class="orange-btn px-10 py-5 rounded-2xl shadow-xl uppercase text-[10px] tracking-widest italic">Initialize Port</button>
-                </div>
-            </div>
-
-            <div class="mt-16 pt-8 border-t border-white/5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <div onclick="triggerModal(1)" id="s1" class="step-card"><p class="text-[9px] font-bold text-orange-500 uppercase mb-1">01 Node</p><p id="v1" class="font-black text-white text-[10px] opacity-20 italic">SELECT</p></div>
-                <div onclick="triggerModal(2)" id="s2" class="step-card"><p class="text-[9px] font-bold text-orange-500 uppercase mb-1">02 Industry</p><p id="v2" class="font-black text-white text-[10px] opacity-20 italic">SELECT</p></div>
-                <div onclick="triggerModal(3)" id="s3" class="step-card"><p class="text-[9px] font-bold text-orange-500 uppercase mb-1">03 Business</p><p id="v3" class="font-black text-white text-[10px] opacity-20 italic">INFO</p></div>
-                <div onclick="triggerModal(4)" id="s4" class="step-card"><p class="text-[9px] font-bold text-orange-500 uppercase mb-1">04 Agent</p><p id="v4" class="font-black text-white text-[10px] opacity-20 italic">CHOOSE</p></div>
-                <div onclick="triggerModal(5)" id="s5" class="step-card border-blue-500/30"><p class="text-[9px] font-bold text-blue-400 uppercase mb-1">05 Demo</p><p id="v5" class="font-black text-white text-[10px] opacity-20 italic">TEST</p></div>
-                <div onclick="triggerModal(6)" id="s6" class="step-card border-green-500/30"><p class="text-[9px] font-bold text-green-500 uppercase mb-1">06 Launch</p><p id="v6" class="font-black text-white text-[10px] opacity-20 italic">ACTIVATE</p></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="setupModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden items-center justify-center p-4">
-        <div class="bg-[#0f172a] border border-orange-500/20 max-w-lg w-full p-8 rounded-[40px] relative">
-            <h2 id="mTitle" class="text-2xl font-black text-white mb-6 italic tracking-tighter text-center uppercase"></h2>
-            <div id="mContent" class="grid gap-3"></div>
-            <div class="text-center mt-8">
-                <button onclick="closeM()" class="text-slate-600 font-bold uppercase text-[9px] tracking-widest hover:text-white transition italic">Cancel</button>
-            </div>
-        </div>
+        <button id="call_btn" onclick="toggleCall()" class="orange-btn">Connect to Agent</button>
     </div>
 
     <script>
-        // CONFIGURATION - PASTE YOUR IDS HERE
+        // CONFIGURATION
         const VAPI_PUBLIC_KEY = 'd4fcbe60-643b-48c8-9d74-dfb8ff3236f3'; 
         const ASSISTANT_ID = 'acbbfa66-260e-48ff-bdc5-477b8fdda1e1'; 
 
-        // Initialize Vapi SDK
+        // INITIALIZE VAPI
         const vapi = new Vapi(VAPI_PUBLIC_KEY);
-        const selections = { country: "", industry: "", business: "", agent: "" };
+        let isCalling = false;
 
-        function triggerModal(step) {
-            const m = document.getElementById('setupModal');
-            const content = document.getElementById('mContent');
-            const title = document.getElementById('mTitle');
-            m.style.display = 'flex';
-            content.innerHTML = "";
+        function toggleCall() {
+            const btn = document.getElementById('call_btn');
+            const status = document.getElementById('status-text');
+            const sub = document.getElementById('sub-text');
 
-            if (step === 1) {
-                title.innerText = "Select Node";
-                ['United States', 'United Kingdom', 'Canada'].forEach(c => {
-                    let b = document.createElement('button');
-                    b.className = "w-full py-4 bg-white/5 rounded-xl text-white font-black italic";
-                    b.innerText = c;
-                    b.onclick = () => finishStep(1, c, 'country');
-                    content.appendChild(b);
-                });
-            } else if (step === 3) {
-                title.innerText = "Business Info";
-                content.innerHTML = `<input id="bn" placeholder="COMPANY NAME" class="w-full bg-white/5 p-5 rounded-xl text-white text-center font-black mb-4">
-                <button onclick="selections.business=document.getElementById('bn').value; finishStep(3, selections.business, 'business')" class="orange-btn w-full p-5 rounded-xl font-black">SAVE</button>`;
-            } else if (step === 2 || step === 4) {
-                title.innerText = "Configure Agent";
-                ['Dental Support', 'Sales Agent', 'Receptionist'].forEach(a => {
-                    let b = document.createElement('button');
-                    b.className = "w-full py-4 bg-white/5 rounded-xl text-white font-black italic";
-                    b.innerText = a;
-                    b.onclick = () => finishStep(step, a, step === 2 ? 'industry' : 'agent');
-                    content.appendChild(b);
-                });
-            } else if (step === 5) {
-                title.innerText = "Live Voice Demo";
-                content.innerHTML = `
-                <div class="text-center mb-6"><p class="text-slate-400 text-xs italic">Talk to the AI via your microphone</p></div>
-                <button id="call_btn" onclick="startVapiCall()" class="orange-btn w-full p-6 rounded-2xl font-black text-lg">START VOICE CHAT</button>
-                <button id="stop_btn" onclick="vapi.stop()" class="hidden bg-red-600 w-full p-6 rounded-2xl font-black mt-4">END CALL</button>`;
-            } else if (step === 6) {
-                title.innerText = "Launch System";
-                content.innerHTML = `<button onclick="alert('System Activated!')" class="orange-btn w-full p-8 rounded-3xl text-2xl font-black">ACTIVATE PORT</button>`;
+            if (!isCalling) {
+                btn.innerText = "CONNECTING...";
+                btn.disabled = true;
+                
+                // Starts the call using the Web SDK
+                vapi.start(ASSISTANT_ID);
+            } else {
+                vapi.stop();
             }
         }
 
-        // THE VAPI ENGINE
-        function startVapiCall() {
+        // EVENT HANDLERS
+        vapi.on('call-start', () => {
+            isCalling = true;
             const btn = document.getElementById('call_btn');
-            const stopBtn = document.getElementById('stop_btn');
-            
-            btn.innerText = "CONNECTING...";
-            btn.disabled = true;
+            btn.innerText = "DISCONNECT";
+            btn.disabled = false;
+            btn.classList.add('pulse');
+            document.getElementById('status-text').innerText = "PORT ACTIVE";
+            document.getElementById('status-text').style.color = "#22c55e";
+            document.getElementById('sub-text').innerText = "AI is listening...";
+        });
 
-            vapi.start(ASSISTANT_ID);
+        vapi.on('call-end', () => {
+            isCalling = false;
+            const btn = document.getElementById('call_btn');
+            btn.innerText = "CONNECT TO AGENT";
+            btn.classList.remove('pulse');
+            document.getElementById('status-text').innerText = "PORT DISCONNECTED";
+            document.getElementById('status-text').style.color = "#f97316";
+            document.getElementById('sub-text').innerText = "Ready to Initialize";
+        });
 
-            vapi.on('call-start', () => {
-                btn.innerText = "SYSTEM ACTIVE";
-                btn.classList.add('pulse-red');
-                stopBtn.classList.remove('hidden');
-            });
-
-            vapi.on('call-end', () => {
-                btn.innerText = "START VOICE CHAT";
-                btn.disabled = false;
-                btn.classList.remove('pulse-red');
-                stopBtn.classList.add('hidden');
-                finishStep(5, 'VERIFIED', 'demo');
-            });
-
-            vapi.on('error', (e) => {
-                console.error(e);
-                alert("Connection Error. Check Console.");
-                btn.innerText = "RETRY";
-                btn.disabled = false;
-            });
-        }
-
-        function finishStep(s, val, key) {
-            selections[key] = val;
-            const display = document.getElementById(`v${s}`);
-            display.innerText = val.toUpperCase().substring(0, 10);
-            display.classList.remove('opacity-20');
-            document.getElementById(`s${s}`).classList.add('active');
-            closeM();
-        }
-
-        function closeM() { document.getElementById('setupModal').style.display = 'none'; }
+        vapi.on('error', (e) => {
+            console.error(e);
+            alert("System Error: " + (e.message || "Check Console"));
+            document.getElementById('call_btn').innerText = "RETRY CONNECTION";
+            document.getElementById('call_btn').disabled = false;
+        });
     </script>
 </body>
 </html>
