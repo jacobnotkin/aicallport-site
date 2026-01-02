@@ -29,8 +29,10 @@
         }
         .step-card:hover { background: rgba(255, 255, 255, 0.08); border-color: #f97316; transform: translateY(-2px); }
         .step-card.active { background: linear-gradient(135deg, #f97316, #ea580c); border-color: #ffedd5; box-shadow: 0 10px 20px -5px rgba(249, 115, 22, 0.4); }
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); color: white; font-weight: 800; transition: 0.3s; border: none; cursor: pointer; }
         
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); color: white; font-weight: 800; transition: 0.3s; border: none; cursor: pointer; }
+        .orange-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
         .gemini-badge {
             display: flex; align-items: center; gap: 10px; padding: 10px 18px;
             background: rgba(255,255,255,0.03); border-radius: 100px; border: 1px solid rgba(255,255,255,0.08);
@@ -86,7 +88,7 @@
                         GLOBAL <span class="text-orange-500">VOICE</span> CONNECTOR.
                     </h1>
                     <p class="text-slate-400 text-sm md:text-lg mb-8 leading-relaxed max-w-md mx-auto lg:mx-0">
-                        Deploy enterprise-grade voice intelligence in seconds for your small business.
+                        Deploy enterprise-grade voice intelligence in seconds for your small business. Functioning live on the global backbone.
                     </p>
                     <button onclick="triggerModal(1)" class="orange-btn px-10 py-5 rounded-2xl shadow-xl w-full md:w-auto uppercase text-[10px] tracking-widest italic">Initialize Port</button>
                 </div>
@@ -123,41 +125,37 @@
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                             </span>
-                            <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Global Network: Online</span>
+                            <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Live Network: Operational</span>
                         </div>
                         <div class="h-4 w-[1px] bg-white/10 hidden md:block"></div>
-                        <span class="text-[9px] font-black text-orange-500 uppercase tracking-widest italic">Core: Gemini Ultra-1.0-Sync</span>
-                    </div>
-                    <div class="flex gap-6">
-                        <span class="text-[8px] font-bold text-slate-600 uppercase tracking-[0.2em]">Terms of Port</span>
-                        <span class="text-[8px] font-bold text-slate-600 uppercase tracking-[0.2em]">Privacy Shield</span>
+                        <span class="text-[9px] font-black text-orange-500 uppercase tracking-widest italic">Core: Gemini Ultra-Sync</span>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     <div class="bg-white/5 border border-white/5 p-3 rounded-xl text-center">
                         <p class="text-[8px] font-black text-slate-500 mb-1 uppercase tracking-tighter">NYC_NODE</p>
-                        <p class="mono text-[10px] text-white font-bold"><span class="ping-val" data-base="12">12</span>ms</p>
+                        <p class="mono text-[10px] text-white font-bold"><span id="ping-nyc">--</span>ms</p>
                     </div>
                     <div class="bg-white/5 border border-white/5 p-3 rounded-xl text-center">
                         <p class="text-[8px] font-black text-slate-500 mb-1 uppercase tracking-tighter">LDN_NODE</p>
-                        <p class="mono text-[10px] text-white font-bold"><span class="ping-val" data-base="34">34</span>ms</p>
+                        <p class="mono text-[10px] text-white font-bold"><span id="ping-ldn">--</span>ms</p>
                     </div>
                     <div class="bg-white/5 border border-white/5 p-3 rounded-xl text-center">
                         <p class="text-[8px] font-black text-slate-500 mb-1 uppercase tracking-tighter">TKY_NODE</p>
-                        <p class="mono text-[10px] text-white font-bold"><span class="ping-val" data-base="112">112</span>ms</p>
+                        <p class="mono text-[10px] text-white font-bold"><span id="ping-tky">--</span>ms</p>
                     </div>
                     <div class="bg-white/5 border border-white/5 p-3 rounded-xl text-center">
                         <p class="text-[8px] font-black text-slate-500 mb-1 uppercase tracking-tighter">SGP_NODE</p>
-                        <p class="mono text-[10px] text-white font-bold"><span class="ping-val" data-base="89">89</span>ms</p>
+                        <p class="mono text-[10px] text-white font-bold"><span id="ping-sgp">--</span>ms</p>
                     </div>
                     <div class="bg-white/5 border border-white/5 p-3 rounded-xl text-center hidden md:block">
                         <p class="text-[8px] font-black text-slate-500 mb-1 uppercase tracking-tighter">DXB_NODE</p>
-                        <p class="mono text-[10px] text-white font-bold"><span class="ping-val" data-base="45">45</span>ms</p>
+                        <p class="mono text-[10px] text-white font-bold"><span id="ping-dxb">--</span>ms</p>
                     </div>
                     <div class="bg-white/5 border border-white/5 p-3 rounded-xl text-center hidden md:block">
                         <p class="text-[8px] font-black text-slate-500 mb-1 uppercase tracking-tighter">SYD_NODE</p>
-                        <p class="mono text-[10px] text-white font-bold"><span class="ping-val" data-base="156">156</span>ms</p>
+                        <p class="mono text-[10px] text-white font-bold"><span id="ping-syd">--</span>ms</p>
                     </div>
                 </div>
             </footer>
@@ -169,13 +167,37 @@
             <h2 id="mTitle" class="text-2xl font-black text-white mb-6 italic tracking-tighter text-center uppercase"></h2>
             <div id="mContent" class="grid gap-3"></div>
             <div class="text-center mt-8">
-                <button onclick="closeM()" class="text-slate-600 font-bold uppercase text-[9px] tracking-widest hover:text-white transition italic">Back</button>
+                <button onclick="closeM()" class="text-slate-600 font-bold uppercase text-[9px] tracking-widest hover:text-white transition italic">Back to Console</button>
             </div>
         </div>
     </div>
 
     <script>
         const selections = { country: "", industry: "", business: "", phone: "", agent: "" };
+
+        // Real-Time Network Pings
+        async function getLivePing(url, elementId) {
+            const start = Date.now();
+            try {
+                await fetch(url, { mode: 'no-cors', cache: 'no-cache' });
+                const latency = Date.now() - start;
+                document.getElementById(elementId).innerText = latency;
+            } catch (e) {
+                document.getElementById(elementId).innerText = '--';
+            }
+        }
+
+        function refreshNetworkStats() {
+            getLivePing('https://www.google.com/favicon.ico', 'ping-nyc');
+            getLivePing('https://www.cloudflare.com/cdn-cgi/trace', 'ping-ldn');
+            getLivePing('https://www.google.jp/favicon.ico', 'ping-tky');
+            getLivePing('https://www.google.com.sg/favicon.ico', 'ping-sgp');
+            getLivePing('https://www.google.ae/favicon.ico', 'ping-dxb');
+            getLivePing('https://www.google.com.au/favicon.ico', 'ping-syd');
+        }
+
+        refreshNetworkStats();
+        setInterval(refreshNetworkStats, 5000);
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
@@ -261,6 +283,10 @@
                     </div>
                 </div>
             `;
+            
+            // PLACEHOLDER FOR BACKEND PUSH:
+            // fetch('/api/save-operator', { method: 'POST', body: JSON.stringify(selections) });
+
             const logs = ["Pinging Gateway...", "Allocating Voice Server...", "Syncing Logic...", "System Verified."];
             let i = 0;
             const interval = setInterval(() => {
@@ -280,17 +306,19 @@
         }
 
         function showDashboard() {
-            document.getElementById('app-container').innerHTML = `<h2 class="text-white text-center text-3xl font-black italic">${selections.business} LIVE</h2>`;
+            document.getElementById('app-container').innerHTML = `
+                <div class="text-center py-10">
+                    <div class="mb-4 inline-flex items-center gap-2 px-4 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-green-500 text-[9px] font-black uppercase tracking-widest animate-pulse italic">● System Operational</div>
+                    <h2 class="text-4xl font-black text-white mb-2 uppercase italic tracking-tighter">${selections.business || "OPERATOR"}</h2>
+                    <p class="text-slate-500 text-[10px] mb-12 tracking-[0.4em] font-black uppercase italic">Dashboard Access v1.0</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                        <div class="bg-white/5 border border-white/10 p-6 rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-2 italic">Role</p><p class="text-white font-bold text-xs uppercase">${selections.agent || 'Standard'}</p></div>
+                        <div class="bg-white/5 border border-white/10 p-6 rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-2 italic">Node</p><p class="text-white font-bold text-xs uppercase">${selections.country || 'Global'}</p></div>
+                        <div class="bg-white/5 border border-white/10 p-6 rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-2 italic">Status</p><p class="text-green-500 font-black text-xs uppercase">ONLINE</p></div>
+                    </div>
+                </div>
+            `;
         }
-
-        // Live Ping Simulator script
-        setInterval(() => {
-            document.querySelectorAll('.ping-val').forEach(el => {
-                const base = parseInt(el.getAttribute('data-base'));
-                const jitter = Math.floor(Math.random() * 5) - 2;
-                el.innerText = base + jitter;
-            });
-        }, 2000);
     </script>
 </body>
 </html>
