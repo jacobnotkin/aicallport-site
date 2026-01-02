@@ -148,9 +148,9 @@
     </div>
 
     <script>
-        // VAPI CONNECTION LOGIC
+        // VAPI SETUP
         const vapi = new Vapi('d4fcbe60-643b-48c8-9d74-dfb8ff3236f3');
-        const assistantID = 'acbbfa66-260e-48ff-bdc5-477b8fdda1e1';
+        const assistantId = 'acbbfa66-260e-48ff-bdc5-477b8fdda1e1';
 
         const activeNodes = ["United States", "United Kingdom", "Canada", "Australia", "Germany", "France", "UAE", "Singapore", "Japan"];
         const otherCountries = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Belgium", "Brazil", "Bulgaria", "Chile", "China", "Colombia", "Denmark", "Egypt", "Finland", "Greece", "India", "Indonesia", "Ireland", "Israel", "Italy", "Mexico", "Netherlands", "New Zealand", "Norway", "Pakistan", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Saudi Arabia", "South Africa", "South Korea", "Spain", "Sweden", "Switzerland", "Thailand", "Turkey", "Vietnam"];
@@ -229,15 +229,12 @@
                 title.innerText = "Voice Port Interaction";
                 content.innerHTML = `
                     <div class="bg-orange-600/10 border border-orange-500/50 p-8 rounded-3xl mb-6 text-center">
-                        <p id="vapi-status-label" class="text-[9px] text-orange-500 font-black mb-2 uppercase tracking-[0.3em]">System Port:</p>
-                        <p id="vapi-status-text" class="text-2xl md:text-3xl font-black text-white tracking-widest italic uppercase">Ready to Connect</p>
+                        <p id="v-status" class="text-[9px] text-orange-500 font-black mb-2 uppercase tracking-[0.3em]">System Port: Ready</p>
+                        <p id="v-sub" class="text-2xl font-black text-white tracking-widest italic uppercase">Live Voice Demo</p>
                     </div>
-                    <button id="vapi-start-btn" onclick="startCall()" class="orange-btn w-full p-5 rounded-xl font-black text-sm uppercase italic tracking-widest">Initialize Demo Call</button>
-                    <button id="vapi-stop-btn" onclick="stopCall()" class="hidden bg-red-600/20 border border-red-500/50 text-red-500 w-full p-5 rounded-xl font-black uppercase text-xs tracking-widest">End Session</button>
-                    <div id="vapi-success-area" class="hidden mt-4">
-                        <button onclick="finishStep(5, 'VERIFIED', 'demo')" class="w-full bg-white text-black p-5 rounded-xl font-black uppercase text-xs tracking-widest">Demo Successful</button>
-                    </div>`;
-
+                    <button id="v-btn" onclick="runDemo()" class="orange-btn w-full p-5 rounded-xl font-black text-sm uppercase italic tracking-widest">Initialize Demo Call</button>
+                    <button id="v-finish" onclick="finishStep(5, 'VERIFIED', 'demo')" class="hidden w-full bg-white text-black p-5 rounded-xl font-black uppercase text-xs tracking-widest">Demo Successful</button>`;
+            
             } else if (step === 6) {
                 title.innerText = "Activate System";
                 content.innerHTML = `
@@ -249,29 +246,26 @@
             }
         }
 
-        // DEMO CALL FUNCTIONS
-        function startCall() {
-            const startBtn = document.getElementById('vapi-start-btn');
-            const stopBtn = document.getElementById('vapi-stop-btn');
-            const statusText = document.getElementById('vapi-status-text');
-            
-            vapi.start(assistantID);
-            
-            vapi.on('call-start', () => {
-                statusText.innerText = "Port Live";
-                startBtn.classList.add('hidden');
-                stopBtn.classList.remove('hidden');
-            });
+        // DEMO HANDLER
+        function runDemo() {
+            const btn = document.getElementById('v-btn');
+            const status = document.getElementById('v-status');
+            const sub = document.getElementById('v-sub');
+            const finish = document.getElementById('v-finish');
 
-            vapi.on('call-end', () => {
-                statusText.innerText = "Port Closed";
-                stopBtn.classList.add('hidden');
-                document.getElementById('vapi-success-area').classList.remove('hidden');
-            });
-        }
-
-        function stopCall() {
-            vapi.stop();
+            if (btn.innerText.includes("INITIALIZE")) {
+                vapi.start(assistantId);
+                btn.innerText = "END VOICE SESSION";
+                btn.style.background = "red";
+                status.innerText = "PORT ACTIVE";
+                sub.innerText = "COMMUNICATING...";
+            } else {
+                vapi.stop();
+                btn.classList.add('hidden');
+                finish.classList.remove('hidden');
+                status.innerText = "SESSION COMPLETE";
+                sub.innerText = "STEP VERIFIED";
+            }
         }
 
         function createSearch(p) {
