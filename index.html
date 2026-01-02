@@ -145,7 +145,7 @@
     </div>
 
     <script>
-        // AUTHENTICATION CONFIGURATION
+        // CONFIGURATION (VAPI CREDENTIALS)
         const VAPI_PUBLIC_KEY = 'd4fcbe60-643b-48c8-9d74-dfb8ff3236f3'; 
         const ASSISTANT_ID = 'acbbfa66-260e-48ff-bdc5-477b8fdda1e1'; 
 
@@ -219,17 +219,16 @@
                 title.innerText = "Operator Sync";
                 content.innerHTML = `
                     <input id="in_name" placeholder="COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-3 outline-none focus:border-orange-500 uppercase font-black text-center text-xs tracking-[0.2em]">
-                    <input id="in_phone" placeholder="YOUR TEST PHONE (E.G. +1555...)" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-6 outline-none focus:border-orange-500 text-center font-bold">
-                    <button onclick="saveStep3()" class="orange-btn w-full p-5 rounded-xl font-black text-sm uppercase italic tracking-widest">Confirm Sync</button>`;
+                    <input id="in_phone" placeholder="PHONE (e.g. +15551234567)" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-6 outline-none focus:border-orange-500 text-center font-bold">
+                    <button onclick="saveStep3()" class="orange-btn w-full p-5 rounded-xl font-black text-sm uppercase italic tracking-widest">Connect Operator Node</button>`;
             } else if (step === 5) {
                 title.innerText = "Voice Port Interaction";
-                content.innerHTML = `
-                    <div class="bg-orange-600/10 border border-orange-500/50 p-8 rounded-3xl mb-6 text-center">
-                        <p class="text-[9px] text-orange-500 font-black mb-2 uppercase tracking-[0.3em]">Ready to Call:</p>
-                        <p class="text-xl md:text-2xl font-black text-white tracking-widest italic">${selections.phone || 'NO PHONE ENTERED'}</p>
-                    </div>
-                    <button id="call_btn" onclick="initiateLiveCall()" class="orange-btn w-full p-6 rounded-2xl font-black uppercase italic tracking-widest mb-4">Request Voice Port</button>
-                    <button onclick="finishStep(5, 'VERIFIED', 'demo')" class="w-full bg-white/5 text-slate-400 p-3 rounded-xl font-bold uppercase text-[9px]">Skip to Activate</button>`;
+                content.innerHTML = `<div class="bg-orange-600/10 border border-orange-500/50 p-8 rounded-3xl mb-6 text-center">
+                    <p class="text-[9px] text-orange-500 font-black mb-2 uppercase tracking-[0.3em]">Dialing Port:</p>
+                    <p class="text-xl font-black text-white tracking-widest italic">${selections.phone || 'Enter Phone in Step 3'}</p>
+                </div>
+                <button id="call_btn" onclick="initiateLiveCall()" class="orange-btn w-full p-5 rounded-xl font-black uppercase text-xs tracking-widest mb-4">Request Voice Port</button>
+                <button onclick="finishStep(5, 'VERIFIED', 'demo')" class="w-full bg-white/5 text-slate-500 p-3 rounded-xl font-bold uppercase text-[9px]">Manually Verify</button>`;
             } else if (step === 6) {
                 title.innerText = "Activate System";
                 content.innerHTML = `
@@ -243,26 +242,21 @@
 
         async function initiateLiveCall() {
             const btn = document.getElementById('call_btn');
-            if (!selections.phone) return alert("Please go back and enter a phone number in step 3.");
-
+            if(!selections.phone) return alert("Missing phone number. Please enter it in Step 3.");
+            
+            btn.innerHTML = "BRIDGING...";
             btn.disabled = true;
-            btn.innerHTML = `<span class="animate-pulse">CONNECTING PORT...</span>`;
 
             try {
                 const response = await fetch('https://api.vapi.ai/call/phone', {
                     method: 'POST',
-                    headers: { 
-                        'Authorization': `Bearer ${VAPI_PUBLIC_KEY}`, 
-                        'Content-Type': 'application/json' 
+                    headers: {
+                        'Authorization': `Bearer ${VAPI_PUBLIC_KEY}`,
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         assistantId: ASSISTANT_ID,
-                        customer: { number: selections.phone },
-                        assistantOverrides: {
-                            variableValues: {
-                                "businessName": selections.business
-                            }
-                        }
+                        customer: { number: selections.phone }
                     })
                 });
 
@@ -270,13 +264,14 @@
                     btn.innerHTML = "CALL DISPATCHED";
                     setTimeout(() => finishStep(5, 'VERIFIED', 'demo'), 2000);
                 } else {
-                    console.error("Vapi Error Status:", response.status);
+                    const errorData = await response.json();
+                    console.error("Vapi Error:", errorData);
                     btn.innerHTML = "OFFLINE";
                     btn.disabled = false;
                 }
-            } catch (e) {
-                console.error("Fetch Error:", e);
-                btn.innerHTML = "OFFLINE"; 
+            } catch (err) {
+                console.error("Connection Error:", err);
+                btn.innerHTML = "OFFLINE";
                 btn.disabled = false;
             }
         }
@@ -310,8 +305,6 @@
                 selections.business = n; 
                 selections.phone = p; 
                 finishStep(3, n, 'business'); 
-            } else {
-                alert("Please fill in both fields.");
             }
         }
 
@@ -329,7 +322,6 @@
                         <div class="bg-white/5 border border-white/10 p-6 rounded-[24px] md:rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-4 tracking-widest italic">Port Node</p><p class="text-white font-black uppercase text-xs tracking-widest">${selections.country}</p></div>
                         <div class="bg-white/5 border border-white/10 p-6 rounded-[24px] md:rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-4 tracking-widest italic">Status</p><p class="text-green-500 font-black uppercase text-xs tracking-widest">OPERATIONAL</p></div>
                     </div>
-                    <button onclick="location.reload()" class="mt-12 text-slate-600 font-bold uppercase text-[9px] tracking-widest hover:text-white transition italic">Disconnect & Re-initialize</button>
                 </div>
             `;
         }
