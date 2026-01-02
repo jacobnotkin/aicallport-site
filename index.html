@@ -3,108 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI CALL PORT | Global Instant AI Voice Agent Connector</title>
+    <title>AI CALL PORT | Global Infrastructure</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { 
-            background: #06080f; background-image: radial-gradient(circle at 50% 50%, #111827 0%, #06080f 100%);
-            color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+            background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh; display: flex; align-items: center; justify-content: center;
         }
-        .command-center {
-            width: 100%; max-width: 900px; padding: 40px; background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 40px;
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8); text-align: center;
-        }
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); color: white; font-weight: 800; transition: 0.3s; }
-        .node-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 20px; cursor: pointer; transition: 0.3s; }
-        .node-btn:hover { border-color: #f97316; background: rgba(249, 115, 22, 0.05); }
-        .node-btn.active { background: #f97316; border-color: #ffedd5; }
+        .command-center { width: 90%; max-width: 500px; padding: 40px; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 32px; text-align: center; }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); color: white; font-weight: 800; padding: 18px; width: 100%; border-radius: 16px; text-transform: uppercase; transition: 0.3s; }
+        .pulse { animation: pulse-orange 2s infinite; }
+        @keyframes pulse-orange { 0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(249, 115, 22, 0); } 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); } }
     </style>
 </head>
 <body>
 
     <div class="command-center">
-        <header class="flex justify-between items-center mb-12">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center font-black italic text-white shadow-lg">AI</div>
-                <span class="text-2xl font-black tracking-tighter uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
-            </div>
-            <div class="text-[10px] font-bold text-green-500 uppercase tracking-widest">● Infrastructure Active</div>
-        </header>
-
-        <h1 class="text-4xl font-black mb-4 italic uppercase">Initialize Global Port</h1>
-        <p class="text-slate-400 mb-10 max-w-md mx-auto">Select a specialized industry node to activate your autonomous voice agent connection.</p>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-            <button class="node-btn" onclick="activatePort('wellness', this)">
-                <p class="text-[10px] font-black text-orange-500 mb-1 uppercase">Node 01</p>
-                <p class="font-bold text-white text-xs">WELLNESS</p>
-            </button>
-            <button class="node-btn" onclick="activatePort('auto', this)">
-                <p class="text-[10px] font-black text-orange-500 mb-1 uppercase">Node 02</p>
-                <p class="font-bold text-white text-xs">AUTOMOTIVE</p>
-            </button>
-            <button class="node-btn" onclick="activatePort('realestate', this)">
-                <p class="text-[10px] font-black text-orange-500 mb-1 uppercase">Node 03</p>
-                <p class="font-bold text-white text-xs">REAL ESTATE</p>
-            </button>
-            <button class="node-btn" onclick="activatePort('hospitality', this)">
-                <p class="text-[10px] font-black text-orange-500 mb-1 uppercase">Node 04</p>
-                <p class="font-bold text-white text-xs">HOSPITALITY</p>
-            </button>
+        <h1 class="text-2xl font-black mb-1 italic uppercase tracking-tighter">Voice Port Interaction</h1>
+        <p class="text-slate-500 text-[9px] tracking-[0.3em] uppercase mb-8">Infrastructure Mode: Active</p>
+        
+        <div id="status-box" class="bg-black/40 border border-white/5 p-8 rounded-2xl mb-8">
+            <p id="status-text" class="text-orange-500 font-bold uppercase text-[10px] tracking-widest mb-2">System Ready</p>
+            <p id="sub-text" class="text-slate-400 text-xs italic">Port destination: Hospitality Node</p>
         </div>
 
-        <div id="connection-status" class="p-6 bg-white/2 rounded-3xl border border-white/5 italic text-slate-500 text-sm">
-            Select a node above to open the Voice Port.
-        </div>
+        <button id="call_btn" onclick="handleCall()" class="orange-btn">Initialize Port</button>
     </div>
 
     <script>
-        // 1. DATA FROM SUCCESSFUL SESSION
-        const apiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3"; 
-        const assistantLibrary = {
-            wellness: "e95dca20-93f2-46f0-b014-3a885586fa65", // Riley
-            auto: "acbbfa66-260e-48ff-bdc5-477b8fdda1e1",     // Current Agent
-            realestate: "acbbfa66-260e-48ff-bdc5-477b8fdda1e1",
-            hospitality: "acbbfa66-260e-48ff-bdc5-477b8fdda1e1"
-        };
+        // 2. YOUR VERIFIED KEYS
+        const VAPI_PUBLIC_KEY = 'd4fcbe60-643b-48c8-9d74-dfb8ff3236f3'; 
+        const ASSISTANT_ID = 'acbbfa66-260e-48ff-bdc5-477b8fdda1e1'; 
 
-        // 2. LOAD VAPI SDK (THE SUCCESSFUL BRIDGE)
-        (function (d, t) {
-            var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-            g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
-            g.defer = true; g.async = true;
-            s.parentNode.insertBefore(g, s);
-            g.onload = () => console.log("Voice Infrastructure Loaded");
-        })(document, "script");
+        const vapi = new Vapi(VAPI_PUBLIC_KEY);
+        let callActive = false;
 
-        // 3. CONNECTION LOGIC
-        function activatePort(type, btn) {
-            // UI Update
-            document.querySelectorAll('.node-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('connection-status').innerHTML = `<span class="text-orange-500 font-bold">PORT OPEN:</span> Connecting to ${type.toUpperCase()} Agent...`;
+        async function handleCall() {
+            const btn = document.getElementById('call_btn');
+            const status = document.getElementById('status-text');
 
-            // Terminate previous if exists
-            if (window.vapiSDK && window.vapiSDK.terminate) {
-                window.vapiSDK.terminate();
+            if (!callActive) {
+                btn.innerText = "CONNECTING...";
+                btn.disabled = true;
+                // vapi.start uses WebRTC (Mic) which is ALLOWED for public keys
+                vapi.start(ASSISTANT_ID);
+            } else {
+                vapi.stop();
             }
-
-            // Execute the Successful Bridge
-            window.vapiSDK.run({
-                apiKey: apiKey,
-                assistant: assistantLibrary[type],
-                config: {
-                    position: "bottom-right",
-                    idle: { 
-                        title: "Talk to " + type, 
-                        color: "#f97316",
-                        textColor: "white"
-                    }
-                }
-            });
         }
+
+        vapi.on('call-start', () => {
+            callActive = true;
+            const btn = document.getElementById('call_btn');
+            btn.innerText = "CLOSE PORT";
+            btn.disabled = false;
+            btn.classList.add('pulse');
+            document.getElementById('status-text').innerText = "PORT LIVE";
+            document.getElementById('status-text').style.color = "#22c55e";
+        });
+
+        vapi.on('call-end', () => {
+            callActive = false;
+            const btn = document.getElementById('call_btn');
+            btn.innerText = "INITIALIZE PORT";
+            btn.classList.remove('pulse');
+            document.getElementById('status-text').innerText = "PORT DISCONNECTED";
+            document.getElementById('status-text').style.color = "#f97316";
+        });
+
+        vapi.on('error', (e) => {
+            console.error(e);
+            alert("Connection Refused. Ensure your microphone is allowed and you are using HTTPS.");
+            document.getElementById('call_btn').disabled = false;
+            document.getElementById('call_btn').innerText = "RETRY PORT";
+        });
     </script>
 </body>
 </html>
