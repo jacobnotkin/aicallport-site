@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI CALL PORT | Global Operator Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { 
@@ -21,12 +21,9 @@
             padding: 20px 10px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s;
         }
         .step-card:hover { border-color: #f97316; background: rgba(249, 115, 22, 0.05); }
-        .step-card.active { background: #f97316; border-color: #ffedd5; transform: translateY(-5px); }
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); color: white; font-weight: 800; transition: 0.3s; }
-        .orange-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .modal-bg { background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
+        .step-card.active { background: #f97316 !important; border-color: #ffedd5; transform: translateY(-5px); }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); color: white; font-weight: 800; cursor: pointer; }
+        .modal-bg { background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; }
     </style>
 </head>
 <body>
@@ -45,161 +42,113 @@
 
         <div id="main-view" class="text-center">
             <h1 class="text-6xl font-black mb-6 italic uppercase tracking-tighter text-white">Initialize Your <span class="text-orange-500">Voice Port</span></h1>
-            <p class="text-slate-400 max-w-2xl mx-auto uppercase text-[11px] font-bold tracking-[0.3em] mb-16">Follow the protocol below to deploy your autonomous receptionist</p>
+            <p class="text-slate-400 max-w-2xl mx-auto uppercase text-[11px] font-bold tracking-[0.3em] mb-16">Deploy your autonomous receptionist protocol</p>
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-                <div onclick="openMenu(1)" id="s1" class="step-card">
-                    <p class="text-[9px] font-black text-orange-500 uppercase mb-2">01 Country</p>
-                    <p id="v1" class="text-[11px] font-bold text-white/40 italic">SELECT</p>
-                </div>
-                <div onclick="openMenu(2)" id="s2" class="step-card">
-                    <p class="text-[9px] font-black text-orange-500 uppercase mb-2">02 Industry</p>
-                    <p id="v2" class="text-[11px] font-bold text-white/40 italic">SELECT</p>
-                </div>
-                <div onclick="openMenu(3)" id="s3" class="step-card">
-                    <p class="text-[9px] font-black text-orange-500 uppercase mb-2">03 Business</p>
-                    <p id="v3" class="text-[11px] font-bold text-white/40 italic">INFO</p>
-                </div>
-                <div onclick="openMenu(4)" id="s4" class="step-card">
-                    <p class="text-[9px] font-black text-orange-500 uppercase mb-2">04 Agent</p>
-                    <p id="v4" class="text-[11px] font-bold text-white/40 italic">CHOOSE</p>
-                </div>
-                <div onclick="openMenu(5)" id="s5" class="step-card">
-                    <p class="text-[9px] font-black text-blue-400 uppercase mb-2">05 Demo</p>
-                    <p id="v5" class="text-[11px] font-bold text-white/40 italic">CALL</p>
-                </div>
-                <div onclick="openMenu(6)" id="s6" class="step-card border-green-500/30">
-                    <p class="text-[9px] font-black text-green-500 uppercase mb-2">06 Launch</p>
-                    <p id="v6" class="text-[11px] font-bold text-white/40 italic">ACTIVATE</p>
-                </div>
+                <div onclick="openMenu(1)" id="s1" class="step-card"><p class="text-[9px] font-black text-orange-500 mb-2">01 COUNTRY</p><p id="v1" class="text-[10px] text-white/40 font-bold">SELECT</p></div>
+                <div onclick="openMenu(2)" id="s2" class="step-card"><p class="text-[9px] font-black text-orange-500 mb-2">02 INDUSTRY</p><p id="v2" class="text-[10px] text-white/40 font-bold">SELECT</p></div>
+                <div onclick="openMenu(3)" id="s3" class="step-card"><p class="text-[9px] font-black text-orange-500 mb-2">03 BUSINESS</p><p id="v3" class="text-[10px] text-white/40 font-bold">INFO</p></div>
+                <div onclick="openMenu(4)" id="s4" class="step-card"><p class="text-[9px] font-black text-orange-500 mb-2">04 AGENT</p><p id="v4" class="text-[10px] text-white/40 font-bold">CHOOSE</p></div>
+                <div onclick="openMenu(5)" id="s5" class="step-card"><p class="text-[9px] font-black text-blue-400 mb-2">05 DEMO</p><p id="v5" class="text-[10px] text-white/40 font-bold">CALL</p></div>
+                <div onclick="openMenu(6)" id="s6" class="step-card border-green-500/30"><p class="text-[9px] font-black text-green-500 mb-2">06 LAUNCH</p><p id="v6" class="text-[10px] text-white/40 font-bold">ACTIVATE</p></div>
             </div>
         </div>
     </div>
 
-    <div id="modal" class="fixed inset-0 modal-bg z-[100] hidden items-center justify-center p-6">
-        <div class="bg-[#0f172a] border border-white/10 max-w-md w-full p-10 rounded-[40px] shadow-2xl relative">
-            <h2 id="modal-title" class="text-2xl font-black text-white italic text-center uppercase tracking-tighter mb-8"></h2>
-            <div id="modal-content" class="space-y-3 custom-scrollbar max-h-[50vh] overflow-y-auto"></div>
-            <button onclick="closeModal()" class="w-full mt-8 text-slate-500 text-[10px] font-bold uppercase tracking-widest hover:text-white">Cancel</button>
+    <div id="modal" class="fixed inset-0 modal-bg z-[100] items-center justify-center p-6">
+        <div class="bg-[#0f172a] border border-white/10 max-w-md w-full p-10 rounded-[40px] relative text-center">
+            <h2 id="modal-title" class="text-2xl font-black text-white italic uppercase tracking-tighter mb-8"></h2>
+            <div id="modal-content" class="space-y-3"></div>
+            <button onclick="closeModal()" class="mt-8 text-slate-500 text-[10px] font-bold uppercase tracking-widest hover:text-white">Back</button>
         </div>
     </div>
 
     <script>
-        // --- VAPI CONFIGURATION ---
-        const vapi = new Vapi('d4fcbe60-643b-48c8-9d74-dfb8ff3236f3');
-        const assistantId = 'e95dca20-93f2-46f0-b014-3a885586fa65'; // Riley
+        // Use window.onload to ensure everything is ready before script runs
+        window.onload = function() {
+            const vapi = new Vapi('d4fcbe60-643b-48c8-9d74-dfb8ff3236f3');
+            const assistantId = 'e95dca20-93f2-46f0-b014-3a885586fa65'; // Riley
+            
+            const config = { country: '', industry: '', company: '', agent: '' };
+            const options = {
+                countries: ['United States', 'United Kingdom', 'Canada', 'Australia'],
+                industries: ['Dental', 'Roofing', 'Real Estate', 'Law Firm', 'Salon'],
+                agents: ['Riley - Receptionist', 'Appointment Booker', 'Lead Qualifier']
+            };
 
-        // System State
-        const config = { country: '', industry: '', company: '', phone: '', agent: '' };
-        
-        // Menu Data
-        const options = {
-            countries: ['United States', 'United Kingdom', 'Canada', 'Australia', 'Germany', 'UAE'],
-            industries: ['Dental Office', 'Roofing', 'Real Estate', 'Hair Salon', 'Law Firm', 'Restaurant'],
-            agents: ['AI Receptionist', 'Appointment Booker', 'Lead Qualifier', 'Support Agent']
+            window.openMenu = function(step) {
+                const modal = document.getElementById('modal');
+                const content = document.getElementById('modal-content');
+                const title = document.getElementById('modal-title');
+                modal.style.display = 'flex';
+                content.innerHTML = '';
+
+                if (step === 1) {
+                    title.innerText = "Select Country";
+                    options.countries.forEach(opt => content.appendChild(createBtn(opt, () => saveStep(1, opt, 'country'))));
+                } else if (step === 2) {
+                    title.innerText = "Select Industry";
+                    options.industries.forEach(opt => content.appendChild(createBtn(opt, () => saveStep(2, opt, 'industry'))));
+                } else if (step === 3) {
+                    title.innerText = "Business Info";
+                    content.innerHTML = `
+                        <input id="biz-n" placeholder="COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white font-bold outline-none mb-3 text-center uppercase text-xs">
+                        <button onclick="handleStep3()" class="orange-btn w-full p-5 rounded-2xl uppercase font-black italic text-xs">Save Info</button>`;
+                } else if (step === 4) {
+                    title.innerText = "Select Agent";
+                    options.agents.forEach(opt => content.appendChild(createBtn(opt, () => saveStep(4, opt, 'agent'))));
+                } else if (step === 5) {
+                    title.innerText = "Live Demo";
+                    content.innerHTML = `
+                        <div id="c-status" class="text-[10px] font-black text-slate-500 uppercase mb-6">Ready to call Riley</div>
+                        <button id="call-btn" onclick="runCall()" class="orange-btn w-full p-6 rounded-2xl uppercase font-black text-sm">Start Call</button>`;
+                } else if (step === 6) {
+                    title.innerText = "Final Launch";
+                    content.innerHTML = `<button onclick="location.reload()" class="orange-btn w-full p-6 rounded-2xl uppercase font-black text-sm">Activate System</button>`;
+                }
+            };
+
+            function createBtn(text, fn) {
+                const b = document.createElement('button');
+                b.className = "w-full p-5 rounded-2xl bg-white/5 hover:bg-orange-600 text-white font-black uppercase text-[10px] tracking-widest flex justify-between";
+                b.innerHTML = `<span>${text}</span> <span>→</span>`;
+                b.onclick = fn;
+                return b;
+            }
+
+            window.saveStep = function(step, val, key) {
+                config[key] = val;
+                document.getElementById(`v${step}`).innerText = val.toUpperCase();
+                document.getElementById(`v${step}`).classList.replace('text-white/40', 'text-white');
+                document.getElementById(`s${step}`).classList.add('active');
+                closeModal();
+            };
+
+            window.handleStep3 = function() {
+                const val = document.getElementById('biz-n').value;
+                if(val) saveStep(3, val, 'company');
+            };
+
+            window.runCall = function() {
+                const btn = document.getElementById('call-btn');
+                const status = document.getElementById('c-status');
+                status.innerText = "Connecting...";
+                vapi.start(assistantId);
+
+                vapi.on('call-start', () => {
+                    status.innerText = "Online - Speak Now";
+                    status.style.color = "#10b981";
+                    btn.innerText = "End Call";
+                    btn.onclick = () => vapi.stop();
+                });
+
+                vapi.on('call-end', () => {
+                    saveStep(5, 'VERIFIED', 'demo');
+                });
+            };
+
+            window.closeModal = function() { document.getElementById('modal').style.display = 'none'; };
         };
-
-        function openMenu(step) {
-            const modal = document.getElementById('modal');
-            const content = document.getElementById('modal-content');
-            const title = document.getElementById('modal-title');
-            
-            modal.style.display = 'flex';
-            content.innerHTML = '';
-
-            if (step === 1) {
-                title.innerText = "Select Operation Region";
-                options.countries.forEach(opt => content.appendChild(createMenuBtn(opt, () => saveStep(1, opt, 'country'))));
-            } else if (step === 2) {
-                title.innerText = "Target Industry";
-                options.industries.forEach(opt => content.appendChild(createMenuBtn(opt, () => saveStep(2, opt, 'industry'))));
-            } else if (step === 3) {
-                title.innerText = "Business Credentials";
-                content.innerHTML = `
-                    <input id="in-name" placeholder="COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white font-bold outline-none focus:border-orange-500 uppercase text-xs mb-3 text-center">
-                    <input id="in-phone" placeholder="BUSINESS PHONE" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white font-bold outline-none focus:border-orange-500 text-xs mb-6 text-center">
-                    <button onclick="handleStep3()" class="orange-btn w-full p-5 rounded-2xl uppercase font-black italic text-xs">Authorize Data</button>`;
-            } else if (step === 4) {
-                title.innerText = "Choose Agent Personality";
-                options.agents.forEach(opt => content.appendChild(createMenuBtn(opt, () => saveStep(4, opt, 'agent'))));
-            } else if (step === 5) {
-                title.innerText = "Live Port Test";
-                content.innerHTML = `
-                    <div id="call-status" class="text-[10px] font-black text-slate-500 uppercase text-center mb-6 tracking-widest">Ready to Connect to Riley</div>
-                    <button id="demo-trigger" onclick="startVapiCall()" class="orange-btn w-full p-6 rounded-2xl uppercase font-black italic text-sm">Initialize Demo Call</button>`;
-            } else if (step === 6) {
-                title.innerText = "System Activation";
-                content.innerHTML = `
-                    <div class="bg-white/5 p-8 rounded-3xl border border-white/10 text-center mb-6">
-                        <p class="text-[10px] text-slate-500 font-bold uppercase mb-2">Monthly Infrastructure Fee</p>
-                        <p class="text-white text-5xl font-black italic">$199<span class="text-lg text-slate-500">/mo</span></p>
-                    </div>
-                    <button onclick="activateSystem()" class="orange-btn w-full p-6 rounded-2xl uppercase font-black italic text-sm">Pay & Deploy Agent</button>`;
-            }
-        }
-
-        function createMenuBtn(text, action) {
-            const btn = document.createElement('button');
-            btn.className = "w-full p-5 rounded-2xl bg-white/5 hover:bg-orange-600 text-white font-black uppercase text-[10px] tracking-widest transition text-left flex justify-between";
-            btn.innerHTML = `<span>${text}</span> <span class="opacity-30">→</span>`;
-            btn.onclick = action;
-            return btn;
-        }
-
-        function saveStep(step, val, key) {
-            config[key] = val;
-            const label = document.getElementById(`v${step}`);
-            label.innerText = val.toUpperCase().substring(0, 12);
-            label.classList.replace('text-white/40', 'text-white');
-            document.getElementById(`s${step}`).classList.add('active');
-            closeModal();
-        }
-
-        function handleStep3() {
-            const name = document.getElementById('in-name').value;
-            const phone = document.getElementById('in-phone').value;
-            if(name && phone) { 
-                saveStep(3, name, 'company'); 
-                config.phone = phone; 
-            }
-        }
-
-        // --- VAPI LOGIC ---
-        function startVapiCall() {
-            const btn = document.getElementById('demo-trigger');
-            const status = document.getElementById('call-status');
-            
-            status.innerText = "Connecting...";
-            vapi.start(assistantId);
-
-            vapi.on('call-start', () => {
-                status.innerText = "Riley is Online - Speak Now";
-                status.classList.replace('text-slate-500', 'text-green-500');
-                btn.innerText = "End Call";
-                btn.classList.replace('orange-btn', 'bg-red-600');
-                btn.onclick = () => vapi.stop();
-            });
-
-            vapi.on('call-end', () => {
-                status.innerText = "Verification Complete";
-                status.classList.replace('text-green-500', 'text-orange-500');
-                btn.innerText = "Success - Continue";
-                btn.className = "orange-btn w-full p-6 rounded-2xl uppercase font-black italic text-sm";
-                btn.onclick = () => saveStep(5, 'VERIFIED', 'demo');
-            });
-
-            vapi.on('error', (e) => {
-                console.error(e);
-                status.innerText = "Connection Failed. Check permissions.";
-            });
-        }
-
-        function activateSystem() {
-            alert("Payment Successful! Initializing your Global Dashboard...");
-            location.reload();
-        }
-
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
     </script>
 </body>
 </html>
