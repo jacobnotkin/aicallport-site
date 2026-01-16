@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI CALL PORT | Global Instant AI Voice Agent Connector</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root { --p-orange: #f97316; }
@@ -140,7 +138,7 @@
     <div id="setupModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden items-center justify-center p-4">
         <div class="bg-[#0f172a] border border-orange-500/20 max-w-lg w-full p-6 md:p-8 rounded-[30px] md:rounded-[40px] relative">
             <h2 id="mTitle" class="text-xl md:text-2xl font-black text-white mb-6 italic tracking-tighter text-center uppercase"></h2>
-            <div id="mContent" class="grid gap-3"></div>
+            <div id="mContent" class="grid gap-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2"></div>
             <div class="text-center mt-8">
                 <button onclick="closeM()" class="text-slate-600 font-bold uppercase text-[9px] tracking-widest hover:text-white transition italic">Back to Console</button>
             </div>
@@ -148,171 +146,109 @@
     </div>
 
     <script>
-        // VAPI LOGIC CONFIG
         const vapi = new Vapi('d4fcbe60-643b-48c8-9d74-dfb8ff3236f3');
         const assistantId = 'acbbfa66-260e-48ff-bdc5-477b8fdda1e1';
 
-        const activeNodes = ["United States", "United Kingdom", "Canada", "Australia", "Germany", "France", "UAE", "Singapore", "Japan"];
-        const otherCountries = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Belgium", "Brazil", "Bulgaria", "Chile", "China", "Colombia", "Denmark", "Egypt", "Finland", "Greece", "India", "Indonesia", "Ireland", "Israel", "Italy", "Mexico", "Netherlands", "New Zealand", "Norway", "Pakistan", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Saudi Arabia", "South Africa", "South Korea", "Spain", "Sweden", "Switzerland", "Thailand", "Turkey", "Vietnam"];
-        const sortedCountries = [...activeNodes, ...otherCountries];
-
-        const industryList = [
-            { n: "Dental Office", s: "LIVE" }, { n: "Roofing Company", s: "LIVE" }, { n: "Real Estate Broker", s: "LIVE" },
-            { n: "Hair Salon", s: "LIVE" }, { n: "Law Firm", s: "BETA" }, { n: "Auto Repair", s: "BETA" },
-            { n: "Restaurant", s: "BETA" }, { n: "Medical Clinic", s: "DEV" }, { n: "HVAC Services", s: "DEV" }
-        ];
-
-        const agentRoles = [
-            { n: "AI Receptionist", s: "LIVE" }, { n: "Appointment Booker", s: "LIVE" },
-            { n: "Lead Qualifier", s: "LIVE" }, { n: "Customer Support", s: "BETA" },
-            { n: "Outbound Sales", s: "DEV" }
-        ];
-
-        const selections = { country: "", industry: "", business: "", phone: "", agent: "" };
+        const store = { country: "", industry: "", company: "", agent: "" };
+        const activeNodes = ["United States", "United Kingdom", "Canada", "Australia", "Germany", "France"];
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
             const content = document.getElementById('mContent');
             const title = document.getElementById('mTitle');
-            m.style.display = 'flex';
+            m.classList.remove('hidden');
+            m.classList.add('flex');
             content.innerHTML = "";
 
             if (step === 1) {
                 title.innerText = "Global Port Selection";
-                const search = createSearch("Filter 190+ Countries...");
-                content.appendChild(search);
-                const listDiv = createListContainer();
-                const render = (f = "") => {
-                    listDiv.innerHTML = "";
-                    sortedCountries.filter(c => c.toLowerCase().includes(f.toLowerCase())).forEach(c => {
-                        const active = activeNodes.includes(c);
-                        let b = document.createElement('button');
-                        b.className = `w-full py-3 px-5 rounded-xl flex justify-between items-center transition ${active ? 'bg-white/5 hover:bg-orange-600' : 'bg-white/2 opacity-30 cursor-not-allowed'}`;
-                        b.innerHTML = `<span class="text-sm font-bold text-white uppercase italic tracking-tighter">${c}</span> <span class="text-[8px] font-black uppercase ${active ? 'text-green-400' : 'text-slate-600'}">${active ? 'ACTIVE' : 'DEV'}</span>`;
-                        if(active) b.onclick = () => finishStep(1, c, 'country');
-                        listDiv.appendChild(b);
-                    });
-                };
-                search.oninput = (e) => render(e.target.value);
-                render(); content.appendChild(listDiv);
-
-            } else if (step === 2 || step === 4) {
-                const isIndustry = step === 2;
-                title.innerText = isIndustry ? "Operator Industry" : "Agent Assignment";
-                const activeList = isIndustry ? industryList : agentRoles;
-                const key = isIndustry ? 'industry' : 'agent';
-                const search = createSearch("Search Library...");
-                content.appendChild(search);
-                const listDiv = createListContainer();
-                const render = (f = "") => {
-                    listDiv.innerHTML = "";
-                    activeList.filter(i => i.n.toLowerCase().includes(f.toLowerCase())).forEach(i => {
-                        const isLive = i.s === 'LIVE';
-                        let b = document.createElement('button');
-                        b.className = `w-full py-4 px-6 rounded-xl flex justify-between items-center transition ${isLive ? 'bg-white/5 hover:bg-orange-600' : 'bg-white/2 opacity-30 cursor-not-allowed'}`;
-                        b.innerHTML = `<span class="font-black text-white uppercase text-xs tracking-widest italic">${i.n}</span> <span class="text-[8px] font-black uppercase tracking-widest ${isLive ? 'text-green-400' : 'text-slate-500'}">${i.s}</span>`;
-                        if(isLive) b.onclick = () => finishStep(step, i.n, key);
-                        listDiv.appendChild(b);
-                    });
-                };
-                search.oninput = (e) => render(e.target.value);
-                render(); content.appendChild(listDiv);
-
+                activeNodes.forEach(c => content.appendChild(createBtn(c, () => setVal(1, c, 'country'))));
+            } else if (step === 2) {
+                title.innerText = "Target Industry";
+                ["Dental Office", "Roofing", "Real Estate", "Medical Spa", "Law Firm"].forEach(i => content.appendChild(createBtn(i, () => setVal(2, i, 'industry'))));
             } else if (step === 3) {
-                title.innerText = "Operator Sync";
+                title.innerText = "Business Credentials";
                 content.innerHTML = `
-                    <input id="in_name" placeholder="COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-3 outline-none focus:border-orange-500 uppercase font-black text-center text-xs tracking-[0.2em]">
-                    <input id="in_phone" placeholder="BUSINESS PHONE NUMBER" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-6 outline-none focus:border-orange-500 text-center font-bold">
-                    <button onclick="saveStep3()" class="orange-btn w-full p-5 rounded-xl font-black text-sm uppercase italic tracking-widest">Connect Operator Node</button>`;
-            
-            } else if (step === 5) {
-                title.innerText = "Voice Port Interaction";
-                content.innerHTML = `
-                    <div id="call-status" class="text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4 italic">Ready to Initialize</div>
-                    <button id="vapi-btn" onclick="startDemo()" class="orange-btn w-full p-5 rounded-xl font-black text-sm uppercase italic tracking-widest">Initialize Demo Call</button>
+                    <input id="bizName" placeholder="COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white mb-3 outline-none focus:border-orange-500 uppercase font-black text-xs text-center">
+                    <button onclick="saveBiz()" class="orange-btn w-full p-5 rounded-xl font-black text-xs uppercase italic">Sync Node</button>
                 `;
-
+            } else if (step === 4) {
+                title.innerText = "Assign AI Operator";
+                ["Standard Receptionist", "Appointment Booker", "Lead Qualifier"].forEach(a => content.appendChild(createBtn(a, () => setVal(4, a, 'agent'))));
+            } else if (step === 5) {
+                title.innerText = "Voice Port Live Demo";
+                content.innerHTML = `
+                    <div id="callStat" class="text-center text-[10px] font-black text-slate-500 uppercase mb-4 italic tracking-widest">Protocol Ready</div>
+                    <button id="callBtn" onclick="toggleCall()" class="orange-btn w-full p-6 rounded-2xl font-black text-sm uppercase italic shadow-2xl">Initialize Audio Link</button>
+                `;
             } else if (step === 6) {
                 title.innerText = "Activate System";
                 content.innerHTML = `
-                    <div class="mb-6 p-6 bg-white/2 rounded-3xl border border-white/5 text-center">
-                         <p class="text-slate-400 mb-2 text-xs font-bold uppercase tracking-widest italic">Authorized Operator Fee:</p>
-                         <p class="text-3xl font-black text-white tracking-tighter mb-1 italic">$199.00 <span class="text-slate-600 text-sm italic">/monthly</span></p>
+                    <div class="bg-black/40 p-8 rounded-3xl border border-white/5 text-center mb-6">
+                        <p class="text-slate-500 text-[10px] font-bold uppercase mb-2 italic">Monthly Infrastructure Fee</p>
+                        <p class="text-4xl font-black text-white italic">$199.00</p>
                     </div>
-                    <button onclick="launchDashboard()" class="orange-btn w-full p-6 rounded-3xl text-xl font-black shadow-2xl uppercase tracking-tighter italic">Launch Operator Console</button>`;
+                    <button onclick="finalize()" class="orange-btn w-full p-6 rounded-2xl font-black text-lg uppercase italic">Launch Console</button>
+                `;
             }
         }
 
-        // START DEMO LOGIC
-        function startDemo() {
-            const status = document.getElementById('call-status');
-            const btn = document.getElementById('vapi-btn');
-            
-            status.innerText = "Connecting to Global Node...";
-            status.classList.add('animate-pulse');
+        function createBtn(text, action) {
+            const b = document.createElement('button');
+            b.className = "w-full py-4 px-6 rounded-xl bg-white/5 hover:bg-orange-600 text-white font-black uppercase text-[10px] tracking-widest transition text-left border border-white/5";
+            b.innerText = text; b.onclick = action; return b;
+        }
+
+        function setVal(step, val, key) {
+            store[key] = val;
+            const label = document.getElementById(`v${step}`);
+            label.innerText = val.toUpperCase().substring(0, 12);
+            label.classList.remove('opacity-20');
+            document.getElementById(`s${step}`).classList.add('active');
+            closeM();
+        }
+
+        function saveBiz() {
+            const name = document.getElementById('bizName').value;
+            if(name) setVal(3, name, 'company');
+        }
+
+        function toggleCall() {
+            const btn = document.getElementById('callBtn');
+            const stat = document.getElementById('callStat');
             
             vapi.start(assistantId);
-
+            
             vapi.on('call-start', () => {
-                status.innerText = "Port Active • Speak Now";
-                status.style.color = "#10b981";
-                btn.innerText = "End Call Session";
-                btn.onclick = () => { vapi.stop(); };
+                stat.innerText = "LINE ACTIVE • ENCRYPTED";
+                stat.classList.replace('text-slate-500', 'text-green-500');
+                btn.innerText = "End Connection";
+                btn.onclick = () => vapi.stop();
             });
 
             vapi.on('call-end', () => {
-                status.innerText = "Transmission Complete";
-                status.style.color = "#f97316";
-                btn.innerText = "Verify & Proceed";
-                btn.onclick = () => { finishStep(5, 'VERIFIED', 'demo'); };
+                stat.innerText = "LINK TERMINATED";
+                btn.innerText = "Confirm & Proceed";
+                btn.onclick = () => setVal(5, 'Passed', 'demo');
             });
         }
 
-        function createSearch(p) {
-            const i = document.createElement('input');
-            i.placeholder = p;
-            i.className = "w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 outline-none focus:border-orange-500 text-xs font-bold uppercase tracking-widest";
-            return i;
-        }
-
-        function createListContainer() {
-            const d = document.createElement('div');
-            d.className = "max-h-64 overflow-y-auto grid gap-2 custom-scrollbar pr-2";
-            return d;
-        }
-
-        function finishStep(s, val, key) {
-            selections[key] = val;
-            const display = document.getElementById(`v${s}`);
-            display.innerText = val.toUpperCase().substring(0, 10);
-            display.classList.remove('opacity-20');
-            document.getElementById(`s${s}`).classList.add('active');
+        function finalize() {
             closeM();
-        }
-
-        function saveStep3() {
-            const n = document.getElementById('in_name').value;
-            const p = document.getElementById('in_phone').value;
-            if(n && p) { selections.business = n; selections.phone = p; finishStep(3, n, 'business'); }
-        }
-
-        function closeM() { document.getElementById('setupModal').style.display = 'none'; }
-
-        function launchDashboard() {
-            closeM();
-            document.getElementById('app-container').innerHTML = `
-                <div class="text-center py-6">
-                    <div class="mb-4 inline-flex items-center gap-2 px-4 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-green-500 text-[9px] font-black uppercase tracking-widest italic animate-pulse">● System Live via Gemini Infrastructure</div>
-                    <h2 class="text-3xl md:text-4xl font-black text-white mb-2 uppercase italic tracking-tighter">${selections.business}</h2>
-                    <p class="text-slate-500 text-[10px] mb-10 tracking-[0.4em] font-black uppercase italic">Operator Console v1.0</p>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-left">
-                        <div class="bg-white/5 border border-white/10 p-6 rounded-[24px] md:rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-4 tracking-widest italic">Agent Role</p><p class="text-white font-black uppercase text-xs tracking-widest">${selections.agent}</p></div>
-                        <div class="bg-white/5 border border-white/10 p-6 rounded-[24px] md:rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-4 tracking-widest italic">Port Node</p><p class="text-white font-black uppercase text-xs tracking-widest">${selections.country}</p></div>
-                        <div class="bg-white/5 border border-white/10 p-6 rounded-[24px] md:rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-4 tracking-widest italic">Status</p><p class="text-green-500 font-black uppercase text-xs tracking-widest">OPERATIONAL</p></div>
+            document.getElementById('hero-view').innerHTML = `
+                <div class="text-center py-20">
+                    <h2 class="text-5xl font-black text-white italic uppercase tracking-tighter mb-4">${store.company || 'System'} Active</h2>
+                    <p class="text-orange-500 font-bold uppercase tracking-[0.4em] text-[10px] italic">Global Port Connection Established</p>
+                    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-3xl mx-auto">
+                        <div class="bg-white/5 p-6 rounded-2xl border border-white/10"><p class="text-[9px] text-orange-500 font-black uppercase mb-2">Location</p><p class="text-white font-bold uppercase text-xs">${store.country}</p></div>
+                        <div class="bg-white/5 p-6 rounded-2xl border border-white/10"><p class="text-[9px] text-orange-500 font-black uppercase mb-2">Industry</p><p class="text-white font-bold uppercase text-xs">${store.industry}</p></div>
+                        <div class="bg-white/5 p-6 rounded-2xl border border-white/10"><p class="text-[9px] text-orange-500 font-black uppercase mb-2">Operator</p><p class="text-white font-bold uppercase text-xs">${store.agent}</p></div>
                     </div>
                 </div>
             `;
         }
+
+        function closeM() { document.getElementById('setupModal').classList.add('hidden'); }
     </script>
 </body>
 </html>
