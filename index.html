@@ -129,7 +129,7 @@
     <div id="setupModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden items-center justify-center p-4">
         <div class="bg-[#0f172a] border border-orange-500/20 max-w-lg w-full p-6 md:p-8 rounded-[30px] md:rounded-[40px] relative">
             <h2 id="mTitle" class="text-xl md:text-2xl font-black text-white mb-6 italic tracking-tighter text-center uppercase"></h2>
-            <div id="mContent" class="grid gap-3"></div>
+            <div id="mContent" class="grid gap-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2"></div>
             <div class="text-center mt-8">
                 <button onclick="closeM()" class="text-slate-600 font-bold uppercase text-[9px] tracking-widest hover:text-white transition italic">Back to Console</button>
             </div>
@@ -148,18 +148,25 @@
         const vapiPublicApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistantLibrary = { "Wellness & Spa": "e95dca20-93f2-46f0-b014-3a885586fa65" };
 
-        const countryList = ["United States", "United Kingdom", "Canada", "Australia", "UAE", "Singapore", "Germany"];
+        const countryList = [
+            { n: "United States", s: "ACTIVE" }, { n: "United Kingdom", s: "ACTIVE" },
+            { n: "Canada", s: "ACTIVE" }, { n: "Australia", s: "ACTIVE" },
+            { n: "UAE", s: "ACTIVE" }, { n: "Japan", s: "COMING SOON" },
+            { n: "France", s: "COMING SOON" }
+        ];
         
         const industryList = [
-            { n: "Electrical Contractor", s: "LIVE" }, { n: "Hair & Nail Salon", s: "LIVE" },
-            { n: "Restaurant / Bistro", s: "LIVE" }, { n: "Car Rental Agency", s: "LIVE" },
-            { n: "Wellness & Spa", s: "LIVE" }, { n: "Dental Clinic", s: "LIVE" },
-            { n: "Real Estate Broker", s: "LIVE" }, { n: "Law Firm / Legal", s: "BETA" }
+            { n: "Electrical Contractor", s: "ACTIVE" }, { n: "Plumbing Service", s: "ACTIVE" },
+            { n: "HVAC Specialist", s: "ACTIVE" }, { n: "Law Firm / Legal", s: "ACTIVE" },
+            { n: "Hair & Nail Salon", s: "ACTIVE" }, { n: "Restaurant / Bistro", s: "ACTIVE" },
+            { n: "Car Rental Agency", s: "ACTIVE" }, { n: "Wellness & Spa", s: "ACTIVE" },
+            { n: "Real Estate Broker", s: "ACTIVE" }, { n: "Veterinary Clinic", s: "COMING SOON" }
         ];
 
         const agentRoles = [
-            { n: "Inbound Receptionist", s: "LIVE" }, { n: "Appointment Booker", s: "LIVE" },
-            { n: "Emergency Dispatcher", s: "LIVE" }, { n: "Outbound Follow-up", s: "BETA" }
+            { n: "Inbound Receptionist", s: "ACTIVE" }, { n: "Appointment Booker", s: "ACTIVE" },
+            { n: "Emergency Dispatcher", s: "ACTIVE" }, { n: "Outbound Follow-up", s: "ACTIVE" },
+            { n: "Multilingual Support", s: "COMING SOON" }
         ];
 
         const selections = { country: "", industry: "", business: "", phone: "", agent: "" };
@@ -174,21 +181,22 @@
             if (step === 1) {
                 title.innerText = "Global Port Selection";
                 countryList.forEach(c => {
+                    const active = c.s === 'ACTIVE';
                     let b = document.createElement('button');
-                    b.className = "w-full py-3 px-5 rounded-xl flex justify-between items-center bg-white/5 hover:bg-orange-600 transition";
-                    b.innerHTML = `<span class="text-sm font-bold text-white uppercase italic">${c}</span> <span class="text-[8px] font-black text-green-400">ACTIVE</span>`;
-                    b.onclick = () => finishStep(1, c, 'country');
+                    b.className = `w-full py-3 px-5 rounded-xl flex justify-between items-center transition ${active ? 'bg-white/5 hover:bg-orange-600' : 'opacity-30 cursor-not-allowed'}`;
+                    b.innerHTML = `<span class="text-sm font-bold text-white uppercase italic">${c.n}</span> <span class="text-[8px] font-black ${active ? 'text-green-400' : 'text-slate-500'}">${c.s}</span>`;
+                    if(active) b.onclick = () => finishStep(1, c.n, 'country');
                     content.appendChild(b);
                 });
             } else if (step === 2 || step === 4) {
                 const isInd = step === 2;
                 title.innerText = isInd ? "Operator Industry" : "Agent Assignment";
                 (isInd ? industryList : agentRoles).forEach(i => {
-                    const live = i.s === 'LIVE';
+                    const active = i.s === 'ACTIVE';
                     let b = document.createElement('button');
-                    b.className = `w-full py-4 px-6 rounded-xl flex justify-between items-center transition ${live ? 'bg-white/5 hover:bg-orange-600' : 'opacity-30 cursor-not-allowed'}`;
-                    b.innerHTML = `<span class="font-black text-white uppercase text-xs italic">${i.n}</span> <span class="text-[8px] font-black ${live ? 'text-green-400' : 'text-slate-500'}">${i.s}</span>`;
-                    if(live) b.onclick = () => finishStep(step, i.n, isInd ? 'industry' : 'agent');
+                    b.className = `w-full py-4 px-6 rounded-xl flex justify-between items-center transition ${active ? 'bg-white/5 hover:bg-orange-600' : 'opacity-30 cursor-not-allowed'}`;
+                    b.innerHTML = `<span class="font-black text-white uppercase text-xs italic">${i.n}</span> <span class="text-[8px] font-black ${active ? 'text-green-400' : 'text-slate-500'}">${i.s}</span>`;
+                    if(active) b.onclick = () => finishStep(step, i.n, isInd ? 'industry' : 'agent');
                     content.appendChild(b);
                 });
             } else if (step === 3) {
