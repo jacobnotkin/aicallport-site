@@ -17,7 +17,6 @@
             position: relative;
         }
 
-        /* PARALLAX BACKGROUND LAYERS */
         body::before {
             content: ""; position: fixed; inset: -5%; z-index: -1;
             background-image: 
@@ -30,45 +29,40 @@
         }
 
         .console-container {
-            width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.8);
+            width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 40px; padding: 40px;
             position: relative; z-index: 10;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        .clickable { cursor: pointer !important; pointer-events: auto !important; position: relative; z-index: 50; }
+        /* 1. BETA SPECIAL GLOW - INTENSIFIED */
+        @keyframes beta-glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(249, 115, 22, 0.8); color: #ff9d52; }
+            50% { text-shadow: 0 0 20px rgba(249, 115, 22, 1), 0 0 30px rgba(234, 88, 12, 0.5); color: #ffffff; }
+        }
+        .glow-text-beta { 
+            animation: beta-glow 2s infinite ease-in-out; 
+            font-weight: 900;
+        }
+
+        /* 2. FOOTER HEADLINE GLOW - INTENSIFIED */
+        .footer-glow {
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(249, 115, 22, 0.9), 0 0 30px rgba(249, 115, 22, 0.4);
+            letter-spacing: 0.5em;
+            font-weight: 900;
+        }
         
         .orange-btn {
             background: linear-gradient(90deg, #f97316, #ea580c);
             transition: all 0.2s ease;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .orange-btn:active { transform: scale(0.97); }
-        
-        @keyframes nudge {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(4px); }
-        }
-        .btn-arrow { animation: nudge 2s infinite ease-in-out; }
-
-        @keyframes pulse-glow {
-            0%, 100% { text-shadow: 0 0 5px rgba(249, 115, 22, 0.2); opacity: 0.8; }
-            50% { text-shadow: 0 0 15px rgba(249, 115, 22, 0.6); opacity: 1; }
-        }
-        .glow-text { animation: pulse-glow 3s infinite ease-in-out; color: #f97316; }
-
-        .footer-glow {
-            color: #fb923c;
-            text-shadow: 0 0 12px rgba(251, 146, 60, 0.6);
-            letter-spacing: 0.4em;
-        }
         
         .step-card {
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 15px; border-radius: 16px; transition: 0.3s;
         }
-        .step-card:hover { background: rgba(255, 255, 255, 0.08); border-color: #f97316; }
         .step-card.active { border-color: #f97316; background: rgba(249, 115, 22, 0.1); }
         
         .beta-ribbon {
@@ -78,18 +72,13 @@
             font-size: 7px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase;
         }
 
-        .status-dot {
-            width: 6px; height: 6px; background: #22c55e; border-radius: 50%;
-            display: inline-block; margin-right: 6px; box-shadow: 0 0 8px #22c55e;
-        }
-
         #setupModal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;
+            z-index: 1000; display: none; align-items: center; justify-content: center;
         }
 
-        .timer-urgent { color: #ff4444 !important; text-shadow: 0 0 10px rgba(255, 68, 68, 0.5); animation: pulse-fast 1s infinite; }
-        @keyframes pulse-fast { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .timer-urgent { color: #ff4444 !important; text-shadow: 0 0 15px rgba(255, 68, 68, 0.8); animation: pulse-fast 0.8s infinite; }
+        @keyframes pulse-fast { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -98,7 +87,7 @@
         <div class="flex justify-between items-start mb-12">
             <div>
                 <div class="flex items-center gap-2 mb-1">
-                    <div class="w-6 h-6 bg-orange-500 rounded-sm italic flex items-center justify-center text-[10px] font-black">BETA</div>
+                    <div class="w-6 h-6 bg-orange-500 rounded-sm italic flex items-center justify-center text-[10px] font-black text-black">BETA</div>
                     <span class="font-black italic text-xl tracking-tighter uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
                 </div>
                 <div class="text-[8px] font-bold text-slate-500 uppercase tracking-widest italic">100% Automated System v5.0</div>
@@ -110,29 +99,21 @@
 
         <div class="grid lg:grid-cols-5 gap-12 items-center">
             <div class="lg:col-span-3">
-                <div class="inline-block px-3 py-1 bg-orange-500 text-black text-[8px] font-black uppercase mb-6 tracking-widest italic rounded">
-                    Automated Beta Access
-                </div>
+                <div class="inline-block px-3 py-1 bg-orange-500 text-black text-[8px] font-black uppercase mb-6 tracking-widest italic rounded">Automated Beta Access</div>
                 <h1 class="text-4xl md:text-6xl font-black italic uppercase leading-none tracking-tighter mb-8">
                     <span class="text-white block mb-1">INSTANT</span>
                     <span class="text-orange-500 block mb-1">AI RECEPTIONIST</span>
                     <span class="text-white block">DEMO & ACTIVATION</span>
                 </h1>
-                
-                <p class="text-slate-400 text-sm mb-10 max-w-sm leading-relaxed">
-                    Zero human interaction required. Test your agent in the Sandbox and deploy instantly. <span class="text-white font-bold">Automated access. Secure payments. 24/7 Deployment.</span>
-                </p>
-                <button onclick="triggerModal(1)" class="clickable orange-btn px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">
-                    Begin 6-Step Activation
-                    <svg class="btn-arrow w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                </button>
+                <p class="text-slate-400 text-sm mb-10 max-w-sm leading-relaxed">Zero human interaction required. Test your agent in the Sandbox and deploy instantly.</p>
+                <button onclick="triggerModal(1)" class="orange-btn px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin 6-Step Activation</button>
             </div>
 
             <div class="lg:col-span-2">
                 <div class="bg-black/40 border-2 border-orange-500/50 rounded-[40px] p-10 text-center relative overflow-hidden">
                     <div class="beta-ribbon">Beta Save $200</div>
                     
-                    <h3 class="glow-text text-[10px] font-black uppercase tracking-widest mb-2 italic">BETA SPECIAL</h3>
+                    <h3 class="glow-text-beta text-[11px] uppercase tracking-widest mb-4 italic">BETA SPECIAL</h3>
                     
                     <div class="flex flex-col items-center mb-4">
                         <span class="text-slate-600 line-through text-lg font-bold opacity-50">$399 Regular</span>
@@ -151,61 +132,37 @@
                         <span id="timer" class="text-sm font-black text-white tracking-widest font-mono">23:59:59</span>
                     </div>
 
-                    <div class="space-y-3 mb-10 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                        <p>✓ No Human Involved</p>
-                        <p>✓ Instant Sandbox Demo</p>
-                        <p>✓ Secure Stripe Platform</p>
-                    </div>
-
-                    <button onclick="triggerModal(1)" class="clickable orange-btn w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg">
-                        Begin 6-Step Activation
-                        <svg class="btn-arrow w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                    </button>
+                    <button onclick="triggerModal(1)" class="orange-btn w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg">Begin Activation</button>
                 </div>
             </div>
         </div>
 
         <div class="mt-20 relative z-50">
-            <h3 class="text-center text-[11px] font-black uppercase footer-glow mb-6">
+            <h3 class="text-center text-[12px] uppercase footer-glow mb-6">
                 AI RECEPTIONIST ACTIVATION STEPS
             </h3>
             
             <div class="pt-6 border-t border-white/5 grid grid-cols-2 md:grid-cols-6 gap-4">
-                <div id="s1" class="clickable step-card" onclick="triggerModal(1)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">01 Market</p><p id="v1" class="text-[9px] text-white/30 uppercase font-bold">Select</p></div>
-                <div id="s2" class="clickable step-card" onclick="triggerModal(2)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">02 Industry</p><p id="v2" class="text-[9px] text-white/30 uppercase font-bold">Select</p></div>
-                <div id="s3" class="clickable step-card" onclick="triggerModal(3)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">03 Business</p><p id="v3" class="text-[9px] text-white/30 uppercase font-bold">Sync</p></div>
-                <div id="s4" class="clickable step-card" onclick="triggerModal(4)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">04 Role</p><p id="v4" class="text-[9px] text-white/30 uppercase font-bold">Choose</p></div>
-                <div id="s5" class="clickable step-card" onclick="triggerModal(5)">
-                    <p class="text-[8px] font-black text-orange-500 uppercase mb-1 flex items-center">
-                        <span class="status-dot animate-pulse"></span>05 Demo
-                    </p>
-                    <p id="v5" class="text-[9px] text-white/30 uppercase font-bold">Sandbox</p>
-                </div>
-                <div id="s6" class="clickable step-card" onclick="triggerModal(6)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">06 Pipeline</p><p id="v6" class="text-[9px] text-white/30 uppercase font-bold">Activate</p></div>
+                <div id="s1" class="step-card" onclick="triggerModal(1)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">01 Market</p><p id="v1" class="text-[9px] text-white/30 uppercase font-bold">Select</p></div>
+                <div id="s2" class="step-card" onclick="triggerModal(2)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">02 Industry</p><p id="v2" class="text-[9px] text-white/30 uppercase font-bold">Select</p></div>
+                <div id="s3" class="step-card" onclick="triggerModal(3)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">03 Business</p><p id="v3" class="text-[9px] text-white/30 uppercase font-bold">Sync</p></div>
+                <div id="s4" class="step-card" onclick="triggerModal(4)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">04 Role</p><p id="v4" class="text-[9px] text-white/30 uppercase font-bold">Choose</p></div>
+                <div id="s5" class="step-card" onclick="triggerModal(5)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">05 Demo</p><p id="v5" class="text-[9px] text-white/30 uppercase font-bold">Sandbox</p></div>
+                <div id="s6" class="step-card" onclick="triggerModal(6)"><p class="text-[8px] font-black text-orange-500 uppercase mb-1">06 Pipeline</p><p id="v6" class="text-[9px] text-white/30 uppercase font-bold">Activate</p></div>
             </div>
         </div>
     </div>
 
     <div id="setupModal">
         <div class="bg-[#0f172a] border border-white/10 p-10 rounded-[40px] max-w-md w-full text-center">
-            <h2 id="mTitle" class="text-xl font-black uppercase text-white mb-6 italic">Configuration</h2>
+            <h2 id="mTitle" class="text-xl font-black uppercase text-white mb-6">Configuration</h2>
             <div id="mContent" class="grid gap-3"></div>
-            <button onclick="closeModal()" class="clickable mt-8 text-[8px] font-bold text-slate-600 uppercase hover:text-white transition">Back to Console</button>
+            <button onclick="closeModal()" class="mt-8 text-[8px] font-bold text-slate-600 uppercase">Back</button>
         </div>
     </div>
 
     <script>
         const stripeLink = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
-        const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
-        const assistants = {
-            "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
-            "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
-            "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65",
-            "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f"
-        };
-        let currentIndustry = "";
-
-        // MOUSE TRACKING FOR PARALLAX
         document.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth) * 100;
             const y = (e.clientY / window.innerHeight) * 100;
@@ -224,12 +181,9 @@
                 const s = Math.floor((diff % 60000) / 1000);
                 timerEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                 if (h === 0) timerEl.classList.add('timer-urgent');
-                else timerEl.classList.remove('timer-urgent');
             }, 1000);
         }
         startTimer();
-
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
@@ -237,55 +191,25 @@
             const t = document.getElementById('mTitle');
             m.style.display = 'flex';
             c.innerHTML = "";
-
-            if(step === 1) {
-                t.innerText = "Target Market";
-                ["United States", "UK", "Canada"].forEach(l => { createBtn(l, () => finish(1, l), c); });
-            } else if(step === 2) {
-                t.innerText = "Business Industry";
-                Object.keys(assistants).forEach(i => { createBtn(i, () => { currentIndustry = i; finish(2, i); }, c); });
-            } else if(step === 3) {
-                t.innerText = "Identity Sync";
-                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase">
-                               <button onclick="saveB()" class="clickable orange-btn w-full py-4 rounded-xl font-black text-[10px] uppercase">Verify Identity</button>`;
-            } else if(step === 4) {
-                t.innerText = "Neural Role";
-                ["Receptionist", "Emergency Dispatcher"].forEach(r => { createBtn(r, () => finish(4, r), c); });
-            } else if(step === 5) {
-                t.innerText = "Voice Sandbox";
-                createBtn("Start Live Demo", runVoice, c);
-            } else if(step === 6) {
-                t.innerText = "Activation Pipeline";
-                createBtn("Finalize & Launch", () => { fireConfetti(); finish(6, "ACTIVATED"); setTimeout(launchStripe, 2000); }, c);
+            if(step === 6) {
+                const b = document.createElement('button');
+                b.className = "w-full py-4 bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase";
+                b.innerText = "Finalize & Launch";
+                b.onclick = () => { 
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#f97316', '#ffffff'] });
+                    finish(6, "ACTIVATED");
+                    setTimeout(() => window.open(stripeLink, '_blank'), 2000);
+                };
+                c.appendChild(b);
             }
         }
-
-        function createBtn(txt, fn, cont) {
-            const b = document.createElement('button');
-            b.className = "clickable w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition flex items-center justify-center gap-2";
-            b.innerText = txt; b.onclick = fn; cont.appendChild(b);
-        }
-
         function finish(s, v) {
             document.getElementById(`v${s}`).innerText = v;
             document.getElementById(`v${s}`).classList.replace('text-white/30', 'text-white');
             document.getElementById(`s${s}`).classList.add('active');
             closeModal();
         }
-
-        function fireConfetti() {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#f97316', '#ffffff', '#ea580c'] });
-        }
-
-        function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
-        function launchStripe() { window.open(stripeLink, '_blank'); }
-        function runVoice() { 
-            const id = assistants[currentIndustry];
-            if(!id) return alert("Select Industry first!");
-            window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
-            closeModal();
-        }
     </script>
 </body>
 </html>
