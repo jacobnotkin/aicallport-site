@@ -3,244 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI CALL PORT | Neural Logic Backbone</title>
+    <title>AI CALL PORT | BETA Operator Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --p-orange: #f97316; }
         body { 
             background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; 
-            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
-            margin: 0; overflow-x: hidden;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; 
+            padding: 20px; margin: 0; overflow-x: hidden; scroll-behavior: smooth;
         }
 
-        /* 1. BACKGROUND DECOR (Unclickable) */
         .bg-glow {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 600px; height: 600px; background: radial-gradient(circle, rgba(249,115,22,0.07) 0%, rgba(6,8,15,0) 70%);
-            pointer-events: none; z-index: 0;
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), var(--glow-color, rgba(249, 115, 22, 0.1)) 0%, transparent 60%);
+            pointer-events: none;
+            transition: background 1.5s ease;
         }
 
-        /* 2. MAIN CONSOLE CONTAINER */
-        .console-box {
-            position: relative; z-index: 10; width: 100%; max-width: 1100px;
-            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 40px;
-            padding: 40px; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5);
+        .console-container {
+            width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; padding: 40px;
+            position: relative; z-index: 10; margin-bottom: 80px;
         }
 
-        /* 3. INTERACTIVE ELEMENTS */
-        .orange-btn {
-            background: linear-gradient(90deg, #f97316, #ea580c);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer !important; position: relative; z-index: 20;
+        @keyframes beta-pulse {
+            0%, 100% { text-shadow: 0 0 15px #f97316; transform: scale(1); color: #fff; }
+            50% { text-shadow: 0 0 30px #f97316, 0 0 45px #ea580c; transform: scale(1.05); color: #f97316; }
         }
-        .orange-btn:hover { transform: translateY(-2px); shadow: 0 10px 20px rgba(249,115,22,0.3); }
-        .orange-btn:active { transform: scale(0.96); }
+        .glow-beta { display: inline-block; animation: beta-pulse 2s infinite ease-in-out; font-weight: 800; }
+
+        .footer-glow {
+            color: #fff;
+            text-shadow: 0 0 20px rgba(249, 115, 22, 1), 0 0 40px rgba(249, 115, 22, 0.6);
+            letter-spacing: 0.4em; font-weight: 800;
+        }
+        
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); transition: transform 0.2s; cursor: pointer; }
+        .orange-btn:hover { filter: brightness(1.2); }
 
         .step-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px; padding: 15px; cursor: pointer !important;
-            transition: 0.3s; position: relative; z-index: 20;
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px; border-radius: 16px; transition: 0.4s; cursor: not-allowed; opacity: 0.3;
         }
-        .step-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(249,115,22,0.3); }
-        .step-card.active { background: #f97316; border-color: #ffedd5; }
+        .step-card.unlocked { opacity: 1; cursor: pointer; border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.05); }
+        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.15) !important; transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(249, 115, 22, 0.3); }
+        
+        @keyframes next-step-pulse {
+            0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
+            50% { border-color: #f97316; box-shadow: 0 0 15px rgba(249, 115, 22, 0.2); }
+        }
+        .next-focus { animation: next-step-pulse 1.5s infinite ease-in-out; border-width: 2px; opacity: 1; cursor: pointer; }
 
-        /* MODAL */
-        #setupModal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(20px); z-index: 1000; display: none;
-            align-items: center; justify-content: center; padding: 20px;
+        .ticker-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
+            background: rgba(6, 8, 15, 0.9); backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(249, 115, 22, 0.2);
+            display: flex; align-items: center; z-index: 100; overflow: hidden;
         }
+        .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* REFINED GLASS TERMINAL */
+        .system-log {
+            position: fixed; bottom: 60px; right: 25px; width: 300px; height: 130px;
+            background: rgba(15, 23, 42, 0.4); /* Glass tint */
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 16px; font-family: monospace; font-size: 10px;
+            color: #94a3b8; z-index: 50; overflow-y: hidden;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+        .log-line { 
+            margin-bottom: 6px; border-left: 2px solid #f97316; padding-left: 8px; 
+            animation: slideIn 0.3s ease-out; color: #e2e8f0;
+            text-shadow: 0 0 8px rgba(249, 115, 22, 0.2);
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .status-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 8px #22c55e; }
     </style>
 </head>
-<body>
-
+<body onmousemove="updateParallax(event)">
     <div class="bg-glow"></div>
 
-    <div id="app-container" class="console-box">
-        
-        <div class="flex justify-between items-center mb-12">
+    <div class="system-log" id="logBox">
+        <div class="text-[9px] text-orange-500 font-black mb-3 flex justify-between uppercase tracking-widest">
+            <span>Neural Terminal</span>
+            <span class="animate-pulse flex items-center gap-1"><span class="status-dot"></span>Active</span>
+        </div>
+        <div id="logContent">
+            <div class="log-line">INITIALIZING KERNEL...</div>
+            <div class="log-line">SECURE PORT OPENED...</div>
+        </div>
+    </div>
+
+    <div class="console-container">
+        <div class="flex justify-between items-start mb-12">
             <div>
                 <div class="flex items-center gap-2 mb-1">
-                    <div class="w-5 h-5 bg-orange-500 rounded-sm rotate-45"></div>
-                    <span class="font-black italic text-xl tracking-tighter uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
+                    <div class="w-6 h-6 bg-orange-500 rounded-sm flex items-center justify-center text-[10px] font-black text-black italic">BETA</div>
+                    <span class="font-black italic text-xl uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
                 </div>
-                <div class="text-[8px] font-bold text-slate-500 uppercase tracking-[0.3em]">Neural Logic Backbone v4.3</div>
+                <div class="text-[8px] font-bold text-slate-500 uppercase tracking-widest italic">100% Automated System v5.0</div>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="hidden md:flex flex-col items-end">
-                    <span class="text-[7px] font-black text-slate-500 uppercase tracking-widest">System Status</span>
-                    <span class="text-[9px] font-black text-green-500 uppercase">Operational</span>
-                </div>
-                <div class="bg-green-500/10 border border-green-500/20 px-3 py-1.5 rounded-full flex items-center gap-2">
-                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-[8px] font-black text-green-500 uppercase tracking-widest">Global Sync Active</span>
-                </div>
+            <div class="bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full flex items-center gap-2">
+                <span class="text-[8px] font-black text-orange-500 uppercase animate-pulse">Connection Ready</span>
             </div>
         </div>
 
         <div class="grid lg:grid-cols-5 gap-12 items-center">
             <div class="lg:col-span-3">
-                <div class="inline-flex items-center gap-2 px-3 py-1 border border-orange-500/30 rounded text-orange-500 text-[8px] font-black uppercase mb-6 tracking-widest">
-                    Proprietary Voice Systems
-                </div>
-                <h1 class="text-4xl md:text-6xl font-black italic uppercase leading-[0.85] tracking-tighter mb-8">
-                    The World's Most <span class="text-orange-500 block">Human-Centric</span> Voice Infrastructure.
+                <h1 class="text-5xl font-black italic uppercase leading-none mb-6">
+                    <span class="text-white block">INSTANT</span>
+                    <span class="text-orange-500 block">AI RECEPTIONIST</span>
                 </h1>
-                <p class="text-slate-400 text-sm mb-10 max-w-sm leading-relaxed">
-                    Provision professional Neural Voice Nodes in seconds. Engineered for zero-latency communication and <span class="text-white font-bold italic underline decoration-orange-500 underline-offset-4">Rapid Business Scaling.</span>
-                </p>
-                <button onclick="triggerModal(1)" class="orange-btn px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">
-                    Initialize Core Port
-                </button>
+                <p class="text-slate-400 text-sm mb-10 max-w-sm">Deploy an automated voice expert in 6 steps. Zero human interaction required.</p>
+                <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin 6-Step Activation</button>
             </div>
 
             <div class="lg:col-span-2">
-                <div class="bg-black/40 border border-white/10 rounded-[40px] p-10 text-center relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-orange-600 text-white text-[7px] font-black px-10 py-2 rotate-45 translate-x-8 translate-y-2 uppercase">Node Subscription</div>
-                    <h3 class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4 italic italic">Infrastructure Tier</h3>
-                    <div class="flex justify-center items-baseline gap-1 mb-8">
-                        <span class="text-6xl font-black tracking-tighter text-white">$199</span>
-                        <span class="text-slate-500 font-bold text-lg">/mo</span>
+                <div class="bg-black/50 border-2 border-orange-500/50 rounded-[40px] p-10 text-center relative overflow-hidden">
+                    <h3 class="glow-beta text-[12px] uppercase mb-4 tracking-widest">BETA SPECIAL</h3>
+                    <div class="flex flex-col items-center mb-4">
+                        <span class="text-slate-600 line-through text-lg font-bold opacity-50">$399 Regular</span>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-6xl font-black text-white">$199</span>
+                            <span class="text-orange-500 font-bold">/mo</span>
+                        </div>
                     </div>
-                    <div class="space-y-3 mb-8">
-                        <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">● Unlimited AI Logic Porting</div>
-                        <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">● 24/7 Global Dispatcher</div>
-                        <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">● AES-256 Encrypted Gateway</div>
-                    </div>
-                    <button onclick="launchStripe()" class="orange-btn w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg">
-                        Claim Infrastructure
-                    </button>
-                    <p class="mt-4 text-[7px] font-bold text-slate-600 uppercase tracking-widest">Secure Payments via Stripe</p>
+                    <div id="timer" class="text-xl font-mono font-black text-white mb-6">23:59:59</div>
+                    <button onclick="handleStep(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
                 </div>
             </div>
         </div>
 
-        <div class="mt-16 pt-10 border-t border-white/5 grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4">
-            <div id="s1" class="step-card" onclick="triggerModal(1)">
-                <p class="text-[8px] font-black text-orange-500 uppercase mb-1 italic">01 Location</p>
-                <p id="v1" class="text-[10px] font-bold text-white/20 uppercase">Select</p>
-            </div>
-            <div id="s2" class="step-card" onclick="triggerModal(2)">
-                <p class="text-[8px] font-black text-orange-500 uppercase mb-1 italic">02 Industry</p>
-                <p id="v2" class="text-[10px] font-bold text-white/20 uppercase">Select</p>
-            </div>
-            <div id="s3" class="step-card" onclick="triggerModal(3)">
-                <p class="text-[8px] font-black text-orange-500 uppercase mb-1 italic">03 Identity</p>
-                <p id="v3" class="text-[10px] font-bold text-white/20 uppercase">Sync</p>
-            </div>
-            <div id="s4" class="step-card" onclick="triggerModal(4)">
-                <p class="text-[8px] font-black text-orange-500 uppercase mb-1 italic">04 Neural Role</p>
-                <p id="v4" class="text-[10px] font-bold text-white/20 uppercase">Choose</p>
-            </div>
-            <div id="s5" class="step-card" onclick="triggerModal(5)">
-                <p class="text-[8px] font-black text-orange-500 uppercase mb-1 italic">05 Sandbox</p>
-                <p id="v5" class="text-[10px] font-bold text-white/20 uppercase">Test</p>
-            </div>
-            <div id="s6" class="step-card" onclick="triggerModal(6)">
-                <p class="text-[8px] font-black text-orange-500 uppercase mb-1 italic">06 Deploy</p>
-                <p id="v6" class="text-[10px] font-bold text-white/20 uppercase">Launch</p>
+        <div id="stepsSection" class="mt-20">
+            <h3 class="text-center text-[12px] uppercase footer-glow mb-8">AI RECEPTIONIST ACTIVATION STEPS</h3>
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[8px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
+                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[8px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
+                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[8px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase">Sync</p></div>
+                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[8px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase">Choose</p></div>
+                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[8px] font-black text-orange-500 flex items-center"><span class="status-dot animate-pulse"></span>05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase">Sandbox</p></div>
+                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[8px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase">Activate</p></div>
             </div>
         </div>
     </div>
 
+    <div class="ticker-bar"><div class="ticker-content" id="ticker"></div></div>
+
     <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-10 rounded-[40px] max-w-md w-full text-center">
-            <h2 id="mTitle" class="text-2xl font-black italic uppercase text-white mb-6">Initialize Node</h2>
-            <div id="mContent" class="grid gap-3 mb-8"></div>
-            <button onclick="closeModal()" class="text-[9px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition">Cancel Initialization</button>
+        <div class="bg-[#0f172a] border border-white/10 p-10 rounded-[40px] max-w-sm w-full text-center">
+            <h2 id="mTitle" class="text-xl font-black uppercase text-white mb-6">Setup</h2>
+            <div id="mContent" class="grid gap-3"></div>
+            <button onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black">Back to Console</button>
         </div>
     </div>
 
     <script>
-        // 1. DATA AND STATE
         const stripeLink = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
-        
-        const assistants = {
-            "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
-            "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
-            "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65",
-            "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f"
-        };
+        const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
+        let completedSteps = 0; let currentIndustry = "";
 
-        let selections = { industry: "", businessName: "" };
+        function addLog(msg) {
+            const content = document.getElementById('logContent');
+            const div = document.createElement('div');
+            div.className = "log-line";
+            div.innerText = `> ${msg.toUpperCase()}`;
+            content.prepend(div);
+            if(content.children.length > 5) content.lastChild.remove();
+        }
 
-        // 2. VAPI SDK (Lazy Load)
-        (function(d, t) {
-            var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-            g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
-            g.defer = true; g.async = true; s.parentNode.insertBefore(g, s);
-        })(document, "script");
+        function updateParallax(e) {
+            document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
+            document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
+        }
 
-        // 3. CORE FUNCTIONS
+        function handleStep(s) { if(s === 1 || completedSteps >= s-1) { triggerModal(s); } }
+
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
-            const content = document.getElementById('mContent');
-            const title = document.getElementById('mTitle');
-            
-            m.style.display = 'flex';
-            content.innerHTML = "";
+            const c = document.getElementById('mContent');
+            const t = document.getElementById('mTitle');
+            m.style.display = 'flex'; c.innerHTML = "";
 
-            if (step === 1) {
-                title.innerText = "Location Protocol";
-                ["United States", "United Kingdom", "Canada"].forEach(loc => {
-                    createBtn(loc, () => updateStep(1, loc, 'location'), content);
-                });
-            } else if (step === 2) {
-                title.innerText = "Sector Assignment";
-                Object.keys(assistants).forEach(ind => {
-                    createBtn(ind, () => {
-                        selections.industry = ind;
-                        updateStep(2, ind, 'industry');
-                    }, content);
-                });
-            } else if (step === 3) {
-                title.innerText = "Identity Sync";
-                content.innerHTML = `
-                    <input id="bizName" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white text-center font-bold mb-4">
-                    <button onclick="saveBiz()" class="orange-btn w-full p-4 rounded-xl font-black text-[10px] uppercase">Sync Identity</button>
-                `;
-            } else if (step === 5) {
-                title.innerText = "Sandbox Test";
-                createBtn("START VOICE DEMO", startDemo, content);
-            } else if (step === 6) {
-                title.innerText = "Infrastructure Deployment";
-                createBtn("LAUNCH GLOBAL PORT", launchStripe, content);
+            if(step === 1) {
+                t.innerText = "Market Selection";
+                ["United States", "UK", "Canada"].forEach(l => createBtn(l, () => { addLog(`Targeting ${l}`); finish(1, l); }, c));
+            } else if(step === 2) {
+                t.innerText = "Neural Industry";
+                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; addLog(`Loading ${i} Data`); finish(2, i); }, c));
+            } else if(step === 3) {
+                t.innerText = "Business Identity";
+                c.innerHTML = `<input id="bn" placeholder="ENTER NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">Verify</button>`;
+            } else if(step === 4) {
+                t.innerText = "Agent Role";
+                ["Receptionist", "Lead Qualifier"].forEach(r => createBtn(r, () => { addLog(`Configuring ${r}`); finish(4, r); }, c));
+            } else if(step === 5) {
+                t.innerText = "Sandbox Test";
+                createBtn("Initialize Demo", runVoice, c);
+            } else if(step === 6) {
+                t.innerText = "Mainline Activation";
+                createBtn("Activate & Launch", () => { 
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#f97316', '#ffffff'] });
+                    addLog("ACTIVATING PIPELINE");
+                    finish(6, "ACTIVE");
+                    setTimeout(() => window.open(stripeLink, '_blank'), 2000);
+                }, c);
             }
         }
 
-        function createBtn(text, fn, container) {
+        function createBtn(txt, fn, cont) {
             const b = document.createElement('button');
-            b.className = "w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition-all";
-            b.innerText = text;
-            b.onclick = fn;
-            container.appendChild(b);
+            b.className = "w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition";
+            b.innerText = txt; b.onclick = fn; cont.appendChild(b);
         }
 
-        function updateStep(step, val, key) {
-            document.getElementById(`v${step}`).innerText = val;
-            document.getElementById(`v${step}`).classList.replace('text-white/20', 'text-white');
-            document.getElementById(`s${step}`).classList.add('active');
+        function finish(s, v) {
+            completedSteps = s;
+            const el = document.getElementById(`v${s}`);
+            el.innerText = v; el.classList.replace('text-white/30', 'text-white');
+            document.getElementById(`s${s}`).classList.add('active');
+            
+            const orangeIntensity = 249 - (s * 40);
+            document.documentElement.style.setProperty('--glow-color', `rgba(${orangeIntensity}, ${115 + (s*15)}, 22, 0.15)`);
+
             closeModal();
+            if(s < 6) {
+                const n = s + 1;
+                document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus');
+                document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${n}`;
+                document.getElementById('stepsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
 
-        function saveBiz() {
-            const val = document.getElementById('bizName').value;
-            if(val) { selections.businessName = val; updateStep(3, val, 'biz'); }
-        }
-
+        function saveB() { const v = document.getElementById('bn').value; if(v) { addLog(`Syncing ${v}`); finish(3, v); } }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
-
-        function launchStripe() { window.open(stripeLink, '_blank'); }
-
-        function startDemo() {
-            const id = assistants[selections.industry];
-            if(!id) return alert("Select Industry (Step 2) first");
-            window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
-            closeModal();
+        function runVoice() { 
+            const id = assistants[currentIndustry];
+            if(!id) return alert("Industry Required");
+            addLog("VOICE LINK ESTABLISHED");
+            if(window.vapiSDK) window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
+            closeModal(); finish(5, "TESTING");
         }
+
+        const locs = ["Miami", "London", "Austin", "NYC", "Toronto"];
+        let tickerHtml = "";
+        for(let i=0; i<15; i++) {
+            tickerHtml += `<span class="px-16 text-[10px] font-black text-orange-500 uppercase italic"> ⚡ NEW DEPLOYMENT SUCCESSFUL IN ${locs[Math.floor(Math.random()*5)]} </span>`;
+        }
+        document.getElementById('ticker').innerHTML = tickerHtml + tickerHtml;
+
+        setInterval(() => {
+            const now = new Date();
+            const night = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+            const diff = night - now;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }, 1000);
+
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
     </script>
 </body>
 </html>
