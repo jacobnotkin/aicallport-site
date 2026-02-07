@@ -16,8 +16,10 @@
 
         .bg-glow {
             position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.1) 0%, transparent 60%);
+            /* Transitioning background color */
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), var(--glow-color, rgba(249, 115, 22, 0.1)) 0%, transparent 60%);
             pointer-events: none;
+            transition: background 1.5s ease;
         }
 
         .console-container {
@@ -63,7 +65,6 @@
         .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* NEURAL LOG BOX */
         .system-log {
             position: fixed; bottom: 60px; left: 20px; width: 280px; height: 120px;
             background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1);
@@ -112,7 +113,7 @@
                     <span class="text-orange-500 block">AI RECEPTIONIST</span>
                 </h1>
                 <p class="text-slate-400 text-sm mb-10 max-w-sm">Deploy an automated voice expert in 6 steps. Zero human interaction required.</p>
-                <button id="mainActionBtn" onmouseenter="playClick()" onclick="handleStep(1)" class="orange-btn px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin 6-Step Activation</button>
+                <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin 6-Step Activation</button>
             </div>
 
             <div class="lg:col-span-2">
@@ -126,7 +127,7 @@
                         </div>
                     </div>
                     <div id="timer" class="text-xl font-mono font-black text-white mb-6">23:59:59</div>
-                    <button onmouseenter="playClick()" onclick="handleStep(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
+                    <button onclick="handleStep(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
                 </div>
             </div>
         </div>
@@ -134,12 +135,12 @@
         <div id="stepsSection" class="mt-20">
             <h3 class="text-center text-[12px] uppercase footer-glow mb-8">AI RECEPTIONIST ACTIVATION STEPS</h3>
             <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-                <div id="s1" class="step-card unlocked next-focus" onmouseenter="playClick()" onclick="handleStep(1)"><p class="text-[8px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
-                <div id="s2" class="step-card" onmouseenter="playClick()" onclick="handleStep(2)"><p class="text-[8px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
-                <div id="s3" class="step-card" onmouseenter="playClick()" onclick="handleStep(3)"><p class="text-[8px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase">Sync</p></div>
-                <div id="s4" class="step-card" onmouseenter="playClick()" onclick="handleStep(4)"><p class="text-[8px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase">Choose</p></div>
-                <div id="s5" class="step-card" onmouseenter="playClick()" onclick="handleStep(5)"><p class="text-[8px] font-black text-orange-500 flex items-center"><span class="status-dot animate-pulse"></span>05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase">Sandbox</p></div>
-                <div id="s6" class="step-card" onmouseenter="playClick()" onclick="handleStep(6)"><p class="text-[8px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase">Activate</p></div>
+                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[8px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
+                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[8px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
+                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[8px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase">Sync</p></div>
+                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[8px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase">Choose</p></div>
+                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[8px] font-black text-orange-500 flex items-center"><span class="status-dot animate-pulse"></span>05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase">Sandbox</p></div>
+                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[8px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase">Activate</p></div>
             </div>
         </div>
     </div>
@@ -160,11 +161,6 @@
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
         let completedSteps = 0; let currentIndustry = "";
 
-        // UI Sounds
-        const clickSound = new Audio("https://www.soundjay.com/buttons/button-16.mp3");
-        clickSound.volume = 0.15;
-        function playClick() { clickSound.cloneNode(true).play().catch(()=>{}); }
-
         function addLog(msg) {
             const content = document.getElementById('logContent');
             const div = document.createElement('div');
@@ -179,7 +175,7 @@
             document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
         }
 
-        function handleStep(s) { if(s === 1 || completedSteps >= s-1) { playClick(); triggerModal(s); } }
+        function handleStep(s) { if(s === 1 || completedSteps >= s-1) { triggerModal(s); } }
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
@@ -216,19 +212,26 @@
         function createBtn(txt, fn, cont) {
             const b = document.createElement('button');
             b.className = "w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition";
-            b.innerText = txt; b.onmouseenter = playClick; b.onclick = fn; cont.appendChild(b);
+            b.innerText = txt; b.onclick = fn; cont.appendChild(b);
         }
 
         function finish(s, v) {
-            completedSteps = s; playClick();
+            completedSteps = s;
             const el = document.getElementById(`v${s}`);
             el.innerText = v; el.classList.replace('text-white/30', 'text-white');
             document.getElementById(`s${s}`).classList.add('active');
+            
+            // Glow color shift logic
+            const greenIntensity = s * 30; // 0 to 180
+            const orangeIntensity = 249 - (s * 40);
+            document.documentElement.style.setProperty('--glow-color', `rgba(${orangeIntensity}, ${115 + (s*15)}, 22, 0.15)`);
+
             closeModal();
             if(s < 6) {
                 const n = s + 1;
                 document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus');
                 document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${n}`;
+                document.getElementById('stepsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
