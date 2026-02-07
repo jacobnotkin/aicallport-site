@@ -38,17 +38,15 @@
             letter-spacing: 0.4em; font-weight: 800;
         }
         
-        .orange-btn {
-            background: linear-gradient(90deg, #f97316, #ea580c);
-            transition: transform 0.2s; cursor: pointer;
-        }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); transition: transform 0.2s; cursor: pointer; }
+        .orange-btn:hover { filter: brightness(1.2); }
 
         .step-card {
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 15px; border-radius: 16px; transition: 0.4s; cursor: not-allowed; opacity: 0.4;
+            padding: 15px; border-radius: 16px; transition: 0.4s; cursor: not-allowed; opacity: 0.3;
         }
         .step-card.unlocked { opacity: 1; cursor: pointer; border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.05); }
-        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.15) !important; transform: translateY(-5px); }
+        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.15) !important; transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(249, 115, 22, 0.3); }
         
         @keyframes next-step-pulse {
             0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
@@ -56,24 +54,42 @@
         }
         .next-focus { animation: next-step-pulse 1.5s infinite ease-in-out; border-width: 2px; opacity: 1; cursor: pointer; }
 
-        /* SLOW TICKER BAR */
         .ticker-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 50px;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
             background: rgba(6, 8, 15, 0.95); backdrop-filter: blur(15px);
             border-top: 1px solid rgba(249, 115, 22, 0.2);
             display: flex; align-items: center; z-index: 100; overflow: hidden;
         }
-        /* SLOWED DOWN TO 60s for readability */
         .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        .timer-urgent { color: #ff4444 !important; text-shadow: 0 0 15px red; }
+        /* NEURAL LOG BOX */
+        .system-log {
+            position: fixed; bottom: 60px; left: 20px; width: 280px; height: 120px;
+            background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px; padding: 12px; font-family: monospace; font-size: 9px;
+            color: #64748b; z-index: 50; overflow-y: hidden;
+        }
+        .log-line { margin-bottom: 4px; border-left: 2px solid #f97316; padding-left: 6px; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
         #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; }
         .status-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 8px #22c55e; }
     </style>
 </head>
-<body>
+<body onmousemove="updateParallax(event)">
     <div class="bg-glow"></div>
+
+    <div class="system-log" id="logBox">
+        <div class="text-[8px] text-orange-500 font-black mb-2 flex justify-between uppercase">
+            <span>Neural Terminal</span>
+            <span class="animate-pulse">ONLINE</span>
+        </div>
+        <div id="logContent">
+            <div class="log-line">INITIALIZING KERNEL...</div>
+            <div class="log-line">AWAITING OPERATOR INPUT...</div>
+        </div>
+    </div>
 
     <div class="console-container">
         <div class="flex justify-between items-start mb-12">
@@ -96,7 +112,7 @@
                     <span class="text-orange-500 block">AI RECEPTIONIST</span>
                 </h1>
                 <p class="text-slate-400 text-sm mb-10 max-w-sm">Deploy an automated voice expert in 6 steps. Zero human interaction required.</p>
-                <button id="mainActionBtn" onclick="triggerModal(1)" class="orange-btn px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin 6-Step Activation</button>
+                <button id="mainActionBtn" onmouseenter="playClick()" onclick="handleStep(1)" class="orange-btn px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin 6-Step Activation</button>
             </div>
 
             <div class="lg:col-span-2">
@@ -110,7 +126,7 @@
                         </div>
                     </div>
                     <div id="timer" class="text-xl font-mono font-black text-white mb-6">23:59:59</div>
-                    <button onclick="triggerModal(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
+                    <button onmouseenter="playClick()" onclick="handleStep(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
                 </div>
             </div>
         </div>
@@ -118,19 +134,17 @@
         <div id="stepsSection" class="mt-20">
             <h3 class="text-center text-[12px] uppercase footer-glow mb-8">AI RECEPTIONIST ACTIVATION STEPS</h3>
             <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[8px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
-                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[8px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
-                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[8px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase">Sync</p></div>
-                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[8px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase">Choose</p></div>
-                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[8px] font-black text-orange-500 flex items-center"><span class="status-dot animate-pulse"></span>05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase">Sandbox</p></div>
-                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[8px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase">Activate</p></div>
+                <div id="s1" class="step-card unlocked next-focus" onmouseenter="playClick()" onclick="handleStep(1)"><p class="text-[8px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
+                <div id="s2" class="step-card" onmouseenter="playClick()" onclick="handleStep(2)"><p class="text-[8px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
+                <div id="s3" class="step-card" onmouseenter="playClick()" onclick="handleStep(3)"><p class="text-[8px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase">Sync</p></div>
+                <div id="s4" class="step-card" onmouseenter="playClick()" onclick="handleStep(4)"><p class="text-[8px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase">Choose</p></div>
+                <div id="s5" class="step-card" onmouseenter="playClick()" onclick="handleStep(5)"><p class="text-[8px] font-black text-orange-500 flex items-center"><span class="status-dot animate-pulse"></span>05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase">Sandbox</p></div>
+                <div id="s6" class="step-card" onmouseenter="playClick()" onclick="handleStep(6)"><p class="text-[8px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase">Activate</p></div>
             </div>
         </div>
     </div>
 
-    <div class="ticker-bar">
-        <div class="ticker-content" id="ticker"></div>
-    </div>
+    <div class="ticker-bar"><div class="ticker-content" id="ticker"></div></div>
 
     <div id="setupModal">
         <div class="bg-[#0f172a] border border-white/10 p-10 rounded-[40px] max-w-sm w-full text-center">
@@ -144,59 +158,56 @@
         const stripeLink = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
-        let currentIndustry = "";
-        let completedSteps = 0;
+        let completedSteps = 0; let currentIndustry = "";
 
-        function fillTicker() {
-            const locs = ["Miami", "London", "Austin", "Chicago", "NYC", "Toronto"];
-            const nics = ["Law Firm", "Plumbing", "Electrical", "Medical", "Agency"];
-            const ticker = document.getElementById('ticker');
-            let content = "";
-            for(let i=0; i<15; i++) {
-                const l = locs[Math.floor(Math.random()*locs.length)];
-                const n = nics[Math.floor(Math.random()*nics.length)];
-                content += `<span class="px-16 text-[10px] font-black text-orange-500 uppercase italic tracking-widest"> ⚡ SYSTEM ALERT: NEW ACTIVATION — ${n} AGENT DEPLOYED IN ${l} </span>`;
-            }
-            ticker.innerHTML = content + content;
+        // UI Sounds
+        const clickSound = new Audio("https://www.soundjay.com/buttons/button-16.mp3");
+        clickSound.volume = 0.15;
+        function playClick() { clickSound.cloneNode(true).play().catch(()=>{}); }
+
+        function addLog(msg) {
+            const content = document.getElementById('logContent');
+            const div = document.createElement('div');
+            div.className = "log-line";
+            div.innerText = `> ${msg.toUpperCase()}...`;
+            content.prepend(div);
+            if(content.children.length > 5) content.lastChild.remove();
         }
-        fillTicker();
 
-        document.addEventListener('mousemove', (e) => {
+        function updateParallax(e) {
             document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
             document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
-        });
-
-        function handleStep(s) {
-            if(s === 1 || completedSteps >= s-1) triggerModal(s);
         }
+
+        function handleStep(s) { if(s === 1 || completedSteps >= s-1) { playClick(); triggerModal(s); } }
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
             const c = document.getElementById('mContent');
             const t = document.getElementById('mTitle');
-            m.style.display = 'flex';
-            c.innerHTML = "";
+            m.style.display = 'flex'; c.innerHTML = "";
 
             if(step === 1) {
-                t.innerText = "Target Market";
-                ["United States", "UK", "Canada"].forEach(l => createBtn(l, () => finish(1, l), c));
+                t.innerText = "Market Selection";
+                ["United States", "UK", "Canada"].forEach(l => createBtn(l, () => { addLog(`Targeting ${l}`); finish(1, l); }, c));
             } else if(step === 2) {
-                t.innerText = "Industry";
-                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c));
+                t.innerText = "Neural Industry";
+                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; addLog(`Loading ${i} Data`); finish(2, i); }, c));
             } else if(step === 3) {
-                t.innerText = "Identity Sync";
-                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">Verify</button>`;
+                t.innerText = "Business Identity";
+                c.innerHTML = `<input id="bn" placeholder="ENTER NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">Verify</button>`;
             } else if(step === 4) {
-                t.innerText = "Neural Role";
-                ["Receptionist", "Dispatcher"].forEach(r => createBtn(r, () => finish(4, r), c));
+                t.innerText = "Agent Role";
+                ["Receptionist", "Lead Qualifier"].forEach(r => createBtn(r, () => { addLog(`Configuring ${r}`); finish(4, r); }, c));
             } else if(step === 5) {
-                t.innerText = "Voice Sandbox";
-                createBtn("Start Live Demo", runVoice, c);
+                t.innerText = "Sandbox Test";
+                createBtn("Initialize Demo", runVoice, c);
             } else if(step === 6) {
-                t.innerText = "Final Activation";
-                createBtn("Launch & Pay ($199)", () => { 
+                t.innerText = "Mainline Activation";
+                createBtn("Activate & Launch", () => { 
                     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#f97316', '#ffffff'] });
-                    finish(6, "ACTIVATED");
+                    addLog("ACTIVATING PIPELINE");
+                    finish(6, "ACTIVE");
                     setTimeout(() => window.open(stripeLink, '_blank'), 2000);
                 }, c);
             }
@@ -205,36 +216,39 @@
         function createBtn(txt, fn, cont) {
             const b = document.createElement('button');
             b.className = "w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition";
-            b.innerText = txt; b.onclick = fn; cont.appendChild(b);
+            b.innerText = txt; b.onmouseenter = playClick; b.onclick = fn; cont.appendChild(b);
         }
 
         function finish(s, v) {
-            completedSteps = s;
+            completedSteps = s; playClick();
             const el = document.getElementById(`v${s}`);
             el.innerText = v; el.classList.replace('text-white/30', 'text-white');
-            const card = document.getElementById(`s${s}`);
-            card.classList.add('active');
-            card.classList.remove('next-focus');
+            document.getElementById(`s${s}`).classList.add('active');
             closeModal();
             if(s < 6) {
-                const nextStep = s + 1;
-                const nextCard = document.getElementById(`s${nextStep}`);
-                nextCard.classList.add('unlocked', 'next-focus');
-                document.getElementById('stepsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${nextStep}`;
+                const n = s + 1;
+                document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus');
+                document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${n}`;
             }
         }
 
-        function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
+        function saveB() { const v = document.getElementById('bn').value; if(v) { addLog(`Syncing ${v}`); finish(3, v); } }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
         function runVoice() { 
             const id = assistants[currentIndustry];
-            if(!id) return alert("Select Industry first!");
+            if(!id) return alert("Industry Required");
+            addLog("VOICE LINK ESTABLISHED");
             if(window.vapiSDK) window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
-            closeModal();
-            finish(5, "DEMO RUNNING");
+            closeModal(); finish(5, "TESTING");
         }
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
+
+        // Ticker & Timer
+        const locs = ["Miami", "London", "Austin", "NYC", "Toronto"];
+        let tickerHtml = "";
+        for(let i=0; i<15; i++) {
+            tickerHtml += `<span class="px-16 text-[10px] font-black text-orange-500 uppercase italic"> ⚡ NEW DEPLOYMENT SUCCESSFUL IN ${locs[Math.floor(Math.random()*5)]} </span>`;
+        }
+        document.getElementById('ticker').innerHTML = tickerHtml + tickerHtml;
 
         setInterval(() => {
             const now = new Date();
@@ -245,6 +259,8 @@
             const s = Math.floor((diff % 60000) / 1000);
             document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }, 1000);
+
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
     </script>
 </body>
 </html>
