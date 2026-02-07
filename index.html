@@ -21,7 +21,7 @@
 
         .console-container {
             width: 92%; max-width: 1100px; background: rgba(10, 12, 18, 0.85);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; 
             padding: 20px; margin: 20px auto 140px auto; position: relative; z-index: 10;
         }
@@ -33,17 +33,17 @@
         }
         .glow-beta { display: inline-block; animation: beta-pulse 2s infinite ease-in-out; font-weight: 800; }
 
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); transition: transform 0.2s; cursor: pointer; }
-        .orange-btn:hover { filter: brightness(1.2); }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); transition: transform 0.2s; cursor: pointer; border: none; }
+        .orange-btn:active { transform: scale(0.95); }
 
         .step-card {
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 10px; border-radius: 10px; transition: 0.4s; cursor: not-allowed; opacity: 0.3;
+            padding: 12px; border-radius: 12px; transition: 0.4s; cursor: not-allowed; opacity: 0.3;
         }
         .step-card.unlocked { opacity: 1; cursor: pointer; border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.05); }
-        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.15) !important; transform: translateY(-2px); }
+        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.15) !important; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(249, 115, 22, 0.2); }
         .next-focus { animation: next-step-pulse 1.5s infinite ease-in-out; border-width: 2px; opacity: 1; cursor: pointer; }
-        @keyframes next-step-pulse { 0%, 100% { border-color: rgba(249, 115, 22, 0.3); } 50% { border-color: #f97316; } }
+        @keyframes next-step-pulse { 0%, 100% { border-color: rgba(249, 115, 22, 0.2); } 50% { border-color: #f97316; } }
 
         .ticker-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 35px;
@@ -55,20 +55,20 @@
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
         .system-log {
-            position: fixed; bottom: 45px; right: 15px; left: 15px; height: 85px;
+            position: fixed; bottom: 45px; right: 15px; left: 15px; height: 90px;
             background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; 
-            padding: 10px; font-family: monospace; font-size: 8px; z-index: 50; overflow: hidden;
+            padding: 12px; font-family: monospace; font-size: 8px; z-index: 50; overflow: hidden;
         }
         @media (min-width: 768px) { 
             .system-log { right: 25px; left: auto; width: 300px; height: 130px; font-size: 10px; bottom: 55px; } 
         }
 
-        .log-line { margin-bottom: 2px; border-left: 2px solid #f97316; padding-left: 6px; animation: slideIn 0.3s ease-out; color: #e2e8f0; }
+        .log-line { margin-bottom: 3px; border-left: 2px solid #f97316; padding-left: 8px; animation: slideIn 0.3s ease-out; color: #e2e8f0; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
-        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 15px; }
-        .status-dot { width: 5px; height: 5px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 4px; box-shadow: 0 0 6px #22c55e; }
+        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .status-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 8px #22c55e; }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
@@ -77,63 +77,63 @@
     <div class="system-log" id="logBox">
         <div class="text-[7px] md:text-[9px] text-orange-500 font-black mb-1 flex justify-between uppercase tracking-widest">
             <span>Neural Terminal</span>
-            <span class="animate-pulse">Active</span>
+            <span id="connectionState" class="animate-pulse">Active</span>
         </div>
         <div id="logContent">
-            <div class="log-line">KERNEL READY</div>
-            <div class="log-line">PORT SCANNING...</div>
+            <div class="log-line">KERNEL v5.0 ONLINE</div>
+            <div class="log-line">AWAITING MOBILE GESTURE...</div>
         </div>
     </div>
 
     <div class="console-container">
-        <div class="flex flex-col md:flex-row justify-between items-start mb-6 md:mb-12 gap-4">
+        <div class="flex flex-col md:flex-row justify-between items-start mb-8 md:mb-12 gap-4">
             <div>
                 <div class="flex items-center gap-2 mb-1">
-                    <div class="w-5 h-5 bg-orange-500 rounded-sm flex items-center justify-center text-[8px] font-black text-black italic">BETA</div>
-                    <span class="font-black italic text-base md:text-xl uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
+                    <div class="w-6 h-6 bg-orange-500 rounded-sm flex items-center justify-center text-[10px] font-black text-black italic">BETA</div>
+                    <span class="font-black italic text-lg md:text-xl uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
                 </div>
-                <div class="text-[6px] md:text-[8px] font-bold text-slate-500 uppercase tracking-widest italic">Automated System v5.0</div>
+                <div class="text-[7px] md:text-[8px] font-bold text-slate-500 uppercase tracking-widest italic">100% Automated Infrastructure</div>
             </div>
-            <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-full flex items-center gap-2">
-                <span class="text-[7px] font-black text-orange-500 uppercase animate-pulse">Sync Ready</span>
+            <div class="bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full flex items-center gap-2">
+                <span class="text-[8px] font-black text-orange-500 uppercase animate-pulse">Sync Ready</span>
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-5 gap-6 md:gap-12 items-center">
+        <div class="grid lg:grid-cols-5 gap-8 md:gap-12 items-center">
             <div class="lg:col-span-3 text-center md:text-left">
-                <h1 class="text-3xl md:text-5xl lg:text-6xl font-black italic uppercase leading-none mb-3 md:mb-6">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black italic uppercase leading-none mb-4 md:mb-6">
                     <span class="text-white block">INSTANT</span>
                     <span class="text-orange-500 block">AI RECEPTIONIST</span>
                 </h1>
-                <p class="text-slate-400 text-[10px] md:text-sm mb-5 md:mb-10 max-w-sm mx-auto md:mx-0">One-click deployment of autonomous voice agents.</p>
-                <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn w-full md:w-auto px-8 py-4 rounded-xl text-[9px] font-black uppercase tracking-widest italic">Begin Activation</button>
+                <p class="text-slate-400 text-xs md:text-sm mb-6 md:mb-10 max-w-sm mx-auto md:mx-0">Deploy an automated voice expert in 6 steps. Zero human interaction required.</p>
+                <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn w-full md:w-auto px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin Activation</button>
             </div>
 
             <div class="lg:col-span-2">
-                <div class="bg-black/50 border border-orange-500/40 rounded-2xl md:rounded-[40px] p-5 md:p-10 text-center relative overflow-hidden">
-                    <h3 class="glow-beta text-[9px] md:text-[12px] uppercase mb-2 tracking-widest">BETA OFFER</h3>
-                    <div class="flex flex-col items-center mb-3">
-                        <span class="text-slate-600 line-through text-xs md:text-lg font-bold opacity-50">$399 Regular</span>
+                <div class="bg-black/50 border-2 border-orange-500/50 rounded-3xl md:rounded-[40px] p-6 md:p-10 text-center relative overflow-hidden">
+                    <h3 class="glow-beta text-[10px] md:text-[12px] uppercase mb-4 tracking-widest">BETA SPECIAL</h3>
+                    <div class="flex flex-col items-center mb-4">
+                        <span class="text-slate-600 line-through text-sm md:text-lg font-bold opacity-50">$399 Regular</span>
                         <div class="flex items-baseline gap-1">
-                            <span class="text-4xl md:text-6xl font-black text-white">$199</span>
-                            <span class="text-orange-500 font-bold text-xs">/mo</span>
+                            <span class="text-5xl md:text-6xl font-black text-white">$199</span>
+                            <span class="text-orange-500 font-bold">/mo</span>
                         </div>
                     </div>
-                    <div id="timer" class="text-sm md:text-xl font-mono font-black text-white mb-4">23:59:59</div>
-                    <button onclick="handleStep(6)" class="orange-btn w-full py-3 rounded-lg text-[9px] font-black uppercase tracking-widest">Instant Activation</button>
+                    <div id="timer" class="text-lg md:text-xl font-mono font-black text-white mb-6">23:59:59</div>
+                    <button onclick="handleStep(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
                 </div>
             </div>
         </div>
 
-        <div id="stepsSection" class="mt-8 md:mt-20">
-            <h3 class="text-center text-[9px] md:text-[12px] uppercase font-bold text-white mb-6 tracking-[0.2em]">ACTIVATION PIPELINE</h3>
-            <div class="grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-4">
-                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[6px] md:text-[8px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[7px] md:text-[9px] text-white/30 font-bold uppercase">Select</p></div>
-                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[6px] md:text-[8px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[7px] md:text-[9px] text-white/30 font-bold uppercase">Select</p></div>
-                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[6px] md:text-[8px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[7px] md:text-[9px] text-white/30 font-bold uppercase">Sync</p></div>
-                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[6px] md:text-[8px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[7px] md:text-[9px] text-white/30 font-bold uppercase">Choose</p></div>
-                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[6px] md:text-[8px] font-black text-orange-500">05 DEMO</p><p id="v5" class="text-[7px] md:text-[9px] text-white/30 font-bold uppercase">Test</p></div>
-                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[6px] md:text-[8px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[7px] md:text-[9px] text-white/30 font-bold uppercase">Launch</p></div>
+        <div id="stepsSection" class="mt-12 md:mt-20">
+            <h3 class="text-center text-[10px] md:text-[12px] uppercase font-bold text-white mb-8 tracking-[0.3em]">ACTIVATION PIPELINE</h3>
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4">
+                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] md:text-[8px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[8px] md:text-[9px] text-white/30 font-bold uppercase">Select</p></div>
+                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] md:text-[8px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[8px] md:text-[9px] text-white/30 font-bold uppercase">Select</p></div>
+                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] md:text-[8px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[8px] md:text-[9px] text-white/30 font-bold uppercase">Sync</p></div>
+                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] md:text-[8px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[8px] md:text-[9px] text-white/30 font-bold uppercase">Choose</p></div>
+                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] md:text-[8px] font-black text-orange-500">05 LIVE DEMO</p><p id="v5" class="text-[8px] md:text-[9px] text-white/30 font-bold uppercase">Connect</p></div>
+                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] md:text-[8px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[8px] md:text-[9px] text-white/30 font-bold uppercase">Launch</p></div>
             </div>
         </div>
     </div>
@@ -141,34 +141,46 @@
     <div class="ticker-bar"><div class="ticker-content" id="ticker"></div></div>
 
     <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-6 md:p-10 rounded-2xl md:rounded-[40px] max-w-sm w-full text-center">
-            <h2 id="mTitle" class="text-base md:text-xl font-black uppercase text-white mb-4">Setup</h2>
-            <div id="mContent" class="grid gap-2"></div>
-            <button onclick="closeModal()" class="mt-4 text-[9px] text-slate-500 uppercase font-black">Back</button>
+        <div class="bg-[#0f172a] border border-white/10 p-8 md:p-10 rounded-3xl md:rounded-[40px] max-w-sm w-full text-center">
+            <h2 id="mTitle" class="text-lg md:text-xl font-black uppercase text-white mb-6">Setup</h2>
+            <div id="mContent" class="grid gap-3"></div>
+            <button onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black">Back to Console</button>
         </div>
     </div>
 
     <script>
         const stripeLink = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
-        const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
-        let completedSteps = 0; let currentIndustry = "";
+        const assistants = { 
+            "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", 
+            "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", 
+            "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", 
+            "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" 
+        };
+        
+        let completedSteps = 0; 
+        let currentIndustry = "";
 
+        // UI Logger
         function addLog(msg) {
             const content = document.getElementById('logContent');
             const div = document.createElement('div');
             div.className = "log-line";
             div.innerText = `> ${msg.toUpperCase()}`;
             content.prepend(div);
-            if(content.children.length > 4) content.lastChild.remove();
+            if(content.children.length > 5) content.lastChild.remove();
         }
 
+        // Parallax Effect
         function updateParallax(e) {
             document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
             document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
         }
 
-        function handleStep(s) { if(s === 1 || completedSteps >= s-1) { triggerModal(s); } }
+        // Logic Router
+        function handleStep(s) { 
+            if(s === 1 || completedSteps >= s-1) { triggerModal(s); } 
+        }
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
@@ -177,23 +189,24 @@
             m.style.display = 'flex'; c.innerHTML = "";
 
             if(step === 1) {
-                t.innerText = "Market";
-                ["USA", "UK", "CAN"].forEach(l => createBtn(l, () => { addLog(`Link: ${l}`); finish(1, l); }, c));
+                t.innerText = "Market Selection";
+                ["USA", "UK", "Canada"].forEach(l => createBtn(l, () => { addLog(`Targeting ${l}`); finish(1, l); }, c));
             } else if(step === 2) {
-                t.innerText = "Industry";
-                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; addLog(`Industry: ${i}`); finish(2, i); }, c));
+                t.innerText = "Neural Industry";
+                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; addLog(`Loading ${i} Data`); finish(2, i); }, c));
             } else if(step === 3) {
-                t.innerText = "Sync Identity";
-                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white mb-3 text-center font-black uppercase text-[10px]"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-lg font-black text-[9px]">Sync</button>`;
+                t.innerText = "Business Identity";
+                c.innerHTML = `<input id="bn" placeholder="ENTER NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase text-xs"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">Verify & Sync</button>`;
             } else if(step === 4) {
-                t.innerText = "Assign Role";
-                ["Receptionist", "Dispatcher"].forEach(r => createBtn(r, () => { addLog(`Role: ${r}`); finish(4, r); }, c));
+                t.innerText = "Agent Role";
+                ["Receptionist", "Lead Qualifier"].forEach(r => createBtn(r, () => { addLog(`Configuring ${r}`); finish(4, r); }, c));
             } else if(step === 5) {
-                t.innerText = "Live Sandbox";
-                createBtn("Start Demo Call", runVoice, c);
+                t.innerText = "Sandbox Test";
+                addLog("Awaiting Mic Trigger");
+                createBtn("Start Live Demo", runVoice, c);
             } else if(step === 6) {
-                t.innerText = "Pipeline Activation";
-                createBtn("Launch Agent ($199)", () => { 
+                t.innerText = "Mainline Activation";
+                createBtn("Activate Agent ($199)", () => { 
                     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#f97316', '#ffffff'] });
                     addLog("ACTIVATING PIPELINE");
                     finish(6, "ACTIVE");
@@ -204,7 +217,7 @@
 
         function createBtn(txt, fn, cont) {
             const b = document.createElement('button');
-            b.className = "w-full py-3 bg-white/5 hover:bg-orange-600 rounded-lg text-white font-black text-[9px] uppercase transition";
+            b.className = "w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition active:scale-95";
             b.innerText = txt; b.onclick = fn; cont.appendChild(b);
         }
 
@@ -215,6 +228,7 @@
             document.getElementById(`s${s}`).classList.add('active');
             document.getElementById(`s${s}`).classList.remove('next-focus');
             
+            // Glow Shift
             const orangeIntensity = 249 - (s * 40);
             document.documentElement.style.setProperty('--glow-color', `rgba(${orangeIntensity}, ${115 + (s*15)}, 22, 0.12)`);
 
@@ -223,23 +237,54 @@
                 const n = s + 1;
                 document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus');
                 document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${n}`;
+                document.getElementById('stepsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
         function saveB() { const v = document.getElementById('bn').value; if(v) { addLog(`Syncing ${v}`); finish(3, v); } }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
-        function runVoice() { 
+
+        // MOBILE SECURE VOICE LAUNCHER
+        async function runVoice() { 
             const id = assistants[currentIndustry];
-            if(!id) return alert("Industry Required");
-            addLog("VOICE LINK OPEN");
-            if(window.vapiSDK) window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
-            closeModal(); finish(5, "TESTING");
+            if(!id) return alert("Select Industry First");
+
+            addLog("WAKING MIC...");
+            
+            try {
+                // Mobile Browsers require a direct interaction to start Audio
+                if (window.AudioContext || window.webkitAudioContext) {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') await audioCtx.resume();
+                }
+
+                // Request Permissions
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                addLog("CONNECTING TO VAPI...");
+                
+                if(window.vapiSDK) {
+                    window.vapiSDK.run({ 
+                        apiKey: vapiApiKey, 
+                        assistant: id 
+                    });
+                    closeModal(); 
+                    finish(5, "TESTING");
+                } else {
+                    addLog("SDK NOT LOADED");
+                    alert("SDK is still loading. Please wait 2 seconds and try again.");
+                }
+            } catch (err) {
+                addLog("SECURE MIC REJECTED");
+                alert("Demo requires HTTPS and Microphone permission. Please check your settings.");
+            }
         }
 
+        // Ticker & Timer logic
         const locs = ["Miami", "London", "Austin", "NYC", "Toronto"];
         let tickerHtml = "";
         for(let i=0; i<15; i++) {
-            tickerHtml += `<span class="px-12 text-[8px] font-black text-orange-500 uppercase italic"> ⚡ NEW ACTIVATION IN ${locs[Math.floor(Math.random()*5)]} </span>`;
+            tickerHtml += `<span class="px-12 text-[8px] font-black text-orange-500 uppercase italic"> ⚡ NEW DEPLOYMENT SUCCESSFUL IN ${locs[Math.floor(Math.random()*5)]} </span>`;
         }
         document.getElementById('ticker').innerHTML = tickerHtml + tickerHtml;
 
@@ -253,6 +298,12 @@
             document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }, 1000);
 
+        // Security check for HTTPS
+        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+            addLog("WARNING: NON-HTTPS DETECTED");
+        }
+
+        // Load Vapi SDK
         (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
     </script>
 </body>
