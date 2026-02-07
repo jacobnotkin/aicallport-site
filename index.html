@@ -50,9 +50,6 @@
             transform: rotate(45deg); letter-spacing: 0.1em; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             display: flex; justify-content: center; align-items: center; line-height: 1; z-index: 10;
         }
-
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -137,6 +134,7 @@
     </div>
 
     <script>
+      // Vapi SDK Initialization
       (function (d, t) {
         var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
         g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
@@ -146,24 +144,32 @@
 
     <script>
         const vapiPublicApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
+        
+        // Industry-to-Agent ID Mapping
         const assistantLibrary = { 
-    "Wellness & Spa": "e95dca20-93f2-46f0-b014-3a885586fa65", // The working demo
-    "Electrical Contractor": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",        // Your new Dispatcher  
-    "Law Firm / Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f",// You can use the same ID for now!
-    "Plumbing Service": "e6dec738-840f-4932-85b4-421b2a7bdb0c"
-};
-        const countryList = ["United States", "United Kingdom", "Canada", "Australia", "UAE", "Singapore", "Germany"];
+            "Wellness & Spa": "e95dca20-93f2-46f0-b014-3a885586fa65",
+            "Electrical Contractor": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+            "Law Firm / Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f",
+            "Plumbing Service": "e6dec738-840f-4932-85b4-421b2a7bdb0c"
+        };
+
+        const countryList = ["United States", "United Kingdom", "Canada", "Australia", "UAE"];
         
         const industryList = [
-            { n: "Electrical Contractor", s: "LIVE" }, { n: "Hair & Nail Salon", s: "LIVE" },
-            { n: "Restaurant / Bistro", s: "LIVE" }, { n: "Car Rental Agency", s: "LIVE" },
-            { n: "Wellness & Spa", s: "LIVE" }, { n: "Dental Clinic", s: "LIVE" },
-            { n: "Real Estate Broker", s: "LIVE" }, { n: "Law Firm / Legal", s: "BETA" }
+            { n: "Electrical Contractor", s: "LIVE" }, 
+            { n: "Plumbing Service", s: "LIVE" },
+            { n: "Wellness & Spa", s: "LIVE" }, 
+            { n: "Law Firm / Legal", s: "LIVE" },
+            { n: "Hair & Nail Salon", s: "BETA" },
+            { n: "Restaurant / Bistro", s: "BETA" }, 
+            { n: "Car Rental Agency", s: "BETA" }
         ];
 
         const agentRoles = [
-            { n: "Inbound Receptionist", s: "LIVE" }, { n: "Appointment Booker", s: "LIVE" },
-            { n: "Emergency Dispatcher", s: "LIVE" }, { n: "Outbound Follow-up", s: "BETA" }
+            { n: "Inbound Receptionist", s: "LIVE" }, 
+            { n: "Emergency Dispatcher", s: "LIVE" }, 
+            { n: "Appointment Booker", s: "LIVE" }, 
+            { n: "Outbound Follow-up", s: "BETA" }
         ];
 
         const selections = { country: "", industry: "", business: "", phone: "", agent: "" };
@@ -229,22 +235,32 @@
 
         function startVoiceDemo() {
             const id = assistantLibrary[selections.industry];
-            if (!id) { alert("Demo currently available for 'Wellness & Spa'. Select it in Step 2 to test."); return; }
+            if (!id) { alert("Please select a LIVE industry in Step 2 first."); return; }
             window.vapiSDK.run({ apiKey: vapiPublicApiKey, assistant: id });
             closeM();
         }
 
         function launchDashboard() {
+            // LIVE STRIPE LINK INTEGRATED HERE
+            const stripePaymentLink = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
+            
+            // Open secure payment in new tab
+            window.open(stripePaymentLink, '_blank');
+
+            // Switch UI to Pending State
             closeM();
             document.getElementById('app-container').innerHTML = `
                 <div class="text-center py-12">
-                    <div class="mb-4 inline-flex items-center gap-2 px-4 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-green-500 text-[9px] font-black uppercase tracking-widest italic animate-pulse">● System Operational</div>
+                    <div class="mb-4 inline-flex items-center gap-2 px-4 py-1 bg-orange-500/10 border border-orange-500/20 rounded-full text-orange-500 text-[9px] font-black uppercase tracking-widest italic animate-pulse">● Port Activation Pending</div>
                     <h2 class="text-4xl font-black text-white mb-2 uppercase italic">${selections.business}</h2>
                     <p class="text-slate-500 text-[10px] mb-10 tracking-[0.4em] font-black uppercase italic">Operator Console v1.0</p>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                        <div class="bg-white/5 border border-white/10 p-6 rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-4 italic">Agent Role</p><p class="text-white font-black text-xs uppercase">${selections.agent}</p></div>
-                        <div class="bg-white/5 border border-white/10 p-6 rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-4 italic">Industry Hub</p><p class="text-white font-black text-xs uppercase">${selections.industry}</p></div>
-                        <div class="bg-white/5 border border-white/10 p-6 rounded-[30px]"><p class="text-[9px] font-black text-orange-500 uppercase mb-4 italic">Country Node</p><p class="text-white font-black text-xs uppercase">${selections.country}</p></div>
+                    <div class="max-w-md mx-auto bg-white/5 border border-white/10 p-8 rounded-[40px]">
+                        <p class="text-xs text-slate-400 leading-relaxed italic mb-6">
+                            Secure payment portal initialized. Your AI Voice node for <span class="text-white font-bold">${selections.industry}</span> will activate once the subscription is verified by Stripe.
+                        </p>
+                        <div class="flex justify-center opacity-30">
+                             <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" class="h-4 filter brightness-0 invert">
+                        </div>
                     </div>
                 </div>`;
         }
