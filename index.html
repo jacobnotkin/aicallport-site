@@ -21,17 +21,13 @@
             transition: background 1.5s ease;
         }
 
-        /* MOBILE FIX: Flexible width and reduced padding for small screens */
         .console-container {
             width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; 
-            padding: 25px; /* Reduced from 40px */
-            position: relative; z-index: 10; margin-bottom: 80px;
+            padding: 25px; position: relative; z-index: 10; margin-bottom: 80px;
         }
-        @media (min-width: 768px) {
-            .console-container { padding: 40px; border-radius: 40px; }
-        }
+        @media (min-width: 768px) { .console-container { padding: 40px; border-radius: 40px; } }
 
         @keyframes beta-pulse {
             0%, 100% { text-shadow: 0 0 15px #f97316; transform: scale(1); color: #fff; }
@@ -71,7 +67,6 @@
         .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* MOBILE FIX: Terminal size and position */
         .system-log {
             position: fixed; bottom: 50px; right: 15px; width: 260px; height: 110px;
             background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(12px);
@@ -85,7 +80,12 @@
             margin-bottom: 4px; border-left: 2px solid #f97316; padding-left: 8px; 
             animation: slideIn 0.3s ease-out; color: #e2e8f0;
         }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* VAPI BUTTON FIX FOR MOBILE */
+        #vapi-support-btn {
+            bottom: 180px !important; /* Moves it above the terminal/pricing */
+            right: 25px !important;
+        }
 
         #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .status-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 8px #22c55e; }
@@ -183,16 +183,9 @@
             if(content.children.length > 5) content.lastChild.remove();
         }
 
-        function updateParallax(e) {
-            document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
-            document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
-        }
-
         function handleStep(s) { 
-            // Browser Interaction Hint (Required for Mobile Voice)
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             if (AudioContext) { const ctx = new AudioContext(); if (ctx.state === 'suspended') ctx.resume(); }
-            
             if(s === 1 || completedSteps >= s-1) { triggerModal(s); } 
         }
 
@@ -239,10 +232,6 @@
             const el = document.getElementById(`v${s}`);
             el.innerText = v; el.classList.replace('text-white/30', 'text-white');
             document.getElementById(`s${s}`).classList.add('active');
-            
-            const orangeIntensity = 249 - (s * 40);
-            document.documentElement.style.setProperty('--glow-color', `rgba(${orangeIntensity}, ${115 + (s*15)}, 22, 0.15)`);
-
             closeModal();
             if(s < 6) {
                 const n = s + 1;
@@ -260,30 +249,31 @@
             if(!id) return alert("Industry Required");
             addLog("VOICE LINK ESTABLISHED");
             try {
-                // Mobile safety check
                 await navigator.mediaDevices.getUserMedia({ audio: true });
                 if(window.vapiSDK) {
                     window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
                     closeModal(); finish(5, "TESTING");
                 }
-            } catch(e) { alert("Microphone access is required for the demo."); }
+            } catch(e) { alert("Microphone access is required."); }
+        }
+
+        function updateParallax(e) {
+            document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
+            document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
         }
 
         const locs = ["Miami", "London", "Austin", "NYC", "Toronto"];
         let tickerHtml = "";
-        for(let i=0; i<15; i++) {
-            tickerHtml += `<span class="px-10 text-[9px] font-black text-orange-500 uppercase italic"> ⚡ NEW DEPLOYMENT SUCCESSFUL IN ${locs[Math.floor(Math.random()*5)]} </span>`;
-        }
+        for(let i=0; i<15; i++) tickerHtml += `<span class="px-10 text-[9px] font-black text-orange-500 uppercase italic"> ⚡ NEW DEPLOYMENT SUCCESSFUL IN ${locs[i%5]} </span>`;
         document.getElementById('ticker').innerHTML = tickerHtml + tickerHtml;
 
         setInterval(() => {
             const now = new Date();
-            const night = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
-            const diff = night - now;
-            const h = Math.floor(diff / 3600000);
-            const m = Math.floor((diff % 3600000) / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
-            document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            const diff = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
+            const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+            const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+            const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+            document.getElementById('timer').textContent = `${h}:${m}:${s}`;
         }, 1000);
 
         (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
