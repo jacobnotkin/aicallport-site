@@ -23,7 +23,7 @@
         .console-container {
             width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; padding: 40px;
-            position: relative; z-index: 10;
+            position: relative; z-index: 10; margin-bottom: 60px;
         }
 
         @keyframes beta-pulse {
@@ -49,12 +49,21 @@
         }
         .step-card.active { border-color: #f97316; background: rgba(249, 115, 22, 0.15); transform: translateY(-5px); }
         
-        /* Focus Animation for Next Step */
         @keyframes next-step-pulse {
             0%, 100% { border-color: rgba(255,255,255,0.1); box-shadow: 0 0 0px transparent; }
             50% { border-color: #f97316; box-shadow: 0 0 15px rgba(249, 115, 22, 0.3); }
         }
         .next-focus { animation: next-step-pulse 1.5s infinite ease-in-out; }
+
+        /* TICKER STYLES */
+        .ticker-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(249, 115, 22, 0.3);
+            display: flex; align-items: center; z-index: 100; overflow: hidden;
+        }
+        .ticker-content { display: flex; white-space: nowrap; animation: marquee 30s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
         .timer-urgent { color: #ff4444 !important; text-shadow: 0 0 15px red; }
         #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; }
@@ -117,6 +126,11 @@
         </div>
     </div>
 
+    <div class="ticker-bar">
+        <div class="ticker-content" id="ticker">
+            </div>
+    </div>
+
     <div id="setupModal">
         <div class="bg-[#0f172a] border border-white/10 p-10 rounded-[40px] max-w-sm w-full text-center">
             <h2 id="mTitle" class="text-xl font-black uppercase text-white mb-6">Setup</h2>
@@ -130,6 +144,22 @@
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
         let currentIndustry = "";
+
+        // Ticker Logic
+        const locations = ["Miami", "New York", "London", "Toronto", "Austin", "Chicago", "Los Angeles"];
+        const niches = ["Law Office", "Plumbing Co.", "Medical Center", "Electrician", "HVAC Pro"];
+        const ticker = document.getElementById('ticker');
+        
+        function fillTicker() {
+            let html = "";
+            for(let i=0; i<20; i++) {
+                const loc = locations[Math.floor(Math.random()*locations.length)];
+                const nic = niches[Math.floor(Math.random()*niches.length)];
+                html += `<span class="px-8 text-[9px] font-black text-orange-500 uppercase italic"> ⚡ NEW DEPLOYMENT: ${nic} IN ${loc} JUST ACTIVATED </span>`;
+            }
+            ticker.innerHTML = html + html; // Double for seamless loop
+        }
+        fillTicker();
 
         document.addEventListener('mousemove', (e) => {
             document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
@@ -195,19 +225,11 @@
             const card = document.getElementById(`s${s}`);
             card.classList.add('active');
             card.classList.remove('next-focus');
-            
             closeModal();
-
-            // Auto-scroll logic to next step
             if(s < 6) {
                 const nextStep = s + 1;
-                const nextCard = document.getElementById(`s${nextStep}`);
-                nextCard.classList.add('next-focus');
-                
-                // Smooth scroll to the step section
+                document.getElementById(`s${nextStep}`).classList.add('next-focus');
                 document.getElementById('stepsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Update Main Action Button Text
                 document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${nextStep}`;
             }
         }
