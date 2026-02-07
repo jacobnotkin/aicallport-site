@@ -5,17 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI CALL PORT | BETA Operator Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        :root { --mx: 50%; --my: 50%; }
+        
         body { 
             background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; 
-            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; margin: 0;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; 
+            padding: 20px; margin: 0; overflow-x: hidden;
+            position: relative;
         }
+
+        /* PARALLAX BACKGROUND LAYERS */
+        body::before {
+            content: ""; position: fixed; inset: -5%; z-index: -1;
+            background-image: 
+                radial-gradient(circle at var(--mx) var(--my), rgba(249, 115, 22, 0.07) 0%, transparent 40%),
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            transform: translate(calc((var(--mx) - 50%) * -0.02), calc((var(--my) - 50%) * -0.02));
+            transition: transform 0.1s ease-out;
+        }
+
         .console-container {
-            width: 100%; max-width: 1100px; background: rgba(255, 255, 255, 0.02);
+            width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.8);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 40px; padding: 40px;
             position: relative; z-index: 10;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
+
         .clickable { cursor: pointer !important; pointer-events: auto !important; position: relative; z-index: 50; }
         
         .orange-btn {
@@ -37,10 +58,9 @@
         }
         .glow-text { animation: pulse-glow 3s infinite ease-in-out; color: #f97316; }
 
-        /* BRIGHTER GLOW FOR FOOTER HEADLINE */
         .footer-glow {
             color: #fb923c;
-            text-shadow: 0 0 12px rgba(251, 146, 60, 0.4);
+            text-shadow: 0 0 12px rgba(251, 146, 60, 0.6);
             letter-spacing: 0.4em;
         }
         
@@ -67,6 +87,9 @@
             position: fixed; inset: 0; background: rgba(0,0,0,0.95);
             z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;
         }
+
+        .timer-urgent { color: #ff4444 !important; text-shadow: 0 0 10px rgba(255, 68, 68, 0.5); animation: pulse-fast 1s infinite; }
+        @keyframes pulse-fast { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
     </style>
 </head>
 <body>
@@ -125,7 +148,7 @@
 
                     <div class="bg-white/5 border border-white/10 rounded-xl py-2 px-4 inline-block mb-8">
                         <span class="text-[7px] text-slate-500 uppercase font-black block mb-1">Offer Expires In</span>
-                        <span id="timer" class="text-sm font-black text-white tracking-widest tracking-tighter font-mono">23:59:59</span>
+                        <span id="timer" class="text-sm font-black text-white tracking-widest font-mono">23:59:59</span>
                     </div>
 
                     <div class="space-y-3 mb-10 text-[9px] font-black text-slate-400 uppercase tracking-widest">
@@ -182,17 +205,26 @@
         };
         let currentIndustry = "";
 
-        // Countdown Timer Logic
+        // MOUSE TRACKING FOR PARALLAX
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            document.documentElement.style.setProperty('--mx', `${x}%`);
+            document.documentElement.style.setProperty('--my', `${y}%`);
+        });
+
         function startTimer() {
             const timerEl = document.getElementById('timer');
             setInterval(() => {
                 const now = new Date();
                 const night = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
                 const diff = night - now;
-                const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
-                const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-                const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-                timerEl.textContent = `${h}:${m}:${s}`;
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                timerEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                if (h === 0) timerEl.classList.add('timer-urgent');
+                else timerEl.classList.remove('timer-urgent');
             }, 1000);
         }
         startTimer();
@@ -224,7 +256,7 @@
                 createBtn("Start Live Demo", runVoice, c);
             } else if(step === 6) {
                 t.innerText = "Activation Pipeline";
-                createBtn("Launch & Bill BETA ($199)", launchStripe, c);
+                createBtn("Finalize & Launch", () => { fireConfetti(); finish(6, "ACTIVATED"); setTimeout(launchStripe, 2000); }, c);
             }
         }
 
@@ -239,6 +271,10 @@
             document.getElementById(`v${s}`).classList.replace('text-white/30', 'text-white');
             document.getElementById(`s${s}`).classList.add('active');
             closeModal();
+        }
+
+        function fireConfetti() {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#f97316', '#ffffff', '#ea580c'] });
         }
 
         function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
