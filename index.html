@@ -1,4 +1,4 @@
-a<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -22,7 +22,8 @@ a<!DOCTYPE html>
         }
 
         .console-container {
-            width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.9);
+            width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; padding: 40px;
             position: relative; z-index: 10; margin-bottom: 80px;
         }
@@ -57,22 +58,29 @@ a<!DOCTYPE html>
 
         .ticker-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
-            background: rgba(6, 8, 15, 0.95); backdrop-filter: blur(15px);
+            background: rgba(6, 8, 15, 0.9); backdrop-filter: blur(15px);
             border-top: 1px solid rgba(249, 115, 22, 0.2);
             display: flex; align-items: center; z-index: 100; overflow: hidden;
         }
         .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* NEURAL TERMINAL - MOVED TO BOTTOM RIGHT */
+        /* REFINED GLASS TERMINAL */
         .system-log {
-            position: fixed; bottom: 60px; right: 20px; width: 280px; height: 120px;
-            background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px; padding: 12px; font-family: monospace; font-size: 9px;
-            color: #64748b; z-index: 50; overflow-y: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: fixed; bottom: 60px; right: 25px; width: 300px; height: 130px;
+            background: rgba(15, 23, 42, 0.4); /* Glass tint */
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 16px; font-family: monospace; font-size: 10px;
+            color: #94a3b8; z-index: 50; overflow-y: hidden;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
         }
-        .log-line { margin-bottom: 4px; border-left: 2px solid #f97316; padding-left: 6px; animation: slideIn 0.3s ease-out; }
+        .log-line { 
+            margin-bottom: 6px; border-left: 2px solid #f97316; padding-left: 8px; 
+            animation: slideIn 0.3s ease-out; color: #e2e8f0;
+            text-shadow: 0 0 8px rgba(249, 115, 22, 0.2);
+        }
         @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
         #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; }
@@ -83,13 +91,13 @@ a<!DOCTYPE html>
     <div class="bg-glow"></div>
 
     <div class="system-log" id="logBox">
-        <div class="text-[8px] text-orange-500 font-black mb-2 flex justify-between uppercase">
+        <div class="text-[9px] text-orange-500 font-black mb-3 flex justify-between uppercase tracking-widest">
             <span>Neural Terminal</span>
-            <span class="animate-pulse">ONLINE</span>
+            <span class="animate-pulse flex items-center gap-1"><span class="status-dot"></span>Active</span>
         </div>
         <div id="logContent">
             <div class="log-line">INITIALIZING KERNEL...</div>
-            <div class="log-line">AWAITING OPERATOR INPUT...</div>
+            <div class="log-line">SECURE PORT OPENED...</div>
         </div>
     </div>
 
@@ -166,7 +174,7 @@ a<!DOCTYPE html>
             const content = document.getElementById('logContent');
             const div = document.createElement('div');
             div.className = "log-line";
-            div.innerText = `> ${msg.toUpperCase()}...`;
+            div.innerText = `> ${msg.toUpperCase()}`;
             content.prepend(div);
             if(content.children.length > 5) content.lastChild.remove();
         }
@@ -262,256 +270,6 @@ a<!DOCTYPE html>
         }, 1000);
 
         (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI CALL PORT | BETA Operator Console</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; 
-            min-height: 100vh; display: flex; align-items: center; justify-content: center; 
-            padding: 20px; margin: 0; overflow-x: hidden; scroll-behavior: smooth;
-        }
-
-        .bg-glow {
-            position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.1) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
-        .console-container {
-            width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; padding: 40px;
-            position: relative; z-index: 10; margin-bottom: 80px;
-        }
-
-        @keyframes beta-pulse {
-            0%, 100% { text-shadow: 0 0 15px #f97316; transform: scale(1); color: #fff; }
-            50% { text-shadow: 0 0 30px #f97316, 0 0 45px #ea580c; transform: scale(1.05); color: #f97316; }
-        }
-        .glow-beta { display: inline-block; animation: beta-pulse 2s infinite ease-in-out; font-weight: 800; }
-
-        .footer-glow {
-            color: #fff;
-            text-shadow: 0 0 20px rgba(249, 115, 22, 1), 0 0 40px rgba(249, 115, 22, 0.6);
-            letter-spacing: 0.4em; font-weight: 800;
-        }
-        
-        .orange-btn {
-            background: linear-gradient(90deg, #f97316, #ea580c);
-            transition: transform 0.2s; cursor: pointer;
-        }
-
-        .step-card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 15px; border-radius: 16px; transition: 0.4s; cursor: not-allowed; opacity: 0.4;
-        }
-        .step-card.unlocked { opacity: 1; cursor: pointer; border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.05); }
-        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.15) !important; transform: translateY(-5px); }
-        
-        @keyframes next-step-pulse {
-            0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
-            50% { border-color: #f97316; box-shadow: 0 0 15px rgba(249, 115, 22, 0.2); }
-        }
-        .next-focus { animation: next-step-pulse 1.5s infinite ease-in-out; border-width: 2px; opacity: 1; cursor: pointer; }
-
-        /* SLOW TICKER BAR */
-        .ticker-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 50px;
-            background: rgba(6, 8, 15, 0.95); backdrop-filter: blur(15px);
-            border-top: 1px solid rgba(249, 115, 22, 0.2);
-            display: flex; align-items: center; z-index: 100; overflow: hidden;
-        }
-        /* SLOWED DOWN TO 60s for readability */
-        .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        .timer-urgent { color: #ff4444 !important; text-shadow: 0 0 15px red; }
-        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; }
-        .status-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 8px #22c55e; }
-    </style>
-</head>
-<body>
-    <div class="bg-glow"></div>
-
-    <div class="console-container">
-        <div class="flex justify-between items-start mb-12">
-            <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <div class="w-6 h-6 bg-orange-500 rounded-sm flex items-center justify-center text-[10px] font-black text-black italic">BETA</div>
-                    <span class="font-black italic text-xl uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
-                </div>
-                <div class="text-[8px] font-bold text-slate-500 uppercase tracking-widest italic">100% Automated System v5.0</div>
-            </div>
-            <div class="bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full flex items-center gap-2">
-                <span class="text-[8px] font-black text-orange-500 uppercase animate-pulse">Connection Ready</span>
-            </div>
-        </div>
-
-        <div class="grid lg:grid-cols-5 gap-12 items-center">
-            <div class="lg:col-span-3">
-                <h1 class="text-5xl font-black italic uppercase leading-none mb-6">
-                    <span class="text-white block">INSTANT</span>
-                    <span class="text-orange-500 block">AI RECEPTIONIST</span>
-                </h1>
-                <p class="text-slate-400 text-sm mb-10 max-w-sm">Deploy an automated voice expert in 6 steps. Zero human interaction required.</p>
-                <button id="mainActionBtn" onclick="triggerModal(1)" class="orange-btn px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin 6-Step Activation</button>
-            </div>
-
-            <div class="lg:col-span-2">
-                <div class="bg-black/50 border-2 border-orange-500/50 rounded-[40px] p-10 text-center relative overflow-hidden">
-                    <h3 class="glow-beta text-[12px] uppercase mb-4 tracking-widest">BETA SPECIAL</h3>
-                    <div class="flex flex-col items-center mb-4">
-                        <span class="text-slate-600 line-through text-lg font-bold opacity-50">$399 Regular</span>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-6xl font-black text-white">$199</span>
-                            <span class="text-orange-500 font-bold">/mo</span>
-                        </div>
-                    </div>
-                    <div id="timer" class="text-xl font-mono font-black text-white mb-6">23:59:59</div>
-                    <button onclick="triggerModal(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="stepsSection" class="mt-20">
-            <h3 class="text-center text-[12px] uppercase footer-glow mb-8">AI RECEPTIONIST ACTIVATION STEPS</h3>
-            <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[8px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
-                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[8px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
-                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[8px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase">Sync</p></div>
-                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[8px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase">Choose</p></div>
-                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[8px] font-black text-orange-500 flex items-center"><span class="status-dot animate-pulse"></span>05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase">Sandbox</p></div>
-                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[8px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase">Activate</p></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="ticker-bar">
-        <div class="ticker-content" id="ticker"></div>
-    </div>
-
-    <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-10 rounded-[40px] max-w-sm w-full text-center">
-            <h2 id="mTitle" class="text-xl font-black uppercase text-white mb-6">Setup</h2>
-            <div id="mContent" class="grid gap-3"></div>
-            <button onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black">Back to Console</button>
-        </div>
-    </div>
-
-    <script>
-        const stripeLink = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
-        const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
-        const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
-        let currentIndustry = "";
-        let completedSteps = 0;
-
-        function fillTicker() {
-            const locs = ["Miami", "London", "Austin", "Chicago", "NYC", "Toronto"];
-            const nics = ["Law Firm", "Plumbing", "Electrical", "Medical", "Agency"];
-            const ticker = document.getElementById('ticker');
-            let content = "";
-            for(let i=0; i<15; i++) {
-                const l = locs[Math.floor(Math.random()*locs.length)];
-                const n = nics[Math.floor(Math.random()*nics.length)];
-                content += `<span class="px-16 text-[10px] font-black text-orange-500 uppercase italic tracking-widest"> ⚡ SYSTEM ALERT: NEW ACTIVATION — ${n} AGENT DEPLOYED IN ${l} </span>`;
-            }
-            ticker.innerHTML = content + content;
-        }
-        fillTicker();
-
-        document.addEventListener('mousemove', (e) => {
-            document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
-            document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
-        });
-
-        function handleStep(s) {
-            if(s === 1 || completedSteps >= s-1) triggerModal(s);
-        }
-
-        function triggerModal(step) {
-            const m = document.getElementById('setupModal');
-            const c = document.getElementById('mContent');
-            const t = document.getElementById('mTitle');
-            m.style.display = 'flex';
-            c.innerHTML = "";
-
-            if(step === 1) {
-                t.innerText = "Target Market";
-                ["United States", "UK", "Canada"].forEach(l => createBtn(l, () => finish(1, l), c));
-            } else if(step === 2) {
-                t.innerText = "Industry";
-                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c));
-            } else if(step === 3) {
-                t.innerText = "Identity Sync";
-                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">Verify</button>`;
-            } else if(step === 4) {
-                t.innerText = "Neural Role";
-                ["Receptionist", "Dispatcher"].forEach(r => createBtn(r, () => finish(4, r), c));
-            } else if(step === 5) {
-                t.innerText = "Voice Sandbox";
-                createBtn("Start Live Demo", runVoice, c);
-            } else if(step === 6) {
-                t.innerText = "Final Activation";
-                createBtn("Launch & Pay ($199)", () => { 
-                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#f97316', '#ffffff'] });
-                    finish(6, "ACTIVATED");
-                    setTimeout(() => window.open(stripeLink, '_blank'), 2000);
-                }, c);
-            }
-        }
-
-        function createBtn(txt, fn, cont) {
-            const b = document.createElement('button');
-            b.className = "w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition";
-            b.innerText = txt; b.onclick = fn; cont.appendChild(b);
-        }
-
-        function finish(s, v) {
-            completedSteps = s;
-            const el = document.getElementById(`v${s}`);
-            el.innerText = v; el.classList.replace('text-white/30', 'text-white');
-            const card = document.getElementById(`s${s}`);
-            card.classList.add('active');
-            card.classList.remove('next-focus');
-            closeModal();
-            if(s < 6) {
-                const nextStep = s + 1;
-                const nextCard = document.getElementById(`s${nextStep}`);
-                nextCard.classList.add('unlocked', 'next-focus');
-                document.getElementById('stepsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${nextStep}`;
-            }
-        }
-
-        function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
-        function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
-        function runVoice() { 
-            const id = assistants[currentIndustry];
-            if(!id) return alert("Select Industry first!");
-            if(window.vapiSDK) window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
-            closeModal();
-            finish(5, "DEMO RUNNING");
-        }
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
-
-        setInterval(() => {
-            const now = new Date();
-            const night = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
-            const diff = night - now;
-            const h = Math.floor(diff / 3600000);
-            const m = Math.floor((diff % 3600000) / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
-            document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        }, 1000);
     </script>
 </body>
 </html>
