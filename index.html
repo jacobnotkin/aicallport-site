@@ -9,48 +9,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; } 
-        
         html, body { 
             overflow-x: hidden; width: 100%; position: relative;
             background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; 
             margin: 0; padding: 0;
         }
-
         body { 
             min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
             padding: 12px; scroll-behavior: smooth;
         }
-
-        @media (min-width: 1024px) {
-            body { justify-content: center; }
-        }
+        @media (min-width: 1024px) { body { justify-content: center; } }
 
         .bg-glow {
             position: fixed; inset: 0; z-index: -1;
-            background: 
-                radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.05) 0%, transparent 40%);
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%);
             pointer-events: none;
         }
 
         .console-container {
             width: 100%; max-width: 100%; 
-            background: rgba(10, 12, 18, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(10, 12, 18, 0.85); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px;
-            position: relative; z-index: 10;
-            margin-bottom: 20px; 
+            position: relative; z-index: 10; margin-bottom: 20px; 
         }
-
-        @media (min-width: 1024px) {
-            .console-container { max-width: 1100px; border-radius: 40px; padding: 40px; margin-bottom: 0; }
-        }
+        @media (min-width: 1024px) { .console-container { max-width: 1100px; border-radius: 40px; padding: 40px; } }
 
         .hero-title {
             background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
         .orange-btn { 
@@ -59,58 +45,21 @@
             cursor: pointer; position: relative; overflow: hidden;
         }
 
-        .orange-btn::after {
-            content: ''; position: absolute; top: -50%; left: -60%; width: 20%; height: 200%;
-            background: rgba(255, 255, 255, 0.2); transform: rotate(30deg);
-            transition: all 0.6s; pointer-events: none;
-        }
-
-        .orange-btn:hover::after { left: 120%; }
-
         .step-card {
-            background: rgba(255, 255, 255, 0.02); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); 
             padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s;
-            position: relative; overflow: hidden;
         }
-
-        .step-card.active::before {
-            content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(249, 115, 22, 0.1), transparent);
-            animation: scanline 2.5s infinite linear;
-        }
-
-        @keyframes scanline { 0% { top: -100%; } 100% { top: 100%; } }
-
+        .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
         @keyframes border-glow {
-            0%, 100% { border-color: rgba(249, 115, 22, 0.3); box-shadow: 0 0 5px rgba(249, 115, 22, 0.1); }
+            0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
             50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
         }
-
-        .next-focus { 
-            animation: border-glow 2s infinite ease-in-out !important; 
-            opacity: 1 !important; border-width: 2px !important;
-        }
-
-        .step-card.unlocked { opacity: 0.6; }
-        .step-card.active { 
-            border-color: #f97316 !important; 
-            background: rgba(249, 115, 22, 0.1) !important; 
-            opacity: 1 !important; transform: scale(1.02); 
-        }
+        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; opacity: 1 !important; }
 
         #setupModal { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
             z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; 
         }
-        
-        .modal-btn {
-            width: 100%; py: 12px; background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; color: white; font-weight: 800; font-size: 10px;
-            text-transform: uppercase; transition: 0.3s;
-        }
-        .modal-btn:hover { background: #f97316; border-color: #fff; }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
@@ -118,11 +67,9 @@
 
     <div class="console-container">
         <div class="flex justify-between items-center mb-6 lg:mb-12">
-            <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <div class="w-5 h-5 bg-orange-500 rounded-sm flex items-center justify-center text-[8px] font-black text-black">BETA</div>
-                    <span class="font-black italic text-base lg:text-xl uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
-                </div>
+            <div class="flex items-center gap-2">
+                <div class="w-5 h-5 bg-orange-500 rounded-sm flex items-center justify-center text-[8px] font-black text-black">BETA</div>
+                <span class="font-black italic text-base lg:text-xl uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
             </div>
             <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
                 <div class="w-1 h-1 bg-orange-500 rounded-full animate-pulse"></div>
@@ -133,8 +80,7 @@
         <div class="grid lg:grid-cols-5 gap-6 lg:gap-12 items-center">
             <div class="lg:col-span-3 text-center lg:text-left">
                 <h1 class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title">
-                    INSTANT SMALL BUSINESS<br>
-                    AI RECEPTIONIST
+                    INSTANT SMALL BUSINESS<br> AI RECEPTIONIST
                 </h1>
                 <p class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0">Empowering local firms with automated voice experts. Deploy in 6 steps.</p>
                 <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">Begin SMB Activation</button>
@@ -143,13 +89,29 @@
             <div class="lg:col-span-2">
                 <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-6 text-center">
                     <h3 class="text-[10px] uppercase mb-2 font-black text-orange-500">BETA SPECIAL</h3>
-                    <div class="flex flex-col items-center mb-2">
+                    <div class="flex flex-col items-center mb-4">
                         <span class="text-slate-600 line-through text-xs font-bold">$399 Regular</span>
                         <div class="flex items-baseline gap-1">
                             <span class="text-4xl lg:text-6xl font-black text-white">$199</span>
                             <span class="text-orange-500 font-bold">/mo</span>
                         </div>
                     </div>
+                    
+                    <div class="space-y-2 mb-6 text-left max-w-[180px] mx-auto">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-3 h-3 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                            <span class="text-[10px] font-black text-white uppercase">Unlimited Calling</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-3 h-3 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                            <span class="text-[10px] font-bold text-slate-300 uppercase">Pay Monthly</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-3 h-3 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                            <span class="text-[10px] font-bold text-slate-300 uppercase">No Contract</span>
+                        </div>
+                    </div>
+
                     <div id="timer" class="text-sm font-mono text-white/30 mb-4">00:00:00</div>
                     <button onclick="handleStep(1)" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic tracking-widest">Begin SMB Activation</button>
                 </div>
@@ -169,7 +131,7 @@
         </div>
     </div>
 
-    <div class="h-24 w-full block"></div>
+    <div class="h-24 w-full"></div>
 
     <div id="setupModal">
         <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
@@ -180,6 +142,7 @@
     </div>
 
     <script>
+        // ... (Keep existing script logic same as before)
         const stripeLink = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
@@ -191,79 +154,36 @@
         }
 
         function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
-
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
             const c = document.getElementById('mContent');
             const t = document.getElementById('mTitle');
             m.style.display = 'flex'; c.innerHTML = "";
-
-            if(step === 1) {
-                t.innerText = "Target Market";
-                ["United States", "UK", "Canada"].forEach(l => createBtn(l, () => finish(1, l), c));
-            } else if(step === 2) {
-                t.innerText = "SMB Industry";
-                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c));
-            } else if(step === 3) {
-                t.innerText = "Business Name";
-                c.innerHTML = `<input id="bn" placeholder="ENTER COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE ENTITY</button>`;
-            } else if(step === 4) {
-                t.innerText = "Agent Role";
-                ["Receptionist", "Lead Qualifier"].forEach(r => createBtn(r, () => finish(4, r), c));
-            } else if(step === 5) {
-                t.innerText = "Voice Sandbox";
-                createBtn("Start SMB Voice Test", runVoice, c);
-            } else if(step === 6) {
-                t.innerText = "Final Activation";
-                createBtn("Complete Activation", () => { 
-                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                    finish(6, "DONE");
-                    setTimeout(() => window.open(stripeLink, '_blank'), 1500);
-                }, c);
-            }
+            if(step === 1) { t.innerText = "Target Market"; ["United States", "UK", "Canada"].forEach(l => createBtn(l, () => finish(1, l), c)); }
+            else if(step === 2) { t.innerText = "SMB Industry"; Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c)); }
+            else if(step === 3) { t.innerText = "Business Name"; c.innerHTML = `<input id="bn" placeholder="ENTER COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE ENTITY</button>`; }
+            else if(step === 4) { t.innerText = "Agent Role"; ["Receptionist", "Lead Qualifier"].forEach(r => createBtn(r, () => finish(4, r), c)); }
+            else if(step === 5) { t.innerText = "Voice Sandbox"; createBtn("Start SMB Voice Test", runVoice, c); }
+            else if(step === 6) { t.innerText = "Final Activation"; createBtn("Complete Activation", () => { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); finish(6, "DONE"); setTimeout(() => window.open(stripeLink, '_blank'), 1500); }, c); }
         }
-
-        function createBtn(txt, fn, cont) {
-            const b = document.createElement('button');
-            b.className = "modal-btn py-3";
-            b.innerText = txt; b.onclick = fn; cont.appendChild(b);
-        }
-
+        function createBtn(txt, fn, cont) { const b = document.createElement('button'); b.className = "modal-btn py-3"; b.innerText = txt; b.onclick = fn; cont.appendChild(b); }
         function finish(s, v) {
-            completedSteps = s;
-            const el = document.getElementById(`v${s}`);
-            const card = document.getElementById(`s${s}`);
+            completedSteps = s; const el = document.getElementById(`v${s}`); const card = document.getElementById(`s${s}`);
             el.innerText = v; el.classList.replace('text-white/30', 'text-white');
-            card.classList.add('active');
-            card.classList.remove('next-focus');
-            closeModal();
-            if(s < 6) {
-                const n = s + 1;
-                document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus');
-                document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${n}`;
-            }
+            card.classList.add('active'); card.classList.remove('next-focus'); closeModal();
+            if(s < 6) { const n = s + 1; document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus'); document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${n}`; }
         }
-
         function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
-        
         async function runVoice() { 
             const id = assistants[currentIndustry] || assistants["Electrical"];
-            try {
-                await navigator.mediaDevices.getUserMedia({ audio: true });
-                if(window.vapiSDK) {
-                    window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
-                    closeModal(); finish(5, "ACTIVE");
-                }
-            } catch(e) { alert("Mic required for Small Business demo."); }
+            try { await navigator.mediaDevices.getUserMedia({ audio: true }); if(window.vapiSDK) { window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); closeModal(); finish(5, "ACTIVE"); } } 
+            catch(e) { alert("Mic required."); }
         }
-
         setInterval(() => {
-            const now = new Date();
-            const h = 23 - now.getHours(); const m = 59 - now.getMinutes(); const s = 59 - now.getSeconds();
+            const now = new Date(); const h = 23 - now.getHours(); const m = 59 - now.getMinutes(); const s = 59 - now.getSeconds();
             document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }, 1000);
-
         (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
     </script>
 </body>
