@@ -8,23 +8,27 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; } /* Prevents padding from pushing width beyond 100% */
+        * { box-sizing: border-box; } 
         
-        body { 
+        html, body { 
+            overflow-x: hidden; width: 100%; position: relative;
             background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; padding: 0;
+        }
+
+        body { 
             min-height: 100vh; display: flex; align-items: center; justify-content: center; 
-            padding: 12px; margin: 0; overflow-x: hidden; scroll-behavior: smooth;
+            padding: 12px; scroll-behavior: smooth;
         }
 
         .bg-glow {
             position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), var(--glow-color, rgba(249, 115, 22, 0.1)) 0%, transparent 60%);
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.1) 0%, transparent 60%);
             pointer-events: none;
         }
 
         .console-container {
-            width: 100%; 
-            max-width: 100%; /* Force fit on mobile */
+            width: 100%; max-width: 100%; 
             background: rgba(10, 12, 18, 0.85);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px;
@@ -35,37 +39,38 @@
             .console-container { max-width: 1100px; border-radius: 40px; padding: 40px; }
         }
 
-        /* Fixed Button stays centered and on top */
-        #vapi-support-btn, [class*="vapi-btn"] {
-            position: fixed !important;
-            bottom: 60px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            z-index: 9999 !important;
+        /* NEXT STEP GLOW ANIMATION */
+        @keyframes border-glow {
+            0%, 100% { border-color: rgba(249, 115, 22, 0.3); box-shadow: 0 0 5px rgba(249, 115, 22, 0.1); }
+            50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
         }
 
-        @keyframes beta-pulse {
-            0%, 100% { text-shadow: 0 0 15px #f97316; transform: scale(1); color: #fff; }
-            50% { text-shadow: 0 0 30px #f97316, 0 0 45px #ea580c; transform: scale(1.05); color: #f97316; }
+        .next-focus { 
+            animation: border-glow 2s infinite ease-in-out !important; 
+            opacity: 1 !important;
+            border-width: 2px !important;
         }
-        .glow-beta { display: inline-block; animation: beta-pulse 2s infinite ease-in-out; font-weight: 800; }
 
-        .footer-glow {
-            color: #fff;
-            text-shadow: 0 0 20px rgba(249, 115, 22, 1);
-            letter-spacing: 0.1em; font-weight: 800;
+        /* BUTTON BORDERS */
+        .orange-btn { 
+            background: linear-gradient(90deg, #f97316, #ea580c); 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer; 
         }
-        
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); cursor: pointer; }
 
         .step-card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.02); 
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Visible border for all cards */
             padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s;
         }
-        .step-card.unlocked { opacity: 1; border-color: rgba(255, 255, 255, 0.15); }
-        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; transform: scale(1.02); }
         
-        .next-focus { border: 2px solid #f97316; opacity: 1; box-shadow: 0 0 15px rgba(249, 115, 22, 0.2); }
+        .step-card.unlocked { opacity: 0.6; }
+        .step-card.active { 
+            border-color: #f97316 !important; 
+            background: rgba(249, 115, 22, 0.1) !important; 
+            opacity: 1 !important;
+            transform: scale(1.02); 
+        }
 
         .ticker-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
@@ -75,31 +80,20 @@
         .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* Desktop Only Terminal */
-        .system-log {
-            position: fixed; bottom: 60px; right: 25px; width: 300px; height: 130px;
-            background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px; padding: 16px; font-family: monospace; font-size: 10px;
-            color: #94a3b8; z-index: 50; overflow-y: hidden;
-        }
-        .log-line { margin-bottom: 6px; border-left: 2px solid #f97316; padding-left: 8px; color: #e2e8f0; }
-
         #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        
+        /* Modal Buttons with Borders */
+        .modal-btn {
+            width: 100%; py: 12px; background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; color: white; font-weight: 800; font-size: 10px;
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .modal-btn:hover { background: #f97316; border-color: #fff; }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
     <div class="bg-glow"></div>
-
-    <div class="system-log hidden lg:block" id="logBox">
-        <div class="text-[9px] text-orange-500 font-black mb-3 flex justify-between uppercase tracking-widest">
-            <span>Neural Terminal</span>
-            <span class="animate-pulse">● Active</span>
-        </div>
-        <div id="logContent">
-            <div class="log-line">INITIALIZING...</div>
-        </div>
-    </div>
 
     <div class="console-container">
         <div class="flex justify-between items-center mb-6 lg:mb-12">
@@ -126,7 +120,7 @@
 
             <div class="lg:col-span-2">
                 <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-6 text-center">
-                    <h3 class="glow-beta text-[10px] uppercase mb-2">BETA SPECIAL</h3>
+                    <h3 class="text-[10px] uppercase mb-2 font-black text-orange-500">BETA SPECIAL</h3>
                     <div class="flex flex-col items-center mb-2">
                         <span class="text-slate-600 line-through text-xs font-bold">$399 Regular</span>
                         <div class="flex items-baseline gap-1">
@@ -141,7 +135,7 @@
         </div>
 
         <div id="stepsSection" class="mt-10 lg:mt-20">
-            <h3 class="text-center text-[10px] footer-glow mb-6 uppercase">Activation Pipeline</h3>
+            <h3 class="text-center text-[10px] text-white font-black mb-6 uppercase tracking-widest">Activation Pipeline</h3>
             <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
                 <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
                 <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
@@ -159,7 +153,7 @@
         <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
             <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
             <div id="mContent" class="grid gap-3"></div>
-            <button onclick="closeModal()" class="mt-4 text-[10px] text-slate-500 uppercase">Back</button>
+            <button onclick="closeModal()" class="mt-4 text-[10px] text-slate-500 uppercase font-black">Back</button>
         </div>
     </div>
 
@@ -168,16 +162,6 @@
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
         let completedSteps = 0; let currentIndustry = "";
-
-        function addLog(msg) {
-            const content = document.getElementById('logContent');
-            if(!content) return;
-            const div = document.createElement('div');
-            div.className = "log-line";
-            div.innerText = `> ${msg.toUpperCase()}`;
-            content.prepend(div);
-            if(content.children.length > 5) content.lastChild.remove();
-        }
 
         function updateParallax(e) {
             document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
@@ -194,16 +178,16 @@
 
             if(step === 1) {
                 t.innerText = "Market";
-                ["United States", "UK", "Canada"].forEach(l => createBtn(l, () => { addLog(`Set ${l}`); finish(1, l); }, c));
+                ["United States", "UK", "Canada"].forEach(l => createBtn(l, () => finish(1, l), c));
             } else if(step === 2) {
                 t.innerText = "Industry";
-                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; addLog(`Set ${i}`); finish(2, i); }, c));
+                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c));
             } else if(step === 3) {
                 t.innerText = "Name";
-                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>`;
+                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>`;
             } else if(step === 4) {
                 t.innerText = "Role";
-                ["Receptionist", "Qualifier"].forEach(r => createBtn(r, () => { addLog(`Set ${r}`); finish(4, r); }, c));
+                ["Receptionist", "Qualifier"].forEach(r => createBtn(r, () => finish(4, r), c));
             } else if(step === 5) {
                 t.innerText = "Sandbox";
                 createBtn("Start Voice Call", runVoice, c);
@@ -219,15 +203,17 @@
 
         function createBtn(txt, fn, cont) {
             const b = document.createElement('button');
-            b.className = "w-full py-3 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition";
+            b.className = "modal-btn py-3";
             b.innerText = txt; b.onclick = fn; cont.appendChild(b);
         }
 
         function finish(s, v) {
             completedSteps = s;
             const el = document.getElementById(`v${s}`);
+            const card = document.getElementById(`s${s}`);
             el.innerText = v; el.classList.replace('text-white/30', 'text-white');
-            document.getElementById(`s${s}`).classList.add('active');
+            card.classList.add('active');
+            card.classList.remove('next-focus');
             closeModal();
             if(s < 6) {
                 const n = s + 1;
@@ -236,7 +222,7 @@
             }
         }
 
-        function saveB() { const v = document.getElementById('bn').value; if(v) { addLog(`Sync ${v}`); finish(3, v); } }
+        function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
         
         async function runVoice() { 
@@ -244,7 +230,7 @@
             try {
                 await navigator.mediaDevices.getUserMedia({ audio: true });
                 if(window.vapiSDK) {
-                    window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); 
+                    window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
                     closeModal(); finish(5, "ACTIVE");
                 }
             } catch(e) { alert("Mic required."); }
@@ -259,9 +245,7 @@
 
         setInterval(() => {
             const now = new Date();
-            const h = 23 - now.getHours();
-            const m = 59 - now.getMinutes();
-            const s = 59 - now.getSeconds();
+            const h = 23 - now.getHours(); const m = 59 - now.getMinutes(); const s = 59 - now.getSeconds();
             document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }, 1000);
 
