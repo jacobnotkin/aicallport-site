@@ -17,8 +17,12 @@
         }
 
         body { 
-            min-height: 100vh; display: flex; align-items: center; justify-content: center; 
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
             padding: 12px; scroll-behavior: smooth;
+        }
+
+        @media (min-width: 1024px) {
+            body { justify-content: center; }
         }
 
         .bg-glow {
@@ -35,10 +39,12 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px;
             position: relative; z-index: 10;
+            /* Added margin to clear the Vapi button on mobile */
+            margin-bottom: 100px; 
         }
 
         @media (min-width: 1024px) {
-            .console-container { max-width: 1100px; border-radius: 40px; padding: 40px; }
+            .console-container { max-width: 1100px; border-radius: 40px; padding: 40px; margin-bottom: 0; }
         }
 
         .hero-title {
@@ -51,9 +57,7 @@
         .orange-btn { 
             background: linear-gradient(90deg, #f97316, #ea580c); 
             border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer; 
-            position: relative;
-            overflow: hidden;
+            cursor: pointer; position: relative; overflow: hidden;
         }
 
         .orange-btn::after {
@@ -68,8 +72,7 @@
             background: rgba(255, 255, 255, 0.02); 
             border: 1px solid rgba(255, 255, 255, 0.1); 
             padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s;
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
 
         .step-card.active::before {
@@ -78,10 +81,7 @@
             animation: scanline 2.5s infinite linear;
         }
 
-        @keyframes scanline {
-            0% { top: -100%; }
-            100% { top: 100%; }
-        }
+        @keyframes scanline { 0% { top: -100%; } 100% { top: 100%; } }
 
         @keyframes border-glow {
             0%, 100% { border-color: rgba(249, 115, 22, 0.3); box-shadow: 0 0 5px rgba(249, 115, 22, 0.1); }
@@ -90,16 +90,14 @@
 
         .next-focus { 
             animation: border-glow 2s infinite ease-in-out !important; 
-            opacity: 1 !important;
-            border-width: 2px !important;
+            opacity: 1 !important; border-width: 2px !important;
         }
 
         .step-card.unlocked { opacity: 0.6; }
         .step-card.active { 
             border-color: #f97316 !important; 
             background: rgba(249, 115, 22, 0.1) !important; 
-            opacity: 1 !important;
-            transform: scale(1.02); 
+            opacity: 1 !important; transform: scale(1.02); 
         }
 
         #setupModal { 
@@ -114,6 +112,9 @@
             text-transform: uppercase; transition: 0.3s;
         }
         .modal-btn:hover { background: #f97316; border-color: #fff; }
+
+        /* Ensuring the Vapi widget doesn't hide behind UI */
+        .vapi-btn { z-index: 9999 !important; }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
@@ -172,6 +173,8 @@
         </div>
     </div>
 
+    <div class="h-24 w-full block lg:hidden"></div>
+
     <div id="setupModal">
         <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
             <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
@@ -191,9 +194,7 @@
             document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
         }
 
-        function handleStep(s) { 
-            if(s === 1 || completedSteps >= s-1) triggerModal(s); 
-        }
+        function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
