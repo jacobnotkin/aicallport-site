@@ -60,6 +60,26 @@
             position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
             z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; 
         }
+
+        .modal-btn { 
+            width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 10px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .modal-btn:hover { background: rgba(249, 115, 22, 0.1); border-color: #f97316; }
+
+        .dot-blink {
+            width: 6px; height: 6px; background-color: #22c55e;
+            border-radius: 50%; display: inline-block;
+            box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
@@ -72,7 +92,7 @@
                 <div class="px-1.5 py-0.5 bg-orange-500 rounded-sm flex items-center justify-center text-[8px] font-black text-black">BETA</div>
             </div>
             <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
-                <div class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                <div class="dot-blink"></div>
                 <span class="text-[7px] font-black text-orange-500 uppercase tracking-widest">Global Connection Active</span>
             </div>
         </div>
@@ -109,10 +129,6 @@
                             <svg class="w-3 h-3 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
                             <span class="text-[10px] font-bold text-slate-300 uppercase">Pay Monthly</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="w-3 h-3 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
-                            <span class="text-[10px] font-bold text-slate-300 uppercase">No Contract</span>
-                        </div>
                     </div>
 
                     <div id="timer" class="text-sm font-mono text-white/30 mb-4">00:00:00</div>
@@ -134,12 +150,10 @@
         </div>
     </div>
 
-    <div class="h-24 w-full"></div>
-
     <div id="setupModal">
         <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
             <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
-            <div id="mContent" class="grid gap-3"></div>
+            <div id="mContent" class="grid gap-3 max-h-[60vh] overflow-y-auto"></div>
             <button onclick="closeModal()" class="mt-4 text-[10px] text-slate-500 uppercase font-black">Back</button>
         </div>
     </div>
@@ -148,6 +162,10 @@
         const stripeLink = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
+        
+        const activeMarkets = ["United States", "UK", "Canada"];
+        const comingSoon = ["Australia", "Germany", "UAE"];
+
         let completedSteps = 0; let currentIndustry = "";
 
         function updateParallax(e) {
@@ -169,15 +187,60 @@
             const c = document.getElementById('mContent');
             const t = document.getElementById('mTitle');
             m.style.display = 'flex'; c.innerHTML = "";
-            if(step === 1) { t.innerText = "Target Market"; ["United States", "UK", "Canada", "EU", "Global Node"].forEach(l => createBtn(l, () => finish(1, l), c)); }
+            
+            if(step === 1) { 
+                t.innerText = "Target Market"; 
+                c.innerHTML = `<p class="text-[8px] font-black text-green-500 mb-1 uppercase text-left">Live Nodes</p>`;
+                activeMarkets.forEach(l => {
+                    const b = document.createElement('button');
+                    b.className = "modal-btn";
+                    b.innerHTML = `<div class="dot-blink"></div> ${l}`;
+                    b.onclick = () => finish(1, l);
+                    c.appendChild(b);
+                });
+                c.innerHTML += `<p class="text-[8px] font-black text-orange-500 mt-4 mb-1 uppercase text-left">Coming Soon</p>`;
+                comingSoon.forEach(l => {
+                    const b = document.createElement('button');
+                    b.className = "modal-btn opacity-60";
+                    b.innerText = l + " (Waitlist)";
+                    b.onclick = () => openWaitlist(l);
+                    c.appendChild(b);
+                });
+            }
             else if(step === 2) { t.innerText = "SMB Industry"; Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c)); }
-            else if(step === 3) { t.innerText = "Business Name"; c.innerHTML = `<input id="bn" placeholder="ENTER COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE ENTITY</button>`; }
+            else if(step === 3) { t.innerText = "Business Name"; c.innerHTML = `<input id="bn" placeholder="ENTER COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none focus:border-orange-500"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE ENTITY</button>`; }
             else if(step === 4) { t.innerText = "Agent Role"; ["Receptionist", "Lead Qualifier"].forEach(r => createBtn(r, () => finish(4, r), c)); }
             else if(step === 5) { t.innerText = "Automated Sandbox"; createBtn("Start Voice Call (No Humans)", runVoice, c); }
             else if(step === 6) { t.innerText = "Instant Deployment"; createBtn("Activate System Now", () => { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); finish(6, "DEPLOYED"); setTimeout(() => window.open(stripeLink, '_blank'), 1500); }, c); }
         }
 
-        function createBtn(txt, fn, cont) { const b = document.createElement('button'); b.className = "modal-btn py-3"; b.innerText = txt; b.onclick = fn; cont.appendChild(b); }
+        function openWaitlist(country) {
+            const c = document.getElementById('mContent');
+            const t = document.getElementById('mTitle');
+            t.innerText = country + " Waitlist";
+            c.innerHTML = `
+                <p class="text-[9px] text-slate-400 mb-4 uppercase font-bold">Node not active. Enter email to secure $199 Beta pricing for ${country}.</p>
+                <input id="wEmail" type="email" placeholder="BUSINESS EMAIL" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none focus:border-orange-500">
+                <button onclick="submitWaitlist('${country}')" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">RESERVE MY SPOT</button>
+            `;
+        }
+
+        function submitWaitlist(country) {
+            const email = document.getElementById('wEmail').value;
+            if(email.includes('@')) {
+                confetti({ particleCount: 40 });
+                document.getElementById('mContent').innerHTML = `<p class="text-white font-black uppercase text-[10px] p-6">REGISTRATION SUCCESSFUL.<br><br>Reserved for:<br><span class="text-orange-500">${email}</span></p>`;
+                setTimeout(closeModal, 2500);
+            } else { alert("Please enter a valid email."); }
+        }
+
+        function createBtn(txt, fn, cont) { 
+            const b = document.createElement('button'); 
+            b.className = "modal-btn"; 
+            b.innerText = txt; 
+            b.onclick = fn; 
+            cont.appendChild(b); 
+        }
 
         function finish(s, v) {
             completedSteps = s; 
@@ -186,13 +249,10 @@
             el.innerText = v; el.classList.replace('text-white/30', 'text-white');
             card.classList.add('active'); card.classList.remove('next-focus'); 
             closeModal();
-            
             if(s < 6) { 
                 const n = s + 1; 
                 document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus');
                 updateButtons(`Proceed to Step 0${n}`, n);
-            } else {
-                updateButtons("Activation Complete", null);
             }
         }
 
