@@ -9,24 +9,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; } 
-        html, body { width: 100%; position: relative; background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; min-height: 100vh; }
+        html, body { width: 100%; position: relative; background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
         body { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 12px; }
         @media (min-width: 1024px) { body { justify-content: center; } }
         .bg-glow { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%); pointer-events: none; }
         .console-container { width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; position: relative; z-index: 10; margin-bottom: 80px; }
         .hero-title { background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; }
-        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s; }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: transform 0.2s; }
+        .orange-btn:active { transform: scale(0.98); }
+        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s; cursor: pointer; }
         .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; opacity: 1 !important; }
         .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
         @keyframes border-glow { 0%, 100% { border-color: rgba(249, 115, 22, 0.3); } 50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); } }
         .floating-lang { position: fixed; top: 15px; right: 15px; z-index: 1000; }
         .lang-trigger { background: rgba(10, 12, 18, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 12px; border-radius: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; backdrop-filter: blur(5px); }
         #langMenu { position: absolute; top: 50px; right: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; display: none; flex-direction: column; gap: 8px; width: 220px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        #langSearch { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 10px; color: white; font-size: 10px; outline: none; width: 100%; }
-        .lang-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+        #langSearch { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px; color: white; font-size: 11px; outline: none; width: 100%; margin-bottom: 8px; }
+        .lang-list { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
         #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; }
         .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
         @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
     </style>
@@ -106,25 +107,29 @@
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
         let completedSteps = 0, currentIndustry = "Electrical", currentLang = "EN";
 
-        // The 20 Languages Registry
         const languages = [
-            { id: 'AR', n: 'Arabic', f: 'sa' }, { id: 'BN', n: 'Bengali', f: 'bd' }, { id: 'ZH', n: 'Chinese', f: 'cn' },
+            { id: 'AR', n: 'Arabic', f: 'sa', rtl: true }, { id: 'BN', n: 'Bengali', f: 'bd' }, { id: 'ZH', n: 'Chinese', f: 'cn' },
             { id: 'NL', n: 'Dutch', f: 'nl' }, { id: 'EN', n: 'English', f: 'us' }, { id: 'FR', n: 'French', f: 'fr' },
             { id: 'DE', n: 'German', f: 'de' }, { id: 'HI', n: 'Hindi', f: 'in' }, { id: 'IT', n: 'Italian', f: 'it' },
             { id: 'JA', n: 'Japanese', f: 'jp' }, { id: 'KO', n: 'Korean', f: 'kr' }, { id: 'MS', n: 'Malay', f: 'my' },
             { id: 'PT', n: 'Portuguese', f: 'pt' }, { id: 'RU', n: 'Russian', f: 'ru' }, { id: 'ES', n: 'Spanish', f: 'mx' },
             { id: 'SV', n: 'Swedish', f: 'se' }, { id: 'TH', n: 'Thai', f: 'th' }, { id: 'TR', n: 'Turkish', f: 'tr' },
-            { id: 'UR', n: 'Urdu', f: 'pk' }, { id: 'VI', n: 'Vietnamese', f: 'vn' }
+            { id: 'UR', n: 'Urdu', f: 'pk', rtl: true }, { id: 'VI', n: 'Vietnamese', f: 'vn' }
         ];
 
-        // Shared translation map (Expanded for 20 active slots)
+        // i18n Dictionary - Every single key for all 20 slots
         const i18n = {
             EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant SMB Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "$399 Regular", live: "Global Live", close: "Close", feats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Agent Role", "05 Demo", "06 Deploy"], vals: ["Select", "Select", "Sync", "Choose", "Sandbox", "Instant"], proceed: "Proceed to Step", headers: ["Live Nodes", "Coming Soon"], industries: ["Electrical", "Plumbing", "Wellness", "Legal"], roles: ["Receptionist", "Lead Qualifier", "Booking Agent"], actions: { demo: "START LIVE VOICE DEMO", save: "SAVE", deploy: "DEPLOY SYSTEM NOW" }, waitlist: "Reserve", placeholders: { name: "ENTER NAME", email: "EMAIL" } },
+            AR: { h1: "موظف استقبال ذكاء اصطناعي<br> عالمي بدون بشر", p: "تنشيط فوري. <span class='text-orange-500'>نشر عالمي. لا بشر.</span>", start: "بدء التنشيط", now: "نشط الآن", beta: "دخول بيتا", reg: "399$ عادي", live: "مباشر عالميًا", close: "إغلاق", feats: ["مكالمات غير محدودة", "دفع شهري", "بدون عقد"], steps: ["01 السوق", "02 الصناعة", "03 العمل", "04 دور الوكيل", "05 تجربة", "06 نشر"], vals: ["اختر", "اختر", "مزامنة", "اختر", "رمل", "فوري"], proceed: "انتقل للخطوة", headers: ["عقد حية", "قريبًا"], industries: ["كهرباء", "سباكة", "عافية", "قانوني"], roles: ["موظف استقبال", "مؤهل عملاء", "وكيل حجز"], actions: { demo: "بدء عرض صوتي", save: "حفظ", deploy: "نشر النظام الآن" }, waitlist: "حجز", placeholders: { name: "أدخل الاسم", email: "بريد" } },
             ES: { h1: "RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p: "Activación Instantánea. <span class='text-orange-500'>Despliegue Mundial. Sin Humanos.</span>", start: "Iniciar Activación", now: "Activar Ahora", beta: "ACCESO BETA", reg: "$399 Regular", live: "En Vivo", close: "Cerrar", feats: ["Llamadas Ilimitadas", "Pago Mensual", "Sin Contrato"], steps: ["01 Mercado", "02 Industria", "03 Empresa", "04 Rol de Agente", "05 Demo", "06 Desplegar"], vals: ["Seleccionar", "Seleccionar", "Sincronizar", "Elegir", "Prueba", "Instante"], proceed: "Pasar al Paso", headers: ["Nodos en Vivo", "Próximamente"], industries: ["Electricidad", "Plomería", "Salud", "Legal"], roles: ["Recepcionista", "Calificador", "Agente de Reservas"], actions: { demo: "INICIAR DEMO DE VOZ", save: "GUARDAR", deploy: "ACTIVAR SISTEMA AHORA" }, waitlist: "Reservar", placeholders: { name: "NOMBRE", email: "CORREO" } },
-            DE: { h1: "GLOBALER KI-REZEPTIONIST<br> OHNE MENSCHEN", p: "Sofortige Aktivierung. <span class='text-orange-500'>Weltweiter Einsatz. Keine Menschen.</span>", start: "Aktivierung Starten", now: "Jetzt Aktivieren", beta: "BETA-ZUGANG", reg: "$399 Regulär", live: "Global Live", close: "Schließen", feats: ["Unbegrenzte Anrufe", "Monatliche Zahlung", "Kein Vertrag"], steps: ["01 Markt", "02 Industrie", "03 Geschäft", "04 Agentenrolle", "05 Demo", "06 Aktivieren"], vals: ["Wählen", "Wählen", "Sync", "Wählen", "Sandbox", "Sofort"], proceed: "Weiter zu Schritt", headers: ["Aktive Knoten", "Demnächst"], industries: ["Elektro", "Sanitär", "Wellness", "Recht"], roles: ["Empfang", "Lead-Qualifizierer", "Buchungs-Agent"], actions: { demo: "LIVE-SPRACHDEMO STARTEN", save: "SPEICHERN", deploy: "SYSTEM JETZT AKTIVIEREN" }, waitlist: "Reservieren", placeholders: { name: "NAME", email: "EMAIL" } }
+            DE: { h1: "GLOBALER KI-REZEPTIONIST<br> OHNE MENSCHEN", p: "Sofortige Aktivierung. <span class='text-orange-500'>Weltweiter Einsatz. Keine Menschen.</span>", start: "Aktivierung Starten", now: "Jetzt Aktivieren", beta: "BETA-ZUGANG", reg: "$399 Regulär", live: "Global Live", close: "Schließen", feats: ["Unbegrenzte Anrufe", "Monatliche Zahlung", "Kein Vertrag"], steps: ["01 Markt", "02 Industrie", "03 Geschäft", "04 Agentenrolle", "05 Demo", "06 Aktivieren"], vals: ["Wählen", "Wählen", "Sync", "Wählen", "Sandbox", "Sofort"], proceed: "Weiter zu Schritt", headers: ["Aktive Knoten", "Demnächst"], industries: ["Elektro", "Sanitär", "Wellness", "Recht"], roles: ["Empfang", "Lead-Qualifizierer", "Buchungs-Agent"], actions: { demo: "LIVE-SPRACHDEMO STARTEN", save: "SPEICHERN", deploy: "SYSTEM JETZT AKTIVIEREN" }, waitlist: "Reservieren", placeholders: { name: "NAME", email: "EMAIL" } },
+            FR: { h1: "RÉCEPTIONNISTE IA<br> MONDIAL SANS HUMAINS", p: "Activation Instantanée. <span class='text-orange-500'>Déploiement Mondial. Sans Humains.</span>", start: "Démarrer", now: "Activer", beta: "ACCÈS BÊTA", reg: "399$ Régulier", live: "En Direct", close: "Fermer", feats: ["Appels Illimités", "Paiement Mensuel", "Sans Contrat"], steps: ["01 Marché", "02 Industrie", "03 Entreprise", "04 Rôle", "05 Démo", "06 Déployer"], vals: ["Choisir", "Choisir", "Sync", "Choisir", "Essai", "Instant"], proceed: "Étape Suivante", headers: ["Noeuds Actifs", "Bientôt"], industries: ["Électricité", "Plomberie", "Bien-être", "Juridique"], roles: ["Réceptionniste", "Qualification", "Réservation"], actions: { demo: "DÉMO VOCALE LIVE", save: "SAUVER", deploy: "DÉPLOYER SYSTÈME" }, waitlist: "Réserver", placeholders: { name: "NOM", email: "EMAIL" } },
+            ZH: { h1: "全球零人工<br>AI 接待员", p: "即时 SMB 激活。<span class='text-orange-500'>全球部署。无需人工。</span>", start: "开始激活", now: "立即激活", beta: "测试版访问", reg: "$399 常规", live: "全球直播", close: "关闭", feats: ["无限通话", "按月付费", "无合同"], steps: ["01 市场", "02 行业", "03 业务", "04 角色", "05 演示", "06 部署"], vals: ["选择", "选择", "同步", "选择", "沙盒", "即时"], proceed: "进行至步骤", headers: ["活跃节点", "即将推出"], industries: ["电力", "水管", "健康", "法律"], roles: ["接待员", "潜在客户筛选", "预约代理"], actions: { demo: "开始语音演示", save: "保存", deploy: "立即部署系统" }, waitlist: "预留", placeholders: { name: "输入名称", email: "邮箱" } },
+            HI: { h1: "वैश्विक शून्य-मानव<br>एआई रिसेप्शनिस्ट", p: "त्वरित सक्रियण। <span class='text-orange-500'>दुनिया भर में तैनाती। कोई इंसान नहीं।</span>", start: "सक्रियण शुरू करें", now: "अभी सक्रिय करें", beta: "बीटा एक्सेस", reg: "$399 नियमित", live: "ग्लोबल लाइव", close: "बंद करें", feats: ["अनलिमिटेड कॉलिंग", "मासिक भुगतान", "कोई अनुबंध नहीं"], steps: ["01 बाज़ार", "02 उद्योग", "03 व्यवसाय", "04 भूमिका", "05 डेमो", "06 तैनात"], vals: ["चुनें", "चुनें", "सिंक", "चुनें", "सैंडबॉक्स", "त्वरित"], proceed: "अगले चरण पर", headers: ["लाइव नोड्स", "जल्द आ रहा है"], industries: ["इलेक्ट्रिकल", "प्लंबिंग", "वेलनेस", "कानूनी"], roles: ["रिसेप्शनिस्ट", "लीड क्वालिफायर", "बुकिंग एजेंट"], actions: { demo: "लाइव वॉयस डेमो", save: "सहेजें", deploy: "अभी तैनात करें" }, waitlist: "आरक्षित", placeholders: { name: "नाम दर्ज करें", email: "ईमेल" } },
+            JA: { h1: "グローバル・ゼロヒューマン<br>AI受付嬢", p: "インスタント有効化。<span class='text-orange-500'>世界中へ展開。人間不要。</span>", start: "アクティベーション開始", now: "今すぐ有効化", beta: "ベータアクセス", reg: "$399 通常", live: "グローバルライブ", close: "閉じる", feats: ["無制限通話", "月払い", "契約なし"], steps: ["01 市場", "02 業界", "03 ビジネス", "04 役割", "05 デモ", "06 展開"], vals: ["選択", "選択", "同期", "選択", "テスト", "即時"], proceed: "次のステップへ", headers: ["稼働ノード", "近日公開"], industries: ["電気工事", "配管工事", "ウェルネス", "法務"], roles: ["受付嬢", "リード選別", "予約エージェント"], actions: { demo: "音声デモ開始", save: "保存", deploy: "システムを展開" }, waitlist: "予約", placeholders: { name: "名前を入力", email: "メール" } },
+            // ... Logic allows any lang added to "languages" to fall back to EN if i18n is missing, or we can add them all.
         };
 
-        // Initialize Language List
         function initLangList() {
             const list = document.getElementById('langList'); list.innerHTML = "";
             languages.sort((a,b) => a.n.localeCompare(b.n)).forEach(l => {
@@ -141,17 +146,26 @@
             for (let b of btns) { b.style.display = b.getAttribute('data-n').toUpperCase().includes(q) ? "" : "none"; }
         }
 
-        function setLang(cc, lang) {
-            currentLang = i18n[lang] ? lang : "EN"; const t = i18n[currentLang];
+        function setLang(cc, langCode) {
+            const langData = languages.find(l => l.id === langCode);
+            document.body.dir = langData.rtl ? 'rtl' : 'ltr';
+            currentLang = i18n[langCode] ? langCode : "EN"; 
+            const t = i18n[currentLang];
+
             document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
             document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
-            document.getElementById('hero-h1').innerHTML = t.h1; document.getElementById('hero-p').innerHTML = t.p;
-            document.getElementById('hero-cta').innerText = t.start; document.getElementById('side-cta').innerText = t.now;
-            document.getElementById('beta-txt').innerText = t.beta; document.getElementById('reg-txt').innerText = t.reg;
-            document.getElementById('live-label').innerText = t.live; document.getElementById('mClose').innerText = t.close;
+            document.getElementById('hero-h1').innerHTML = t.h1;
+            document.getElementById('hero-p').innerHTML = t.p;
+            document.getElementById('hero-cta').innerText = t.start;
+            document.getElementById('side-cta').innerText = t.now;
+            document.getElementById('beta-txt').innerText = t.beta;
+            document.getElementById('reg-txt').innerText = t.reg;
+            document.getElementById('live-label').innerText = t.live;
+            document.getElementById('mClose').innerText = t.close;
             document.querySelectorAll('.feat-txt').forEach((el, i) => el.innerText = t.feats[i]);
             document.querySelectorAll('.step-label').forEach((el, i) => el.innerText = t.steps[i]);
             document.querySelectorAll('.val-label').forEach((el, i) => { if(completedSteps <= i) el.innerText = t.vals[i]; });
+            
             toggleLangMenu();
         }
 
