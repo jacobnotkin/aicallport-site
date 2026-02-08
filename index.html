@@ -16,108 +16,75 @@
         }
         body { 
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
-            padding: 12px; padding-top: 80px; /* Space for nav */
+            padding: 12px; padding-top: 100px; /* Increased padding to make room for the flag bar */
         }
-        @media (min-width: 1024px) { body { justify-content: center; padding-top: 0; } }
+        @media (min-width: 1024px) { body { justify-content: center; } }
 
-        #vapi-support-sdk-root, .vapi-btn, [id*="vapi"] { z-index: 99999 !important; }
-
-        .bg-glow {
-            position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        .console-container {
-            width: 100%; max-width: 100%; 
-            background: rgba(10, 12, 18, 0.85); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px;
-            position: relative; z-index: 10; margin-bottom: 80px; 
-        }
-        @media (min-width: 1024px) { .console-container { max-width: 1100px; border-radius: 40px; padding: 40px; } }
-
-        .hero-title {
-            background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        /* NEW: HIGH VISIBILITY FLAG BAR */
+        .global-nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 70px;
+            z-index: 9999; background: rgba(10, 12, 18, 0.95);
+            border-bottom: 1px solid rgba(249, 115, 22, 0.3);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; backdrop-filter: blur(10px);
         }
 
-        .orange-btn { 
-            background: linear-gradient(90deg, #f97316, #ea580c); 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer; position: relative;
+        .lang-trigger {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 16px; border-radius: 99px; display: flex; align-items: center; gap: 10px;
+            cursor: pointer; transition: 0.3s;
+        }
+        .lang-trigger:hover { border-color: #f97316; background: rgba(249, 115, 22, 0.1); }
+
+        #langDropdown {
+            position: absolute; top: 75px; right: 24px; width: 220px;
+            background: #0f172a; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 8px; display: none; flex-direction: column; gap: 4px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 10000;
         }
 
-        .step-card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); 
-            padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s;
-        }
+        /* REST OF YOUR BASE STYLES */
+        .bg-glow { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%); pointer-events: none; }
+        .console-container { width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; position: relative; z-index: 10; margin-bottom: 80px; }
+        .hero-title { background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; position: relative; }
+        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s; }
         .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
-        @keyframes border-glow {
-            0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
-            50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
-        }
+        @keyframes border-glow { 0%, 100% { border-color: rgba(249, 115, 22, 0.3); } 50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); } }
         .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; opacity: 1 !important; }
-
-        #setupModal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
-            z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; 
-        }
-
-        .modal-btn { 
-            width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 10px;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;
-            display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
-        }
-
-        .dot-blink {
-            width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%;
-            animation: pulse-green 2s infinite; pointer-events: none;
-        }
-        @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
-
-        /* Language Switcher UI */
-        #langDropdown { transition: 0.2s ease-in-out; transform-origin: top right; }
-        .lang-option:hover { background: rgba(249, 115, 22, 0.15); }
+        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-btn { width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+        .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; pointer-events: none; }
+        @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
     <div class="bg-glow"></div>
 
-    <nav class="fixed top-0 left-0 w-full z-[100] px-6 py-4 flex justify-between items-center bg-[#06080f]/90 backdrop-blur-md border-b border-white/5">
+    <header class="global-nav">
         <div class="flex items-center gap-2">
-            <span class="font-black italic text-base lg:text-xl uppercase tracking-tighter text-white">AI CALL <span class="text-orange-500">PORT</span></span>
+            <span class="font-black italic text-lg lg:text-xl uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
         </div>
         
-        <div class="relative group">
-            <button onclick="document.getElementById('langDropdown').classList.toggle('hidden')" class="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full hover:border-orange-500 transition-all">
-                <img id="headerFlag" src="https://flagcdn.com/us.svg" class="w-5 rounded-sm" alt="Flag">
-                <span id="headerLangLabel" class="text-[9px] font-black uppercase tracking-widest text-white">US | EN</span>
-                <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+        <div class="relative">
+            <button onclick="toggleLang()" class="lang-trigger">
+                <img id="activeFlag" src="https://flagcdn.com/us.svg" class="w-5 rounded-sm" alt="Flag">
+                <span id="activeLangName" class="text-[10px] font-black text-white uppercase tracking-widest">US | EN</span>
             </button>
 
-            <div id="langDropdown" class="hidden absolute top-full right-0 mt-2 w-48 bg-[#0f172a] border border-white/10 rounded-2xl p-2 shadow-2xl">
-                <p class="text-[8px] font-black text-slate-500 p-2 uppercase">Select Node</p>
-                <div class="grid gap-1">
-                    <button onclick="setGlobalLocale('us', 'EN', 'United States')" class="lang-option flex items-center gap-3 w-full p-2 rounded-xl transition-all">
-                        <img src="https://flagcdn.com/us.svg" class="w-4" alt="US">
-                        <span class="text-[9px] font-bold text-white uppercase">United States (EN)</span>
-                    </button>
-                    <button onclick="setGlobalLocale('mx', 'ES', 'Mexico')" class="lang-option flex items-center gap-3 w-full p-2 rounded-xl transition-all">
-                        <img src="https://flagcdn.com/mx.svg" class="w-4" alt="MX">
-                        <span class="text-[9px] font-bold text-white uppercase">México (ES)</span>
-                    </button>
-                    <button onclick="setGlobalLocale('de', 'DE', 'Germany')" class="lang-option flex items-center gap-3 w-full p-2 rounded-xl transition-all">
-                        <img src="https://flagcdn.com/de.svg" class="w-4" alt="DE">
-                        <span class="text-[9px] font-bold text-white uppercase">Deutschland (DE)</span>
-                    </button>
-                </div>
+            <div id="langDropdown">
+                <button onclick="changeLocale('us', 'EN', 'United States')" class="modal-btn hover:bg-orange-500/20">
+                    <img src="https://flagcdn.com/us.svg" class="w-4"> USA (EN)
+                </button>
+                <button onclick="changeLocale('mx', 'ES', 'Mexico')" class="modal-btn hover:bg-orange-500/20">
+                    <img src="https://flagcdn.com/mx.svg" class="w-4"> MEXICO (ES)
+                </button>
+                <button onclick="changeLocale('de', 'DE', 'Germany')" class="modal-btn hover:bg-orange-500/20">
+                    <img src="https://flagcdn.com/de.svg" class="w-4"> GERMANY (DE)
+                </button>
             </div>
         </div>
-    </nav>
+    </header>
 
     <div class="console-container">
         <div class="flex justify-between items-center mb-6 lg:mb-12">
@@ -133,29 +100,25 @@
 
         <div class="grid lg:grid-cols-5 gap-6 lg:gap-12 items-center">
             <div class="lg:col-span-3 text-center lg:text-left">
-                <h1 id="heroTitle" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
-                <p id="heroSubtitle" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider">
+                <h1 id="heroH1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
+                <p id="heroP" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider">
                     Instant SMB Activation. <span class="text-orange-500">Worldwide Deployment. No Humans.</span>
                 </p>
-                <button onclick="handleStep(1)" id="heroBtn" class="sync-btn orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">Start Activation</button>
+                <button onclick="handleStep(1)" class="sync-btn orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic" id="mainCTA">Start Activation</button>
             </div>
 
             <div class="lg:col-span-2">
                 <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-6 text-center">
-                    <h3 id="pricingTitle" class="text-[10px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]">BETA ACCESS</h3>
+                    <h3 class="text-[10px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]">BETA ACCESS</h3>
                     <div class="flex flex-col items-center mb-4">
-                        <span id="regPrice" class="text-slate-600 line-through text-xs font-bold">$399 Regular</span>
+                        <span class="text-slate-600 line-through text-xs font-bold">$399 Regular</span>
                         <div class="flex items-baseline gap-1">
                             <span class="text-4xl lg:text-5xl font-black text-white">$199</span>
                             <span class="text-orange-500 font-bold">/mo</span>
                         </div>
                     </div>
-
-                    <div id="featuresList" class="space-y-2 mb-6 text-left max-w-[200px] mx-auto border-y border-white/5 py-4">
-                        </div>
-
                     <div id="timer" class="text-xs font-mono text-white/30 mb-4">00:00:00</div>
-                    <button onclick="handleStep(1)" id="activateBtn" class="sync-btn orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic">Activate Now</button>
+                    <button onclick="handleStep(1)" class="sync-btn orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic" id="sideCTA">Activate Now</button>
                 </div>
             </div>
         </div>
@@ -183,74 +146,38 @@
     <script>
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
-        let completedSteps = 0; let currentIndustry = ""; let currentLang = "EN";
+        let completedSteps = 0; let currentIndustry = "";
 
-        // TRANSLATION DATA
-        const translations = {
-            EN: {
-                hero: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST",
-                sub: "Instant SMB Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>",
-                start: "Start Activation",
-                activate: "Activate Now",
-                priceReg: "$399 Regular",
-                access: "BETA ACCESS",
-                features: ["Unlimited Calling", "Pay Monthly", "No Contract"],
-                proceed: "Proceed to Step"
-            },
-            ES: {
-                hero: "RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS",
-                sub: "Activación Instantánea. <span class='text-orange-500'>Despliegue Mundial. Sin Humanos.</span>",
-                start: "Iniciar Activación",
-                activate: "Activar Ahora",
-                priceReg: "$399 Regular",
-                access: "ACCESO BETA",
-                features: ["Llamadas Ilimitadas", "Pago Mensual", "Sin Contrato"],
-                proceed: "Pasar al Paso"
-            },
-            DE: {
-                hero: "GLOBALER KI-REZEPTIONIST<br> OHNE MENSCHEN",
-                sub: "Sofortige SMB-Aktivierung. <span class='text-orange-500'>Weltweiter Einsatz. Keine Menschen.</span>",
-                start: "Aktivierung Starten",
-                activate: "Jetzt Aktivieren",
-                priceReg: "$399 Regulär",
-                access: "BETA-ZUGANG",
-                features: ["Unbegrenzte Anrufe", "Monatliche Zahlung", "Kein Vertrag"],
-                proceed: "Weiter zu Schritt"
-            }
+        // MULTILINGUAL CONTENT
+        const langData = {
+            EN: { h: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant SMB Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", b: "Start Activation" },
+            ES: { h: "RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p: "Activación Instantánea. <span class='text-orange-500'>Despliegue Mundial. Sin Humanos.</span>", b: "Iniciar Activación" },
+            DE: { h: "GLOBALER KI-REZEPTIONIST<br> OHNE MENSCHEN", p: "Sofortige Aktivierung. <span class='text-orange-500'>Weltweiter Einsatz. Keine Menschen.</span>", b: "Aktivierung Starten" }
         };
 
-        function setGlobalLocale(flag, lang, countryName) {
-            currentLang = lang;
-            const t = translations[lang];
-            
-            // Update Header
-            document.getElementById('headerFlag').src = `https://flagcdn.com/${flag}.svg`;
-            document.getElementById('headerLangLabel').innerText = `${flag.toUpperCase()} | ${lang}`;
-            
-            // Update Hero
-            document.getElementById('heroTitle').innerHTML = t.hero;
-            document.getElementById('heroSubtitle').innerHTML = t.sub;
-            document.getElementById('heroBtn').innerText = t.start;
-            document.getElementById('activateBtn').innerText = t.activate;
-            
-            // Update Pricing Box
-            document.getElementById('pricingTitle').innerText = t.access;
-            document.getElementById('regPrice').innerText = t.priceReg;
-            
-            const featCont = document.getElementById('featuresList');
-            featCont.innerHTML = "";
-            t.features.forEach(f => {
-                const div = document.createElement('div');
-                div.className = "flex items-center gap-2";
-                div.innerHTML = `<svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span class="text-[10px] font-black text-white uppercase tracking-tighter">${f}</span>`;
-                featCont.appendChild(div);
-            });
-
-            // Close dropdown and Auto-set Step 1
-            document.getElementById('langDropdown').classList.add('hidden');
-            finish(1, `${countryName} (${lang})`);
+        function toggleLang() {
+            const d = document.getElementById('langDropdown');
+            d.style.display = (d.style.display === 'flex') ? 'none' : 'flex';
         }
 
+        function changeLocale(flag, lang, cName) {
+            // 1. Update Flag & Label
+            document.getElementById('activeFlag').src = `https://flagcdn.com/${flag}.svg`;
+            document.getElementById('activeLangName').innerText = `${flag.toUpperCase()} | ${lang}`;
+            
+            // 2. Translate Text
+            const content = langData[lang];
+            document.getElementById('heroH1').innerHTML = content.h;
+            document.getElementById('heroP').innerHTML = content.p;
+            document.getElementById('mainCTA').innerText = content.b;
+            document.getElementById('sideCTA').innerText = content.b;
+
+            // 3. Auto-Complete Step 1
+            finish(1, `${cName} (${lang})`);
+            toggleLang();
+        }
+
+        // BASE LOGIC (UNCHANGED)
         function updateParallax(e) {
             document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
             document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
@@ -271,10 +198,6 @@
                     const b = createBtn(l, () => finish(1, l));
                     b.innerHTML = `<div class="dot-blink"></div> <span>${l}</span>`;
                     c.appendChild(b);
-                });
-                createHeader("Coming Soon", "text-orange-500 mt-4", c);
-                ["Australia", "Germany", "UAE"].forEach(l => {
-                    c.appendChild(createBtn(l + " (Waitlist)", () => openWaitlist(l)));
                 });
             } else if (step === 2) {
                 t.innerText = "Industry";
@@ -321,12 +244,6 @@
             cont.appendChild(h);
         }
 
-        function openWaitlist(country) {
-            const c = document.getElementById('mContent');
-            c.innerHTML = `<p class="text-[9px] text-slate-400 mb-4 uppercase font-bold">Reserving $199 rate for ${country}</p><input id="wE" placeholder="EMAIL" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none"><button id="resBtn" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black">RESERVE</button>`;
-            document.getElementById('resBtn').onclick = closeModal;
-        }
-
         function finish(s, v) {
             completedSteps = s; 
             const el = document.getElementById(`v${s}`);
@@ -337,8 +254,7 @@
             if(s < 6) {
                 const next = s + 1;
                 document.getElementById(`s${next}`).classList.add('next-focus');
-                const btnText = translations[currentLang].proceed;
-                document.querySelectorAll('.sync-btn').forEach(btn => btn.innerText = `${btnText} 0${next}`);
+                document.querySelectorAll('.sync-btn').forEach(btn => btn.innerText = `Proceed to Step 0${next}`);
             }
         }
 
@@ -351,14 +267,10 @@
                 await navigator.mediaDevices.getUserMedia({ audio: true }); 
                 if(window.vapiSDK) { 
                     window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); 
-                    closeModal(); 
-                    finish(5, "ACTIVE"); 
+                    closeModal(); finish(5, "ACTIVE"); 
                 } 
-            } catch(e) { alert("Mic required for demo."); }
+            } catch(e) { alert("Mic required."); }
         }
-
-        // Initialize features on load
-        setGlobalLocale('us', 'EN', 'United States');
 
         setInterval(() => {
             const now = new Date(); const h = 23 - now.getHours(); const m = 59 - now.getMinutes(); const s = 59 - now.getSeconds();
