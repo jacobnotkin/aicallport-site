@@ -64,8 +64,23 @@
         .modal-btn { 
             width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 10px;
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .modal-btn:hover { background: rgba(249, 115, 22, 0.1); border-color: #f97316; }
+
+        /* Blinking Green Dot */
+        .dot-blink {
+            width: 6px; h-6px; height: 6px; width: 6px; background-color: #22c55e;
+            border-radius: 50%; display: inline-block;
+            box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
 
         .ticker-wrap {
             width: 100%; overflow: hidden; background: rgba(249, 115, 22, 0.05);
@@ -74,7 +89,6 @@
         }
         .ticker { display: inline-block; white-space: nowrap; animation: ticker 30s linear infinite; }
         .ticker-item { display: inline-block; padding: 0 2rem; font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
-        .ticker-item span { color: #f97316; margin-left: 4px; }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
     </style>
 </head>
@@ -88,7 +102,7 @@
                 <div class="px-1.5 py-0.5 bg-orange-500 rounded-sm flex items-center justify-center text-[8px] font-black text-black">BETA</div>
             </div>
             <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
-                <div class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                <div class="dot-blink"></div>
                 <span class="text-[7px] font-black text-orange-500 uppercase tracking-widest">Global Connection Active</span>
             </div>
         </div>
@@ -151,13 +165,13 @@
 
         <div class="ticker-wrap">
             <div class="ticker">
-                <div class="ticker-item">UPCOMING NODE: <span>AUSTRALIA</span></div>
-                <div class="ticker-item">UPCOMING NODE: <span>GERMANY</span></div>
-                <div class="ticker-item">UPCOMING NODE: <span>FRANCE</span></div>
-                <div class="ticker-item">UPCOMING NODE: <span>UAE</span></div>
-                <div class="ticker-item">UPCOMING NODE: <span>BRAZIL</span></div>
-                <div class="ticker-item">UPCOMING NODE: <span>JAPAN</span></div>
-                <div class="ticker-item">UPCOMING NODE: <span>AUSTRALIA</span></div>
+                <div class="ticker-item">UPCOMING NODE: Australia</div>
+                <div class="ticker-item">UPCOMING NODE: Germany</div>
+                <div class="ticker-item">UPCOMING NODE: France</div>
+                <div class="ticker-item">UPCOMING NODE: UAE</div>
+                <div class="ticker-item">UPCOMING NODE: Japan</div>
+                <div class="ticker-item">UPCOMING NODE: Brazil</div>
+                <div class="ticker-item">UPCOMING NODE: Australia</div>
             </div>
         </div>
     </div>
@@ -203,9 +217,15 @@
             if(step === 1) { 
                 t.innerText = "Target Market"; 
                 c.innerHTML = `<p class="text-[8px] font-black text-green-500 mb-2 uppercase">Live Nodes</p>`;
-                activeMarkets.forEach(l => createBtn(l, () => finish(1, l), c));
-                c.innerHTML += `<p class="text-[8px] font-black text-orange-500 mt-4 mb-2 uppercase">Coming Soon (Join Waitlist)</p>`;
-                comingSoon.forEach(l => createBtn(l + " (Soon)", () => openWaitlist(l), c));
+                activeMarkets.forEach(l => {
+                    const b = document.createElement('button');
+                    b.className = "modal-btn mb-2";
+                    b.innerHTML = `<div class="dot-blink"></div> ${l}`;
+                    b.onclick = () => finish(1, l);
+                    c.appendChild(b);
+                });
+                c.innerHTML += `<p class="text-[8px] font-black text-orange-500 mt-4 mb-2 uppercase">Coming Soon (Priority Waitlist)</p>`;
+                comingSoon.forEach(l => createBtn(l, () => openWaitlist(l), c));
             }
             else if(step === 2) { t.innerText = "SMB Industry"; Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c)); }
             else if(step === 3) { t.innerText = "Business Name"; c.innerHTML = `<input id="bn" placeholder="ENTER COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE ENTITY</button>`; }
@@ -219,9 +239,9 @@
             const t = document.getElementById('mTitle');
             t.innerText = "Priority Waitlist";
             c.innerHTML = `
-                <p class="text-[10px] text-slate-400 mb-4 uppercase font-bold">Secure the <span class="text-orange-500">$199 Beta Special</span> for ${country}. We will alert you the moment the node is live.</p>
+                <p class="text-[10px] text-slate-400 mb-4 uppercase font-bold">Secure the <span class="text-orange-500">$199 Beta Special</span> for ${country}. <br> We will inform you the moment the node is live.</p>
                 <input id="wEmail" type="email" placeholder="ENTER BUSINESS EMAIL" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black">
-                <button onclick="submitWaitlist('${country}')" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">LOCK IN SPECIAL PRICE</button>
+                <button onclick="submitWaitlist('${country}')" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">RESERVE MY NODE</button>
             `;
         }
 
@@ -229,9 +249,9 @@
             const email = document.getElementById('wEmail').value;
             if(email.includes('@')) {
                 confetti({ particleCount: 50 });
-                document.getElementById('mContent').innerHTML = `<p class="text-white font-black uppercase text-xs p-6">SUCCESS. <br><br> ${country} Node reserved for: <br> ${email}</p>`;
-                setTimeout(closeModal, 2500);
-            } else { alert("Valid email required."); }
+                document.getElementById('mContent').innerHTML = `<p class="text-white font-black uppercase text-xs p-6 tracking-widest">REGISTRATION SUCCESSFUL. <br><br> ${country} Node reserved for: <br> <span class="text-orange-500">${email}</span></p>`;
+                setTimeout(closeModal, 3000);
+            } else { alert("Please enter a valid email."); }
         }
 
         function createBtn(txt, fn, cont) { const b = document.createElement('button'); b.className = "modal-btn mb-2"; b.innerText = txt; b.onclick = fn; cont.appendChild(b); }
