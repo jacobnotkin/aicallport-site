@@ -34,7 +34,7 @@
             background: rgba(10, 12, 18, 0.85);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px;
-            position: relative; z-index: 10; margin-bottom: 80px;
+            position: relative; z-index: 10;
         }
 
         @media (min-width: 1024px) {
@@ -102,15 +102,10 @@
             transform: scale(1.02); 
         }
 
-        .ticker-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
-            background: rgba(6, 8, 15, 0.95); border-top: 1px solid rgba(249, 115, 22, 0.2);
-            display: flex; align-items: center; z-index: 100; overflow: hidden;
+        #setupModal { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
+            z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; 
         }
-        .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
         
         .modal-btn {
             width: 100%; py: 12px; background: rgba(255,255,255,0.05); 
@@ -177,8 +172,6 @@
         </div>
     </div>
 
-    <div class="ticker-bar"><div class="ticker-content" id="ticker"></div></div>
-
     <div id="setupModal">
         <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
             <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
@@ -199,7 +192,6 @@
         }
 
         function handleStep(s) { 
-            // Ensures both buttons now trigger the modal correctly based on progress
             if(s === 1 || completedSteps >= s-1) triggerModal(s); 
         }
 
@@ -268,13 +260,6 @@
                 }
             } catch(e) { alert("Mic required."); }
         }
-
-        const locs = ["Miami", "London", "Austin", "NYC", "Toronto"];
-        let tickerHtml = "";
-        for(let i=0; i<15; i++) {
-            tickerHtml += `<span class="px-10 text-[8px] font-black text-orange-500 italic uppercase"> ⚡ DEPLOYMENT SUCCESS: ${locs[Math.floor(Math.random()*5)]} </span>`;
-        }
-        document.getElementById('ticker').innerHTML = tickerHtml + tickerHtml;
 
         setInterval(() => {
             const now = new Date();
