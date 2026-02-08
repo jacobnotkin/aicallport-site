@@ -63,10 +63,17 @@
             z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; 
         }
 
+        .modal-scroll {
+            max-height: 60vh; overflow-y: auto; padding-right: 8px;
+        }
+        .modal-scroll::-webkit-scrollbar { width: 4px; }
+        .modal-scroll::-webkit-scrollbar-thumb { background: rgba(249, 115, 22, 0.5); border-radius: 10px; }
+
         .modal-btn { 
             width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 10px;
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;
             display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+            margin-bottom: 6px;
         }
         .modal-btn:hover { background: rgba(249, 115, 22, 0.1); border-color: #f97316; }
 
@@ -141,7 +148,7 @@
     <div id="setupModal">
         <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
             <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
-            <div id="mContent" class="flex flex-col gap-2"></div>
+            <div id="mContent" class="modal-scroll"></div>
             <button onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white transition-colors">Close</button>
         </div>
     </div>
@@ -150,6 +157,10 @@
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
         let completedSteps = 0; let currentIndustry = "";
+
+        // Market Lists
+        const activeCountries = ["Canada", "Chile", "France", "Germany", "Mexico", "Spain", "UAE", "UK", "United States"].sort();
+        const comingSoonCountries = ["Argentina", "Brazil", "India", "Italy", "Japan", "Norway", "South Korea", "Sweden", "Switzerland"].sort();
 
         function updateParallax(e) {
             document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
@@ -166,15 +177,15 @@
             
             if(step === 1) { 
                 t.innerText = "Target Market"; 
-                createHeader("Live Nodes", "text-green-500", c);
-                ["United States", "UK", "Canada"].forEach(l => {
+                createHeader("Live Activation Nodes", "text-green-500", c);
+                activeCountries.forEach(l => {
                     const b = createBtn(l, () => finish(1, l));
                     b.innerHTML = `<div class="dot-blink"></div> <span>${l}</span>`;
                     c.appendChild(b);
                 });
-                createHeader("Coming Soon", "text-orange-500 mt-4", c);
-                ["Australia", "Germany", "UAE"].forEach(l => {
-                    c.appendChild(createBtn(l + " (Waitlist)", () => openWaitlist(l, "Market")));
+                createHeader("Deploying Soon", "text-orange-500 mt-4", c);
+                comingSoonCountries.forEach(l => {
+                    c.appendChild(createBtn(l + " (Reserve)", () => openWaitlist(l, "Market")));
                 });
             } else if (step === 2) {
                 t.innerText = "Industry Vertical";
@@ -185,7 +196,7 @@
                     c.appendChild(b);
                 });
                 createHeader("In Training", "text-orange-500 mt-4", c);
-                ["Real Estate", "Medical", "Automotive"].forEach(i => {
+                ["Automotive", "Medical", "Real Estate"].sort().forEach(i => {
                     c.appendChild(createBtn(i + " (Request)", () => openWaitlist(i, "Industry")));
                 });
             } else if (step === 3) {
@@ -194,7 +205,7 @@
                 document.getElementById('saveBtn').onclick = saveB;
             } else if (step === 4) {
                 t.innerText = "Agent Role";
-                ["Receptionist", "Lead Qualifier", "Booking Agent"].forEach(r => {
+                ["Booking Agent", "Lead Qualifier", "Receptionist"].sort().forEach(r => {
                     c.appendChild(createBtn(r, () => finish(4, r)));
                 });
             } else if (step === 5) {
