@@ -3,140 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>AI CALL PORT | BETA Operator Console</title>
+    <title>AI CALL PORT | Operator Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        /* CRITICAL RESET: Stops the "Double Vision" layout bug */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         html, body { 
-            background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; 
-            margin: 0; padding: 0; overflow-x: hidden; width: 100%;
-            display: block; 
+            background: #06080f; 
+            color: #e2e8f0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            width: 100vw;
+            overflow-x: hidden;
+            display: block !important; /* Forces single-column mode */
         }
 
-        body { padding: 15px; min-height: 100vh; }
+        body { padding: 15px; min-height: 100vh; position: relative; }
 
         .bg-glow {
             position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), var(--glow-color, rgba(249, 115, 22, 0.1)) 0%, transparent 60%);
+            background: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.1) 0%, transparent 70%);
             pointer-events: none;
         }
 
-        .console-container {
-            width: 100%; max-width: 1100px; margin: 0 auto;
-            background: rgba(10, 12, 18, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; 
-            padding: 24px; position: relative; z-index: 10; margin-bottom: 80px;
+        /* Container focused for mobile first */
+        .console-wrap {
+            width: 100%;
+            max-width: 450px; /* Locked mobile width */
+            margin: 0 auto;
+            background: rgba(10, 12, 18, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 24px;
+            position: relative;
+            z-index: 10;
         }
 
         @media (min-width: 1024px) {
-            .console-container { padding: 40px; border-radius: 40px; }
+            .console-wrap { max-width: 1100px; padding: 40px; }
         }
 
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); cursor: pointer; touch-action: manipulation; }
+        .orange-btn { 
+            background: linear-gradient(90deg, #f97316, #ea580c); 
+            cursor: pointer; 
+            touch-action: manipulation; /* Fixes mobile lag */
+        }
         
         .step-card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 15px; border-radius: 16px; transition: 0.4s; opacity: 0.3;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px; border-radius: 12px; opacity: 0.3;
         }
-        .step-card.unlocked { opacity: 1; border-color: rgba(255, 255, 255, 0.15); }
-        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.15) !important; }
-        .next-focus { border: 2px solid #f97316; opacity: 1; }
+        .step-card.unlocked { opacity: 1; border-color: rgba(255, 255, 255, 0.2); }
+        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; }
 
+        /* MODAL FIX: The "Unclickable Role" Fix */
         #setupModal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
-            z-index: 9999; display: none; align-items: center; justify-content: center; 
-            padding: 20px; backdrop-filter: blur(10px);
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.98); 
+            z-index: 99999; /* Highest possible */
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+        }
+        
+        .modal-box {
+            background: #0f172a; 
+            border: 1px solid rgba(255,255,255,0.15); 
+            padding: 30px; 
+            border-radius: 24px; 
+            width: 100%; 
+            max-width: 320px; 
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0,0,0,1);
         }
 
+        /* Ticker Bar */
         .ticker-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
             background: #06080f; border-top: 1px solid rgba(249, 115, 22, 0.2);
-            z-index: 100; display: flex; align-items: center; overflow: hidden;
+            z-index: 50; display: flex; align-items: center; overflow: hidden;
         }
         .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        .system-log {
-            position: fixed; bottom: 60px; right: 20px; width: 250px; height: 100px;
-            background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px; padding: 12px; font-family: monospace; font-size: 8px;
-            color: #64748b; z-index: 50; display: none;
-        }
-        @media (min-width: 768px) { .system-log { display: block; } }
     </style>
 </head>
-<body onmousemove="updateParallax(event)">
+<body>
     <div class="bg-glow"></div>
 
-    <div class="system-log" id="logBox">
-        <div class="text-[8px] text-orange-500 font-black mb-2 flex justify-between uppercase">
-            <span>Neural Terminal</span>
-            <span class="animate-pulse">ONLINE</span>
-        </div>
-        <div id="logContent">
-            <div class="log-line">> STANDBY...</div>
-        </div>
-    </div>
-
-    <div class="console-container">
-        <div class="flex justify-between items-start mb-10">
-            <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <div class="px-2 py-0.5 bg-orange-500 rounded-sm text-[9px] font-black text-black italic">BETA</div>
-                    <span class="font-black italic text-lg uppercase tracking-tighter">AI CALL <span class="text-orange-500">PORT</span></span>
-                </div>
-                <div class="text-[7px] font-bold text-slate-500 uppercase tracking-widest italic">100% Automated System</div>
+    <div class="console-wrap">
+        <div class="mb-8">
+            <div class="flex items-center gap-2 mb-1">
+                <div class="px-2 py-0.5 bg-orange-500 rounded text-[9px] font-black text-black italic">BETA</div>
+                <span class="font-black italic text-lg uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
             </div>
+            <p class="text-[7px] text-slate-500 font-bold uppercase tracking-widest italic">Neural System v5.0</p>
         </div>
 
-        <div class="grid lg:grid-cols-5 gap-8 items-center">
-            <div class="lg:col-span-3 text-center lg:text-left">
-                <h1 class="text-3xl lg:text-6xl font-black italic uppercase leading-[0.9] mb-6">
-                    <span class="text-white">INSTANT</span><br>
-                    <span class="text-orange-500">AI RECEPTIONIST</span>
-                </h1>
-                <p class="text-slate-400 text-xs mb-8 max-w-xs mx-auto lg:mx-0">One-click deployment. Scalable voice infrastructure.</p>
-                <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn w-full lg:w-auto px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin Activation</button>
-            </div>
+        <div class="text-center lg:text-left mb-10">
+            <h1 class="text-4xl lg:text-6xl font-black italic uppercase leading-[0.9] mb-6">
+                <span class="text-white block">INSTANT</span>
+                <span class="text-orange-500 block">AI OPERATOR</span>
+            </h1>
+            <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn w-full lg:w-auto px-10 py-5 rounded-2xl text-[10px] font-black uppercase italic shadow-xl">Begin Activation</button>
+        </div>
 
-            <div class="lg:col-span-2">
-                <div class="bg-black/50 border-2 border-orange-500/30 rounded-[35px] p-8 text-center relative overflow-hidden">
-                    <h3 class="text-[10px] text-orange-500 font-black uppercase mb-4 tracking-widest">BETA ACCESS</h3>
-                    <div class="flex flex-col items-center mb-4">
-                        <span class="text-slate-600 line-through text-sm font-bold opacity-50">$399 Regular</span>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-black text-white">$199</span>
-                            <span class="text-orange-500 font-bold">/mo</span>
-                        </div>
-                    </div>
-                    <div id="timer" class="text-xl font-mono font-black text-white/40 mb-6">00:00:00</div>
-                    <button onclick="handleStep(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
+        <div class="bg-black/60 border border-orange-500/30 rounded-[30px] p-8 text-center mb-10">
+            <p class="text-[9px] text-orange-500 font-black mb-4 tracking-widest uppercase">Special Beta Access</p>
+            <div class="flex flex-col items-center mb-4">
+                <span class="text-slate-600 line-through text-xs font-bold">$399 Regular</span>
+                <div class="flex items-baseline gap-1 mt-1">
+                    <span class="text-5xl font-black text-white">$199</span>
+                    <span class="text-orange-500 font-bold">/mo</span>
                 </div>
             </div>
+            <div id="timer" class="text-xl font-mono text-white/30 mb-6">00:00:00</div>
+            <button onclick="handleStep(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase">Instant Activation</button>
         </div>
 
-        <div id="stepsSection" class="mt-16">
-            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
-                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500">01 REGION</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
-                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500">02 NICHE</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
-                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500">03 BRAND</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate">Sync</p></div>
-                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate">Choose</p></div>
-                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] font-black text-orange-500">05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate">Sandbox</p></div>
-                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] font-black text-orange-500">06 LAUNCH</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate">Activate</p></div>
-            </div>
+        <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+            <div id="s1" class="step-card unlocked" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
+            <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
+            <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500">03 BRAND</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate">Sync</p></div>
+            <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate">Choose</p></div>
+            <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] font-black text-orange-500">05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate">Sandbox</p></div>
+            <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] font-black text-orange-500">06 LAUNCH</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate">Activate</p></div>
         </div>
     </div>
 
     <div class="ticker-bar"><div class="ticker-content" id="ticker"></div></div>
 
     <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-10 rounded-[40px] max-w-sm w-full text-center shadow-2xl">
-            <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
+        <div class="modal-box">
+            <h2 id="mTitle" class="text-sm font-black uppercase text-white mb-6 tracking-widest">Setup</h2>
             <div id="mContent" class="grid gap-3"></div>
-            <button onclick="closeModal()" class="mt-8 text-[10px] text-slate-500 uppercase font-black">← Back to Console</button>
+            <button onclick="closeModal()" class="mt-8 text-[9px] text-slate-500 uppercase font-black">← Close Console</button>
         </div>
     </div>
 
@@ -145,19 +152,6 @@
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
         let completedSteps = 0; let currentIndustry = "";
-
-        function addLog(msg) {
-            const content = document.getElementById('logContent');
-            const div = document.createElement('div');
-            div.innerText = `> ${msg.toUpperCase()}`;
-            content.prepend(div);
-            if(content.children.length > 5) content.lastChild.remove();
-        }
-
-        function updateParallax(e) {
-            document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
-            document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
-        }
 
         function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
 
@@ -169,22 +163,22 @@
 
             if(step === 1) {
                 t.innerText = "Target Market";
-                ["USA", "UK", "Canada"].forEach(l => createBtn(l, () => { addLog(`Target: ${l}`); finish(1, l); }, c));
+                ["USA", "UK", "Canada"].forEach(l => createBtn(l, () => finish(1, l), c));
             } else if(step === 2) {
                 t.innerText = "Industry";
-                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; addLog(`Niche: ${i}`); finish(2, i); }, c));
+                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c));
             } else if(step === 3) {
                 t.innerText = "Business Name";
-                c.innerHTML = `<input id="bn" placeholder="ENTER NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">Sync Identity</button>`;
+                c.innerHTML = `<input id="bn" placeholder="ENTER NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase text-xs"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">SYNC IDENTITY</button>`;
             } else if(step === 4) {
-                t.innerText = "Agent Role";
-                ["Receptionist", "Qualifier"].forEach(r => createBtn(r, () => { addLog(`Role: ${r}`); finish(4, r); }, c));
+                t.innerText = "Choose Role";
+                ["Receptionist", "Qualifier"].forEach(r => createBtn(r, () => finish(4, r), c));
             } else if(step === 5) {
-                t.innerText = "Sandbox Sandbox";
+                t.innerText = "Demo Test";
                 createBtn("START LIVE CALL", runVoice, c);
             } else if(step === 6) {
-                t.innerText = "Finalize";
-                createBtn("Pay & Launch", () => { 
+                t.innerText = "Activation";
+                createBtn("FINALIZE & LAUNCH", () => { 
                     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                     finish(6, "ACTIVE");
                     setTimeout(() => window.open(stripeLink, '_blank'), 1500);
@@ -205,39 +199,27 @@
             document.getElementById(`s${s}`).classList.add('active');
             closeModal();
             if(s < 6) {
-                const n = s + 1;
-                document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus');
-                document.getElementById('mainActionBtn').innerText = `Next: Step 0${n}`;
+                document.getElementById(`s${s+1}`).classList.add('unlocked');
+                document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${s+1}`;
             }
         }
 
         function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
         
-        // MOBILE DEMO FIX: Force user-initiated audio context
         async function runVoice() { 
             const id = assistants[currentIndustry] || assistants["Electrical"];
-            addLog("REQUESTING AUDIO...");
-            
             try {
-                // This 'unlocks' the mic for iOS/Android
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                await navigator.mediaDevices.getUserMedia({ audio: true });
                 if(window.vapiSDK) {
                     window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
-                    addLog("VOICE PIPELINE CONNECTED");
-                    closeModal(); 
-                    finish(5, "TESTING");
+                    closeModal(); finish(5, "TESTING");
                 }
-            } catch(e) {
-                addLog("ERROR: MIC BLOCKED");
-                alert("Please allow microphone access to test the AI.");
-            }
+            } catch(e) { alert("Mic required."); }
         }
 
         let tickerHtml = "";
-        for(let i=0; i<15; i++) {
-            tickerHtml += `<span class="px-16 text-[9px] font-black text-orange-500 uppercase italic"> ⚡ SYSTEM ONLINE ⚡ DEPLOYMENT READY </span>`;
-        }
+        for(let i=0; i<15; i++) tickerHtml += `<span class="px-16 text-[9px] font-black text-orange-500 uppercase italic"> ⚡ SYSTEM ONLINE ⚡ DEPLOYMENT READY </span>`;
         document.getElementById('ticker').innerHTML = tickerHtml + tickerHtml;
 
         setInterval(() => {
