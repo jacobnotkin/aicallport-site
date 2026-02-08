@@ -11,14 +11,19 @@
         * { box-sizing: border-box; } 
         
         html, body { 
-            overflow: hidden; width: 100%; height: 100%; position: relative;
+            width: 100%; min-height: 100%; position: relative;
             background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; 
             margin: 0; padding: 0;
+            overflow-x: hidden;
         }
 
         body { 
-            display: flex; align-items: center; justify-content: center; 
-            padding: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
+            padding: 16px; 
+        }
+
+        @media (min-width: 1024px) {
+            body { justify-content: center; height: 100vh; overflow: hidden; }
         }
 
         .bg-glow {
@@ -68,8 +73,7 @@
             background: rgba(255, 255, 255, 0.02); 
             border: 1px solid rgba(255, 255, 255, 0.1); 
             padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s;
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
 
         .step-card.active::before {
@@ -78,10 +82,7 @@
             animation: scanline 2.5s infinite linear;
         }
 
-        @keyframes scanline {
-            0% { top: -100%; }
-            100% { top: 100%; }
-        }
+        @keyframes scanline { 0% { top: -100%; } 100% { top: 100%; } }
 
         @keyframes border-glow {
             0%, 100% { border-color: rgba(249, 115, 22, 0.3); box-shadow: 0 0 5px rgba(249, 115, 22, 0.1); }
@@ -98,11 +99,14 @@
         .step-card.active { 
             border-color: #f97316 !important; 
             background: rgba(249, 115, 22, 0.1) !important; 
-            opacity: 1 !important;
-            transform: scale(1.02); 
+            opacity: 1 !important; transform: scale(1.02); 
         }
 
-        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        #setupModal { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
+            z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px;
+            overflow-y: auto;
+        }
         
         .modal-btn {
             width: 100%; py: 12px; background: rgba(255,255,255,0.05); 
@@ -156,9 +160,9 @@
             </div>
         </div>
 
-        <div id="stepsSection" class="mt-10 lg:mt-20">
+        <div id="stepsSection" class="mt-8 lg:mt-20">
             <h3 class="text-center text-[10px] text-white font-black mb-6 uppercase tracking-widest">Activation Pipeline</h3>
-            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 pb-4">
                 <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
                 <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
                 <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate">Sync</p></div>
@@ -170,10 +174,10 @@
     </div>
 
     <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
+        <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center my-auto">
             <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
             <div id="mContent" class="grid gap-3"></div>
-            <button onclick="closeModal()" class="mt-4 text-[10px] text-slate-500 uppercase font-black">Back</button>
+            <button onclick="closeModal()" class="mt-8 mb-4 text-[10px] text-slate-500 uppercase font-black">Back to Console</button>
         </div>
     </div>
 
@@ -188,9 +192,7 @@
             document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
         }
 
-        function handleStep(s) { 
-            if(s === 1 || completedSteps >= s-1) triggerModal(s); 
-        }
+        function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
@@ -225,7 +227,7 @@
 
         function createBtn(txt, fn, cont) {
             const b = document.createElement('button');
-            b.className = "modal-btn py-3";
+            b.className = "modal-btn py-3 mb-1";
             b.innerText = txt; b.onclick = fn; cont.appendChild(b);
         }
 
