@@ -61,7 +61,12 @@
             z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; 
         }
 
-        /* Rolling Ticker for Upcoming Countries */
+        .modal-btn { 
+            width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 10px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; transition: 0.2s;
+        }
+        .modal-btn:hover { background: rgba(249, 115, 22, 0.1); border-color: #f97316; }
+
         .ticker-wrap {
             width: 100%; overflow: hidden; background: rgba(249, 115, 22, 0.05);
             border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 8px 0;
@@ -152,21 +157,15 @@
                 <div class="ticker-item">UPCOMING NODE: <span>UAE</span></div>
                 <div class="ticker-item">UPCOMING NODE: <span>BRAZIL</span></div>
                 <div class="ticker-item">UPCOMING NODE: <span>JAPAN</span></div>
-                <div class="ticker-item">UPCOMING NODE: <span>MEXICO</span></div>
                 <div class="ticker-item">UPCOMING NODE: <span>AUSTRALIA</span></div>
-                <div class="ticker-item">UPCOMING NODE: <span>GERMANY</span></div>
-                <div class="ticker-item">UPCOMING NODE: <span>FRANCE</span></div>
-                <div class="ticker-item">UPCOMING NODE: <span>UAE</span></div>
             </div>
         </div>
     </div>
 
-    <div class="h-24 w-full"></div>
-
     <div id="setupModal">
         <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
             <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
-            <div id="mContent" class="grid gap-3"></div>
+            <div id="mContent" class="grid gap-3 max-h-[60vh] overflow-y-auto"></div>
             <button onclick="closeModal()" class="mt-4 text-[10px] text-slate-500 uppercase font-black">Back</button>
         </div>
     </div>
@@ -175,6 +174,10 @@
         const stripeLink = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
+        
+        const activeMarkets = ["United States", "UK", "Canada"];
+        const comingSoon = ["Australia", "Germany", "France", "UAE", "Japan", "Brazil"];
+
         let completedSteps = 0; let currentIndustry = "";
 
         function updateParallax(e) {
@@ -196,7 +199,14 @@
             const c = document.getElementById('mContent');
             const t = document.getElementById('mTitle');
             m.style.display = 'flex'; c.innerHTML = "";
-            if(step === 1) { t.innerText = "Target Market"; ["United States", "UK", "Canada", "EU", "Global Expansion"].forEach(l => createBtn(l, () => finish(1, l), c)); }
+            
+            if(step === 1) { 
+                t.innerText = "Target Market"; 
+                c.innerHTML = `<p class="text-[8px] font-black text-green-500 mb-2 uppercase">Live Nodes</p>`;
+                activeMarkets.forEach(l => createBtn(l, () => finish(1, l), c));
+                c.innerHTML += `<p class="text-[8px] font-black text-orange-500 mt-4 mb-2 uppercase">Coming Soon (Join Waitlist)</p>`;
+                comingSoon.forEach(l => createBtn(l + " (Soon)", () => openWaitlist(l), c));
+            }
             else if(step === 2) { t.innerText = "SMB Industry"; Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c)); }
             else if(step === 3) { t.innerText = "Business Name"; c.innerHTML = `<input id="bn" placeholder="ENTER COMPANY NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE ENTITY</button>`; }
             else if(step === 4) { t.innerText = "Agent Role"; ["Receptionist", "Lead Qualifier"].forEach(r => createBtn(r, () => finish(4, r), c)); }
@@ -204,7 +214,27 @@
             else if(step === 6) { t.innerText = "Instant Deployment"; createBtn("Activate System Now", () => { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); finish(6, "DEPLOYED"); setTimeout(() => window.open(stripeLink, '_blank'), 1500); }, c); }
         }
 
-        function createBtn(txt, fn, cont) { const b = document.createElement('button'); b.className = "modal-btn py-3"; b.innerText = txt; b.onclick = fn; cont.appendChild(b); }
+        function openWaitlist(country) {
+            const c = document.getElementById('mContent');
+            const t = document.getElementById('mTitle');
+            t.innerText = "Priority Waitlist";
+            c.innerHTML = `
+                <p class="text-[10px] text-slate-400 mb-4 uppercase font-bold">Secure the <span class="text-orange-500">$199 Beta Special</span> for ${country}. We will alert you the moment the node is live.</p>
+                <input id="wEmail" type="email" placeholder="ENTER BUSINESS EMAIL" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black">
+                <button onclick="submitWaitlist('${country}')" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">LOCK IN SPECIAL PRICE</button>
+            `;
+        }
+
+        function submitWaitlist(country) {
+            const email = document.getElementById('wEmail').value;
+            if(email.includes('@')) {
+                confetti({ particleCount: 50 });
+                document.getElementById('mContent').innerHTML = `<p class="text-white font-black uppercase text-xs p-6">SUCCESS. <br><br> ${country} Node reserved for: <br> ${email}</p>`;
+                setTimeout(closeModal, 2500);
+            } else { alert("Valid email required."); }
+        }
+
+        function createBtn(txt, fn, cont) { const b = document.createElement('button'); b.className = "modal-btn mb-2"; b.innerText = txt; b.onclick = fn; cont.appendChild(b); }
 
         function finish(s, v) {
             completedSteps = s; 
@@ -213,13 +243,10 @@
             el.innerText = v; el.classList.replace('text-white/30', 'text-white');
             card.classList.add('active'); card.classList.remove('next-focus'); 
             closeModal();
-            
             if(s < 6) { 
                 const n = s + 1; 
                 document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus');
                 updateButtons(`Proceed to Step 0${n}`, n);
-            } else {
-                updateButtons("Activation Complete", null);
             }
         }
 
