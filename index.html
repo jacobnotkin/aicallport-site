@@ -2,81 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>AI CALL PORT | BETA Operator Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { 
+        /* MOBILE LOCK: Stops the doubling/shifting */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        html, body { 
             background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; 
-            min-height: 100vh; display: flex; align-items: center; justify-content: center; 
-            padding: 20px; margin: 0; overflow-x: hidden; scroll-behavior: smooth;
+            margin: 0; padding: 0; overflow-x: hidden; width: 100%;
+            display: block; /* Fixes doubling */
         }
+
+        body { padding: 15px; min-height: 100vh; }
 
         .bg-glow {
             position: fixed; inset: 0; z-index: -1;
             background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), var(--glow-color, rgba(249, 115, 22, 0.1)) 0%, transparent 60%);
             pointer-events: none;
-            transition: background 1.5s ease;
         }
 
         .console-container {
-            width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; padding: 40px;
-            position: relative; z-index: 10; margin-bottom: 80px;
+            width: 100%; max-width: 1100px; margin: 0 auto;
+            background: rgba(10, 12, 18, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; 
+            padding: 24px; position: relative; z-index: 10; margin-bottom: 80px;
         }
 
-        @keyframes beta-pulse {
-            0%, 100% { text-shadow: 0 0 15px #f97316; transform: scale(1); color: #fff; }
-            50% { text-shadow: 0 0 30px #f97316, 0 0 45px #ea580c; transform: scale(1.05); color: #f97316; }
+        @media (min-width: 1024px) {
+            .console-container { padding: 40px; border-radius: 40px; }
         }
-        .glow-beta { display: inline-block; animation: beta-pulse 2s infinite ease-in-out; font-weight: 800; }
 
-        .footer-glow {
-            color: #fff;
-            text-shadow: 0 0 20px rgba(249, 115, 22, 1), 0 0 40px rgba(249, 115, 22, 0.6);
-            letter-spacing: 0.4em; font-weight: 800;
-        }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); cursor: pointer; touch-action: manipulation; }
         
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); transition: transform 0.2s; cursor: pointer; }
-        .orange-btn:hover { filter: brightness(1.2); }
-
         .step-card {
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 15px; border-radius: 16px; transition: 0.4s; cursor: not-allowed; opacity: 0.3;
+            padding: 15px; border-radius: 16px; transition: 0.4s; opacity: 0.3;
         }
-        .step-card.unlocked { opacity: 1; cursor: pointer; border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.05); }
-        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.15) !important; transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(249, 115, 22, 0.3); }
-        
-        @keyframes next-step-pulse {
-            0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
-            50% { border-color: #f97316; box-shadow: 0 0 15px rgba(249, 115, 22, 0.2); }
+        .step-card.unlocked { opacity: 1; border-color: rgba(255, 255, 255, 0.15); }
+        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.15) !important; }
+        .next-focus { border: 2px solid #f97316; opacity: 1; }
+
+        /* NEURAL TERMINAL - Hidden on small mobile to save space, visible on large mobile/desktop */
+        .system-log {
+            position: fixed; bottom: 60px; right: 20px; width: 250px; height: 100px;
+            background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px; padding: 12px; font-family: monospace; font-size: 8px;
+            color: #64748b; z-index: 50; display: none;
         }
-        .next-focus { animation: next-step-pulse 1.5s infinite ease-in-out; border-width: 2px; opacity: 1; cursor: pointer; }
+        @media (min-width: 768px) { .system-log { display: block; } }
+
+        /* MODAL FIX: Ensures you can click Role buttons */
+        #setupModal { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
+            z-index: 9999; display: none; align-items: center; justify-content: center; 
+            padding: 20px; backdrop-filter: blur(10px);
+        }
 
         .ticker-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
-            background: rgba(6, 8, 15, 0.95); backdrop-filter: blur(15px);
-            border-top: 1px solid rgba(249, 115, 22, 0.2);
-            display: flex; align-items: center; z-index: 100; overflow: hidden;
+            background: #06080f; border-top: 1px solid rgba(249, 115, 22, 0.2);
+            z-index: 100; display: flex; align-items: center; overflow: hidden;
         }
         .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        /* NEURAL TERMINAL - MOVED TO BOTTOM RIGHT */
-        .system-log {
-            position: fixed; bottom: 60px; right: 20px; width: 280px; height: 120px;
-            background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px; padding: 12px; font-family: monospace; font-size: 9px;
-            color: #64748b; z-index: 50; overflow-y: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .log-line { margin-bottom: 4px; border-left: 2px solid #f97316; padding-left: 6px; animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
-
-        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; }
-        .status-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 8px #22c55e; }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
@@ -88,60 +80,56 @@
             <span class="animate-pulse">ONLINE</span>
         </div>
         <div id="logContent">
-            <div class="log-line">INITIALIZING KERNEL...</div>
-            <div class="log-line">AWAITING OPERATOR INPUT...</div>
+            <div class="log-line">> INITIALIZING KERNEL...</div>
         </div>
     </div>
 
     <div class="console-container">
-        <div class="flex justify-between items-start mb-12">
+        <div class="flex justify-between items-start mb-10">
             <div>
                 <div class="flex items-center gap-2 mb-1">
-                    <div class="w-6 h-6 bg-orange-500 rounded-sm flex items-center justify-center text-[10px] font-black text-black italic">BETA</div>
-                    <span class="font-black italic text-xl uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
+                    <div class="px-2 py-0.5 bg-orange-500 rounded-sm text-[9px] font-black text-black italic">BETA</div>
+                    <span class="font-black italic text-lg uppercase tracking-tighter">AI CALL <span class="text-orange-500">PORT</span></span>
                 </div>
-                <div class="text-[8px] font-bold text-slate-500 uppercase tracking-widest italic">100% Automated System v5.0</div>
-            </div>
-            <div class="bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full flex items-center gap-2">
-                <span class="text-[8px] font-black text-orange-500 uppercase animate-pulse">Connection Ready</span>
+                <div class="text-[7px] font-bold text-slate-500 uppercase tracking-widest italic">100% Automated System</div>
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-5 gap-12 items-center">
-            <div class="lg:col-span-3">
-                <h1 class="text-5xl font-black italic uppercase leading-none mb-6">
-                    <span class="text-white block">INSTANT</span>
-                    <span class="text-orange-500 block">AI RECEPTIONIST</span>
+        <div class="grid lg:grid-cols-5 gap-8 items-center">
+            <div class="lg:col-span-3 text-center lg:text-left">
+                <h1 class="text-3xl lg:text-6xl font-black italic uppercase leading-[0.9] mb-6">
+                    <span class="text-white">INSTANT</span><br>
+                    <span class="text-orange-500">AI RECEPTIONIST</span>
                 </h1>
-                <p class="text-slate-400 text-sm mb-10 max-w-sm">Deploy an automated voice expert in 6 steps. Zero human interaction required.</p>
-                <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin 6-Step Activation</button>
+                <p class="text-slate-400 text-xs mb-8 max-w-xs mx-auto lg:mx-0">Deploy a voice expert in 6 steps. Zero human interaction required.</p>
+                <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn w-full lg:w-auto px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">Begin 6-Step Activation</button>
             </div>
 
             <div class="lg:col-span-2">
-                <div class="bg-black/50 border-2 border-orange-500/50 rounded-[40px] p-10 text-center relative overflow-hidden">
-                    <h3 class="glow-beta text-[12px] uppercase mb-4 tracking-widest">BETA SPECIAL</h3>
+                <div class="bg-black/50 border-2 border-orange-500/30 rounded-[35px] p-8 text-center relative overflow-hidden">
+                    <h3 class="text-[10px] text-orange-500 font-black uppercase mb-4 tracking-widest">BETA SPECIAL</h3>
                     <div class="flex flex-col items-center mb-4">
-                        <span class="text-slate-600 line-through text-lg font-bold opacity-50">$399 Regular</span>
+                        <span class="text-slate-600 line-through text-sm font-bold opacity-50">$399 Regular</span>
                         <div class="flex items-baseline gap-1">
-                            <span class="text-6xl font-black text-white">$199</span>
+                            <span class="text-5xl font-black text-white">$199</span>
                             <span class="text-orange-500 font-bold">/mo</span>
                         </div>
                     </div>
-                    <div id="timer" class="text-xl font-mono font-black text-white mb-6">23:59:59</div>
+                    <div id="timer" class="text-xl font-mono font-black text-white/40 mb-6">00:00:00</div>
                     <button onclick="handleStep(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
                 </div>
             </div>
         </div>
 
-        <div id="stepsSection" class="mt-20">
-            <h3 class="text-center text-[12px] uppercase footer-glow mb-8">AI RECEPTIONIST ACTIVATION STEPS</h3>
-            <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[8px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
-                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[8px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase">Select</p></div>
-                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[8px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase">Sync</p></div>
-                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[8px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase">Choose</p></div>
-                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[8px] font-black text-orange-500 flex items-center"><span class="status-dot animate-pulse"></span>05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase">Sandbox</p></div>
-                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[8px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase">Activate</p></div>
+        <div id="stepsSection" class="mt-16">
+            <h3 class="text-center text-[9px] text-white/40 uppercase mb-6 tracking-[0.3em]">Activation Pipeline</h3>
+            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
+                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
+                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500">03 NAME</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate">Sync</p></div>
+                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate">Choose</p></div>
+                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] font-black text-orange-500">05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate">Sandbox</p></div>
+                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate">Activate</p></div>
             </div>
         </div>
     </div>
@@ -150,9 +138,9 @@
 
     <div id="setupModal">
         <div class="bg-[#0f172a] border border-white/10 p-10 rounded-[40px] max-w-sm w-full text-center">
-            <h2 id="mTitle" class="text-xl font-black uppercase text-white mb-6">Setup</h2>
+            <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
             <div id="mContent" class="grid gap-3"></div>
-            <button onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black">Back to Console</button>
+            <button onclick="closeModal()" class="mt-8 text-[10px] text-slate-500 uppercase font-black">Close</button>
         </div>
     </div>
 
@@ -165,8 +153,8 @@
         function addLog(msg) {
             const content = document.getElementById('logContent');
             const div = document.createElement('div');
-            div.className = "log-line";
-            div.innerText = `> ${msg.toUpperCase()}...`;
+            div.className = "mb-1";
+            div.innerText = `> ${msg.toUpperCase()}`;
             content.prepend(div);
             if(content.children.length > 5) content.lastChild.remove();
         }
@@ -176,7 +164,7 @@
             document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
         }
 
-        function handleStep(s) { if(s === 1 || completedSteps >= s-1) { triggerModal(s); } }
+        function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal');
@@ -185,25 +173,24 @@
             m.style.display = 'flex'; c.innerHTML = "";
 
             if(step === 1) {
-                t.innerText = "Market Selection";
-                ["United States", "UK", "Canada"].forEach(l => createBtn(l, () => { addLog(`Targeting ${l}`); finish(1, l); }, c));
+                t.innerText = "Target Market";
+                ["USA", "UK", "Canada"].forEach(l => createBtn(l, () => { addLog(`Region: ${l}`); finish(1, l); }, c));
             } else if(step === 2) {
                 t.innerText = "Neural Industry";
-                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; addLog(`Loading ${i} Data`); finish(2, i); }, c));
+                Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; addLog(`Industry: ${i}`); finish(2, i); }, c));
             } else if(step === 3) {
                 t.innerText = "Business Identity";
                 c.innerHTML = `<input id="bn" placeholder="ENTER NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">Verify</button>`;
             } else if(step === 4) {
                 t.innerText = "Agent Role";
-                ["Receptionist", "Lead Qualifier"].forEach(r => createBtn(r, () => { addLog(`Configuring ${r}`); finish(4, r); }, c));
+                ["Receptionist", "Qualifier"].forEach(r => createBtn(r, () => { addLog(`Role: ${r}`); finish(4, r); }, c));
             } else if(step === 5) {
                 t.innerText = "Sandbox Test";
-                createBtn("Initialize Demo", runVoice, c);
+                createBtn("Start Live Demo", runVoice, c);
             } else if(step === 6) {
-                t.innerText = "Mainline Activation";
+                t.innerText = "Activation";
                 createBtn("Activate & Launch", () => { 
-                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#f97316', '#ffffff'] });
-                    addLog("ACTIVATING PIPELINE");
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                     finish(6, "ACTIVE");
                     setTimeout(() => window.open(stripeLink, '_blank'), 2000);
                 }, c);
@@ -212,7 +199,7 @@
 
         function createBtn(txt, fn, cont) {
             const b = document.createElement('button');
-            b.className = "w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition";
+            b.className = "w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition-all active:scale-95";
             b.innerText = txt; b.onclick = fn; cont.appendChild(b);
         }
 
@@ -221,43 +208,33 @@
             const el = document.getElementById(`v${s}`);
             el.innerText = v; el.classList.replace('text-white/30', 'text-white');
             document.getElementById(`s${s}`).classList.add('active');
-            
-            const orangeIntensity = 249 - (s * 40);
-            document.documentElement.style.setProperty('--glow-color', `rgba(${orangeIntensity}, ${115 + (s*15)}, 22, 0.15)`);
-
             closeModal();
             if(s < 6) {
                 const n = s + 1;
                 document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus');
                 document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${n}`;
-                document.getElementById('stepsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
-        function saveB() { const v = document.getElementById('bn').value; if(v) { addLog(`Syncing ${v}`); finish(3, v); } }
+        function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
-        function runVoice() { 
-            const id = assistants[currentIndustry];
-            if(!id) return alert("Industry Required");
-            addLog("VOICE LINK ESTABLISHED");
+        
+        async function runVoice() { 
+            const id = assistants[currentIndustry] || assistants["Electrical"];
+            addLog("VOICE LINK ACTIVE");
             if(window.vapiSDK) window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
             closeModal(); finish(5, "TESTING");
         }
 
-        const locs = ["Miami", "London", "Austin", "NYC", "Toronto"];
         let tickerHtml = "";
         for(let i=0; i<15; i++) {
-            tickerHtml += `<span class="px-16 text-[10px] font-black text-orange-500 uppercase italic"> ⚡ NEW DEPLOYMENT SUCCESSFUL IN ${locs[Math.floor(Math.random()*5)]} </span>`;
+            tickerHtml += `<span class="px-16 text-[9px] font-black text-orange-500 uppercase italic"> ⚡ NEW DEPLOYMENT SUCCESSFUL </span>`;
         }
         document.getElementById('ticker').innerHTML = tickerHtml + tickerHtml;
 
         setInterval(() => {
             const now = new Date();
-            const night = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
-            const diff = night - now;
-            const h = Math.floor(diff / 3600000);
-            const m = Math.floor((diff % 3600000) / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
+            const h = 23 - now.getHours(); const m = 59 - now.getMinutes(); const s = 59 - now.getSeconds();
             document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }, 1000);
 
