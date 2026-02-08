@@ -3,120 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>AI CALL PORT | BETA Operator Console</title>
+    <title>AI CALL PORT | Operator Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* FIX: Prevents the horizontal doubling/sliding seen in screenshots */
-        * { box-sizing: border-box; }
+        /* CRITICAL: This stops the doubling and ensures taps work */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         html, body { 
             overflow-x: hidden; 
             width: 100%; 
             margin: 0; 
             padding: 0; 
             background: #06080f; 
+            position: relative;
+            display: block; /* Prevents flex-based doubling */
         }
 
         body { 
-            color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; 
-            min-height: 100vh; display: flex; flex-direction: column; align-items: center; 
+            color: #e2e8f0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            min-height: 100vh;
             padding: 12px;
         }
 
         .bg-glow {
-            position: fixed; inset: 0; z-index: -1;
+            position: fixed; inset: 0; z-index: 1;
             background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.1) 0%, transparent 60%);
             pointer-events: none;
         }
 
         .console-container {
             width: 100%; 
-            max-width: 100%; /* Safety lock for mobile */
-            background: rgba(10, 12, 18, 0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px;
-            position: relative; z-index: 10; margin-bottom: 80px;
+            max-width: 480px; /* Locked for mobile */
+            margin: 0 auto; 
+            background: rgba(10, 12, 18, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 24px; 
+            padding: 24px;
+            position: relative; 
+            z-index: 10; /* Above the glow */
         }
 
         @media (min-width: 1024px) {
-            .console-container { max-width: 1100px; border-radius: 40px; padding: 40px; }
+            .console-container { max-width: 1100px; padding: 40px; }
         }
 
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); cursor: pointer; transition: 0.2s; }
-        .orange-btn:active { transform: scale(0.98); }
-
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); cursor: pointer; touch-action: manipulation; }
+        
         .step-card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 12px; border-radius: 12px; opacity: 0.3; transition: 0.3s;
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px; border-radius: 14px; opacity: 0.4;
         }
-        .step-card.unlocked { opacity: 1; border-color: rgba(255, 255, 255, 0.15); }
-        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; }
-        .next-focus { border: 2px solid #f97316; opacity: 1; box-shadow: 0 0 15px rgba(249, 115, 22, 0.2); }
+        .step-card.unlocked { opacity: 1; border-color: rgba(255, 255, 255, 0.2); }
+        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.15) !important; }
 
+        /* Ticker Bar */
         .ticker-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
-            background: rgba(6, 8, 15, 0.95); border-top: 1px solid rgba(249, 115, 22, 0.2);
-            z-index: 100; display: flex; align-items: center; overflow: hidden;
+            background: #06080f; border-top: 1px solid rgba(249, 115, 22, 0.2);
+            z-index: 50; display: flex; align-items: center; overflow: hidden;
         }
         .ticker-content { display: flex; white-space: nowrap; animation: marquee 60s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* Vapi Button centering */
-        #vapi-support-btn, [class*="vapi-btn"] {
-            position: fixed !important; bottom: 60px !important; left: 50% !important;
-            transform: translateX(-50%) !important; z-index: 9999 !important;
+        /* MODAL FIX: High Z-Index and Flex Centering */
+        #setupModal { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.9); 
+            z-index: 99999; /* Highest possible */
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+            backdrop-filter: blur(8px);
         }
-
-        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        
+        .modal-box {
+            background: #0f172a; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            padding: 32px; 
+            border-radius: 28px; 
+            width: 100%; 
+            max-width: 340px; 
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
     <div class="bg-glow"></div>
 
     <div class="console-container">
-        <div class="flex justify-between items-start mb-8">
-            <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <div class="w-6 h-6 bg-orange-500 rounded-sm flex items-center justify-center text-[10px] font-black text-black italic">BETA</div>
-                    <span class="font-black italic text-lg uppercase">AI CALL <span class="text-orange-500">PORT</span></span>
-                </div>
-                <div class="text-[7px] font-bold text-slate-500 uppercase tracking-widest italic">100% Automated System</div>
+        <div class="mb-10">
+            <div class="flex items-center gap-2 mb-1">
+                <div class="px-2 py-0.5 bg-orange-500 rounded text-[10px] font-black text-black italic">BETA</div>
+                <span class="font-black italic text-lg uppercase tracking-tight">AI CALL <span class="text-orange-500">PORT</span></span>
             </div>
+            <p class="text-[8px] text-slate-500 uppercase font-bold tracking-[0.3em]">100% Automated System</p>
         </div>
 
-        <div class="grid lg:grid-cols-5 gap-8 items-center">
-            <div class="lg:col-span-3 text-center lg:text-left">
-                <h1 class="text-3xl lg:text-5xl font-black italic uppercase leading-[0.9] mb-4">
-                    <span class="text-white block">INSTANT</span>
-                    <span class="text-orange-500 block">AI RECEPTIONIST</span>
-                </h1>
-                <p class="text-slate-400 text-[11px] mb-8 max-w-xs mx-auto lg:mx-0">One-click deployment of automated voice experts. No coding. No complex setup.</p>
-                <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn w-full lg:w-auto px-10 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic shadow-lg">Begin 6-Step Activation</button>
-            </div>
-
-            <div class="lg:col-span-2">
-                <div class="bg-black/50 border-2 border-orange-500/30 rounded-[30px] p-8 text-center relative overflow-hidden">
-                    <h3 class="text-[9px] uppercase mb-1 tracking-widest text-orange-500 font-black">BETA SPECIAL</h3>
-                    <div class="flex flex-col items-center mb-2">
-                        <span class="text-slate-600 line-through text-xs font-bold opacity-50">$399 Regular</span>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-black text-white">$199</span>
-                            <span class="text-orange-500 font-bold text-sm">/mo</span>
-                        </div>
-                    </div>
-                    <div id="timer" class="text-lg font-mono font-black text-white/40 mb-6">00:00:00</div>
-                    <button onclick="handleStep(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
-                </div>
-            </div>
+        <div class="text-center lg:text-left mb-10">
+            <h1 class="text-4xl lg:text-6xl font-black italic uppercase leading-[0.85] mb-6">
+                <span class="text-white">INSTANT</span><br>
+                <span class="text-orange-500">AI RECEPTIONIST</span>
+            </h1>
+            <button id="mainActionBtn" onclick="handleStep(1)" class="orange-btn w-full lg:w-auto px-10 py-5 rounded-2xl text-[11px] font-black uppercase tracking-widest italic shadow-xl">Begin 6-Step Activation</button>
         </div>
 
-        <div id="stepsSection" class="mt-12 lg:mt-20">
-            <h3 class="text-center text-[10px] text-white/40 uppercase mb-6 tracking-widest">Activation Pipeline</h3>
+        <div class="bg-black/60 border border-orange-500/30 rounded-[30px] p-8 text-center mb-10">
+            <p class="text-[10px] text-orange-500 font-black uppercase mb-3">Beta Access Only</p>
+            <div class="mb-4">
+                <span class="text-slate-600 line-through text-xs font-bold">$399 Regular</span>
+                <div class="flex justify-center items-baseline gap-1 mt-1">
+                    <span class="text-5xl font-black text-white">$199</span>
+                    <span class="text-orange-500 font-bold">/mo</span>
+                </div>
+            </div>
+            <div id="timer" class="text-xl font-mono text-white/30 mb-6">00:00:00</div>
+            <button onclick="handleStep(6)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest">Instant Activation</button>
+        </div>
+
+        <div id="stepsSection">
+            <h3 class="text-center text-[9px] text-white/40 uppercase mb-5 tracking-widest">Activation Pipeline</h3>
             <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
-                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
+                <div id="s1" class="step-card unlocked" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500">01 MARKET</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
                 <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500">02 INDUSTRY</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p></div>
-                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500">03 BUSINESS</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate">Sync</p></div>
+                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500">03 NAME</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate">Sync</p></div>
                 <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500">04 ROLE</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate">Choose</p></div>
                 <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] font-black text-orange-500">05 DEMO</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate">Sandbox</p></div>
                 <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] font-black text-orange-500">06 PIPELINE</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate">Activate</p></div>
@@ -127,10 +144,10 @@
     <div class="ticker-bar"><div class="ticker-content" id="ticker"></div></div>
 
     <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-8 rounded-[30px] max-w-sm w-full text-center">
-            <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
+        <div class="modal-box">
+            <h2 id="mTitle" class="text-base font-black uppercase text-white mb-6 tracking-widest">Setup</h2>
             <div id="mContent" class="grid gap-3"></div>
-            <button onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black">Close</button>
+            <button onclick="closeModal()" class="mt-8 text-[9px] text-slate-500 uppercase font-black tracking-widest">← Back</button>
         </div>
     </div>
 
@@ -154,23 +171,23 @@
             m.style.display = 'flex'; c.innerHTML = "";
 
             if(step === 1) {
-                t.innerText = "Market";
+                t.innerText = "Target Market";
                 ["USA", "UK", "Canada"].forEach(l => createBtn(l, () => finish(1, l), c));
             } else if(step === 2) {
                 t.innerText = "Industry";
                 Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c));
             } else if(step === 3) {
-                t.innerText = "Identity";
-                c.innerHTML = `<input id="bn" placeholder="ENTER NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">Verify</button>`;
+                t.innerText = "Biz Identity";
+                c.innerHTML = `<input id="bn" placeholder="ENTER NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center font-black uppercase focus:border-orange-500 outline-none"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">VERIFY NAME</button>`;
             } else if(step === 4) {
-                t.innerText = "Role";
+                t.innerText = "Agent Role";
                 ["Receptionist", "Qualifier"].forEach(r => createBtn(r, () => finish(4, r), c));
             } else if(step === 5) {
-                t.innerText = "Sandbox";
-                createBtn("Start Demo", runVoice, c);
+                t.innerText = "Voice Sandbox";
+                createBtn("Start Live Demo", runVoice, c);
             } else if(step === 6) {
-                t.innerText = "Final Step";
-                createBtn("Activate & Launch", () => { 
+                t.innerText = "Activation";
+                createBtn("Finalize & Launch", () => { 
                     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                     finish(6, "ACTIVE");
                     setTimeout(() => window.open(stripeLink, '_blank'), 1500);
@@ -180,7 +197,7 @@
 
         function createBtn(txt, fn, cont) {
             const b = document.createElement('button');
-            b.className = "w-full py-4 bg-white/5 hover:bg-orange-600 rounded-xl text-white font-black text-[10px] uppercase transition";
+            b.className = "w-full py-4 bg-white/5 hover:bg-orange-500 rounded-xl text-white font-black text-[10px] uppercase transition-all active:scale-95";
             b.innerText = txt; b.onclick = fn; cont.appendChild(b);
         }
 
@@ -191,9 +208,8 @@
             document.getElementById(`s${s}`).classList.add('active');
             closeModal();
             if(s < 6) {
-                const n = s + 1;
-                document.getElementById(`s${n}`).classList.add('unlocked', 'next-focus');
-                document.getElementById('mainActionBtn').innerText = `Proceed to Step 0${n}`;
+                document.getElementById(`s${s+1}`).classList.add('unlocked');
+                document.getElementById('mainActionBtn').innerText = `Next: Step 0${s+1}`;
             }
         }
 
@@ -208,7 +224,7 @@
                     window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id });
                     closeModal(); finish(5, "TESTING");
                 }
-            } catch(e) { alert("Mic required."); }
+            } catch(e) { alert("Mic required for Demo."); }
         }
 
         let tickerHtml = "";
