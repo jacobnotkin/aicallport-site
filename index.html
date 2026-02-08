@@ -56,9 +56,7 @@
         .orange-btn { 
             background: linear-gradient(90deg, #f97316, #ea580c); 
             border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer; 
-            position: relative;
-            overflow: hidden;
+            cursor: pointer; position: relative; overflow: hidden;
         }
 
         .orange-btn::after {
@@ -91,8 +89,7 @@
 
         .next-focus { 
             animation: border-glow 2s infinite ease-in-out !important; 
-            opacity: 1 !important;
-            border-width: 2px !important;
+            opacity: 1 !important; border-width: 2px !important;
         }
 
         .step-card.unlocked { opacity: 0.6; }
@@ -102,10 +99,12 @@
             opacity: 1 !important; transform: scale(1.02); 
         }
 
+        /* MODAL FIX: TOP-ALIGNED SCROLLING */
         #setupModal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
-            z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px;
-            overflow-y: auto;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
+            z-index: 99999; display: none; flex-direction: column; 
+            align-items: center; justify-content: flex-start; 
+            padding: 40px 20px; overflow-y: auto;
         }
         
         .modal-btn {
@@ -174,10 +173,10 @@
     </div>
 
     <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center my-auto">
+        <div class="bg-[#0f172a] border border-white/10 p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl">
             <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
             <div id="mContent" class="grid gap-3"></div>
-            <button onclick="closeModal()" class="mt-8 mb-4 text-[10px] text-slate-500 uppercase font-black">Back to Console</button>
+            <button onclick="closeModal()" class="mt-10 mb-2 text-[10px] text-slate-500 uppercase font-black tracking-widest">Cancel / Back</button>
         </div>
     </div>
 
@@ -199,6 +198,7 @@
             const c = document.getElementById('mContent');
             const t = document.getElementById('mTitle');
             m.style.display = 'flex'; c.innerHTML = "";
+            window.scrollTo(0,0); // Reset scroll position
 
             if(step === 1) {
                 t.innerText = "Market";
@@ -208,7 +208,7 @@
                 Object.keys(assistants).forEach(i => createBtn(i, () => { currentIndustry = i; finish(2, i); }, c));
             } else if(step === 3) {
                 t.innerText = "Name";
-                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>`;
+                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-2 text-center text-xs uppercase font-black"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">SAVE NAME</button>`;
             } else if(step === 4) {
                 t.innerText = "Role";
                 ["Receptionist", "Qualifier"].forEach(r => createBtn(r, () => finish(4, r), c));
@@ -227,7 +227,7 @@
 
         function createBtn(txt, fn, cont) {
             const b = document.createElement('button');
-            b.className = "modal-btn py-3 mb-1";
+            b.className = "modal-btn py-4 mb-2";
             b.innerText = txt; b.onclick = fn; cont.appendChild(b);
         }
 
