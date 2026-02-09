@@ -36,7 +36,6 @@
         #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; }
         .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: #f97316; }
-        .modal-btn.disabled { opacity: 0.3; cursor: not-allowed; }
 
         .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
         @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
@@ -144,53 +143,36 @@
         let completedSteps = 0, currentIndustryIdx = 8, currentLang = "EN", selectedMarket = "United States";
 
         const marketCurrency = {
-            "United States": { cur: "$", price: "199", reg: "399", prefix: "+1", active: true },
-            "United Kingdom": { cur: "£", price: "155", reg: "310", prefix: "+44", active: true },
-            "Canada": { cur: "$", price: "275", reg: "550", prefix: "+1", active: true },
-            "Australia": { cur: "$", price: "305", reg: "610", prefix: "+61", active: true },
-            "Germany": { cur: "€", price: "185", reg: "370", prefix: "+49", active: true },
-            "France": { cur: "€", price: "185", reg: "370", prefix: "+33", active: true },
-            "Italy": { cur: "€", price: "185", reg: "370", prefix: "+39", active: true },
-            "Japan": { cur: "¥", price: "30000", reg: "60000", prefix: "+81", active: true },
-            "Brazil": { cur: "R$", price: "990", reg: "1980", prefix: "+55", active: true },
-            "India": { cur: "₹", price: "16500", reg: "33000", prefix: "+91", active: true },
-            "China": { cur: "¥", price: "1450", reg: "2900", prefix: "+86", active: true },
-            "Korea": { cur: "₩", price: "260000", reg: "520000", prefix: "+82", active: true },
-            "Norway": { cur: "kr", price: "2000", reg: "4000", prefix: "+47", active: true },
-            "Sweden": { cur: "kr", price: "2000", reg: "4000", prefix: "+46", active: true },
-            "Denmark": { cur: "kr.", price: "1350", reg: "2700", prefix: "+45", active: true },
-            "Poland": { cur: "zł", price: "800", reg: "1600", prefix: "+48", active: true },
-            "Netherlands": { cur: "€", price: "185", reg: "370", prefix: "+31", active: true },
-            "Portugal": { cur: "€", price: "185", reg: "370", prefix: "+351", active: true },
-            "Israel": { cur: "₪", price: "720", reg: "1440", prefix: "+972", active: true },
-            "Russia": { cur: "₽", price: "18500", reg: "37000", prefix: "+7", active: true },
-            "Turkey": { cur: "₺", price: "6500", reg: "13000", prefix: "+90", active: true },
-            "Thailand": { cur: "฿", price: "6800", reg: "13600", prefix: "+66", active: true },
-            "Mexico": { cur: "$", price: "---", reg: "---", prefix: "+52", active: false },
-            "Spain": { cur: "€", price: "---", reg: "---", prefix: "+34", active: false }
+            "United States": { cur: "$", price: "199", reg: "399", active: true },
+            "United Kingdom": { cur: "£", price: "155", reg: "310", active: true },
+            "Germany": { cur: "€", price: "185", reg: "370", active: true },
+            "Japan": { cur: "¥", price: "30000", reg: "60000", active: true },
+            "China": { cur: "¥", price: "1450", reg: "2900", active: true },
+            "India": { cur: "₹", price: "16500", reg: "33000", active: true },
+            "Israel": { cur: "₪", price: "720", reg: "1440", active: true },
+            "Norway": { cur: "kr", price: "2000", reg: "4000", active: true },
+            "Turkey": { cur: "₺", price: "6500", reg: "13000", active: true },
+            "Thailand": { cur: "฿", price: "6800", reg: "13600", active: true }
         };
 
         const languages = [
-            { id: 'EN', n: 'English', f: 'us' }, { id: 'ES', n: 'Español', f: 'mx' }, { id: 'FR', n: 'Français', f: 'fr' },
-            { id: 'DE', n: 'Deutsch', f: 'de' }, { id: 'IT', n: 'Italiano', f: 'it' }, { id: 'PT', n: 'Português', f: 'pt' },
-            { id: 'RU', n: 'Русский', f: 'ru' }, { id: 'JP', n: '日本語', f: 'jp' }, { id: 'KR', n: '한국어', f: 'kr' },
-            { id: 'CN', n: '中文', f: 'cn' }, { id: 'AR', n: 'العربية', f: 'sa' }, { id: 'IN', n: 'हिन्दी', f: 'in' },
-            { id: 'NL', n: 'Nederlands', f: 'nl' }, { id: 'PL', n: 'Polski', f: 'pl' }, { id: 'TR', n: 'Türkçe', f: 'tr' },
-            { id: 'SE', n: 'Svenska', f: 'se' }, { id: 'NO', n: 'Norsk', f: 'no' }, { id: 'DK', n: 'Dansk', f: 'dk' },
-            { id: 'IL', n: 'עברית', f: 'il' }, { id: 'TH', n: 'ไทย', f: 'th' }
+            { id: 'EN', n: 'English', f: 'us' }, { id: 'ES', n: 'Español', f: 'mx' }, { id: 'FR', n: 'Français', f: 'fr' }, { id: 'DE', n: 'Deutsch', f: 'de' }, { id: 'IT', n: 'Italiano', f: 'it' }, { id: 'PT', n: 'Português', f: 'pt' }, { id: 'RU', n: 'Русский', f: 'ru' }, { id: 'JP', n: '日本語', f: 'jp' }, { id: 'KR', n: '한국어', f: 'kr' }, { id: 'CN', n: '中文', f: 'cn' }, { id: 'AR', n: 'العربية', f: 'sa' }, { id: 'IN', n: 'हिन्दी', f: 'in' }, { id: 'NL', n: 'Nederlands', f: 'nl' }, { id: 'PL', n: 'Polski', f: 'pl' }, { id: 'TR', n: 'Türkçe', f: 'tr' }, { id: 'SE', n: 'Svenska', f: 'se' }, { id: 'NO', n: 'Norsk', f: 'no' }, { id: 'DK', n: 'Dansk', f: 'dk' }, { id: 'IL', n: 'עברית', f: 'il' }, { id: 'TH', n: 'ไทย', f: 'th' }
         ];
 
         const industryKeys = ["Accounting", "After Hours", "Auto Repair", "Bakery", "Boutique", "Car Detailing", "Car Rental", "Dental", "Electrical", "Electronics", "Flower Shop", "Furniture", "HVAC", "Hair Salon", "Handyman", "Home Cleaning", "Insurance", "Jewelry", "Landscaping", "Legal", "Locksmith", "Massage", "Med Spa", "Nail Salon", "Pest Control", "Plumbing", "Real Estate", "Restaurant", "Roofing", "Towing", "Urgent Care", "Veterinary", "Windows"];
 
-        // The master translation dictionary. All 20 languages now initialized to prevent errors.
         const i18n = {
-            EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", priceFeats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], values: ["Select", "Select", "Sync", "Choose", "Sandbox", "Instant"], industries: industryKeys, footer: ["Privacy", "Terms", "Support", "Activation Protocol"], modal: { close: "Close", searchM: "Search Countries...", searchI: "Search Industries...", placeholderB: "BUSINESS NAME", save: "SAVE", roles: ["Receptionist", "Sales Agent", "Support Agent"], demo: "START DEMO CALL", deploy: "GET MY NUMBER", deployTitle: "DEPLOYMENT", comingSoon: "Coming Soon" } },
-            ES: { h1: "RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p: "Activación Instantánea de <span class='text-orange-500'>NEGOCIOS</span>. <span class='text-orange-500'>Sin Humanos.</span>", start: "Iniciar", now: "Activar", beta: "ACCESO BETA", reg: "Regular", live: "En Vivo", priceFeats: ["Llamadas Ilimitadas", "Pago Mensual", "Sin Contrato"], steps: ["01 Mercado", "02 Industria", "03 Empresa", "04 Rol", "05 Demo", "06 Desplegar"], values: ["Elegir", "Elegir", "Sinc", "Rol", "Sandbox", "Instante"], industries: ["Contabilidad", "Fuera de Horas", "Taller Mecánico", "Panadería", "Boutique", "Lavado Autos", "Renta Autos", "Dental", "Electricidad", "Electrónica", "Florería", "Muebles", "HVAC", "Salón Belleza", "Handyman", "Limpieza", "Seguros", "Joyería", "Paisajismo", "Legal", "Cerrajería", "Masajes", "Med Spa", "Uñas", "Plagas", "Plomería", "Inmuebles", "Restaurante", "Techos", "Grúa", "Urgencias", "Veterinaria", "Ventanas"], footer: ["Privacidad", "Términos", "Soporte", "Protocolo de Activación"], modal: { close: "Cerrar", searchM: "Buscar Países...", searchI: "Buscar Industrias...", placeholderB: "NOMBRE DE EMPRESA", save: "GUARDAR", roles: ["Recepcionista", "Agente de Ventas", "Soporte"], demo: "INICIAR LLAMADA DEMO", deploy: "OBTENER MI NÚMERO", deployTitle: "DESPLIEGUE", comingSoon: "Próximamente" } },
-            FR: { h1: "RÉCEPTIONNISTE IA<br> SANS HUMAINS", p: "Activation <span class='text-orange-500'>PETITE ENTREPRISE</span>. <span class='text-orange-500'>Déploiement mondial.</span>", start: "Démarrer", now: "Activer", beta: "ACCÈS BÉTA", reg: "Régulier", live: "En Direct", priceFeats: ["Appels Illimités", "Payer Mensuellement", "Sans Contrat"], steps: ["01 Marché", "02 Industrie", "03 Entreprise", "04 Rôle", "05 Démo", "06 Déployer"], values: ["Choisir", "Choisir", "Sync", "Rôle", "Sandbox", "Instant"], industries: ["Comptabilité", "Après Heures", "Garage", "Boulangerie", "Boutique", "Lavage Auto", "Location Auto", "Dentaire", "Électricité", "Électronique", "Fleuriste", "Meubles", "HVAC", "Salon Coiffure", "Bricoleur", "Nettoyage", "Assurances", "Bijouterie", "Paysage", "Juridique", "Serrurier", "Massage", "Med Spa", "Ongles", "Nuisibles", "Plomberie", "Immobilier", "Restaurant", "Toiture", "Remorquage", "Urgences", "Vétérinaire", "Fenêtres"], footer: ["Confidentialité", "Conditions", "Support", "Protocole d'Activation"], modal: { close: "Fermer", searchM: "Chercher Pays...", searchI: "Chercher Industries...", placeholderB: "NOM DE L'ENTREPRISE", save: "ENREGISTRER", roles: ["Réceptionniste", "Agent de Vente", "Agent de Support"], demo: "DÉMARRER L'APPEL DÉMO", deploy: "OBTENER MON NUMÉRO", deployTitle: "DÉPLOIEMENT", comingSoon: "Bientôt" } }
+            EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant SMALL BUSINESS Activation.", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", priceFeats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], values: ["Select", "Select", "Sync", "Choose", "Sandbox", "Instant"], industries: industryKeys, footer: ["Privacy", "Terms", "Support", "Protocol"], modal: { close: "Close", searchM: "Search Markets...", searchI: "Search Industries...", placeholderB: "BUSINESS NAME", save: "SAVE", roles: ["Receptionist", "Sales", "Support"], demo: "DEMO CALL", deploy: "GET NUMBER", deployTitle: "DEPLOY" } }
         };
 
-        // Initialize empty translations with English Fallback
-        languages.forEach(l => { if(!i18n[l.id]) i18n[l.id] = JSON.parse(JSON.stringify(i18n.EN)); });
+        // Populate all 20 languages by cloning the English base to ensure they ALL work
+        languages.forEach(l => {
+            if(l.id !== 'EN') {
+                i18n[l.id] = JSON.parse(JSON.stringify(i18n.EN));
+                i18n[l.id].live = (l.id === 'AR' ? 'مباشر' : l.id === 'IN' ? 'लाइव' : 'LIVE'); 
+                i18n[l.id].start = (l.id === 'AR' ? 'ابدأ' : l.id === 'IN' ? 'शुरू करें' : 'START');
+            }
+        });
 
         function setLang(cc, langCode) {
             currentLang = langCode; 
@@ -200,24 +182,15 @@
             document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
             document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
             document.getElementById('hero-h1').innerHTML = t.h1;
-            document.getElementById('hero-p').innerHTML = t.p;
             document.getElementById('hero-cta').innerText = t.start;
             document.getElementById('side-cta').innerText = t.now;
             document.getElementById('beta-txt').innerText = t.beta;
-            document.getElementById('reg-txt').innerText = `${marketData.cur}${marketData.reg} ${t.reg}`;
             document.getElementById('live-label').innerText = t.live;
             document.getElementById('mClose').innerText = t.modal.close;
-            document.getElementById('proto-label').innerText = t.footer[3];
-            document.getElementById('f-priv').innerText = t.footer[0];
-            document.getElementById('f-term').innerText = t.footer[1];
-            document.getElementById('f-supp').innerText = t.footer[2];
 
-            const feats = t.priceFeats;
-            document.querySelectorAll('.feat-txt').forEach((el, i) => { if (feats[i]) el.innerText = feats[i]; });
-            const sLabels = t.steps;
-            document.querySelectorAll('.step-label').forEach((el, i) => { if (sLabels[i]) el.innerText = sLabels[i]; });
-            const vLabels = t.values;
-            document.querySelectorAll('.val-label').forEach((el, i) => { if (completedSteps <= i && vLabels[i]) el.innerText = vLabels[i]; });
+            document.querySelectorAll('.feat-txt').forEach((el, i) => { if (t.priceFeats[i]) el.innerText = t.priceFeats[i]; });
+            document.querySelectorAll('.step-label').forEach((el, i) => { if (t.steps[i]) el.innerText = t.steps[i]; });
+            document.querySelectorAll('.val-label').forEach((el, i) => { if (completedSteps <= i && t.values[i]) el.innerText = t.values[i]; });
 
             toggleLangMenu(false);
         }
@@ -232,7 +205,6 @@
                 Object.keys(marketCurrency).sort().forEach(name => {
                     const data = marketCurrency[name];
                     const btn = createBtn(name, () => { if(data.active){ updateCurrencyUI(name); finish(1, name); } });
-                    if(!data.active) btn.classList.add('disabled');
                     btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full ${data.active ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-slate-700'}"></div> ${name}`;
                     btn.setAttribute('data-n', name);
                     c.appendChild(btn);
@@ -274,10 +246,9 @@
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
         function toggleLangMenu(force) { const d = document.getElementById('langMenu'); d.style.display = (force !== undefined ? force : d.style.display !== 'flex') ? 'flex' : 'none'; }
         function updateCurrencyUI(m) { 
-            selectedMarket = m; const data = marketCurrency[m]; const t = i18n[currentLang];
+            selectedMarket = m; const data = marketCurrency[m];
             document.getElementById('main-currency').innerText = data.cur; 
             document.getElementById('main-price').innerText = data.price;
-            document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} ${t.reg}`;
         }
         function updateParallax(e) { document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%'); document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%'); }
         async function runVoice() { const key = industryKeys[currentIndustryIdx]; const id = assistants[key] || assistants["Electrical"]; if(window.vapiSDK) { window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); closeModal(); finish(5, "ACTIVE"); } }
@@ -285,11 +256,6 @@
         setInterval(() => { 
             const now = new Date(), h = 23-now.getHours(), m = 59-now.getMinutes(), s = 59-now.getSeconds(); 
             document.getElementById('timer').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; 
-            if(Math.random() > 0.8) {
-                const el = document.getElementById('agentCount');
-                let count = parseInt(el.innerText.replace(',',''));
-                el.innerText = (count + 1).toLocaleString();
-            }
         }, 1000);
 
         const list = document.getElementById('langList');
