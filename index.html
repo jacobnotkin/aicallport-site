@@ -27,10 +27,14 @@
         #langSearch { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px; color: white; font-size: 11px; outline: none; width: 100%; margin-bottom: 8px; }
         .lang-list { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
         #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-inner { background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; max-width: 400px; width: 100%; padding: 24px; text-align: center; }
-        .modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .modal-inner { background: #0f172a; border: 1px solid rgba(255,255,255,0.1); p-6 rounded-3xl max-w-lg w-full text-center p-6; }
+        .modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; }
+        .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
         @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+        #mContent { max-height: 50vh; overflow-y: auto; padding-right: 4px; }
+        #mContent::-webkit-scrollbar { width: 4px; }
+        #mContent::-webkit-scrollbar-thumb { background: rgba(249, 115, 22, 0.3); border-radius: 10px; }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
@@ -42,7 +46,7 @@
             <span id="curLangText" class="text-[9px] font-black text-white uppercase">US | EN</span>
         </button>
         <div id="langMenu">
-            <input type="text" id="langSearch" placeholder="SEARCH LANGUAGES..." onkeyup="filterLanguages()">
+            <input type="text" id="langSearch" placeholder="SEARCH 20 LANGUAGES..." onkeyup="filterLanguages()">
             <div class="lang-list" id="langList"></div>
         </div>
     </div>
@@ -110,65 +114,91 @@
 
     <script>
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
-        const industryList = ["Electrical", "Plumbing", "HVAC", "Roofing", "Pest Control", "Locksmith", "Handyman", "Windows & Doors", "Home Cleaning", "Landscaping", "Legal", "Real Estate", "Insurance", "Accounting", "Urgent Care", "Dental", "Veterinary", "Med Spa", "Hair Salon", "Nail Salon", "Massage Therapy"];
-        const rolesList = ["Receptionist", "Lead Qualifier", "Booking Agent", "Retail Specialist"];
-        const assistants = {}; industryList.forEach(ind => assistants[ind] = "7a2fbe45-b54b-4375-aa1f-111be3f1501a");
-
+        // EXPANDED ASSISTANTS OBJECT
+        const assistants = { 
+            "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", 
+            "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f",
+            "Hair Salon": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Nail Salon": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", 
+            "Car Rental": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Urgent Care": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+            "Windows & Doors": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Handyman": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+            "Home Cleaning": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Landscaping": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+            "HVAC": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Roofing": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", 
+            "Pest Control": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Locksmith": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+            "Real Estate": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Insurance": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", 
+            "Accounting": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Auto Repair": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+            "Towing": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Car Detailing": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+            "Dental": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Veterinary": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+            "Med Spa": "7a2fbe45-b54b-4375-aa1f-111be3f1501a"
+        };
         let completedSteps = 0, currentIndustry = "Electrical", currentLang = "EN", selectedMarket = "United States";
 
-        const marketCurrency = { "Australia": { cur: "$", price: "305", reg: "610", prefix: "+61 2" }, "Brazil": { cur: "R$", price: "990", reg: "1980", prefix: "+55 11" }, "Canada": { cur: "$", price: "275", reg: "550", prefix: "+1 (416)" }, "Chile": { cur: "CLP ", price: "190.000", reg: "380.000", prefix: "+56 2" }, "China": { cur: "¥", price: "1450", reg: "2900", prefix: "+86 10" }, "France": { cur: "€", price: "185", reg: "370", prefix: "+33 1" }, "Germany": { cur: "€", price: "185", reg: "370", prefix: "+49 30" }, "India": { cur: "₹", price: "16500", reg: "33000", prefix: "+91 11" }, "Ireland": { cur: "€", price: "185", reg: "370", prefix: "+353 1" }, "Israel": { cur: "₪", price: "720", reg: "1440", prefix: "+972 3" }, "Japan": { cur: "¥", price: "30000", reg: "60000", prefix: "+81 3" }, "Norway": { cur: "kr ", price: "2150", reg: "4300", prefix: "+47 21" }, "Poland": { cur: "zł ", price: "820", reg: "1640", prefix: "+48 22" }, "Russia": { cur: "₽", price: "18500", reg: "37000", prefix: "+7 495" }, "Singapore": { cur: "S$", price: "265", reg: "530", prefix: "+65 6" }, "South Korea": { cur: "₩", price: "265000", reg: "530000", prefix: "+82 2" }, "Sweden": { cur: "kr ", price: "2100", reg: "4200" }, "Switzerland": { cur: "CHF ", price: "180", reg: "360", prefix: "+41 44" }, "UAE": { cur: "AED ", price: "730", reg: "1460" }, "UK": { cur: "£", price: "155", reg: "310", prefix: "+44 20" }, "United States": { cur: "$", price: "199", reg: "399", prefix: "+1 (555)" } };
+        // Markets and Currencies... (remain unchanged from base)
+        const marketCurrency = { "Australia": { cur: "$", price: "305", reg: "610", prefix: "+61 2" }, "Brazil": { cur: "R$", price: "990", reg: "1980", prefix: "+55 11" }, "Canada": { cur: "$", price: "275", reg: "550", prefix: "+1 (416)" }, "Chile": { cur: "CLP ", price: "190.000", reg: "380.000", prefix: "+56 2" }, "China": { cur: "¥", price: "1450", reg: "2900", prefix: "+86 10" }, "France": { cur: "€", price: "185", reg: "370", prefix: "+33 1" }, "Germany": { cur: "€", price: "185", reg: "370", prefix: "+49 30" }, "India": { cur: "₹", price: "16500", reg: "33000", prefix: "+91 11" }, "Ireland": { cur: "€", price: "185", reg: "370", prefix: "+353 1" }, "Israel": { cur: "₪", price: "720", reg: "1440", prefix: "+972 3" }, "Japan": { cur: "¥", price: "30000", reg: "60000", prefix: "+81 3" }, "Norway": { cur: "kr ", price: "2150", reg: "4300", prefix: "+47 21" }, "Poland": { cur: "zł ", price: "820", reg: "1640", prefix: "+48 22" }, "Russia": { cur: "₽", price: "18500", reg: "37000", prefix: "+7 495" }, "Singapore": { cur: "S$", price: "265", reg: "530", prefix: "+65 6" }, "South Korea": { cur: "₩", price: "265000", reg: "530000", prefix: "+82 2" }, "Sweden": { cur: "kr ", price: "2100", reg: "4200", prefix: "+46 8" }, "Switzerland": { cur: "CHF ", price: "180", reg: "360", prefix: "+41 44" }, "UAE": { cur: "AED ", price: "730", reg: "1460", prefix: "+971 4" }, "UK": { cur: "£", price: "155", reg: "310", prefix: "+44 20" }, "United States": { cur: "$", price: "199", reg: "399", prefix: "+1 (555)" } };
+        const comingSoon = ["Argentina", "Austria", "Belgium", "Colombia", "Denmark", "Egypt", "Finland", "Greece", "Hong Kong", "Indonesia", "Italy", "Malaysia", "Mexico", "Netherlands", "New Zealand", "Portugal", "Qatar", "Saudi Arabia", "South Africa", "Spain", "Thailand", "Turkey", "Vietnam"];
         const languages = [{ id: 'AR', n: 'Arabic', f: 'sa', rtl: true }, { id: 'BN', n: 'Bengali', f: 'bd' }, { id: 'ZH', n: 'Chinese', f: 'cn' }, { id: 'NL', n: 'Dutch', f: 'nl' }, { id: 'EN', n: 'English', f: 'us' }, { id: 'FR', n: 'French', f: 'fr' }, { id: 'DE', n: 'German', f: 'de' }, { id: 'HI', n: 'Hindi', f: 'in' }, { id: 'IT', n: 'Italian', f: 'it' }, { id: 'JA', n: 'Japanese', f: 'jp' }, { id: 'KO', n: 'Korean', f: 'kr' }, { id: 'MS', n: 'Malay', f: 'my' }, { id: 'PT', n: 'Portuguese', f: 'pt' }, { id: 'RU', n: 'Russian', f: 'ru' }, { id: 'ES', n: 'Spanish', f: 'mx' }, { id: 'SV', n: 'Swedish', f: 'se' }, { id: 'TH', n: 'Thai', f: 'th' }, { id: 'TR', n: 'Turkish', f: 'tr' }, { id: 'UR', n: 'Urdu', f: 'pk', rtl: true }, { id: 'VI', n: 'Vietnamese', f: 'vn' }];
 
+        // i18n simplified for current update - industry names are shared
+        const industryList = Object.keys(assistants);
         const i18n = {
-            AR: { h1: "موظف استقبال ذكاء اصطناعي<br>عالمي بدون تدخل بشري", p: "تنشيط فوري للشركات الصغيرة. <span class='text-orange-500'>نشر عالمي. بدون بشر.</span>", start: "بدء التنشيط", now: "نشط الآن", beta: "وصول تجريبي", reg: "عادي", live: "بث عالمي", close: "إغلاق", feats: ["مكالمات غير محدودة", "دفع شهري", "بدون عقد"], steps: ["01 السوق", "02 الصناعة", "03 العمل", "04 الدور", "05 تجربة", "06 نشر"], vals: ["اختر", "اختر", "مزامنة", "اختر", "تجربة", "فوري"], actions: { demo: "بدء التجربة الصوتية المباشرة", save: "حفظ" } },
-            EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant SMB Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", close: "Close", feats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], vals: ["Select", "Select", "Sync", "Choose", "Sandbox", "Instant"], actions: { demo: "START LIVE VOICE DEMO", save: "SAVE" } },
-            ES: { h1: "RECEPCIONISTA IA GLOBAL<br>SIN HUMANOS", p: "Activación PME instantánea. <span class='text-orange-500'>Despliegue mundial. Sin humanos.</span>", start: "Iniciar activación", now: "Activar ahora", beta: "ACCESO BETA", reg: "Regular", live: "Vivo Global", close: "Cerrar", feats: ["Llamadas ilimitadas", "Pago mensual", "Sin contrato"], steps: ["01 Mercado", "02 Industria", "03 Empresa", "04 Rol", "05 Demo", "06 Desplegar"], vals: ["Elegir", "Elegir", "Sinc", "Elegir", "Prueba", "Instante"], actions: { demo: "INICIAR DEMO DE VOZ", save: "GUARDAR" } }
+            EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant SMB Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", close: "Close", feats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], vals: ["Select", "Select", "Sync", "Choose", "Sandbox", "Instant"], proceed: "Proceed to Step", headers: ["Live Nodes", "Coming Soon", "Choose Local Number"], industries: industryList, roles: ["Receptionist", "Lead Qualifier", "Booking Agent"], actions: { demo: "START LIVE VOICE DEMO", save: "SAVE", deploy: "DEPLOY SYSTEM NOW" }, waitlist: "Reserve", placeholders: { name: "ENTER NAME", email: "EMAIL" } }
         };
 
+        // UI Initialization...
         function initLangList() { const list = document.getElementById('langList'); list.innerHTML = ""; languages.sort((a,b) => a.n.localeCompare(b.n)).forEach(l => { const b = document.createElement('button'); b.className = "modal-btn"; b.setAttribute('data-n', l.n); b.onclick = () => setLang(l.f, l.id); b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3"> ${l.n}`; list.appendChild(b); }); }
         function toggleLangMenu() { const d = document.getElementById('langMenu'); d.style.display = (d.style.display==='flex')?'none':'flex'; }
         function filterLanguages() { const q = document.getElementById('langSearch').value.toUpperCase(); const btns = document.getElementById('langList').getElementsByTagName('button'); for (let b of btns) { b.style.display = b.getAttribute('data-n').toUpperCase().includes(q) ? "" : "none"; } }
 
         function setLang(cc, langCode) {
-            const langData = languages.find(l => l.id === langCode); document.body.dir = langData.rtl ? 'rtl' : 'ltr';
-            currentLang = langCode; const t = i18n[currentLang] || i18n.EN;
+            const langData = languages.find(l => l.id === langCode);
+            document.body.dir = langData.rtl ? 'rtl' : 'ltr';
+            currentLang = langCode; 
+            const t = i18n[currentLang] || i18n.EN;
             document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
             document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
-            document.getElementById('hero-h1').innerHTML = t.h1 || i18n.EN.h1;
-            document.getElementById('hero-p').innerHTML = t.p || i18n.EN.p;
-            document.getElementById('hero-cta').innerText = t.start || i18n.EN.start;
-            document.getElementById('side-cta').innerText = t.now || i18n.EN.now;
-            document.querySelectorAll('.feat-txt').forEach((el, i) => el.innerText = (t.feats && t.feats[i]) || i18n.EN.feats[i]);
-            document.querySelectorAll('.step-label').forEach((el, i) => el.innerText = (t.steps && t.steps[i]) || i18n.EN.steps[i]);
+            document.getElementById('hero-h1').innerHTML = t.h1;
+            document.getElementById('hero-p').innerHTML = t.p;
+            document.getElementById('hero-cta').innerText = t.start;
+            document.getElementById('side-cta').innerText = t.now;
+            document.getElementById('beta-txt').innerText = t.beta;
+            document.getElementById('live-label').innerText = t.live;
+            document.getElementById('mClose').innerText = t.close;
+            document.querySelectorAll('.feat-txt').forEach((el, i) => el.innerText = t.feats[i] || i18n.EN.feats[i]);
+            document.querySelectorAll('.step-label').forEach((el, i) => el.innerText = t.steps[i] || i18n.EN.steps[i]);
+            document.querySelectorAll('.val-label').forEach((el, i) => { if(completedSteps <= i) el.innerText = t.vals[i] || i18n.EN.vals[i]; });
             toggleLangMenu();
         }
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal'), c = document.getElementById('mContent'), t = document.getElementById('mTitle'), lang = i18n[currentLang] || i18n.EN;
-            m.style.display = 'flex'; c.innerHTML = "";
+            m.style.display = 'flex'; c.innerHTML = ""; c.className = "flex flex-col gap-2";
+            
             if(step === 1) { 
-                t.innerText = lang.steps[0]; Object.keys(marketCurrency).forEach(l => { const b = createBtn(l, () => { const mc = marketCurrency[l]; selectedMarket = l; document.getElementById('main-currency').innerText = mc.cur; document.getElementById('main-price').innerText = mc.price; document.getElementById('reg-txt').innerText = `${mc.cur}${mc.reg} ${lang.reg || i18n.EN.reg}`; finish(1, l); }); b.innerHTML = `<div class="dot-blink"></div> <span>${l}</span>`; c.appendChild(b); });
+                t.innerText = lang.steps[0]; createHeader(lang.headers[0], "text-green-500", c);
+                Object.keys(marketCurrency).forEach(l => { const b = createBtn(l, () => { finish(1, l); }); b.innerHTML = `<div class="dot-blink"></div> <span>${l}</span>`; c.appendChild(b); });
             } else if (step === 2) {
-                t.innerText = lang.steps[1]; industryList.forEach(name => c.appendChild(createBtn(name, () => { currentIndustry = name; finish(2, name); })));
+                t.innerText = lang.steps[1]; 
+                c.className = "grid-layout"; // GRID FOR INDUSTRIES
+                industryList.sort().forEach(name => c.appendChild(createBtn(name, () => { currentIndustry = name; finish(2, name); })));
             } else if (step === 3) {
-                t.innerText = lang.steps[2]; c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none focus:border-orange-500"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase">${lang.actions.save}</button>`;
+                t.innerText = lang.steps[2]; c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none focus:border-orange-500"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>`;
             } else if (step === 4) {
-                t.innerText = lang.steps[3]; rolesList.forEach(r => c.appendChild(createBtn(r, () => finish(4, r))));
+                t.innerText = lang.steps[3]; lang.roles.forEach(r => c.appendChild(createBtn(r, () => finish(4, r))));
             } else if (step === 5) {
-                t.innerText = lang.steps[4]; const b = createBtn(lang.actions.demo, runVoice); b.className = "orange-btn w-full py-4 rounded-xl font-black text-[10px] uppercase italic"; c.appendChild(b);
+                t.innerText = lang.steps[4]; const b = createBtn("START LIVE VOICE DEMO", runVoice); b.className = "orange-btn w-full py-4 rounded-xl font-black text-[10px]"; c.appendChild(b);
             } else if (step === 6) {
-                t.innerText = "CHOOSE NUMBER";
-                for(let i=0; i<3; i++) { const num = `${marketCurrency[selectedMarket].prefix} ${Math.floor(100+Math.random()*899)}-${Math.floor(1000+Math.random()*8999)}`; c.appendChild(createBtn(num, () => { confetti(); finish(6, "READY"); setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1200); })); }
+                t.innerText = "CHOOSE LOCAL NUMBER";
+                for(let i=0; i<3; i++) { const num = `+1 (555) ${Math.floor(100+Math.random()*899)}-${Math.floor(1000+Math.random()*8999)}`; c.appendChild(createBtn(num, () => { confetti(); finish(6, "READY"); setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1200); })); }
             }
         }
 
         function createBtn(txt, fn) { const b = document.createElement('button'); b.className = "modal-btn"; b.innerText = txt; b.onclick = (e) => { e.preventDefault(); fn(); }; return b; }
+        function createHeader(txt, cls, cont) { const h = document.createElement('p'); h.className = `text-[8px] font-black mb-1 uppercase text-left ${cls}`; h.innerText = txt; cont.appendChild(h); }
         function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
         function finish(s, v) { completedSteps = s; const el = document.getElementById(`v${s}`), card = document.getElementById(`s${s}`); el.innerText = v; el.classList.replace('text-white/30', 'text-white'); card.classList.add('active'); card.classList.remove('next-focus'); closeModal(); if(s < 6) document.getElementById(`s${s+1}`).classList.add('next-focus'); }
         function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
         function updateParallax(e) { document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%'); document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%'); }
-        async function runVoice() { const id = assistants[currentIndustry]; try { await navigator.mediaDevices.getUserMedia({ audio: true }); if(window.vapiSDK) { window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); closeModal(); finish(5, "ACTIVE"); } } catch(e) { alert("Mic required."); } }
+        async function runVoice() { const id = assistants[currentIndustry] || assistants["Electrical"]; try { await navigator.mediaDevices.getUserMedia({ audio: true }); if(window.vapiSDK) { window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); closeModal(); finish(5, "ACTIVE"); } } catch(e) { alert("Mic required."); } }
         setInterval(() => { const now = new Date(), h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds(); document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; }, 1000);
         initLangList();
         (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
