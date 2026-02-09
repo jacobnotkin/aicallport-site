@@ -9,30 +9,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; } 
-        html, body { width: 100%; min-height: 100vh; background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
-        body { padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        
+        html, body { width: 100%; position: relative; background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+        body { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 12px; }
+        @media (min-width: 1024px) { body { justify-content: center; } }
         .bg-glow { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%); pointer-events: none; }
-        .console-container { width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 30px; position: relative; z-index: 10; }
-        
+        .console-container { width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; position: relative; z-index: 10; margin-bottom: 80px; }
         .hero-title { background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: 0.2s; color: white; font-weight: 800; }
-        .orange-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: transform 0.2s; }
         .orange-btn:active { transform: scale(0.98); }
-        
-        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 16px; opacity: 0.3; transition: 0.3s; cursor: pointer; }
-        .step-card.active { border-color: #f97316; background: rgba(249, 115, 22, 0.1); opacity: 1; }
-        .next-focus { animation: border-glow 2s infinite ease-in-out; opacity: 1; }
-        
-        @keyframes border-glow { 0%, 100% { border-color: rgba(249, 115, 22, 0.3); } 50% { border-color: #f97316; box-shadow: 0 0 15px rgba(249, 115, 22, 0.3); } }
-        
-        .floating-lang { position: fixed; top: 20px; right: 20px; z-index: 1000; }
-        .lang-trigger { background: rgba(10, 12, 18, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 15px; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        #langMenu { position: absolute; top: 55px; right: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 10px; display: none; flex-direction: column; gap: 5px; width: 180px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: white; display: flex; align-items: center; gap: 10px; text-transform: uppercase; }
-        .modal-btn:hover { background: rgba(255,255,255,0.1); border-color: #f97316; }
-
-        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s; cursor: pointer; }
+        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; opacity: 1 !important; }
+        .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
+        @keyframes border-glow { 0%, 100% { border-color: rgba(249, 115, 22, 0.3); } 50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); } }
+        .floating-lang { position: fixed; top: 15px; right: 15px; z-index: 1000; }
+        .lang-trigger { background: rgba(10, 12, 18, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 12px; border-radius: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; backdrop-filter: blur(5px); }
+        #langMenu { position: absolute; top: 50px; right: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; display: none; flex-direction: column; gap: 8px; width: 220px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .search-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px; color: white; font-size: 11px; outline: none; width: 100%; margin-bottom: 8px; }
+        .lang-list, .modal-scroll { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; }
+        .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: #f97316; }
+        .modal-btn.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+        .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
+        @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
@@ -41,111 +40,298 @@
     <div class="floating-lang">
         <button onclick="toggleLangMenu()" class="lang-trigger">
             <img id="curFlag" src="https://flagcdn.com/us.svg" class="w-4" alt="Flag">
-            <span id="curLangText" class="text-[10px] font-black text-white uppercase">US | EN</span>
+            <span id="curLangText" class="text-[9px] font-black text-white uppercase">US | EN</span>
         </button>
         <div id="langMenu">
-            <div class="max-h-[300px] overflow-y-auto" id="langList"></div>
+            <input type="text" id="langSearch" class="search-box" placeholder="SEARCH LANGUAGES..." onkeyup="filterList('langList', this.value)">
+            <div class="lang-list" id="langList"></div>
         </div>
     </div>
 
     <div class="console-container">
-        <div class="flex justify-between items-center mb-16">
-            <span class="font-black italic text-2xl text-white uppercase tracking-tighter">AI CALL <span class="text-orange-500">PORT</span></span>
-            <div class="flex items-center gap-2 px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded-full">
-                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                <span class="text-[8px] font-black text-orange-500 uppercase tracking-widest">System Active</span>
+        <div class="flex justify-between items-center mb-6 lg:mb-12">
+            <div class="flex items-center gap-2">
+                <span class="font-black italic text-base lg:text-xl uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
+                <div class="ml-2 px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase leading-none">BETA</div>
+            </div>
+            <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
+                <div class="dot-blink"></div>
+                <span id="live-label" class="text-[7px] font-black text-orange-500 uppercase tracking-widest text-nowrap">Global Live</span>
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-5 gap-12 items-center mb-16">
+        <div class="grid lg:grid-cols-5 gap-6 lg:gap-12 items-center">
             <div class="lg:col-span-3 text-center lg:text-left">
-                <h1 class="text-4xl lg:text-6xl font-black italic uppercase leading-[0.9] mb-6 hero-title">GLOBAL ZERO-HUMAN<br>AI RECEPTIONIST</h1>
-                <p class="text-slate-400 text-sm lg:text-base mb-8 font-bold uppercase tracking-widest">Instant <span class="text-orange-500">Small Business</span> Activation. Worldwide.</p>
-                <button onclick="handleStep(1)" class="orange-btn px-10 py-5 rounded-2xl text-xs uppercase italic tracking-widest">Start Activation Protocol</button>
+                <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
+                <p id="hero-p" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider">Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Worldwide Deployment. No Humans.</span></p>
+                <button onclick="handleStep(1)" id="hero-cta" class="sync-btn orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">Start Activation</button>
             </div>
             
             <div class="lg:col-span-2">
-                <div class="bg-black/40 border border-white/5 p-8 rounded-[32px] text-center">
-                    <div class="flex items-baseline justify-center gap-1 mb-6">
-                        <span id="curSym" class="text-5xl font-black text-white">$</span>
-                        <span id="curPrice" class="text-5xl font-black text-white">199</span>
-                        <span class="text-orange-500 font-bold">/mo</span>
+                <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-6 text-center">
+                    <h3 id="beta-txt" class="text-[10px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]">BETA ACCESS</h3>
+                    <div class="flex flex-col items-center mb-4">
+                        <span id="reg-txt" class="text-slate-600 line-through text-xs font-bold">$399 Regular</span>
+                        <div class="flex items-baseline gap-1">
+                            <span id="main-currency" class="text-4xl lg:text-5xl font-black text-white">$</span>
+                            <span id="main-price" class="text-4xl lg:text-5xl font-black text-white">199</span>
+                            <span class="text-orange-500 font-bold">/mo</span>
+                        </div>
                     </div>
-                    <button onclick="handleStep(1)" class="orange-btn w-full py-4 rounded-xl text-[10px] uppercase italic">Activate Now</button>
+                    <div class="space-y-2 mb-6 text-left max-w-[200px] mx-auto border-y border-white/5 py-4">
+                        <div class="flex items-center gap-2"><svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-black text-white uppercase tracking-tighter feat-txt">Unlimited Calling</span></div>
+                        <div class="flex items-center gap-2"><svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-black text-white uppercase tracking-tighter feat-txt">Pay Monthly</span></div>
+                        <div class="flex items-center gap-2"><svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-black text-white uppercase tracking-tighter feat-txt">No Contract</span></div>
+                    </div>
+                    <div id="timer" class="text-xs font-mono text-white/30 mb-4">00:00:00</div>
+                    <button onclick="handleStep(1)" id="side-cta" class="sync-btn orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic">Activate Now</button>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
-            <div id="s1" class="step-card next-focus" onclick="handleStep(1)"><p class="text-[8px] font-black text-orange-500 mb-1">01 MARKET</p><p id="v1" class="text-[10px] text-white/40 font-bold uppercase">Select</p></div>
-            <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[8px] font-black text-orange-500 mb-1">02 INDUSTRY</p><p id="v2" class="text-[10px] text-white/40 font-bold uppercase">Select</p></div>
-            <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[8px] font-black text-orange-500 mb-1">03 BUSINESS</p><p id="v3" class="text-[10px] text-white/40 font-bold uppercase">Sync</p></div>
-            <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[8px] font-black text-orange-500 mb-1">04 ROLE</p><p id="v4" class="text-[10px] text-white/40 font-bold uppercase">Choose</p></div>
-            <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[8px] font-black text-orange-500 mb-1">05 DEMO</p><p id="v5" class="text-[10px] text-white/40 font-bold uppercase italic">Test</p></div>
-            <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[8px] font-black text-orange-500 mb-1">06 DEPLOY</p><p id="v6" class="text-[10px] text-white/40 font-bold uppercase italic">Live</p></div>
+        <div class="mt-10 lg:mt-20">
+            <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
+                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Activation Protocol</span>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">01 Market</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
+                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">02 Industry</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
+                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">03 Business</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Sync</p></div>
+                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">04 Agent Role</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Choose</p></div>
+                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">05 Demo</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label">Sandbox</p></div>
+                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">06 Deploy</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label">Instant</p></div>
+            </div>
         </div>
     </div>
 
     <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-8 rounded-3xl max-w-sm w-full text-center">
-            <h2 id="mTitle" class="text-xl font-black uppercase text-white mb-6">Setup</h2>
-            <div id="mContent" class="space-y-2"></div>
-            <button onclick="closeModal()" class="mt-8 text-[10px] text-slate-500 font-black uppercase hover:text-white transition-colors">Close</button>
+        <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
+            <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
+            <div id="modalSearchContainer"></div>
+            <div id="mContent" class="modal-scroll flex flex-col gap-2"></div>
+            <button id="mClose" onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white">Close</button>
         </div>
     </div>
 
     <script>
-        let completedSteps = 0;
-        const markets = { "United States": ["$", "199"], "United Kingdom": ["£", "155"], "Germany": ["€", "185"], "Japan": ["¥", "30k"] };
+        const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
+        const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
+        let completedSteps = 0, currentIndustryIdx = 8, currentLang = "EN", selectedMarket = "United States";
+
+        const marketCurrency = {
+            "United States": { cur: "$", price: "199", reg: "399", prefix: "+1", active: true },
+            "United Kingdom": { cur: "£", price: "155", reg: "310", prefix: "+44", active: true },
+            "Canada": { cur: "$", price: "275", reg: "550", prefix: "+1", active: true },
+            "Australia": { cur: "$", price: "305", reg: "610", prefix: "+61", active: true },
+            "Germany": { cur: "€", price: "185", reg: "370", prefix: "+49", active: true },
+            "France": { cur: "€", price: "185", reg: "370", prefix: "+33", active: true },
+            "Italy": { cur: "€", price: "185", reg: "370", prefix: "+39", active: true },
+            "Japan": { cur: "¥", price: "30000", reg: "60000", prefix: "+81", active: true },
+            "Brazil": { cur: "R$", price: "990", reg: "1980", prefix: "+55", active: true },
+            "India": { cur: "₹", price: "16500", reg: "33000", prefix: "+91", active: true },
+            "China": { cur: "¥", price: "1450", reg: "2900", prefix: "+86", active: true },
+            "Korea": { cur: "₩", price: "260000", reg: "520000", prefix: "+82", active: true },
+            "Norway": { cur: "kr", price: "2000", reg: "4000", prefix: "+47", active: true },
+            "Sweden": { cur: "kr", price: "2000", reg: "4000", prefix: "+46", active: true },
+            "Denmark": { cur: "kr.", price: "1350", reg: "2700", prefix: "+45", active: true },
+            "Poland": { cur: "zł", price: "800", reg: "1600", prefix: "+48", active: true },
+            "Netherlands": { cur: "€", price: "185", reg: "370", prefix: "+31", active: true },
+            "Portugal": { cur: "€", price: "185", reg: "370", prefix: "+351", active: true },
+            "Israel": { cur: "₪", price: "720", reg: "1440", prefix: "+972", active: true },
+            "Russia": { cur: "₽", price: "18500", reg: "37000", prefix: "+7", active: true },
+            "Turkey": { cur: "₺", price: "6500", reg: "13000", prefix: "+90", active: true },
+            "Thailand": { cur: "฿", price: "6800", reg: "13600", prefix: "+66", active: true },
+            "Mexico": { cur: "$", price: "---", reg: "---", prefix: "+52", active: false },
+            "Spain": { cur: "€", price: "---", reg: "---", prefix: "+34", active: false },
+            "Vietnam": { cur: "₫", price: "---", reg: "---", prefix: "+84", active: false },
+            "Argentina": { cur: "$", price: "---", reg: "---", prefix: "+54", active: false },
+            "Austria": { cur: "€", price: "---", reg: "---", prefix: "+43", active: false },
+            "Belgium": { cur: "€", price: "---", reg: "---", prefix: "+32", active: false },
+            "Chile": { cur: "$", price: "---", reg: "---", prefix: "+56", active: false },
+            "Colombia": { cur: "$", price: "---", reg: "---", prefix: "+57", active: false },
+            "Finland": { cur: "€", price: "---", reg: "---", prefix: "+358", active: false },
+            "Greece": { cur: "€", price: "---", reg: "---", prefix: "+30", active: false },
+            "Hong Kong": { cur: "$", price: "---", reg: "---", prefix: "+852", active: false },
+            "Ireland": { cur: "€", price: "---", reg: "---", prefix: "+353", active: false },
+            "Malaysia": { cur: "RM", price: "---", reg: "---", prefix: "+60", active: false },
+            "New Zealand": { cur: "$", price: "---", reg: "---", prefix: "+64", active: false },
+            "Philippines": { cur: "₱", price: "---", reg: "---", prefix: "+63", active: false },
+            "Singapore": { cur: "$", price: "---", reg: "---", prefix: "+65", active: false },
+            "South Africa": { cur: "R", price: "---", reg: "---", prefix: "+27", active: false },
+            "Switzerland": { cur: "CHF", price: "---", reg: "---", prefix: "+41", active: false },
+            "Taiwan": { cur: "$", price: "---", reg: "---", prefix: "+886", active: false },
+            "United Arab Emirates": { cur: "AED", price: "---", reg: "---", prefix: "+971", active: false }
+        };
+
         const languages = [
-            { id: 'EN', n: 'English', f: 'us' }, { id: 'ES', n: 'Español', f: 'mx' }, { id: 'FR', n: 'Français', f: 'fr' }, { id: 'DE', n: 'Deutsch', f: 'de' },
-            { id: 'IT', n: 'Italiano', f: 'it' }, { id: 'PT', n: 'Português', f: 'pt' }, { id: 'RU', n: 'Русский', f: 'ru' }, { id: 'JP', n: '日本語', f: 'jp' }
+            { id: 'EN', n: 'English', f: 'us' }, { id: 'ES', n: 'Spanish', f: 'mx' }, { id: 'FR', n: 'French', f: 'fr' },
+            { id: 'DE', n: 'German', f: 'de' }, { id: 'IT', n: 'Italian', f: 'it' }, { id: 'PT', n: 'Portuguese', f: 'pt' },
+            { id: 'RU', n: 'Russian', f: 'ru' }, { id: 'JP', n: 'Japanese', f: 'jp' }, { id: 'KR', n: 'Korean', f: 'kr' },
+            { id: 'CN', n: 'Chinese', f: 'cn' }, { id: 'AR', n: 'Arabic', f: 'sa' }, { id: 'IN', n: 'Hindi', f: 'in' },
+            { id: 'NL', n: 'Dutch', f: 'nl' }, { id: 'PL', n: 'Polish', f: 'pl' }, { id: 'TR', n: 'Turkish', f: 'tr' },
+            { id: 'SE', n: 'Swedish', f: 'se' }, { id: 'NO', n: 'Norwegian', f: 'no' }, { id: 'DK', n: 'Danish', f: 'dk' },
+            { id: 'IL', n: 'Hebrew', f: 'il' }, { id: 'TH', n: 'Thai', f: 'th' }
         ];
 
-        function setLang(id, flag) {
-            document.getElementById('curFlag').src = `https://flagcdn.com/${flag}.svg`;
-            document.getElementById('curLangText').innerText = `${flag.toUpperCase()} | ${id}`;
+        const industryKeys = ["Accounting", "After Hours", "Auto Repair", "Bakery", "Boutique", "Car Detailing", "Car Rental", "Dental", "Electrical", "Electronics", "Flower Shop", "Furniture", "HVAC", "Hair Salon", "Handyman", "Home Cleaning", "Insurance", "Jewelry", "Landscaping", "Legal", "Locksmith", "Massage", "Med Spa", "Nail Salon", "Pest Control", "Plumbing", "Real Estate", "Restaurant", "Roofing", "Towing", "Urgent Care", "Veterinary", "Windows"];
+
+        const i18n = {
+            EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", priceFeats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], industries: industryKeys, industryRoles: { "default": ["Receptionist", "Agent"] } },
+            ES: { h1: "RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p: "Activación Instantánea de <span class='text-orange-500'>NEGOCIOS</span>. <span class='text-orange-500'>Sin Humanos.</span>", start: "Iniciar", now: "Activar", beta: "ACCESO BETA", reg: "Regular", live: "En Vivo", priceFeats: ["Llamadas Ilimitadas", "Pago Mensual", "Sin Contrato"], steps: ["01 Mercado", "02 Industria", "03 Empresa", "04 Rol", "05 Demo", "06 Desplegar"], industries: ["Contabilidad", "Fuera de Horas", "Taller Mecánico", "Panadería", "Boutique", "Lavado Autos", "Renta Autos", "Dental", "Electricidad", "Electrónica", "Florería", "Muebles", "HVAC", "Salón Belleza", "Handyman", "Limpieza", "Seguros", "Joyería", "Paisajismo", "Legal", "Cerrajería", "Masajes", "Med Spa", "Uñas", "Plagas", "Plomería", "Inmuebles", "Restaurante", "Techos", "Grúa", "Urgencias", "Veterinaria", "Ventanas"], industryRoles: { "default": ["Recepcionista", "Agente"] } },
+            FR: { h1: "RÉCEPTIONNISTE IA<br> SANS HUMAINS", p: "Activation <span class='text-orange-500'>PETITE ENTREPRISE</span>. <span class='text-orange-500'>Déploiement mondial.</span>", start: "Démarrer", now: "Activer", beta: "ACCÈS BÉTA", reg: "Régulier", live: "En Direct", priceFeats: ["Appels Illimités", "Payer Mensuellement", "Sans Contrat"], steps: ["01 Marché", "02 Industrie", "03 Entreprise", "04 Rôle", "05 Démo", "06 Déployer"], industries: ["Comptabilité", "Après Heures", "Garage", "Boulangerie", "Boutique", "Lavage Auto", "Location Auto", "Dentaire", "Électricité", "Électronique", "Fleuriste", "Meubles", "HVAC", "Salon Coiffure", "Bricoleur", "Nettoyage", "Assurances", "Bijouterie", "Paysage", "Juridique", "Serrurier", "Massage", "Med Spa", "Ongles", "Nuisibles", "Plomberie", "Immobilier", "Restaurant", "Toiture", "Remorquage", "Urgences", "Vétérinaire", "Fenêtres"], industryRoles: { "default": ["Réceptionniste", "Agent"] } },
+            DE: { h1: "KI-EMPFANGSCHEF<br> OHNE MENSCHEN", p: "Sofortige <span class='text-orange-500'>KLEINUNTERNEHMEN</span> Aktivierung.", start: "Start", now: "Aktivieren", beta: "BETA-ZUGANG", reg: "Regulär", live: "Live", priceFeats: ["Unbegrenzte Anrufe", "Monatliche Zahlung", "Kein Vertrag"], steps: ["01 Markt", "02 Branche", "03 Geschäft", "04 Rolle", "05 Demo", "06 Aktivieren"], industries: ["Buchhaltung", "After Hours", "Werkstatt", "Bäckerei", "Boutique", "Aufbereitung", "Mietwagen", "Zahnarzt", "Elektrik", "Elektronik", "Blumen", "Möbel", "HVAC", "Friseur", "Handwerker", "Reinigung", "Versicherung", "Schmuck", "Gartenbau", "Recht", "Schlüsseldienst", "Massage", "Med Spa", "Nägel", "Schädlingsbekämpfung", "Sanitär", "Immobilien", "Restaurant", "Dach", "Abschleppdienst", "Notaufnahme", "Tierarzt", "Fenster"], industryRoles: { "default": ["Empfang", "Agent"] } },
+            IT: { h1: "RECEPTIONIST AI<br> SENZA UMANI", p: "Attivazione Istantanea <span class='text-orange-500'>PICCOLE IMPRESE</span>.", start: "Inizia", now: "Attiva", beta: "ACCESSO BETA", reg: "Regolare", live: "Dal Vivo", priceFeats: ["Chiamate Illimitate", "Pagamento Mensile", "Senza Contratto"], steps: ["01 Mercato", "02 Settore", "03 Azienda", "04 Ruolo", "05 Demo", "06 Distribuisci"], industries: ["Contabilità", "Dopo Orario", "Meccanico", "Forno", "Boutique", "Lavaggio Auto", "Noleggio Auto", "Dentista", "Elettricista", "Elettronica", "Fiorista", "Mobili", "HVAC", "Parrucchiere", "Tuttofare", "Pulizie", "Assicurazione", "Gioielleria", "Paesaggistica", "Legale", "Fabbro", "Massaggi", "Med Spa", "Unghie", "Disinfestazione", "Idraulico", "Immobiliare", "Ristorante", "Tetti", "Rimorchio", "Urgenze", "Veterinario", "Finestre"], industryRoles: { "default": ["Receptionist", "Agente"] } },
+            PT: { h1: "RECEPCIONISTA IA<br> SEM HUMANOS", p: "Ativação Instantânea <span class='text-orange-500'>PEQUENAS EMPRESAS</span>.", start: "Começar", now: "Ativar", beta: "ACESSO BETA", reg: "Regular", live: "Ao Vivo", priceFeats: ["Chamadas Ilimitadas", "Pagamento Mensal", "Sem Contrato"], steps: ["01 Mercado", "02 Indústria", "03 Empresa", "04 Função", "05 Demo", "06 Implantar"], industries: ["Contabilidade", "Pós-Horário", "Oficina", "Padaria", "Boutique", "Lavagem", "Aluguel Carro", "Dentista", "Elétrica", "Eletrônicos", "Floricultura", "Móveis", "HVAC", "Salão", "Handyman", "Limpeza", "Seguros", "Joalheria", "Jardinagem", "Jurídico", "Chaveiro", "Massagem", "Med Spa", "Unhas", "Pragas", "Encanador", "Imobiliária", "Restaurante", "Telhados", "Guincho", "Urgência", "Veterinário", "Janelas"], industryRoles: { "default": ["Recepcionista", "Agente"] } },
+            RU: { h1: "AI-РЕЦЕПЦИЯ<br> БЕЗ ЛЮДЕЙ", p: "Мгновенная активация <span class='text-orange-500'>МАЛОГО БИЗНЕСА</span>.", start: "Начать", now: "Активировать", beta: "БЕТА-ДОСТУП", reg: "Обычная", live: "В прямом эфире", priceFeats: ["Безлимитные звонки", "Ежемесячная оплата", "Без контракта"], steps: ["01 Рынок", "02 Отрасль", "03 Бизнес", "04 Роль", "05 Демо", "06 Запуск"], industries: ["Бухгалтерия", "Внеурочное время", "Авторемонт", "Пекарня", "Бутик", "Детейлинг", "Прокат авто", "Стоматология", "Электрика", "Электроника", "Цветы", "Мебель", "ОВК", "Салон красоты", "Мастер", "Уборка", "Страхование", "Ювелир", "Ландшафт", "Юрист", "Слесарь", "Массаж", "Мед-спа", "Ногти", "Дезинфекция", "Сантехник", "Недвижимость", "Ресторан", "Кровля", "Эвакуатор", "Срочная помощь", "Ветеринар", "Окна"], industryRoles: { "default": ["Регистратор", "Агент"] } },
+            JP: { h1: "グローバル・ゼロヒューマン<br> AI受付係", p: "<span class='text-orange-500'>SMALL BUSINESS</span> 即時有効化。", start: "開始", now: "有効化", beta: "ベータアクセス", reg: "通常", live: "ライブ", priceFeats: ["無制限通話", "月払い", "契約なし"], steps: ["01 市場", "02 業種", "03 ビジネス", "04 役割", "05 デモ", "06 展開"], industries: ["会計", "時間外サポート", "自動車修理", "ベーカリー", "ブティック", "洗車", "レンタカー", "歯科", "電気", "電子機器", "花屋", "家具", "空調", "美容室", "便利屋", "ハウスクリーニング", "保険", "宝石", "造園", "法律", "鍵屋", "マッサージ", "メドスパ", "ネイル", "害虫駆除", "配管", "不動産", "レストラン", "屋根", "レッカー", "急患", "獣医", "窓"], industryRoles: { "default": ["受付", "エージェント"] } },
+            CN: { h1: "全球零人工<br> AI 接待員", p: "即時 <span class='text-orange-500'>SMALL BUSINESS</span> 激活。", start: "開始", now: "立即激活", beta: "測試版", reg: "定期", live: "直播中", priceFeats: ["無限通話", "按月付款", "無合約"], steps: ["01 市場", "02 行業", "03 業務", "04 角色", "05 演示", "06 部署"], industries: ["會計", "售後", "汽修", "烘焙", "精品", "洗車", "租車", "牙科", "電力", "電子", "花店", "家具", "暖通", "沙龍", "修繕", "保潔", "保險", "珠寶", "園林", "法律", "鎖匠", "按摩", "醫美", "美甲", "除蟲", "管道", "房產", "餐飲", "屋頂", "拖車", "急診", "獸醫", "門窗"], industryRoles: { "default": ["接待員", "代理"] } },
+            KR: { h1: "AI 리셉셔니스트<br> 인력 제로", p: "<span class='text-orange-500'>소상공인</span> 즉시 활성화.", start: "시작", now: "활성화", beta: "베타 액세스", reg: "정가", live: "라이브", priceFeats: ["무제한 통화", "월 결제", "무약정"], steps: ["01 시장", "02 업종", "03 비즈니스", "04 역할", "05 데모", "06 배포"], industries: ["회계", "업무외시간", "자동차 정비", "베이커리", "부티크", "세차", "렌터카", "치과", "전기", "전자제품", "꽃집", "가구", "냉난방", "헤어살롱", "핸디맨", "청소", "보험", "보석", "조경", "법률", "열쇠", "마사지", "메드스파", "네일", "해충방제", "배관", "부동산", "레스토랑", "지붕", "견인", "응급실", "수의사", "창문"], industryRoles: { "default": ["접수원", "에이전트"] } },
+            AR: { h1: "موظف استقبال ذكاء اصطناعي<br> بدون بشر", p: "تفعيل فوري <span class='text-orange-500'>للأعمال الصغيرة</span>.", start: "ابدأ", now: "تفعيل", beta: "وصول بيتا", reg: "عادي", live: "مباشر", priceFeats: ["مكالمات غير محدودة", "دفع شهري", "بدون عقد"], steps: ["01 السوق", "02 الصناعة", "03 العمل", "04 الدور", "05 عرض", "06 نشر"], industries: ["المحاسبة", "بعد الساعات", "تصليح سيارات", "مخبز", "بوتيك", "غسيل سيارات", "تأجير سيارات", "أسنان", "كهرباء", "إلكترونيات", "زهور", "أثاث", "تكييف", "صالون شعر", "عامل صيانة", "تنظيف منازل", "تأمين", "مجوهرات", "تنسيق حدائق", "قانوني", "نجار", "تدليك", "سبا", "أظافر", "مكافحة حشرات", "سباكة", "عقارات", "مطعم", "سقف", "سحب", "طوارئ", "بيطري", "نوافذ"], industryRoles: { "default": ["موظف استقبال", "عميل"] } },
+            IN: { h1: "AI रिसेप्शनिस्ट<br> बिना किसी मानव के", p: "<span class='text-orange-500'>छोटे व्यवसायों</span> के लिए तत्काल सक्रियण।", start: "शुरू करें", now: "सक्रिय करें", beta: "बीटा एक्सेस", reg: "नियमित", live: "लाइव", priceFeats: ["असीमित कॉलिंग", "मासिक भुगतान", "कोई अनुबंध नहीं"], steps: ["01 बाजार", "02 उद्योग", "03 व्यवसाय", "04 भूमिका", "05 डेमो", "06 तैनात करें"], industries: ["लेखांकन", "समय के बाद", "ऑटो मरम्मत", "बेकरी", "बुटीक", "कार डिटेलिंग", "कार किराए पर लेना", "दंत", "इलेक्ट्रिकल", "इलेक्ट्रॉनिक्स", "फूलों की दुकान", "फर्नीचर", "HVAC", "हेयर सैलูน", "हैंडीमैन", "घर की सफाई", "बीमा", "आभूषण", "लैंडस्केपिंग", "कानूनी", "ताला बनाने वाला", "मालिश", "मेड स्पा", "नेल सैलून", "कीट नियंत्रण", "पाइपिंग", "रियल एस्टेट", "रेस्तरां", "छत", "टोइंग", "तत्काल देखभाल", "पशु चिकित्सक", "खिड़कियां"], industryRoles: { "default": ["रिसेप्शनिस्ट", "एजेंट"] } },
+            NL: { h1: "AI RECEPTIONIST<br> ZONDER MENSEN", p: "Directe <span class='text-orange-500'>MKB</span> Activering.", start: "Start", now: "Activeer", beta: "BETA TOEGANG", reg: "Normaal", live: "Live", priceFeats: ["Onbeperkt Bellen", "Maandelijkse Betaling", "Geen Contract"], steps: ["01 Markt", "02 Branche", "03 Bedrijf", "04 Rol", "05 Demo", "06 Implementeren"], industries: ["Boekhouding", "Na Sluitingstijd", "Autoreparatie", "Bakkerij", "Boutique", "Car Detailing", "Autoverhuur", "Tandheelkunde", "Elektra", "Elektronica", "Bloemist", "Meubels", "HVAC", "Kapsalon", "Klusjesman", "Schoonmaak", "Verzekeringen", "Juwelier", "Tuinieren", "Juridisch", "Slotenmaker", "Massage", "Med Spa", "Nagels", "Ongediertebestrijding", "Loodgieter", "Vastgoed", "Restaurant", "Dakdekker", "Slepen", "Spoedeisende Hulp", "Dierenarts", "Ramen"], industryRoles: { "default": ["Receptionist", "Agent"] } },
+            PL: { h1: "RECEPCJONISTA AI<br> BEZ LUDZI", p: "Natychmiastowa aktywacja <span class='text-orange-500'>MAŁYCH FIRM</span>.", start: "Start", now: "Aktywuj", beta: "DOSTĘP BETA", reg: "Normalny", live: "Na Żywo", priceFeats: ["Nielimitowane Połączenia", "Płatność Miesięczna", "Bez Umowy"], steps: ["01 Rynek", "02 Branża", "03 Firma", "04 Rola", "05 Demo", "06 Wdróż"], industries: ["Księgowość", "Po Godzinach", "Naprawa Aut", "Piekarnia", "Butik", "Czyszczenie Aut", "Wynajem Aut", "Stomatolog", "Elektryka", "Elektronika", "Kwiaciarnia", "Meble", "Klimatyzacja", "Fryzjer", "Złota Rączka", "Sprzątanie", "Ubezpieczenia", "Jubiler", "Ogrodnik", "Prawnik", "Ślusarz", "Masaż", "Med Spa", "Paznokcie", "Dezynfekcja", "Hydraulik", "Nieruchomości", "Restauracja", "Dachy", "Holowanie", "Pomoc Doraźna", "Weterynarz", "Okna"], industryRoles: { "default": ["Recepcjonista", "Agent"] } },
+            TR: { h1: "INSANSIZ AI<br> RESEPSİYONİST", p: "Hızlı <span class='text-orange-500'>KÜÇÜK İŞLETME</span> Aktivasyonu.", start: "Başlat", now: "Aktive Et", beta: "BETA ERİŞİMİ", reg: "Normal", live: "Canlı", priceFeats: ["Sınırsız Arama", "Aylık Ödeme", "Sözleşmesiz"], steps: ["01 Pazar", "02 Sektör", "03 İşletme", "04 Rol", "05 Demo", "06 Kurulum"], industries: ["Muhasebe", "Mesai Dışı", "Oto Tamir", "Fırın", "Butik", "Araç Bakım", "Araç Kiralama", "Dişçi", "Elektrik", "Elektronik", "Çiçekçi", "Mobilya", "HVAC", "Kuaför", "Tamirci", "Ev Temizliği", "Sigorta", "Kuyumcu", "Peyzaj", "Hukuk", "Çilingir", "Masaj", "Med Spa", "Nail Salon", "Haşere Kontrol", "Tesisatçı", "Emlak", "Restoran", "Çatı", "Çekici", "Acil Servis", "Veteriner", "Pencere"], industryRoles: { "default": ["Resepsiyonist", "Ajan"] } },
+            SE: { h1: "AI RECEPTIONIST<br> UTAN MÄNNISKOR", p: "Snabb aktivering för <span class='text-orange-500'>SMÅFÖRETAG</span>.", start: "Starta", now: "Aktivera", beta: "BETA-TILLGÅNG", reg: "Ordinarie", live: "Live", priceFeats: ["Obegränsade Samtal", "Betala Månadsvis", "Inget Avtal"], steps: ["01 Marknad", "02 Bransch", "03 Företag", "04 Roll", "05 Demo", "06 Driftsätt"], industries: ["Bokföring", "Efter Stängning", "Bilverkstad", "Bageri", "Butik", "Rekond", "Biluthyrning", "Tandläkare", "El", "Elektronik", "Blomsterbutik", "Möbler", "HVAC", "Frisör", "Handyman", "Hemstädning", "Försäkring", "Smycken", "Trädgård", "Juridik", "Låssmed", "Massage", "Med Spa", "Naglar", "Skadedjur", "Rörmokare", "Fastigheter", "Restaurang", "Tak", "Bärgning", "Akutvård", "Veterinär", "Fönster"], industryRoles: { "default": ["Receptionist", "Agent"] } },
+            NO: { h1: "AI-RESEPSJONIST<br> UTEN MENNESKER", p: "Øyeblikkelig aktivering for <span class='text-orange-500'>BEDRIFTER</span>.", start: "Start", now: "Aktiver", beta: "BETA-TILGANG", reg: "Vanlig", live: "Direkte", priceFeats: ["Ubegrensede Ringing", "Betal Månedlig", "Ingen Kontrakt"], steps: ["01 Marked", "02 Bransje", "03 Bedrift", "04 Rolle", "05 Demo", "06 Distribuer"], industries: ["Regnskap", "Etter Stengetid", "Bilverksted", "Bakeri", "Butikk", "Bilpleie", "Bilutleie", "Tannlege", "Elektriker", "Elektronikk", "Blomster", "Møbler", "HVAC", "Frisør", "Vaktmester", "Rengjøring", "Forsikring", "Smykker", "Hage", "Juridisk", "Låsesmed", "Massasje", "Med Spa", "Negler", "Skadedyr", "Rørlegger", "Eiendom", "Restaurant", "Tak", "Bilberging", "Legevakt", "Veterinær", "Vinduer"], industryRoles: { "default": ["Resepsjonist", "Agent"] } },
+            DK: { h1: "AI RECEPTIONIST<br> UDEN MENNESKER", p: "Hurtig aktivering for <span class='text-orange-500'>SMÅ VIRKSOMHEDER</span>.", start: "Start", now: "Aktiver", beta: "BETA ADGANG", reg: "Normal", live: "Live", priceFeats: ["Ubegrænset Opkald", "Betal Månedligt", "Ingen Kontrakt"], steps: ["01 Marked", "02 Branche", "03 Virksomhed", "04 Rolle", "05 Demo", "06 Udrul"], industries: ["Bogføring", "Efter Lukketid", "Bilværksted", "Bageri", "Butik", "Bilpleie", "Biludlejning", "Tandlæge", "Elektriker", "Elektronik", "Blomster", "Møbler", "HVAC", "Frisør", "Handyman", "Rengøring", "Forsikring", "Smykker", "Have", "Juridisk", "Låsesmed", "Massage", "Med Spa", "Negle", "Skadedyr", "VVS", "Ejendom", "Restaurant", "Tag", "Autohjælp", "Skadestue", "Dyrlæge", "Vinduer"], industryRoles: { "default": ["Receptionist", "Agent"] } },
+            IL: { h1: "פקיד קבלה AI<br> ללא בני אדם", p: "הפעלה מיידית <span class='text-orange-500'>לעסקים קטנים</span>.", start: "התחל", now: "הפעל", beta: "גישת בטא", reg: "רגיל", live: "בשידור חי", priceFeats: ["שיחות ללא הגבלה", "תשלום חודשי", "ללא חוזה"], steps: ["01 שוק", "02 ענף", "03 עסק", "04 תפקיד", "05 דמו", "06 הפצה"], industries: ["חשבונאות", "אחרי שעות", "תיקון רכב", "מאפייה", "בוטיק", "דיטיילינג", "השכרת רכב", "רופא שיניים", "חשמלאי", "אלקטרוניקה", "חנות פרחים", "רהיטים", "מיזוג אוויר", "מספרה", "הנדימן", "ניקיון", "ביטוח", "תכשיטים", "גינון", "משפטי", "מנעולן", "עיסוי", "ספא", "ציפורניים", "הדברה", "אינסטלטור", "נדל\"ן", "מסעדה", "גגות", "גרירה", "רפואה דחופה", "וטרינר", "חלונות"], industryRoles: { "default": ["פקיד קבלה", "סוכן"] } },
+            TH: { h1: "พนักงานต้อนรับ AI<br> ไร้มนุษย์", p: "เปิดใช้งาน <span class='text-orange-500'>ธุรกิจขนาดเล็ก</span> ทันที", start: "เริ่มต้น", now: "เปิดใช้งาน", beta: "เบต้า", reg: "ปกติ", live: "สด", priceFeats: ["โทรไม่จำกัด", "จ่ายรายเดือน", "ไม่มีสัญญา"], steps: ["01 ตลาด", "02 อุตสาหกรรม", "03 ธุรกิจ", "04 บทบาท", "05 เดโม", "06 ติดตั้ง"], industries: ["บัญชี", "นอกเวลา", "ซ่อมรถ", "เบเกอรี่", "บูติก", "ล้างรถ", "เช่ารถ", "ทันตกรรม", "ไฟฟ้า", "อิเล็กทรอนิกส์", "ดอกไม้", "เฟอร์นิเจอร์", "แอร์", "ร้านทำผม", "ช่างซ่อม", "ทำความสะอาด", "ประกัน", "จิวเวลรี่", "จัดสวน", "กฎหมาย", "ช่างกุญแจ", "นวด", "สปา", "ทำเล็บ", "กำจัดแมลง", "ประปา", "อสังหา", "ร้านอาหาร", "หลังคา", "รถยก", "ฉุกเฉิน", "สัตวแพทย์", "หน้าต่าง"], industryRoles: { "default": ["พนักงานต้อนรับ", "ตัวแทน"] } }
+        };
+
+        function setLang(cc, langCode) {
+            currentLang = langCode; 
+            const t = i18n[currentLang] || i18n.EN;
+            const marketData = marketCurrency[selectedMarket] || marketCurrency["United States"];
+
+            document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
+            document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
+            
+            document.getElementById('hero-h1').innerHTML = t.h1 || i18n.EN.h1;
+            document.getElementById('hero-p').innerHTML = t.p || i18n.EN.p;
+            document.getElementById('hero-cta').innerText = t.start || i18n.EN.start;
+            document.getElementById('side-cta').innerText = t.now || i18n.EN.now;
+            document.getElementById('beta-txt').innerText = t.beta || i18n.EN.beta;
+            document.getElementById('reg-txt').innerText = `${marketData.cur}${marketData.reg} ${t.reg || i18n.EN.reg}`;
+            
+            const feats = t.priceFeats || i18n.EN.priceFeats;
+            document.querySelectorAll('.feat-txt').forEach((el, i) => { if (feats[i]) el.innerText = feats[i]; });
+            
+            document.getElementById('live-label').innerText = t.live || i18n.EN.live;
+            const sLabels = t.steps || i18n.EN.steps;
+            document.querySelectorAll('.step-label').forEach((el, i) => { if (sLabels[i]) el.innerText = sLabels[i]; });
+            
             toggleLangMenu(false);
         }
 
-        function handleStep(s) {
-            if (s === 1 || completedSteps >= s - 1) {
-                const modal = document.getElementById('setupModal'), content = document.getElementById('mContent');
-                modal.style.display = 'flex'; content.innerHTML = "";
-                if (s === 1) {
-                    Object.keys(markets).forEach(m => {
-                        const btn = document.createElement('button'); btn.className = "modal-btn"; btn.innerText = m;
-                        btn.onclick = () => { 
-                            document.getElementById('curSym').innerText = markets[m][0];
-                            document.getElementById('curPrice').innerText = markets[m][1];
-                            finish(1, m); 
-                        };
-                        content.appendChild(btn);
-                    });
-                } else { finish(s, "CONFIRMED"); }
+        function triggerModal(step) {
+            const m = document.getElementById('setupModal'), c = document.getElementById('mContent'), s = document.getElementById('modalSearchContainer'), t = document.getElementById('mTitle'), lang = i18n[currentLang] || i18n.EN;
+            m.style.display = 'flex'; c.innerHTML = ""; s.innerHTML = "";
+            
+            if(step === 1) { 
+                t.innerText = lang.steps[0];
+                s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH COUNTRIES..." onkeyup="filterList('mContent', this.value)">`;
+                
+                const countries = Object.keys(marketCurrency);
+                const activeOnes = countries.filter(k => marketCurrency[k].active).sort();
+                const soonOnes = countries.filter(k => !marketCurrency[k].active).sort();
+
+                // 1. ACTIVE ON TOP
+                activeOnes.forEach(name => {
+                    const btn = createBtn(name, () => { updateCurrencyUI(name); finish(1, name); });
+                    btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${name}`;
+                    btn.setAttribute('data-n', name);
+                    c.appendChild(btn);
+                });
+
+                // 2. DIVIDER
+                const div = document.createElement('div');
+                div.className = "text-[8px] font-black text-slate-600 uppercase tracking-[0.2em] my-3 border-b border-white/5 pb-1 text-center";
+                div.innerText = "Coming Soon";
+                c.appendChild(div);
+
+                // 3. COMING SOON AT BOTTOM
+                soonOnes.forEach(name => {
+                    const btn = createBtn(name, () => {});
+                    btn.classList.add('disabled');
+                    btn.style.opacity = "0.3";
+                    btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-slate-700"></div> ${name}`;
+                    btn.setAttribute('data-n', name);
+                    c.appendChild(btn);
+                });
+
+            } else if (step === 2) {
+                t.innerText = lang.steps[1];
+                s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH INDUSTRIES..." onkeyup="filterList('mContent', this.value)">`;
+                const industryList = lang.industries || i18n.EN.industries;
+                industryList.forEach((name, idx) => {
+                    const btn = createBtn(name, () => { currentIndustryIdx = idx; finish(2, name); });
+                    btn.setAttribute('data-n', name);
+                    c.appendChild(btn);
+                });
+            } else if (step === 3) {
+                t.innerText = lang.steps[2];
+                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>`;
+            } else if (step === 4) {
+                t.innerText = lang.steps[3];
+                const key = industryKeys[currentIndustryIdx];
+                const roles = (lang.industryRoles && lang.industryRoles[key]) ? lang.industryRoles[key] : (lang.industryRoles ? lang.industryRoles["default"] : i18n.EN.industryRoles["default"]);
+                roles.forEach(r => c.appendChild(createBtn(r, () => finish(4, r))));
+            } else if (step === 5) {
+                t.innerText = lang.steps[4];
+                c.appendChild(createBtn("START DEMO", runVoice));
+            } else if (step === 6) {
+                t.innerText = "DEPLOYMENT";
+                const num = `${marketCurrency[selectedMarket]?.prefix || "+1"} 555-0199`;
+                c.appendChild(createBtn(num, () => { confetti(); finish(6, "READY"); setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1200); }));
             }
         }
 
-        function finish(s, v) {
-            completedSteps = s; document.getElementById(`v${s}`).innerText = v;
-            document.getElementById(`s${s}`).classList.add('active');
-            document.getElementById(`s${s}`).classList.remove('next-focus');
-            if(s < 6) document.getElementById(`s${s+1}`).classList.add('next-focus');
-            closeModal();
-            if(s === 6) confetti();
+        function filterList(containerId, query) {
+            const q = query.toUpperCase();
+            document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
+                const name = b.getAttribute('data-n') || b.innerText;
+                b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
+            });
         }
 
-        function toggleLangMenu(force) { const m = document.getElementById('langMenu'); m.style.display = (force === false) ? 'none' : (m.style.display === 'flex' ? 'none' : 'flex'); }
-        function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
-        function updateParallax(e) { document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%'); document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%'); }
+        function createBtn(txt, fn) { const b = document.createElement('button'); b.className = "modal-btn"; b.innerText = txt; b.onclick = fn; return b; }
+        function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
+        function finish(s, v) { completedSteps = s; document.getElementById(`v${s}`).innerText = v; document.getElementById(`s${s}`).classList.add('active'); closeModal(); if(s<6) document.getElementById(`s${s+1}`).classList.add('next-focus'); }
+        function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
+        
+        function updateCurrencyUI(m) { 
+            selectedMarket = m; const data = marketCurrency[m]; const t = i18n[currentLang] || i18n.EN;
+            document.getElementById('main-currency').innerText = data.cur; 
+            document.getElementById('main-price').innerText = data.price;
+            document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} ${t.reg || i18n.EN.reg}`;
+        }
 
-        const list = document.getElementById('langList');
-        languages.forEach(l => {
-            const b = document.createElement('button'); b.className = "modal-btn";
-            b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3"> ${l.n}`;
-            b.onclick = () => setLang(l.id, l.f);
-            list.appendChild(b);
-        });
+        function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
+        function toggleLangMenu(force) { 
+            const d = document.getElementById('langMenu'); 
+            d.style.display = (force !== undefined ? force : d.style.display !== 'flex') ? 'flex' : 'none'; 
+        }
+
+        function initLangList() {
+            const list = document.getElementById('langList');
+            languages.forEach(l => {
+                const b = createBtn(l.n, () => setLang(l.f, l.id));
+                b.setAttribute('data-n', l.n);
+                b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3"> ${l.n}`;
+                list.appendChild(b);
+            });
+        }
+
+        function updateParallax(e) { document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%'); document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%'); }
+        async function runVoice() { const key = industryKeys[currentIndustryIdx]; const id = assistants[key] || assistants["Electrical"]; if(window.vapiSDK) { window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); closeModal(); finish(5, "ACTIVE"); } }
+        
+        setInterval(() => { 
+            const now = new Date(), h = 23-now.getHours(), m = 59-now.getMinutes(), s = 59-now.getSeconds(); 
+            document.getElementById('timer').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; 
+        }, 1000);
+
+        initLangList();
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
     </script>
 </body>
 </html>
