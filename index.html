@@ -154,6 +154,56 @@
             VI: { h1: "LỄ TÂN AI TOÀN CẦU<br> KHÔNG CẦN NGƯỜI", p: "Kích hoạt ngay. <span class='text-orange-500'>Triển khai thế giới. Không người.</span>", start: "Bắt đầu", now: "Kích hoạt ngay", beta: "TRUY CẬP BETA", reg: "Thường", live: "Global Live", close: "Đóng", feats: ["Gọi không giới hạn", "Trả hàng tháng", "Không hợp đồng"], steps: ["01 Thị trường", "02 Ngành", "03 Doanh nghiệp", "04 Vai trò", "05 Demo", "06 Triển khai"], vals: ["Chọn", "Chọn", "Đồng bộ", "Chọn", "Thử nghiệm", "Tức thì"], proceed: "Đến bước", headers: ["Nút trực tiếp", "Sắp ra mắt", "Chọn số"], industries: ["Điện", "Nước", "Sức khỏe", "Pháp lý"], roles: ["Lễ tân", "Sàng lọc khách", "Đại lý đặt chỗ"], actions: { demo: "BẮT ĐẦU DEMO", save: "LƯU", deploy: "TRIỂN KHAI NGAY" }, waitlist: "Đặt chỗ", placeholders: { name: "NHẬP TÊN", email: "EMAIL" } }
         };
 
+        // --- NEW PERSISTENCE LOGIC ---
+        function saveState() {
+            const state = {
+                completedSteps,
+                currentIndustry,
+                selectedMarket,
+                businessName: document.getElementById('v3').innerText,
+                currentLang
+            };
+            localStorage.setItem('ai_call_port_state', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('ai_call_port_state');
+            if (!saved) return;
+            
+            const state = JSON.parse(saved);
+            completedSteps = state.completedSteps;
+            currentIndustry = state.currentIndustry;
+            selectedMarket = state.selectedMarket;
+            currentLang = state.currentLang || "EN";
+
+            const t = i18n[currentLang] || i18n.EN;
+
+            for (let i = 1; i <= completedSteps; i++) {
+                const el = document.getElementById(`v${i}`);
+                const card = document.getElementById(`s${i}`);
+                
+                if (i === 1) el.innerText = state.selectedMarket;
+                if (i === 2) el.innerText = state.currentIndustry;
+                if (i === 3) el.innerText = state.businessName;
+                if (i === 4) el.innerText = t.roles[0]; 
+                if (i === 5) el.innerText = "ACTIVE";
+                if (i === 6) el.innerText = "READY";
+
+                el.classList.replace('text-white/30', 'text-white');
+                card.classList.add('active');
+                card.classList.remove('next-focus');
+            }
+
+            if (completedSteps < 6) {
+                const next = completedSteps + 1;
+                document.getElementById(`s${next}`).classList.add('next-focus');
+                document.querySelectorAll('.sync-btn').forEach(btn => btn.innerText = `${t.proceed} 0${next}`);
+            }
+            
+            updateCurrencyUI(selectedMarket);
+        }
+
+        // --- CORE FUNCTIONS ---
         function initLangList() {
             const list = document.getElementById('langList'); list.innerHTML = "";
             languages.sort((a,b) => a.n.localeCompare(b.n)).forEach(l => {
@@ -200,6 +250,7 @@
             document.querySelectorAll('.val-label').forEach((el, i) => { if(completedSteps <= i) el.innerText = t.vals[i]; });
             if(marketCurrency[selectedMarket]) updateCurrencyUI(selectedMarket);
             if(completedSteps > 0 && completedSteps < 6) { document.querySelectorAll('.sync-btn').forEach(btn => btn.innerText = `${t.proceed} 0${completedSteps + 1}`); }
+            saveState();
             toggleLangMenu();
         }
 
@@ -236,13 +287,35 @@
         function createHeader(txt, cls, cont) { const h = document.createElement('p'); h.className = `text-[8px] font-black mb-1 uppercase text-left ${cls}`; h.innerText = txt; cont.appendChild(h); }
         function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
         function openWaitlist(country) { const lang = i18n[currentLang] || i18n.EN; document.getElementById('mContent').innerHTML = `<p class="text-[9px] text-slate-400 mb-4 uppercase font-bold">${country}</p><input placeholder="${lang.placeholders.email}" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none"><button onclick="closeModal()" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black">${lang.waitlist}</button>`; }
-        function finish(s, v) { completedSteps = s; const el = document.getElementById(`v${s}`), card = document.getElementById(`s${s}`); el.innerText = v; el.classList.replace('text-white/30', 'text-white'); card.classList.add('active'); card.classList.remove('next-focus'); closeModal(); if(s < 6) { const next = s + 1; document.getElementById(`s${next}`).classList.add('next-focus'); document.querySelectorAll('.sync-btn').forEach(btn => btn.innerText = `${(i18n[currentLang] || i18n.EN).proceed} 0${next}`); } }
+        
+        function finish(s, v) { 
+            completedSteps = s; 
+            const el = document.getElementById(`v${s}`), card = document.getElementById(`s${s}`); 
+            el.innerText = v; 
+            el.classList.replace('text-white/30', 'text-white'); 
+            card.classList.add('active'); 
+            card.classList.remove('next-focus'); 
+            closeModal(); 
+            if(s < 6) { 
+                const next = s + 1; 
+                document.getElementById(`s${next}`).classList.add('next-focus'); 
+                document.querySelectorAll('.sync-btn').forEach(btn => btn.innerText = `${(i18n[currentLang] || i18n.EN).proceed} 0${next}`); 
+            }
+            saveState();
+        }
+
         function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
         function updateParallax(e) { document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%'); document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%'); }
         async function runVoice() { const id = assistants[currentIndustry] || assistants["Electrical"]; try { await navigator.mediaDevices.getUserMedia({ audio: true }); if(window.vapiSDK) { window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); closeModal(); finish(5, "ACTIVE"); } } catch(e) { alert("Mic required."); } }
+        
         setInterval(() => { const now = new Date(), h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds(); document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; }, 1000);
-        initLangList();
+        
+        window.addEventListener('load', () => {
+            initLangList();
+            loadState(); 
+        });
+
         (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
     </script>
 </body>
