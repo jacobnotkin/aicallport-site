@@ -8,230 +8,189 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
-        html { background: #06080f; }
-        body { 
-            width: 100%; 
-            background: #06080f; 
-            color: #e2e8f0; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            margin: 0; 
-            padding: 12px; 
-            min-height: 100vh;
-            position: relative;
-        }
-        
-        /* High-performance background that won't block clicks */
-        .bg-glow { 
-            position: fixed; 
-            inset: 0; 
-            z-index: 0; 
-            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.1) 0%, transparent 70%); 
-            pointer-events: none; 
-        }
-
-        .console-container { 
-            width: 100%; 
-            max-width: 1100px; 
-            background: rgba(10, 12, 18, 0.9); 
-            backdrop-filter: blur(10px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 24px; 
-            padding: 20px; 
-            position: relative; 
-            z-index: 10; 
-            margin: 20px auto 100px auto; /* Margin bottom for Vapi button space */
-        }
-
-        @media (min-width: 1024px) {
-            .console-container { margin-top: 5vh; }
-        }
-
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; justify-content: center; overflow-x: hidden; }
+        .bg-glow { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%); }
+        .console-container { width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 40px; position: relative; z-index: 10; }
         .hero-title { background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); touch-action: manipulation; }
-        
-        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; opacity: 0.3; transition: 0.3s; touch-action: manipulation; }
-        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; opacity: 1 !important; }
-        .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
-        
-        @keyframes border-glow { 0%, 100% { border-color: rgba(249, 115, 22, 0.3); } 50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); } }
-
-        #setupModal { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.9); 
-            z-index: 100000; /* Ensure it is above EVERYTHING */
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px;
-        }
-
-        .modal-btn { 
-            width: 100%; 
-            padding: 14px; 
-            margin-bottom: 8px;
-            border-radius: 12px; 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            color: white; 
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            text-align: left;
-            touch-action: manipulation;
-        }
-
-        .floating-lang { position: absolute; top: 15px; right: 15px; z-index: 50; }
-        #langMenu { position: absolute; top: 50px; right: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; display: none; flex-direction: column; width: 220px; z-index: 100; }
-        
-        .dot-blink { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; display: inline-block; margin-right: 8px; }
-        @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s; }
+        .orange-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(249, 115, 22, 0.2); }
+        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 16px; opacity: 0.3; transition: 0.3s; cursor: not-allowed; }
+        .step-card.unlocked { opacity: 1; cursor: pointer; border-color: rgba(249, 115, 22, 0.3); }
+        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; }
+        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-btn { width: 100%; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; transition: 0.2s; text-align: left; margin-bottom: 10px; }
+        .modal-btn:hover { background: rgba(255,255,255,0.1); border-color: #f97316; }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
     <div class="bg-glow"></div>
 
-    <div class="floating-lang">
-        <button onclick="toggleLangMenu()" class="bg-black/50 border border-white/20 p-2 rounded-xl flex items-center gap-2">
-            <img id="curFlag" src="https://flagcdn.com/us.svg" class="w-4" alt="Flag">
-            <span id="curLangText" class="text-[9px] font-black text-white uppercase">US | EN</span>
-        </button>
-        <div id="langMenu">
-            <input type="text" id="langSearch" placeholder="SEARCH..." onkeyup="filterLanguages()" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-[10px] mb-2 outline-none">
-            <div id="langList" class="max-h-[200px] overflow-y-auto"></div>
-        </div>
-    </div>
-
     <div class="console-container">
-        <div class="flex justify-between items-center mb-10">
+        <div class="flex justify-between items-center mb-12">
             <div class="flex items-center gap-2">
-                <span class="font-black italic text-lg uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
-                <div class="px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase">BETA</div>
+                <span class="font-black italic text-2xl uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
+                <div class="px-2 py-1 bg-orange-500 rounded text-[10px] font-black text-black">BETA</div>
             </div>
-            <div class="flex items-center gap-1.5">
-                <div class="dot-blink"></div>
-                <span id="live-label" class="text-[8px] font-black text-orange-500 uppercase tracking-widest">Global Live</span>
+            <div class="flex items-center gap-2 text-orange-500">
+                <div class="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                <span class="text-[10px] font-black uppercase tracking-widest">System Live: Global</span>
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-2 gap-10 items-center">
-            <div class="text-center lg:text-left">
-                <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
-                <p id="hero-p" class="text-slate-400 text-xs mb-8 font-bold uppercase tracking-wider">Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation.</p>
-                <button onclick="handleStep(1)" id="hero-cta" class="sync-btn orange-btn w-full lg:w-auto px-10 py-5 rounded-2xl text-xs font-black uppercase italic shadow-lg shadow-orange-500/20">Start Activation</button>
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <h1 class="text-5xl lg:text-7xl font-black italic uppercase leading-none mb-6 hero-title">GLOBAL<br>AI AGENT<br>PORTAL</h1>
+                <p class="text-slate-400 text-sm mb-8 max-w-md font-bold uppercase tracking-wider">Instant <span class="text-orange-500">Small Business</span> Activation. Deployment in 60 seconds. No human required.</p>
+                <button onclick="handleStep(1)" class="orange-btn px-10 py-5 rounded-2xl text-xs font-black uppercase tracking-widest italic">Start Activation Protocol</button>
             </div>
             
-            <div class="bg-black/40 border border-orange-500/20 rounded-[32px] p-8 text-center">
-                <div class="flex items-baseline justify-center gap-1 mb-2">
-                    <span id="main-currency" class="text-5xl font-black text-white">$</span>
-                    <span id="main-price" class="text-5xl font-black text-white">199</span>
-                    <span class="text-orange-500 font-bold">/mo</span>
+            <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-8 text-center relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-[10px] uppercase mb-4 font-black text-orange-500 tracking-[0.3em]">Special Beta Pricing</h3>
+                    <div class="flex items-baseline justify-center gap-2 mb-2">
+                        <span class="text-6xl font-black text-white">$199</span>
+                        <span class="text-orange-500 font-bold">/mo</span>
+                    </div>
+                    <p class="text-slate-500 line-through text-xs font-bold mb-8">$399 REGULAR</p>
+                    <div class="grid grid-cols-2 gap-4 mb-8 text-left">
+                        <div class="flex items-center gap-2"><div class="w-1 h-1 bg-orange-500"></div><span class="text-[10px] font-bold">UNLIMITED CALLS</span></div>
+                        <div class="flex items-center gap-2"><div class="w-1 h-1 bg-orange-500"></div><span class="text-[10px] font-bold">24/7 AVAILABILITY</span></div>
+                    </div>
+                    <button onclick="handleStep(1)" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase">Secure Beta Access</button>
                 </div>
-                <p id="reg-txt" class="text-slate-500 line-through text-[10px] font-bold uppercase mb-6">$399 Regular</p>
-                <div id="timer" class="text-[10px] font-mono text-orange-500/60 mb-6 tracking-[0.3em]">00:00:00</div>
-                <button onclick="handleStep(1)" id="side-cta" class="sync-btn orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase italic">Activate Now</button>
             </div>
         </div>
 
-        <div class="mt-12 grid grid-cols-2 lg:grid-cols-6 gap-3">
-            <div id="s1" class="step-card next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">01 Market</p><p id="v1" class="text-[10px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
-            <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">02 Industry</p><p id="v2" class="text-[10px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
-            <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">03 Business</p><p id="v3" class="text-[10px] text-white/30 font-bold uppercase truncate val-label">Sync</p></div>
-            <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">04 Agent Role</p><p id="v4" class="text-[10px] text-white/30 font-bold uppercase truncate val-label">Choose</p></div>
-            <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">05 Demo</p><p id="v5" class="text-[10px] text-white/30 font-bold uppercase truncate italic val-label">Sandbox</p></div>
-            <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">06 Deploy</p><p id="v6" class="text-[10px] text-white/30 font-bold uppercase truncate italic val-label">Instant</p></div>
+        <div class="mt-20 grid grid-cols-2 lg:grid-cols-6 gap-4">
+            <div id="s1" class="step-card unlocked" onclick="handleStep(1)"><p class="text-[8px] font-black text-orange-500 uppercase mb-2">01 Market</p><p id="v1" class="text-xs text-white font-bold uppercase">Select</p></div>
+            <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[8px] font-black text-orange-500 uppercase mb-2">02 Industry</p><p id="v2" class="text-xs text-white font-bold uppercase">Select</p></div>
+            <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[8px] font-black text-orange-500 uppercase mb-2">03 Business</p><p id="v3" class="text-xs text-white font-bold uppercase">Sync</p></div>
+            <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[8px] font-black text-orange-500 uppercase mb-2">04 Role</p><p id="v4" class="text-xs text-white font-bold uppercase">Choose</p></div>
+            <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[8px] font-black text-orange-500 uppercase mb-2">05 Test</p><p id="v5" class="text-xs text-white font-bold uppercase italic">Demo</p></div>
+            <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[8px] font-black text-orange-500 uppercase mb-2">06 Deploy</p><p id="v6" class="text-xs text-white font-bold uppercase italic">Live</p></div>
         </div>
     </div>
 
     <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-8 rounded-[32px] max-w-sm w-full shadow-2xl">
-            <h2 id="mTitle" class="text-sm font-black uppercase text-white mb-6 text-center tracking-widest">Setup</h2>
-            <div id="mContent" class="max-h-[50vh] overflow-y-auto px-1"></div>
-            <button onclick="closeModal()" class="w-full mt-6 text-[9px] text-slate-500 uppercase font-black tracking-widest">Close [X]</button>
+        <div class="bg-[#0f172a] border border-white/10 p-8 rounded-3xl max-w-md w-full">
+            <h2 id="mTitle" class="text-xl font-black uppercase text-white mb-6">Setup</h2>
+            <div id="mContent" class="space-y-2"></div>
+            <button onclick="closeModal()" class="mt-8 text-[10px] text-slate-500 uppercase font-black hover:text-white">Cancel Protocol</button>
         </div>
     </div>
 
     <script>
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
-        const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
-        let completedSteps = 0, currentIndustry = "Electrical", currentLang = "EN", selectedMarket = "United States";
+        const assistants = {
+            "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+            "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
+            "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65",
+            "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f"
+        };
 
-        const marketCurrency = { "Australia": { cur: "$", price: "305", reg: "610", prefix: "+61 2" }, "Brazil": { cur: "R$", price: "990", reg: "1980", prefix: "+55 11" }, "Canada": { cur: "$", price: "275", reg: "550", prefix: "+1 (416)" }, "Chile": { cur: "CLP ", price: "190.000", reg: "380.000", prefix: "+56 2" }, "China": { cur: "¥", price: "1450", reg: "2900", prefix: "+86 10" }, "France": { cur: "€", price: "185", reg: "370", prefix: "+33 1" }, "Germany": { cur: "€", price: "185", reg: "370", prefix: "+49 30" }, "India": { cur: "₹", price: "16500", reg: "33000", prefix: "+91 11" }, "Ireland": { cur: "€", price: "185", reg: "370", prefix: "+353 1" }, "Israel": { cur: "₪", price: "720", reg: "1440", prefix: "+972 3" }, "Japan": { cur: "¥", price: "30000", reg: "60000", prefix: "+81 3" }, "Norway": { cur: "kr ", price: "2150", reg: "4300", prefix: "+47 21" }, "Poland": { cur: "zł ", price: "820", reg: "1640", prefix: "+48 22" }, "Russia": { cur: "₽", price: "18500", reg: "37000", prefix: "+7 495" }, "Singapore": { cur: "S$", price: "265", reg: "530", prefix: "+65 6" }, "South Korea": { cur: "₩", price: "265000", reg: "530000", prefix: "+82 2" }, "Sweden": { cur: "kr ", price: "2100", reg: "4200", prefix: "+46 8" }, "Switzerland": { cur: "CHF ", price: "180", reg: "360", prefix: "+41 44" }, "UAE": { cur: "AED ", price: "730", reg: "1460", prefix: "+971 4" }, "UK": { cur: "£", price: "155", reg: "310", prefix: "+44 20" }, "United States": { cur: "$", price: "199", reg: "399", prefix: "+1 (555)" } };
-        const comingSoon = ["Argentina", "Austria", "Belgium", "Colombia", "Denmark", "Egypt", "Finland", "Greece", "Hong Kong", "Indonesia", "Italy", "Malaysia", "Mexico", "Netherlands", "New Zealand", "Portugal", "Qatar", "Saudi Arabia", "South Africa", "Spain", "Thailand", "Turkey", "Vietnam"];
-        const languages = [{ id: 'AR', n: 'Arabic', f: 'sa', rtl: true }, { id: 'BN', n: 'Bengali', f: 'bd' }, { id: 'ZH', n: 'Chinese', f: 'cn' }, { id: 'NL', n: 'Dutch', f: 'nl' }, { id: 'EN', n: 'English', f: 'us' }, { id: 'FR', n: 'French', f: 'fr' }, { id: 'DE', n: 'German', f: 'de' }, { id: 'HI', n: 'Hindi', f: 'in' }, { id: 'IT', n: 'Italian', f: 'it' }, { id: 'JA', n: 'Japanese', f: 'jp' }, { id: 'KO', n: 'Korean', f: 'kr' }, { id: 'MS', n: 'Malay', f: 'my' }, { id: 'PT', n: 'Portuguese', f: 'pt' }, { id: 'RU', n: 'Russian', f: 'ru' }, { id: 'ES', n: 'Spanish', f: 'mx' }, { id: 'SV', n: 'Swedish', f: 'se' }, { id: 'TH', n: 'Thai', f: 'th' }, { id: 'TR', n: 'Turkish', f: 'tr' }, { id: 'UR', n: 'Urdu', f: 'pk', rtl: true }, { id: 'VI', n: 'Vietnamese', f: 'vn' }];
-        const i18n = { EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation.", start: "Start Activation", now: "Activate Now", reg: "Regular", live: "Global Live", steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], vals: ["Select", "Select", "Sync", "Choose", "Sandbox", "Instant"], proceed: "Step", headers: ["Live Nodes", "Coming Soon", "Local Number"], industries: ["Electrical", "Plumbing", "Wellness", "Legal"], roles: ["Receptionist", "Lead Qualifier", "Booking Agent"], actions: { demo: "START VOICE DEMO", save: "SAVE", deploy: "DEPLOY" } } };
+        let currentStep = 1;
+        let selectedIndustry = "Electrical";
 
-        function initLangList() {
-            const list = document.getElementById('langList'); list.innerHTML = "";
-            languages.forEach(l => {
-                const b = document.createElement('button'); b.className = "modal-btn flex items-center gap-3";
-                b.onclick = () => setLang(l.f, l.id); b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-4"> ${l.n}`;
-                list.appendChild(b);
-            });
+        function updateParallax(e) {
+            document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
+            document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
         }
 
-        function toggleLangMenu() { const d = document.getElementById('langMenu'); d.style.display = (d.style.display==='flex')?'none':'flex'; }
-        
-        function setLang(cc, langCode) {
-            currentLang = langCode; const t = i18n[currentLang] || i18n.EN;
-            document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
-            document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
-            document.getElementById('hero-h1').innerHTML = t.h1;
-            document.getElementById('hero-cta').innerText = t.start;
-            toggleLangMenu();
-        }
+        function handleStep(step) {
+            if (step > currentStep) return;
+            const modal = document.getElementById('setupModal');
+            const content = document.getElementById('mContent');
+            const title = document.getElementById('mTitle');
+            
+            modal.style.display = 'flex';
+            content.innerHTML = '';
 
-        function triggerModal(step) {
-            const m = document.getElementById('setupModal'), c = document.getElementById('mContent'), t = document.getElementById('mTitle'), lang = i18n[currentLang] || i18n.EN;
-            m.style.display = 'flex'; c.innerHTML = "";
-            if(step === 1) { 
-                Object.keys(marketCurrency).forEach(l => { 
-                    const b = createBtn(l, () => { selectedMarket = l; finish(1, l); }); 
-                    b.innerHTML = `<div class="dot-blink"></div> ${l}`; 
-                    c.appendChild(b); 
+            if (step === 1) {
+                title.innerText = "Select Market";
+                ["United States", "United Kingdom", "Australia", "Canada"].forEach(m => {
+                    content.appendChild(createBtn(m, () => finishStep(1, m)));
                 });
             } else if (step === 2) {
-                const industries = lang.industries || i18n.EN.industries;
-                industries.forEach((name, i) => c.appendChild(createBtn(name, () => { currentIndustry = Object.keys(assistants)[i]; finish(2, name); })));
+                title.innerText = "Select Industry";
+                Object.keys(assistants).forEach(i => {
+                    content.appendChild(createBtn(i, () => {
+                        selectedIndustry = i;
+                        finishStep(2, i);
+                    }));
+                });
             } else if (step === 3) {
-                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 text-center text-xs font-black outline-none focus:border-orange-500"><button onclick="saveB()" class="orange-btn w-full py-4 rounded-xl font-black text-xs">SAVE</button>`;
+                title.innerText = "Business Name";
+                content.innerHTML = `
+                    <input id="bizName" type="text" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-4 outline-none focus:border-orange-500" placeholder="Enter Business Name...">
+                    <button onclick="finishStep(3, document.getElementById('bizName').value)" class="orange-btn w-full py-4 rounded-xl font-black text-[10px]">SYNC PROFILE</button>
+                `;
             } else if (step === 4) {
-                const roles = lang.roles || i18n.EN.roles;
-                roles.forEach(r => c.appendChild(createBtn(r, () => finish(4, r))));
+                title.innerText = "Agent Role";
+                ["Receptionist", "Sales Agent", "Support Tech"].forEach(r => {
+                    content.appendChild(createBtn(r, () => finishStep(4, r)));
+                });
             } else if (step === 5) {
-                const b = createBtn("START LIVE VOICE DEMO", runVoice); b.className = "orange-btn w-full py-5 rounded-xl font-black text-xs"; c.appendChild(b);
+                title.innerText = "Voice Sandbox";
+                const btn = createBtn("START LIVE DEMO", runVoice);
+                btn.className = "orange-btn w-full py-6 rounded-xl font-black text-xs mb-4";
+                content.appendChild(btn);
             } else if (step === 6) {
-                const b = createBtn("FINALIZE & DEPLOY", () => { confetti(); setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1000); });
-                b.className = "orange-btn w-full py-5 rounded-xl font-black text-xs"; c.appendChild(b);
+                title.innerText = "Final Deployment";
+                const btn = createBtn("ACTIVATE GLOBAL NUMBER", () => {
+                    confetti();
+                    setTimeout(() => window.location.href = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01", 2000);
+                });
+                btn.className = "orange-btn w-full py-6 rounded-xl font-black text-xs";
+                content.appendChild(btn);
             }
         }
 
-        function createBtn(txt, fn) { const b = document.createElement('button'); b.className = "modal-btn"; b.innerText = txt; b.onclick = (e) => { e.stopPropagation(); fn(); }; return b; }
-        function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
-        function finish(s, v) { 
-            completedSteps = s; 
-            document.getElementById(`v${s}`).innerText = v; 
-            document.getElementById(`s${s}`).classList.add('active'); 
-            closeModal();
-            if(s < 6) document.getElementById(`s${s+1}`).classList.add('next-focus');
-        }
-        function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
-        function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
-        function updateParallax(e) { document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%'); document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%'); }
-        
-        async function runVoice() { 
-            const id = assistants[currentIndustry] || assistants["Electrical"]; 
-            try { 
-                await navigator.mediaDevices.getUserMedia({ audio: true }); 
-                if(window.vapiSDK) { window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); closeModal(); finish(5, "ACTIVE"); } 
-            } catch(e) { alert("Mic required."); } 
+        function createBtn(text, onClick) {
+            const btn = document.createElement('button');
+            btn.className = 'modal-btn';
+            btn.innerText = text;
+            btn.onclick = onClick;
+            return btn;
         }
 
-        setInterval(() => { const now = new Date(), h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds(); document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; }, 1000);
-        initLangList();
-        
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
+        function finishStep(step, value) {
+            if (!value) return;
+            document.getElementById(`v${step}`).innerText = value;
+            document.getElementById(`s${step}`).classList.add('active');
+            currentStep = Math.max(currentStep, step + 1);
+            if (currentStep <= 6) {
+                document.getElementById(`s${currentStep}`).classList.add('unlocked');
+            }
+            closeModal();
+        }
+
+        function closeModal() {
+            document.getElementById('setupModal').style.display = 'none';
+        }
+
+        async function runVoice() {
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                if (window.vapiSDK) {
+                    window.vapiSDK.run({
+                        apiKey: vapiApiKey,
+                        assistant: assistants[selectedIndustry]
+                    });
+                    closeModal();
+                    finishStep(5, "ACTIVE");
+                }
+            } catch (err) {
+                alert("Please allow microphone access for the demo.");
+            }
+        }
+
+        (function(d,t){
+            var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+            g.defer=true; g.async=true;
+            s.parentNode.insertBefore(g,s);
+        })(document,"script");
     </script>
 </body>
 </html>
