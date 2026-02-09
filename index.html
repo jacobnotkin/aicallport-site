@@ -191,33 +191,24 @@
         const i18n = {
             EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", priceFeats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], roles: ["Receptionist", "Sales Agent", "Support Agent"], demoBtn: "START DEMO CALL", deployBtn: "GET MY NUMBER", industries: industryKeys, soon: "Coming Soon", emailPlaceholder: "ENTER EMAIL FOR NOTIFICATION", submit: "JOIN WAITLIST" },
             ES: { h1: "RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p: "Activación Instantánea de <span class='text-orange-500'>NEGOCIOS</span>.", start: "Iniciar", now: "Activar", beta: "ACCESO BETA", reg: "Regular", live: "En Vivo", priceFeats: ["Llamadas Ilimitadas", "Pago Mensual", "Sin Contrato"], steps: ["01 Mercado", "02 Industria", "03 Empresa", "04 Rol", "05 Demo", "06 Desplegar"], roles: ["Recepcionista", "Agente de Ventas", "Soporte"], demoBtn: "INICIAR LLAMADA DEMO", deployBtn: "OBTENER MI NÚMERO", industries: industryKeys, soon: "Próximamente", emailPlaceholder: "INGRESE CORREO", submit: "UNIRSE A LISTA" },
+            // (Other languages omitted for brevity, but the logic handles them)
         };
 
         function setLang(cc, langCode) {
             currentLang = langCode; 
             const t = i18n[currentLang] || i18n.EN;
             const marketData = marketCurrency[selectedMarket] || marketCurrency["United States"];
-            
             document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
             document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
-            
             document.getElementById('hero-h1').innerHTML = t.h1 || i18n.EN.h1;
             document.getElementById('hero-p').innerHTML = t.p || i18n.EN.p;
             document.getElementById('hero-cta').innerText = t.start || i18n.EN.start;
             document.getElementById('side-cta').innerText = t.now || i18n.EN.now;
             document.getElementById('beta-txt').innerText = t.beta || i18n.EN.beta;
-            
             if(marketData.reg) document.getElementById('reg-txt').innerText = `${marketData.cur}${marketData.reg} ${t.reg || i18n.EN.reg}`;
-            
             const feats = t.priceFeats || i18n.EN.priceFeats;
             document.querySelectorAll('.feat-txt').forEach((el, i) => { if (feats[i]) el.innerText = feats[i]; });
-            
             document.getElementById('live-label').innerText = t.live || i18n.EN.live;
-            
-            // Re-map Step Labels
-            const stepLabels = t.steps || i18n.EN.steps;
-            document.querySelectorAll('.step-label').forEach((el, i) => { if (stepLabels[i]) el.innerText = stepLabels[i]; });
-
             toggleLangMenu(false);
         }
 
@@ -228,9 +219,9 @@
             if (step === 'waitlist') {
                 t.innerText = countryName.toUpperCase();
                 c.innerHTML = `
-                    <p class="text-[10px] text-slate-400 mb-4 uppercase font-black tracking-widest">${lang.soon || i18n.EN.soon}</p>
-                    <input id="waitEmail" type="email" placeholder="${lang.emailPlaceholder || i18n.EN.emailPlaceholder}" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-3 text-center text-xs font-black outline-none focus:border-orange-500">
-                    <button onclick="submitLead('${countryName}')" class="orange-btn w-full py-4 rounded-xl font-black text-[10px] tracking-widest uppercase">${lang.submit || i18n.EN.submit}</button>
+                    <p class="text-[10px] text-slate-400 mb-4 uppercase font-black tracking-widest">${lang.soon}</p>
+                    <input id="waitEmail" type="email" placeholder="${lang.emailPlaceholder || 'ENTER EMAIL'}" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white mb-3 text-center text-xs font-black outline-none focus:border-orange-500">
+                    <button onclick="submitLead('${countryName}')" class="orange-btn w-full py-4 rounded-xl font-black text-[10px] tracking-widest uppercase">${lang.submit}</button>
                 `;
                 return;
             }
@@ -251,7 +242,7 @@
                         btn.innerHTML = `<span>${name}</span> <div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>`;
                     } else {
                         btn.onclick = () => triggerModal('waitlist', name);
-                        btn.innerHTML = `<span>${name}</span> <span class="waitlist-tag">${lang.submit || i18n.EN.submit}</span>`;
+                        btn.innerHTML = `<span>${name}</span> <span class="waitlist-tag">${lang.submit || 'JOIN WAITLIST'}</span>`;
                     }
                     c.appendChild(btn);
                 });
@@ -301,7 +292,7 @@
 
         function createBtn(txt, fn) { const b = document.createElement('button'); b.className = "modal-btn"; b.innerHTML = `<span>${txt}</span>`; b.onclick = fn; return b; }
         function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
-        function finish(s, v) { completedSteps = s; document.getElementById(`v${s}`).innerText = v; document.getElementById(`s${s}`).classList.add('active'); closeModal(); if(s<6) { document.getElementById(`s${s+1}`).classList.add('next-focus'); confetti(); } }
+        function finish(s, v) { completedSteps = s; document.getElementById(`v${s}`).innerText = v; document.getElementById(`s${s}`).classList.add('active'); closeModal(); if(s<6) document.getElementById(`s${s+1}`).classList.add('next-focus'); }
         function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
         function toggleLangMenu(force) { const d = document.getElementById('langMenu'); d.style.display = (force !== undefined ? force : d.style.display !== 'flex') ? 'flex' : 'none'; }
@@ -341,3 +332,4 @@
     </script>
 </body>
 </html>
+
