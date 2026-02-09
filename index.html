@@ -16,6 +16,7 @@
         .console-container { width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; position: relative; z-index: 10; margin-bottom: 80px; }
         .hero-title { background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: transform 0.2s; }
+        .orange-btn:active { transform: scale(0.98); }
         .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s; cursor: pointer; }
         .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; opacity: 1 !important; }
         .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
@@ -23,11 +24,10 @@
         .floating-lang { position: fixed; top: 15px; right: 15px; z-index: 1000; }
         .lang-trigger { background: rgba(10, 12, 18, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 12px; border-radius: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; backdrop-filter: blur(5px); }
         #langMenu { position: absolute; top: 50px; right: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; display: none; flex-direction: column; gap: 8px; width: 220px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        #langSearch { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px; color: white; font-size: 11px; outline: none; width: 100%; margin-bottom: 8px; }
+        .lang-list { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
         #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-scroll-area { max-height: 50vh; overflow-y: auto; padding-right: 8px; margin: 15px 0; }
-        .modal-scroll-area::-webkit-scrollbar { width: 4px; }
-        .modal-scroll-area::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
-        .modal-btn { width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: white; display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 6px; }
+        .modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; }
         .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
         @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
     </style>
@@ -41,8 +41,8 @@
             <span id="curLangText" class="text-[9px] font-black text-white uppercase">US | EN</span>
         </button>
         <div id="langMenu">
-            <input type="text" id="langSearch" placeholder="SEARCH..." onkeyup="filterLanguages()" class="bg-white/5 border border-white/10 p-2 rounded-lg text-white text-[10px] outline-none mb-2 w-full">
-            <div class="lang-list max-h-[250px] overflow-y-auto" id="langList"></div>
+            <input type="text" id="langSearch" placeholder="SEARCH 20 LANGUAGES..." onkeyup="filterLanguages()">
+            <div class="lang-list" id="langList"></div>
         </div>
     </div>
 
@@ -54,7 +54,7 @@
             </div>
             <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
                 <div class="dot-blink"></div>
-                <span id="live-label" class="text-[7px] font-black text-orange-500 uppercase">Global Live</span>
+                <span id="live-label" class="text-[7px] font-black text-orange-500 uppercase tracking-widest">Global Live</span>
             </div>
         </div>
 
@@ -62,7 +62,7 @@
             <div class="lg:col-span-3 text-center lg:text-left">
                 <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
                 <p id="hero-p" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider">Instant SMB Activation. <span class="text-orange-500">Worldwide Deployment. No Humans.</span></p>
-                <button onclick="handleStep(1)" id="hero-cta" class="sync-btn orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase italic">Start Activation</button>
+                <button onclick="handleStep(1)" id="hero-cta" class="sync-btn orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">Start Activation</button>
             </div>
             
             <div class="lg:col-span-2">
@@ -92,25 +92,25 @@
                 <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">01 Market</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
                 <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">02 Industry</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
                 <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">03 Business</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Sync</p></div>
-                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">04 Role</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Choose</p></div>
-                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">05 Demo</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate val-label italic">Sandbox</p></div>
-                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">06 Deploy</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate val-label italic">Instant</p></div>
+                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">04 Agent Role</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Choose</p></div>
+                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">05 Demo</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label">Sandbox</p></div>
+                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">06 Deploy</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label">Instant</p></div>
             </div>
         </div>
     </div>
 
     <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full relative">
-            <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-4 text-center">Setup</h2>
-            <div id="mContent" class="modal-scroll-area"></div>
-            <button id="mClose" onclick="closeModal()" class="w-full mt-4 text-[10px] text-slate-500 uppercase font-black hover:text-white transition">Close</button>
+        <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
+            <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
+            <div id="mContent" class="flex flex-col gap-2"></div>
+            <button id="mClose" onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white">Close</button>
         </div>
     </div>
 
     <script>
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
-        let completedSteps = 0, currentLang = "EN", selectedMarket = "United States", activeStep = 0;
+        let completedSteps = 0, currentIndustry = "Electrical", currentLang = "EN", selectedMarket = "United States";
 
         const marketCurrency = {
             "Australia":     { cur: "$", price: "305", reg: "610", prefix: "+61 2" },
@@ -136,16 +136,26 @@
             "United States": { cur: "$", price: "199", reg: "399", prefix: "+1 (555)" }
         };
 
-        const comingSoon = ["Argentina", "Austria", "Belgium", "Colombia", "Denmark", "Egypt", "Finland", "Greece", "Hong Kong", "Indonesia", "Italy", "Malaysia", "Mexico", "Netherlands", "New Zealand", "Portugal", "Qatar", "Saudi Arabia", "South Africa", "Spain", "Thailand", "Turkey", "Vietnam"];
+        const comingSoon = [
+            "Argentina", "Austria", "Belgium", "Colombia", "Denmark", "Egypt", 
+            "Finland", "Greece", "Hong Kong", "Indonesia", "Italy", "Malaysia", 
+            "Mexico", "Netherlands", "New Zealand", "Portugal", "Qatar", 
+            "Saudi Arabia", "South Africa", "Spain", "Thailand", "Turkey", "Vietnam"
+        ];
+
         const languages = [
-            { id: 'AR', n: 'Arabic', f: 'sa', rtl: true }, { id: 'ZH', n: 'Chinese', f: 'cn' }, { id: 'EN', n: 'English', f: 'us' }, 
-            { id: 'FR', n: 'French', f: 'fr' }, { id: 'DE', n: 'German', f: 'de' }, { id: 'JA', n: 'Japanese', f: 'jp' }, 
-            { id: 'KO', n: 'Korean', f: 'kr' }, { id: 'RU', n: 'Russian', f: 'ru' }, { id: 'ES', n: 'Spanish', f: 'mx' }
+            { id: 'AR', n: 'Arabic', f: 'sa', rtl: true }, { id: 'BN', n: 'Bengali', f: 'bd' }, { id: 'ZH', n: 'Chinese', f: 'cn' },
+            { id: 'NL', n: 'Dutch', f: 'nl' }, { id: 'EN', n: 'English', f: 'us' }, { id: 'FR', n: 'French', f: 'fr' },
+            { id: 'DE', n: 'German', f: 'de' }, { id: 'HI', n: 'Hindi', f: 'in' }, { id: 'IT', n: 'Italian', f: 'it' },
+            { id: 'JA', n: 'Japanese', f: 'jp' }, { id: 'KO', n: 'Korean', f: 'kr' }, { id: 'MS', n: 'Malay', f: 'my' },
+            { id: 'PT', n: 'Portuguese', f: 'pt' }, { id: 'RU', n: 'Russian', f: 'ru' }, { id: 'ES', n: 'Spanish', f: 'mx' },
+            { id: 'SV', n: 'Swedish', f: 'se' }, { id: 'TH', n: 'Thai', f: 'th' }, { id: 'TR', n: 'Turkish', f: 'tr' },
+            { id: 'UR', n: 'Urdu', f: 'pk', rtl: true }, { id: 'VI', n: 'Vietnamese', f: 'vn' }
         ];
 
         const i18n = {
-            EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant SMB Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", close: "Close", feats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], vals: ["Select", "Select", "Sync", "Choose", "Sandbox", "Instant"], proceed: "Proceed to Step", headers: ["Live Nodes", "Coming Soon", "Choose Local Number"], industries: ["Electrical", "Plumbing", "Wellness", "Legal"], roles: ["Receptionist", "Lead Qualifier", "Booking Agent"], actions: { demo: "START VOICE DEMO", save: "SAVE", deploy: "DEPLOY SYSTEM" }, waitlist: "Reserve", placeholders: { name: "ENTER NAME", email: "EMAIL" } },
-            AR: { h1: "موظف استقبال ذكاء اصطناعي<br> عالمي بدون بشر", p: "تنشيط فوري. <span class='text-orange-500'>نشر عالمي. لا بشر.</span>", start: "بدء التنشيط", now: "نشط الآن", beta: "دخول بيتا", reg: "عادي", live: "مباشر عالميًا", close: "إغلاق", feats: ["مكالمات غير محدودة", "دفع شهري", "بدون عقد"], steps: ["01 السوق", "02 الصناعة", "03 العمل", "04 الدور", "05 تجربة", "06 نشر"], vals: ["اختر", "اختر", "مزامنة", "اختر", "رمل", "فوري"], proceed: "انتقل للخطوة", headers: ["عقد حية", "قريبًا", "رقم محلي"], industries: ["كهرباء", "سباكة", "عافية", "قانوني"], roles: ["موظف استقبال", "مؤهل عملاء", "وكيل حجز"], actions: { demo: "بدء عرض صوتي", save: "حفظ", deploy: "نشر النظام الآن" }, waitlist: "حجز", placeholders: { name: "أدخل الاسم", email: "بريد" } },
+            EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant SMB Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", close: "Close", feats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], vals: ["Select", "Select", "Sync", "Choose", "Sandbox", "Instant"], proceed: "Proceed to Step", headers: ["Live Nodes", "Coming Soon", "Choose Local Number"], industries: ["Electrical", "Plumbing", "Wellness", "Legal"], roles: ["Receptionist", "Lead Qualifier", "Booking Agent"], actions: { demo: "START LIVE VOICE DEMO", save: "SAVE", deploy: "DEPLOY SYSTEM NOW" }, waitlist: "Reserve", placeholders: { name: "ENTER NAME", email: "EMAIL" } },
+            AR: { h1: "موظف استقبال ذكاء اصطناعي<br> عالمي بدون بشر", p: "تنشيط فوري. <span class='text-orange-500'>نشر عالمي. لا بشر.</span>", start: "بدء التنشيط", now: "نشط الآن", beta: "دخول بيتا", reg: "عادي", live: "مباشر عالميًا", close: "إغلاق", feats: ["مكالمات غير محدودة", "دفع شهري", "بدون عقد"], steps: ["01 السوق", "02 الصناعة", "03 العمل", "04 دور الوكيل", "05 تجربة", "06 نشر"], vals: ["اختر", "اختر", "مزامنة", "اختر", "رمل", "فوري"], proceed: "انتقل للخطوة", headers: ["عقد حية", "قريبًا", "رقم محلي"], industries: ["كهرباء", "سباكة", "عافية", "قانوني"], roles: ["موظف استقبال", "مؤهل عملاء", "وكيل حجز"], actions: { demo: "بدء عرض صوتي", save: "حفظ", deploy: "نشر النظام الآن" }, waitlist: "حجز", placeholders: { name: "أدخل الاسم", email: "بريد" } },
             ZH: { h1: "全球零人工<br>AI 接待员", p: "即时 SMB 激活。<span class='text-orange-500'>全球部署。无需人工。</span>", start: "开始激活", now: "立即激活", beta: "测试版访问", reg: "常规", live: "全球直播", close: "关闭", feats: ["无限通话", "按月付费", "无合同"], steps: ["01 市场", "02 行业", "03 业务", "04 角色", "05 演示", "06 部署"], vals: ["选择", "选择", "同步", "选择", "沙盒", "即时"], proceed: "进行至步骤", headers: ["活跃节点", "即将推出", "选择号码"], industries: ["电力", "水管", "健康", "法律"], roles: ["接待员", "潜在客户筛选", "预约代理"], actions: { demo: "开始语音演示", save: "保存", deploy: "立即部署系统" }, waitlist: "预留", placeholders: { name: "输入名称", email: "邮箱" } },
             RU: { h1: "ГЛОБАЛЬНЫЙ ИИ-РЕЦЕПШНИСТ<br> БЕЗ ЛЮДЕЙ", p: "Мгновенная активация. <span class='text-orange-500'>Мировое развертывание. Без людей.</span>", start: "Начать", now: "Активировать", beta: "БЕТА-ДОСТУП", reg: "Обычная", live: "Global Live", close: "Закрыть", feats: ["Безлимитные звонки", "Ежемесячная оплата", "Без контракта"], steps: ["01 Рынок", "02 Отрасль", "03 Бизнес", "04 Роль", "05 Демо", "06 Развернуть"], vals: ["Выбрать", "Выбрать", "Синхрон", "Выбрать", "Песочница", "Мгновенно"], proceed: "К шагу", headers: ["Активные узлы", "Скоро", "Выбрать номер"], industries: ["Электрика", "Сантехника", "Велнес", "Юристы"], roles: ["Рецепшн", "Квалификация", "Бронирование"], actions: { demo: "ГОЛОСОВАЯ ДЕМО", save: "СОХРАНИТЬ", deploy: "РАЗВЕРНУТЬ СЕЙЧАС" }, waitlist: "Резерв", placeholders: { name: "ИМЯ", email: "EMAIL" } },
             ES: { h1: "RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p: "Activación Instantánea. <span class='text-orange-500'>Despliegue Mundial. Sin Humanos.</span>", start: "Iniciar Activación", now: "Activar Ahora", beta: "ACCESO BETA", reg: "Regular", live: "En Vivo", close: "Cerrar", feats: ["Llamadas Ilimitadas", "Pago Mensual", "Sin Contrato"], steps: ["01 Mercado", "02 Industria", "03 Empresa", "04 Rol", "05 Demo", "06 Desplegar"], vals: ["Seleccionar", "Seleccionar", "Sincronizar", "Elegir", "Prueba", "Instante"], proceed: "Pasar al Paso", headers: ["Nodos en Vivo", "Próximamente", "Elegir Número"], industries: ["Electricidad", "Plomería", "Salud", "Legal"], roles: ["Recepcionista", "Calificador", "Agente de Reservas"], actions: { demo: "INICIAR DEMO DE VOZ", save: "GUARDAR", deploy: "ACTIVAR SISTEMA AHORA" }, waitlist: "Reservar", placeholders: { name: "NOMBRE", email: "CORREO" } }
@@ -153,16 +163,36 @@
 
         function initLangList() {
             const list = document.getElementById('langList'); list.innerHTML = "";
-            languages.forEach(l => {
-                const b = document.createElement('button'); b.className = "modal-btn";
+            languages.sort((a,b) => a.n.localeCompare(b.n)).forEach(l => {
+                const b = document.createElement('button'); b.className = "modal-btn"; b.setAttribute('data-n', l.n);
                 b.onclick = () => setLang(l.f, l.id); b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3"> ${l.n}`;
                 list.appendChild(b);
             });
         }
 
+        function toggleLangMenu() { const d = document.getElementById('langMenu'); d.style.display = (d.style.display==='flex')?'none':'flex'; }
+        
+        function filterLanguages() {
+            const q = document.getElementById('langSearch').value.toUpperCase();
+            const btns = document.getElementById('langList').getElementsByTagName('button');
+            for (let b of btns) { b.style.display = b.getAttribute('data-n').toUpperCase().includes(q) ? "" : "none"; }
+        }
+
+        function updateCurrencyUI(market) {
+            selectedMarket = market;
+            const data = marketCurrency[market];
+            if(!data) return;
+            const t = i18n[currentLang] || i18n.EN;
+            document.getElementById('main-currency').innerText = data.cur;
+            document.getElementById('main-price').innerText = data.price;
+            document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} ${t.reg || 'Regular'}`;
+        }
+
         function setLang(cc, langCode) {
-            currentLang = langCode; const t = i18n[currentLang] || i18n.EN;
-            document.body.dir = (langCode==='AR') ? 'rtl' : 'ltr';
+            const langData = languages.find(l => l.id === langCode);
+            document.body.dir = langData.rtl ? 'rtl' : 'ltr';
+            currentLang = langCode; 
+            const t = i18n[currentLang] || i18n.EN;
             document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
             document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
             document.getElementById('hero-h1').innerHTML = t.h1;
@@ -175,59 +205,56 @@
             document.querySelectorAll('.feat-txt').forEach((el, i) => el.innerText = t.feats[i]);
             document.querySelectorAll('.step-label').forEach((el, i) => el.innerText = t.steps[i]);
             document.querySelectorAll('.val-label').forEach((el, i) => { if(completedSteps <= i) el.innerText = t.vals[i]; });
-            updateCurrencyUI(selectedMarket);
-            if(document.getElementById('setupModal').style.display === 'flex') triggerModal(activeStep);
+            if(marketCurrency[selectedMarket]) updateCurrencyUI(selectedMarket);
+            if(completedSteps > 0 && completedSteps < 6) { document.querySelectorAll('.sync-btn').forEach(btn => btn.innerText = `${t.proceed} 0${completedSteps + 1}`); }
             toggleLangMenu();
         }
 
         function triggerModal(step) {
-            activeStep = step;
             const m = document.getElementById('setupModal'), c = document.getElementById('mContent'), t = document.getElementById('mTitle'), lang = i18n[currentLang] || i18n.EN;
             m.style.display = 'flex'; c.innerHTML = "";
             if(step === 1) { 
                 t.innerText = lang.steps[0]; createHeader(lang.headers[0], "text-green-500", c);
-                Object.keys(marketCurrency).sort().forEach(l => { 
-                    const b = createBtn(l, () => { finish(1, l); }); 
+                Object.keys(marketCurrency).forEach(l => { 
+                    const b = createBtn(l, () => { updateCurrencyUI(l); finish(1, l); }); 
                     b.innerHTML = `<div class="dot-blink"></div> <span>${l}</span>`; 
                     c.appendChild(b); 
                 });
                 createHeader(lang.headers[1], "text-orange-500 mt-4", c);
-                comingSoon.sort().forEach(l => c.appendChild(createBtn(l, () => openWaitlist(l))));
+                comingSoon.forEach(l => c.appendChild(createBtn(l, () => openWaitlist(l))));
             } else if (step === 2) {
-                t.innerText = lang.steps[1]; lang.industries.forEach((name, i) => c.appendChild(createBtn(name, () => finish(2, name))));
+                t.innerText = lang.steps[1]; const engKeys = Object.keys(assistants);
+                lang.industries.forEach((name, i) => c.appendChild(createBtn(name, () => { currentIndustry = engKeys[i]; finish(2, name); })));
             } else if (step === 3) {
-                t.innerText = lang.steps[2]; c.innerHTML = `<input id="bn" placeholder="${lang.placeholders.name}" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">${lang.actions.save}</button>`;
+                t.innerText = lang.steps[2]; c.innerHTML = `<input id="bn" placeholder="${lang.placeholders.name}" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none focus:border-orange-500"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">${lang.actions.save}</button>`;
             } else if (step === 4) {
                 t.innerText = lang.steps[3]; lang.roles.forEach(r => c.appendChild(createBtn(r, () => finish(4, r))));
             } else if (step === 5) {
                 t.innerText = lang.steps[4]; const b = createBtn(lang.actions.demo, runVoice); b.className = "orange-btn w-full py-4 rounded-xl font-black text-[10px]"; c.appendChild(b);
             } else if (step === 6) {
-                t.innerText = lang.headers[2]; const pref = marketCurrency[selectedMarket]?.prefix || "+1";
-                for(let i=0; i<3; i++) { c.appendChild(createBtn(`${pref} 202-555-01${i}`, () => { confetti(); finish(6, "READY"); })); }
+                t.innerText = lang.headers[2] || "Select Number";
+                const pref = marketCurrency[selectedMarket]?.prefix || "+1 (555)";
+                for(let i=0; i<3; i++) {
+                    const num = `${pref} ${Math.floor(100+Math.random()*899)}-${Math.floor(1000+Math.random()*8999)}`;
+                    const b = createBtn(num, () => { confetti(); finish(6, "READY"); setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1200); });
+                    b.innerHTML = `<svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke-width="2"/></svg> ${num}`;
+                    c.appendChild(b);
+                }
             }
         }
 
-        function updateCurrencyUI(market) {
-            selectedMarket = market; const data = marketCurrency[market]; if(!data) return;
-            const t = i18n[currentLang] || i18n.EN;
-            document.getElementById('main-currency').innerText = data.cur;
-            document.getElementById('main-price').innerText = data.price;
-            document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} ${t.reg}`;
-        }
-
-        function createBtn(txt, fn) { const b = document.createElement('button'); b.className = "modal-btn"; b.innerText = txt; b.onclick = fn; return b; }
-        function createHeader(txt, cls, cont) { const h = document.createElement('p'); h.className = `text-[8px] font-black mb-2 uppercase text-left ${cls}`; h.innerText = txt; cont.appendChild(h); }
+        function createBtn(txt, fn) { const b = document.createElement('button'); b.className = "modal-btn"; b.innerText = txt; b.onclick = (e) => { e.preventDefault(); fn(); }; return b; }
+        function createHeader(txt, cls, cont) { const h = document.createElement('p'); h.className = `text-[8px] font-black mb-1 uppercase text-left ${cls}`; h.innerText = txt; cont.appendChild(h); }
         function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
-        function finish(s, v) { if(s===1) updateCurrencyUI(v); completedSteps = s; const el = document.getElementById(`v${s}`), card = document.getElementById(`s${s}`); el.innerText = v; el.classList.replace('text-white/30', 'text-white'); card.classList.add('active'); card.classList.remove('next-focus'); closeModal(); if(s < 6) document.getElementById(`s${s+1}`).classList.add('next-focus'); }
-        function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
-        function toggleLangMenu() { const d = document.getElementById('langMenu'); d.style.display = (d.style.display==='flex')?'none':'flex'; }
-        function filterLanguages() { const q = document.getElementById('langSearch').value.toUpperCase(); const btns = document.getElementById('langList').getElementsByTagName('button'); for (let b of btns) { b.style.display = b.innerText.toUpperCase().includes(q) ? "" : "none"; } }
-        function updateParallax(e) { document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%'); document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%'); }
-        function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function openWaitlist(country) { const lang = i18n[currentLang] || i18n.EN; document.getElementById('mContent').innerHTML = `<p class="text-[9px] text-slate-400 mb-4 uppercase font-bold">${country}</p><input placeholder="${lang.placeholders.email}" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none"><button onclick="closeModal()" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black">${lang.waitlist}</button>`; }
-        async function runVoice() { closeModal(); finish(5, "ACTIVE"); }
+        function finish(s, v) { completedSteps = s; const el = document.getElementById(`v${s}`), card = document.getElementById(`s${s}`); el.innerText = v; el.classList.replace('text-white/30', 'text-white'); card.classList.add('active'); card.classList.remove('next-focus'); closeModal(); if(s < 6) { const next = s + 1; document.getElementById(`s${next}`).classList.add('next-focus'); document.querySelectorAll('.sync-btn').forEach(btn => btn.innerText = `${(i18n[currentLang] || i18n.EN).proceed} 0${next}`); } }
+        function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
+        function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
+        function updateParallax(e) { document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%'); document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%'); }
+        async function runVoice() { const id = assistants[currentIndustry] || assistants["Electrical"]; try { await navigator.mediaDevices.getUserMedia({ audio: true }); if(window.vapiSDK) { window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); closeModal(); finish(5, "ACTIVE"); } } catch(e) { alert("Mic required."); } }
         setInterval(() => { const now = new Date(), h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds(); document.getElementById('timer').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; }, 1000);
         initLangList();
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
     </script>
 </body>
 </html>
