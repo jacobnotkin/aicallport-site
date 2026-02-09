@@ -37,6 +37,9 @@
         .modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; }
         .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: #f97316; }
         .modal-btn.disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
+        @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
@@ -57,8 +60,10 @@
         <div class="flex justify-between items-center mb-6 lg:mb-12">
             <div class="flex items-center gap-2">
                 <span class="font-black italic text-base lg:text-xl uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
+                <div class="ml-2 px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase leading-none">BETA</div>
             </div>
             <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
+                <div class="dot-blink"></div>
                 <span id="live-label" class="text-[7px] font-black text-orange-500 uppercase tracking-widest">Global Live</span>
             </div>
         </div>
@@ -66,7 +71,7 @@
         <div class="grid lg:grid-cols-5 gap-6 lg:gap-12 items-center">
             <div class="lg:col-span-3 text-center lg:text-left">
                 <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
-                <p id="hero-p" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider">Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation.</p>
+                <p id="hero-p" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider">Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Worldwide Deployment. No Humans.</span></p>
                 <button onclick="handleStep(1)" id="hero-cta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">Start Activation</button>
             </div>
             
@@ -81,6 +86,12 @@
                             <span class="text-orange-500 font-bold">/mo</span>
                         </div>
                     </div>
+                    <div class="space-y-2 mb-6 text-left max-w-[200px] mx-auto border-y border-white/5 py-4">
+                        <div class="flex items-center gap-2"><svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-black text-white uppercase tracking-tighter feat-txt">Unlimited Calling</span></div>
+                        <div class="flex items-center gap-2"><svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-black text-white uppercase tracking-tighter feat-txt">Pay Monthly</span></div>
+                        <div class="flex items-center gap-2"><svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-black text-white uppercase tracking-tighter feat-txt">No Contract</span></div>
+                    </div>
+                    <div id="timer" class="text-xs font-mono text-white/30 mb-4">00:00:00</div>
                     <button onclick="handleStep(1)" id="side-cta" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic">Activate Now</button>
                 </div>
             </div>
@@ -91,10 +102,10 @@
                 <span id="proto-label" class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Activation Protocol</span>
             </div>
             <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
-                <div id="s1" class="step-card next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">01 Market</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
+                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">01 Market</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
                 <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">02 Industry</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
                 <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">03 Business</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Sync</p></div>
-                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">04 Role</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Choose</p></div>
+                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">04 Agent Role</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Choose</p></div>
                 <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">05 Demo</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label">Sandbox</p></div>
                 <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">06 Deploy</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label">Instant</p></div>
             </div>
@@ -110,90 +121,180 @@
         </div>
     </div>
 
+    <footer class="mt-auto py-10 w-full text-center border-t border-white/5 bg-black/20">
+        <div class="max-w-xs mx-auto opacity-40 hover:opacity-100 transition-opacity duration-500">
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-[8px] font-black text-white uppercase tracking-widest"><span id="agentCount">14,202</span> ACTIVE AGENTS</span>
+            </div>
+            <div class="flex justify-center gap-6 text-[9px] font-black uppercase tracking-widest text-slate-500 mb-4">
+                <a href="#" id="f-priv" class="hover:text-orange-500">Privacy</a>
+                <a href="#" id="f-term" class="hover:text-orange-500">Terms</a>
+                <a href="#" id="f-supp" class="hover:text-orange-500">Support</a>
+            </div>
+            <p class="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">
+                &copy; 2026 AI CALL PORT. GLOBAL SMALL BUSINESS PROTOCOL.
+            </p>
+        </div>
+    </footer>
+
     <script>
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
-        let completedSteps = 0, currentLang = "EN", selectedMarket = "United States";
+        const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
+        let completedSteps = 0, currentIndustryIdx = 8, currentLang = "EN", selectedMarket = "United States";
 
         const marketCurrency = {
-            "United States": { cur: "$", price: "199", reg: "399", active: true },
-            "Germany": { cur: "€", price: "185", reg: "370", active: true },
-            "Mexico": { cur: "$", price: "---", reg: "---", active: false }
+            "United States": { cur: "$", price: "199", reg: "399", prefix: "+1", active: true },
+            "United Kingdom": { cur: "£", price: "155", reg: "310", prefix: "+44", active: true },
+            "Canada": { cur: "$", price: "275", reg: "550", prefix: "+1", active: true },
+            "Australia": { cur: "$", price: "305", reg: "610", prefix: "+61", active: true },
+            "Germany": { cur: "€", price: "185", reg: "370", prefix: "+49", active: true },
+            "France": { cur: "€", price: "185", reg: "370", prefix: "+33", active: true },
+            "Italy": { cur: "€", price: "185", reg: "370", prefix: "+39", active: true },
+            "Japan": { cur: "¥", price: "30000", reg: "60000", prefix: "+81", active: true },
+            "Brazil": { cur: "R$", price: "990", reg: "1980", prefix: "+55", active: true },
+            "India": { cur: "₹", price: "16500", reg: "33000", prefix: "+91", active: true },
+            "China": { cur: "¥", price: "1450", reg: "2900", prefix: "+86", active: true },
+            "Korea": { cur: "₩", price: "260000", reg: "520000", prefix: "+82", active: true },
+            "Norway": { cur: "kr", price: "2000", reg: "4000", prefix: "+47", active: true },
+            "Sweden": { cur: "kr", price: "2000", reg: "4000", prefix: "+46", active: true },
+            "Denmark": { cur: "kr.", price: "1350", reg: "2700", prefix: "+45", active: true },
+            "Poland": { cur: "zł", price: "800", reg: "1600", prefix: "+48", active: true },
+            "Netherlands": { cur: "€", price: "185", reg: "370", prefix: "+31", active: true },
+            "Portugal": { cur: "€", price: "185", reg: "370", prefix: "+351", active: true },
+            "Israel": { cur: "₪", price: "720", reg: "1440", prefix: "+972", active: true },
+            "Russia": { cur: "₽", price: "18500", reg: "37000", prefix: "+7", active: true },
+            "Turkey": { cur: "₺", price: "6500", reg: "13000", prefix: "+90", active: true },
+            "Thailand": { cur: "฿", price: "6800", reg: "13600", prefix: "+66", active: true },
+            "Mexico": { cur: "$", price: "---", reg: "---", prefix: "+52", active: false },
+            "Spain": { cur: "€", price: "---", reg: "---", prefix: "+34", active: false }
         };
 
-        const languages = [{ id: 'EN', n: 'English', f: 'us' }, { id: 'ES', n: 'Español', f: 'mx' }, { id: 'FR', n: 'Français', f: 'fr' }];
+        const languages = [
+            { id: 'EN', n: 'English', f: 'us' }, { id: 'ES', n: 'Español', f: 'mx' }, { id: 'FR', n: 'Français', f: 'fr' },
+            { id: 'DE', n: 'Deutsch', f: 'de' }, { id: 'IT', n: 'Italiano', f: 'it' }, { id: 'PT', n: 'Português', f: 'pt' },
+            { id: 'RU', n: 'Русский', f: 'ru' }, { id: 'JP', n: '日本語', f: 'jp' }, { id: 'KR', n: '한국어', f: 'kr' },
+            { id: 'CN', n: '中文', f: 'cn' }
+        ];
+
+        const industryKeys = ["Accounting", "After Hours", "Auto Repair", "Bakery", "Boutique", "Car Detailing", "Car Rental", "Dental", "Electrical", "Electronics", "Flower Shop", "Furniture", "HVAC", "Hair Salon", "Handyman", "Home Cleaning", "Insurance", "Jewelry", "Landscaping", "Legal", "Locksmith", "Massage", "Med Spa", "Nail Salon", "Pest Control", "Plumbing", "Real Estate", "Restaurant", "Roofing", "Towing", "Urgent Care", "Veterinary", "Windows"];
 
         const i18n = {
-            EN: { 
-                h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation.", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", 
-                steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], 
-                values: ["Select", "Select", "Sync", "Choose", "Sandbox", "Instant"], 
-                modal: { close: "Close", searchM: "Search Countries...", searchI: "Search Industries...", placeholderB: "BUSINESS NAME", save: "SAVE", roles: ["Receptionist", "Sales Agent", "Support Agent"], demo: "START DEMO CALL", deploy: "GET MY NUMBER", comingSoon: "Coming Soon" }
-            },
-            ES: { 
-                h1: "RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p: "Activación Instantánea de <span class='text-orange-500'>NEGOCIOS</span>.", start: "Iniciar", now: "Activar", beta: "ACCESO BETA", reg: "Regular", live: "En Vivo", 
-                steps: ["01 Mercado", "02 Industria", "03 Empresa", "04 Rol", "05 Demo", "06 Desplegar"], 
-                values: ["Elegir", "Elegir", "Sinc", "Rol", "Sandbox", "Instante"], 
-                modal: { close: "Cerrar", searchM: "Buscar Países...", searchI: "Buscar Industrias...", placeholderB: "NOMBRE DE EMPRESA", save: "GUARDAR", roles: ["Recepcionista", "Agente de Ventas", "Soporte"], demo: "INICIAR DEMO", deploy: "OBTENER NÚMERO", comingSoon: "Próximamente" }
-            }
+            EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", priceFeats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], values: ["Select", "Select", "Sync", "Choose", "Sandbox", "Instant"], industries: industryKeys, footer: ["Privacy", "Terms", "Support", "Activation Protocol"], modal: { close: "Close", searchM: "Search Countries...", searchI: "Search Industries...", placeholderB: "BUSINESS NAME", save: "SAVE", roles: ["Receptionist", "Sales Agent", "Support Agent"], demo: "START DEMO CALL", deploy: "GET MY NUMBER", deployTitle: "DEPLOYMENT", comingSoon: "Coming Soon" } },
+            ES: { h1: "RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p: "Activación Instantánea de <span class='text-orange-500'>NEGOCIOS</span>. <span class='text-orange-500'>Sin Humanos.</span>", start: "Iniciar", now: "Activar", beta: "ACCESO BETA", reg: "Regular", live: "En Vivo", priceFeats: ["Llamadas Ilimitadas", "Pago Mensual", "Sin Contrato"], steps: ["01 Mercado", "02 Industria", "03 Empresa", "04 Rol", "05 Demo", "06 Desplegar"], values: ["Elegir", "Elegir", "Sinc", "Rol", "Sandbox", "Instante"], industries: ["Contabilidad", "Fuera de Horas", "Taller Mecánico", "Panadería", "Boutique", "Lavado Autos", "Renta Autos", "Dental", "Electricidad", "Electrónica", "Florería", "Muebles", "HVAC", "Salón Belleza", "Handyman", "Limpieza", "Seguros", "Joyería", "Paisajismo", "Legal", "Cerrajería", "Masajes", "Med Spa", "Uñas", "Plagas", "Plomería", "Inmuebles", "Restaurante", "Techos", "Grúa", "Urgencias", "Veterinaria", "Ventanas"], footer: ["Privacidad", "Términos", "Soporte", "Protocolo de Activación"], modal: { close: "Cerrar", searchM: "Buscar Países...", searchI: "Buscar Industrias...", placeholderB: "NOMBRE DE EMPRESA", save: "GUARDAR", roles: ["Recepcionista", "Agente de Ventas", "Soporte"], demo: "INICIAR LLAMADA DEMO", deploy: "OBTENER MI NÚMERO", deployTitle: "DESPLIEGUE", comingSoon: "Próximamente" } },
+            FR: { h1: "RÉCEPTIONNISTE IA<br> SANS HUMAINS", p: "Activation <span class='text-orange-500'>PETITE ENTREPRISE</span>. <span class='text-orange-500'>Déploiement mondial.</span>", start: "Démarrer", now: "Activer", beta: "ACCÈS BÉTA", reg: "Régulier", live: "En Direct", priceFeats: ["Appels Illimités", "Payer Mensuellement", "Sans Contrat"], steps: ["01 Marché", "02 Industrie", "03 Entreprise", "04 Rôle", "05 Démo", "06 Déployer"], values: ["Choisir", "Choisir", "Sync", "Rôle", "Sandbox", "Instant"], industries: ["Comptabilité", "Après Heures", "Garage", "Boulangerie", "Boutique", "Lavage Auto", "Location Auto", "Dentaire", "Électricité", "Électronique", "Fleuriste", "Meubles", "HVAC", "Salon Coiffure", "Bricoleur", "Nettoyage", "Assurances", "Bijouterie", "Paysage", "Juridique", "Serrurier", "Massage", "Med Spa", "Ongles", "Nuisibles", "Plomberie", "Immobilier", "Restaurant", "Toiture", "Remorquage", "Urgences", "Vétérinaire", "Fenêtres"], footer: ["Confidentialité", "Conditions", "Support", "Protocole d'Activation"], modal: { close: "Fermer", searchM: "Chercher Pays...", searchI: "Chercher Industries...", placeholderB: "NOM DE L'ENTREPRISE", save: "ENREGISTRER", roles: ["Réceptionniste", "Agent de Vente", "Agent de Support"], demo: "DÉMARRER L'APPEL DÉMO", deploy: "OBTENER MON NUMÉRO", deployTitle: "DÉPLOIEMENT", comingSoon: "Bientôt" } }
         };
 
         function setLang(cc, langCode) {
             currentLang = langCode; 
             const t = i18n[currentLang] || i18n.EN;
+            const marketData = marketCurrency[selectedMarket] || marketCurrency["United States"];
             
             document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
             document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
-            document.getElementById('hero-h1').innerHTML = t.h1 || i18n.EN.h1;
-            document.getElementById('hero-p').innerHTML = t.p || i18n.EN.p;
-            document.getElementById('hero-cta').innerText = t.start || i18n.EN.start;
-            document.getElementById('side-cta').innerText = t.now || i18n.EN.now;
-            document.getElementById('beta-txt').innerText = t.beta || i18n.EN.beta;
-            document.getElementById('live-label').innerText = t.live || i18n.EN.live;
-            document.getElementById('mClose').innerText = t.modal.close || i18n.EN.modal.close;
+            document.getElementById('hero-h1').innerHTML = t.h1;
+            document.getElementById('hero-p').innerHTML = t.p;
+            document.getElementById('hero-cta').innerText = t.start;
+            document.getElementById('side-cta').innerText = t.now;
+            document.getElementById('beta-txt').innerText = t.beta;
+            document.getElementById('reg-txt').innerText = `${marketData.cur}${marketData.reg} ${t.reg}`;
+            document.getElementById('live-label').innerText = t.live;
+            document.getElementById('mClose').innerText = t.modal.close;
+            document.getElementById('proto-label').innerText = t.footer[3];
+            document.getElementById('f-priv').innerText = t.footer[0];
+            document.getElementById('f-term').innerText = t.footer[1];
+            document.getElementById('f-supp').innerText = t.footer[2];
 
-            document.querySelectorAll('.step-label').forEach((el, i) => { el.innerText = t.steps[i] || i18n.EN.steps[i]; });
-            document.querySelectorAll('.val-label').forEach((el, i) => { if(completedSteps <= i) el.innerText = t.values[i] || i18n.EN.values[i]; });
+            const feats = t.priceFeats;
+            document.querySelectorAll('.feat-txt').forEach((el, i) => { if (feats[i]) el.innerText = feats[i]; });
+            const sLabels = t.steps;
+            document.querySelectorAll('.step-label').forEach((el, i) => { if (sLabels[i]) el.innerText = sLabels[i]; });
+            const vLabels = t.values;
+            document.querySelectorAll('.val-label').forEach((el, i) => { if (completedSteps <= i && vLabels[i]) el.innerText = vLabels[i]; });
 
             toggleLangMenu(false);
         }
 
         function triggerModal(step) {
             const m = document.getElementById('setupModal'), c = document.getElementById('mContent'), s = document.getElementById('modalSearchContainer'), t = document.getElementById('mTitle'), lang = i18n[currentLang] || i18n.EN;
-            const def = i18n.EN; // Fallback
             m.style.display = 'flex'; c.innerHTML = ""; s.innerHTML = "";
             
-            if(step === 3) {
-                t.innerText = lang.steps[2] || def.steps[2];
-                c.innerHTML = `<input id="bn" placeholder="${lang.modal.placeholderB || def.modal.placeholderB}" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">${lang.modal.save || def.modal.save}</button>`;
+            if(step === 1) { 
+                t.innerText = lang.steps[0];
+                s.innerHTML = `<input type="text" class="search-box" placeholder="${lang.modal.searchM}" onkeyup="filterList('mContent', this.value)">`;
+                Object.keys(marketCurrency).sort().forEach(name => {
+                    const data = marketCurrency[name];
+                    const btn = createBtn(name, () => { if(data.active){ updateCurrencyUI(name); finish(1, name); } });
+                    if(!data.active) btn.classList.add('disabled');
+                    btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full ${data.active ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-slate-700'}"></div> ${name}`;
+                    btn.setAttribute('data-n', name);
+                    c.appendChild(btn);
+                });
+            } else if (step === 2) {
+                t.innerText = lang.steps[1];
+                s.innerHTML = `<input type="text" class="search-box" placeholder="${lang.modal.searchI}" onkeyup="filterList('mContent', this.value)">`;
+                lang.industries.forEach((name, idx) => {
+                    const btn = createBtn(name, () => { currentIndustryIdx = idx; finish(2, name); });
+                    btn.setAttribute('data-n', name);
+                    c.appendChild(btn);
+                });
+            } else if (step === 3) {
+                t.innerText = lang.steps[2];
+                c.innerHTML = `<input id="bn" placeholder="${lang.modal.placeholderB}" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">${lang.modal.save}</button>`;
             } else if (step === 4) {
-                t.innerText = lang.steps[3] || def.steps[3];
-                const roles = lang.modal.roles || def.modal.roles;
-                roles.forEach(r => c.appendChild(createBtn(r, () => finish(4, r))));
+                t.innerText = lang.steps[3];
+                lang.modal.roles.forEach(r => c.appendChild(createBtn(r, () => finish(4, r))));
             } else if (step === 5) {
-                t.innerText = lang.steps[4] || def.steps[4];
-                c.appendChild(createBtn(lang.modal.demo || def.modal.demo, () => finish(5, "ACTIVE")));
-            } else if (step === 1 || step === 2) {
-                // Simplified Market/Industry logic for testing
-                t.innerText = lang.steps[step-1] || def.steps[step-1];
-                c.appendChild(createBtn("Demo Option", () => finish(step, "Done")));
+                t.innerText = lang.steps[4];
+                c.appendChild(createBtn(lang.modal.demo, runVoice));
+            } else if (step === 6) {
+                t.innerText = lang.modal.deployTitle;
+                c.appendChild(createBtn(lang.modal.deploy, () => { confetti(); finish(6, "READY"); setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1200); }));
             }
         }
 
+        function filterList(containerId, query) {
+            const q = query.toUpperCase();
+            document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
+                const name = b.getAttribute('data-n') || b.innerText;
+                b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
+            });
+        }
         function createBtn(txt, fn) { const b = document.createElement('button'); b.className = "modal-btn"; b.innerText = txt; b.onclick = fn; return b; }
         function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
         function finish(s, v) { completedSteps = s; document.getElementById(`v${s}`).innerText = v; document.getElementById(`s${s}`).classList.add('active'); closeModal(); if(s<6) document.getElementById(`s${s+1}`).classList.add('next-focus'); }
         function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
         function toggleLangMenu(force) { const d = document.getElementById('langMenu'); d.style.display = (force !== undefined ? force : d.style.display !== 'flex') ? 'flex' : 'none'; }
+        function updateCurrencyUI(m) { 
+            selectedMarket = m; const data = marketCurrency[m]; const t = i18n[currentLang] || i18n.EN;
+            document.getElementById('main-currency').innerText = data.cur; 
+            document.getElementById('main-price').innerText = data.price;
+            document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} ${t.reg}`;
+        }
         function updateParallax(e) { document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%'); document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%'); }
+        async function runVoice() { const key = industryKeys[currentIndustryIdx]; const id = assistants[key] || assistants["Electrical"]; if(window.vapiSDK) { window.vapiSDK.run({ apiKey: vapiApiKey, assistant: id }); closeModal(); finish(5, "ACTIVE"); } }
+        
+        // Timer and Counter
+        setInterval(() => { 
+            const now = new Date(), h = 23-now.getHours(), m = 59-now.getMinutes(), s = 59-now.getSeconds(); 
+            document.getElementById('timer').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; 
+            if(Math.random() > 0.8) {
+                const el = document.getElementById('agentCount');
+                let count = parseInt(el.innerText.replace(',',''));
+                el.innerText = (count + 1).toLocaleString();
+            }
+        }, 1000);
 
-        // Initialize Language List
+        // Lang List Init
         const list = document.getElementById('langList');
         languages.forEach(l => {
             const b = createBtn(l.n, () => setLang(l.f, l.id));
             b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3"> ${l.n}`;
             list.appendChild(b);
         });
+
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";g.defer=true;g.async=true;s.parentNode.insertBefore(g,s);})(document,"script");
     </script>
 </body>
 </html>
