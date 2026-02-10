@@ -113,7 +113,7 @@
         const vapiApiKey = "d4fcbe60-643b-48c8-9d74-dfb8ff3236f3";
         let completedSteps = 0, currentLang = "EN", selectedMarket = "United States";
 
-        // MARKETS (42 RESTORED)
+        // FULL 42 MARKETS
         const marketCurrency = {
             "United States": { cur: "$", price: "199", reg: "399", prefix: "+1", active: true },
             "United Kingdom": { cur: "£", price: "155", reg: "310", prefix: "+44", active: true },
@@ -159,7 +159,7 @@
             "United Arab Emirates": { cur: "AED", price: "---", reg: "---", prefix: "+971", active: false }
         };
 
-        // LANGUAGES (20 RESTORED)
+        // FULL 20 LANGUAGES
         const langs = [
             { id: 'EN', n: 'English', f: 'us' }, { id: 'ES', n: 'Español', f: 'mx' }, { id: 'FR', n: 'Français', f: 'fr' },
             { id: 'DE', n: 'Deutsch', f: 'de' }, { id: 'IT', n: 'Italiano', f: 'it' }, { id: 'PT', n: 'Português', f: 'pt' },
@@ -170,12 +170,11 @@
             { id: 'HE', n: 'עברית', f: 'il' }, { id: 'SE', n: 'Svenska', f: 'se' }
         ];
 
-        // i18n DATA
+        // i18n MAPPING (Structured for automatic fallback)
         const i18n = {
             EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", f1: "Unlimited Calling", f2: "Pay Monthly", f3: "No Contract", protocol: "Activation Protocol", st1: "01 Market", st2: "02 Industry", st3: "03 Business", st4: "04 Role", st5: "05 Demo", st6: "06 Deploy", sel: "Select", sync: "Sync", sand: "Sandbox", inst: "Instant", close: "Close", soon: "Coming Soon", wait: "Join Waitlist" },
             ES: { h1: "RECEPCIONISTA IA GLOBAL<br> SIN HUMANOS", p: "Activación Instantánea de <span class='text-orange-500'>PEQUEÑAS EMPRESAS</span>. <span class='text-orange-500'>Despliegue Mundial.</span>", start: "Iniciar Activación", now: "Activar Ahora", beta: "ACCESO BETA", reg: "Regular", live: "En Vivo", f1: "Llamadas Ilimitadas", f2: "Pago Mensual", f3: "Sin Contrato", protocol: "Protocolo de Activación", st1: "01 Mercado", st2: "02 Industria", st3: "03 Empresa", st4: "04 Rol", st5: "05 Demo", st6: "06 Desplegar", sel: "Seleccionar", sync: "Sincronizar", sand: "Pruebas", inst: "Instantáneo", close: "Cerrar", soon: "Próximamente", wait: "Lista de Espera" },
             FR: { h1: "RÉCEPTIONNISTE IA<br> SANS HUMAINS", p: "Activation <span class='text-orange-500'>PETITE ENTREPRISE</span> Instantanée. <span class='text-orange-500'>Déploiement Mondial.</span>", start: "Démarrer", now: "Activer", beta: "ACCÈS BÉTA", reg: "Régulier", live: "En Direct", f1: "Appels Illimités", f2: "Payer Mensuellement", f3: "Sans Contrat", protocol: "Protocole d'Activation", st1: "01 Marché", st2: "02 Industrie", st3: "03 Entreprise", st4: "04 Rôle", st5: "05 Démo", st6: "06 Déployer", sel: "Choisir", sync: "Sincroniser", sand: "Sandbox", inst: "Instantané", close: "Fermer", soon: "Bientôt", wait: "Liste d'attente" }
-            // All other 17 languages automatically inherit the EN structure via the fallback loop.
         };
 
         function setLang(cc, langCode) {
@@ -183,14 +182,18 @@
             const t = i18n[langCode] || i18n.EN;
             const market = marketCurrency[selectedMarket];
 
-            // Update UI
-            document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
-            document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${langCode}`;
+            // 1. Update Hero Text (HTML)
             document.getElementById('hero-h1').innerHTML = t.h1 || i18n.EN.h1;
             document.getElementById('hero-p').innerHTML = t.p || i18n.EN.p;
+            
+            // 2. Update Pricing Card
             document.getElementById('reg-txt').innerText = `${market.cur}${market.reg} ${t.reg || i18n.EN.reg}`;
 
-            // Global update for all tagged elements
+            // 3. Update Flag & Header
+            document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
+            document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${langCode}`;
+
+            // 4. Update all elements with data-i18n
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 el.innerText = t[key] || i18n.EN[key];
