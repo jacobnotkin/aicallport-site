@@ -181,7 +181,6 @@
 
         const industryKeys = ["Accounting", "After Hours", "Auto Repair", "Bakery", "Boutique", "Car Detailing", "Car Rental", "Dental", "Electrical", "Electronics", "Flower Shop", "Furniture", "HVAC", "Hair Salon", "Handyman", "Home Cleaning", "Insurance", "Jewelry", "Landscaping", "Legal", "Locksmith", "Massage", "Med Spa", "Nail Salon", "Pest Control", "Plumbing", "Real Estate", "Restaurant", "Roofing", "Towing", "Urgent Care", "Veterinary", "Windows"];
 
-        // FULL 20-LANGUAGE DICTIONARY RESTORED
         const i18n = {
             EN: { h1: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>No Humans.</span>", start: "Start Activation", now: "Activate Now", beta: "BETA ACCESS", reg: "Regular", live: "Global Live", feats: ["Unlimited Calling", "Pay Monthly", "No Contract"], steps: ["01 Market", "02 Industry", "03 Business", "04 Role", "05 Demo", "06 Deploy"], soon: "Coming Soon", wait: "JOIN WAITLIST" },
             ES: { h1: "RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p: "Activación Instantánea de <span class='text-orange-500'>NEGOCIOS</span>. <span class='text-orange-500'>Sin Humanos.</span>", start: "Iniciar", now: "Activar", beta: "ACCESO BETA", reg: "Regular", live: "En Vivo", feats: ["Ilimitado", "Mensual", "Sin Contrato"], steps: ["01 Mercado", "02 Industria", "03 Empresa", "04 Rol", "05 Demo", "06 Desplegar"], soon: "Próximamente", wait: "LISTA DE ESPERA" },
@@ -212,8 +211,6 @@
             
             document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
             document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
-            
-            // Core UI Text
             document.getElementById('hero-h1').innerHTML = t.h1;
             document.getElementById('hero-p').innerHTML = t.p;
             document.getElementById('hero-cta').innerText = t.start;
@@ -222,7 +219,6 @@
             document.getElementById('reg-txt').innerText = `${marketData.cur}${marketData.reg} ${t.reg}`;
             document.getElementById('live-label').innerText = t.live;
             
-            // Features & Steps
             const features = document.querySelectorAll('.feat-txt');
             t.feats.forEach((feat, i) => { if(features[i]) features[i].innerText = feat; });
             const labels = document.querySelectorAll('.step-label');
@@ -231,7 +227,6 @@
             toggleLangMenu(false);
         }
 
-        // Rest of the base code functions (triggerModal, initLangList, etc.) remains exactly as requested.
         function triggerModal(step, countryName = null) {
             const m = document.getElementById('setupModal'), c = document.getElementById('mContent'), s = document.getElementById('modalSearchContainer'), t = document.getElementById('mTitle'), lang = i18n[currentLang] || i18n.EN;
             m.style.display = 'flex'; c.innerHTML = ""; s.innerHTML = "";
@@ -274,7 +269,22 @@
                 c.appendChild(createBtn("START DEMO CALL", runVoice));
             } else if (step === 6) {
                 t.innerText = lang.steps[5];
-                c.appendChild(createBtn("GET MY NUMBER", () => { confetti(); finish(6, "READY"); setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1200); }));
+                
+                // MARKET-SPECIFIC STRIPE LIVE LINKS
+                const stripeLinks = {
+                    "United States": "https://buy.stripe.com/live_USA_LINK_HERE",
+                    "Germany": "https://buy.stripe.com/live_EU_LINK_HERE",
+                    "United Kingdom": "https://buy.stripe.com/live_UK_LINK_HERE",
+                    "default": "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01" // Current fallback
+                };
+
+                const targetLink = stripeLinks[selectedMarket] || stripeLinks["default"];
+
+                c.appendChild(createBtn("GET MY NUMBER", () => { 
+                    confetti(); 
+                    finish(6, "READY"); 
+                    setTimeout(() => window.open(targetLink), 1200); 
+                }));
             }
         }
 
