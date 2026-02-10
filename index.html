@@ -10,7 +10,7 @@
     <style>
         * { box-sizing: border-box; scroll-behavior: smooth; } 
         
-        /* Immersive Full Screen */
+        /* FULL SCREEN RESET */
         html, body { 
             width: 100vw; 
             height: 100vh; 
@@ -22,51 +22,54 @@
             overflow: hidden; 
             display: flex; 
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
+        /* Interactive Parallax Background */
         .bg-glow { 
             position: fixed; 
             inset: 0; 
             z-index: -1; 
-            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 60%); 
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.12) 0%, transparent 60%); 
             pointer-events: none; 
         }
         
-        /* 15% ZOOM LOGIC */
+        /* Main Container - Scaled Down 15% */
         .console-container { 
-            width: 100%; 
-            height: 100%;
+            width: 118%; /* Compensate for zoom out to keep edge-to-edge look */
+            height: 118%;
             background: rgba(10, 12, 18, 0.7); 
             backdrop-filter: blur(12px); 
+            padding: 5vh 5vw; 
             display: flex; 
             flex-direction: column;
             justify-content: space-between;
-            padding: 4vh 4vw;
-            transform: scale(1.15); /* Applying the 15% Zoom */
+            transform: scale(0.85); /* ZOOM OUT 15% */
             transform-origin: center;
         }
         
         .hero-title { background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: 0.2s; color: white; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2); }
-        .orange-btn:active { transform: scale(0.95); }
+        .orange-btn:active { transform: scale(0.98); }
         
-        /* Activation Steps */
-        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; opacity: 0.3; transition: 0.4s; cursor: pointer; }
+        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5vh 1vw; border-radius: 12px; opacity: 0.3; transition: 0.4s; cursor: pointer; }
         .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; opacity: 1 !important; }
         .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
         
         @keyframes border-glow { 0%, 100% { border-color: rgba(249, 115, 22, 0.3); } 50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); } }
 
-        /* Floating Nav & Modal */
+        /* Floating Nav & Modals */
         .floating-lang { position: fixed; top: 2vh; right: 2vw; z-index: 1000; }
-        .lang-trigger { background: rgba(10, 12, 18, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 12px; border-radius: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .lang-trigger { background: rgba(10, 12, 18, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 12px; border-radius: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; backdrop-filter: blur(5px); }
         #langMenu { position: absolute; top: 50px; right: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 10px; display: none; flex-direction: column; gap: 4px; width: 200px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         
         #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .modal-scroll { max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding: 10px; }
         .modal-btn { width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: white; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .modal-btn:hover { background: rgba(249, 115, 22, 0.1); border-color: #f97316; }
 
-        footer { padding: 1vh 0; border-top: 1px solid rgba(255,255,255,0.05); }
+        footer { padding: 2vh 2vw; border-top: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
@@ -75,7 +78,7 @@
     <div class="floating-lang">
         <button onclick="toggleLangMenu()" class="lang-trigger">
             <img id="curFlag" src="https://flagcdn.com/us.svg" class="w-4" alt="Flag">
-            <span id="curLangText" class="text-[9px] font-black text-white uppercase">US | EN</span>
+            <span id="curLangText" class="text-[9px] font-black text-white uppercase tracking-wider">US | EN</span>
         </button>
         <div id="langMenu">
             <div class="modal-scroll" id="langList"></div>
@@ -90,50 +93,50 @@
             </div>
             <div class="bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full flex items-center gap-2">
                 <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                <span data-i18n="live" class="text-[8px] font-black text-orange-500 uppercase tracking-widest">Global Live</span>
+                <span data-i18n="live" class="text-[8px] font-black text-orange-500 uppercase tracking-[0.2em]">Global Live</span>
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-5 gap-12 items-center my-auto">
+        <div class="grid lg:grid-cols-5 gap-10 items-center my-auto">
             <div class="lg:col-span-3 text-center lg:text-left">
-                <h1 id="hero-h1" class="text-4xl lg:text-5xl font-black italic uppercase leading-[0.95] mb-4 hero-title" data-i18n="h1_raw">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
-                <p id="hero-p" class="text-slate-400 text-xs mb-8 max-w-md mx-auto lg:mx-0 font-bold uppercase tracking-widest" data-i18n="p_raw">Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Worldwide Deployment.</span></p>
-                <button onclick="handleStep(1)" data-i18n="start" class="orange-btn px-10 py-5 rounded-xl text-[10px] font-black uppercase italic tracking-widest">Start Activation</button>
+                <h1 id="hero-h1" class="text-4xl lg:text-6xl font-black italic uppercase leading-[0.95] mb-4 hero-title" data-i18n="h1_raw">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
+                <p id="hero-p" class="text-slate-400 text-sm mb-6 max-w-md mx-auto lg:mx-0 font-bold uppercase tracking-widest leading-relaxed" data-i18n="p_raw">Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Worldwide Deployment. No Humans.</span></p>
+                <button onclick="handleStep(1)" data-i18n="start" class="orange-btn px-10 py-5 rounded-xl text-[12px] font-black uppercase tracking-[0.2em] italic">Start Activation</button>
             </div>
             
             <div class="lg:col-span-2">
                 <div class="bg-black/40 border border-white/10 rounded-3xl p-8 text-center backdrop-blur-md">
-                    <h3 data-i18n="beta_access" class="text-[9px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]">BETA ACCESS</h3>
+                    <h3 data-i18n="beta_access" class="text-[10px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]">BETA ACCESS</h3>
                     <div class="flex flex-col items-center mb-4">
-                        <span id="reg-txt" class="text-slate-600 line-through text-xs font-bold">$399 Regular</span>
+                        <span id="reg-txt" class="text-slate-600 line-through text-sm font-bold mb-1">$399 Regular</span>
                         <div class="flex items-baseline gap-1 text-white">
-                            <span id="main-currency" class="text-5xl font-black">$</span>
-                            <span id="main-price" class="text-5xl font-black">199</span>
-                            <span class="text-orange-500 font-bold text-sm">/mo</span>
+                            <span id="main-currency" class="text-6xl font-black">$</span>
+                            <span id="main-price" class="text-6xl font-black">199</span>
+                            <span class="text-orange-500 font-bold text-lg">/mo</span>
                         </div>
                     </div>
-                    <div class="space-y-2 mb-6 text-left max-w-[200px] mx-auto border-y border-white/5 py-4 text-white font-bold uppercase text-[10px]">
-                        <div class="flex items-center gap-3"><div class="w-1.5 h-1.5 bg-orange-500 rotate-45"></div><span data-i18n="f1">Unlimited Calling</span></div>
-                        <div class="flex items-center gap-3"><div class="w-1.5 h-1.5 bg-orange-500 rotate-45"></div><span data-i18n="f2">Pay Monthly</span></div>
-                        <div class="flex items-center gap-3"><div class="w-1.5 h-1.5 bg-orange-500 rotate-45"></div><span data-i18n="f3">No Contract</span></div>
+                    <div class="space-y-3 mb-6 text-left max-w-[220px] mx-auto border-y border-white/5 py-6 text-white font-bold uppercase text-[11px]">
+                        <div class="flex items-center gap-3"><div class="w-2 h-2 bg-orange-500 rotate-45"></div><span data-i18n="f1">Unlimited Calling</span></div>
+                        <div class="flex items-center gap-3"><div class="w-2 h-2 bg-orange-500 rotate-45"></div><span data-i18n="f2">Pay Monthly</span></div>
+                        <div class="flex items-center gap-3"><div class="w-2 h-2 bg-orange-500 rotate-45"></div><span data-i18n="f3">No Contract</span></div>
                     </div>
-                    <button onclick="handleStep(1)" data-i18n="now" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase italic tracking-widest">Activate Now</button>
+                    <button onclick="handleStep(1)" data-i18n="now" class="orange-btn w-full py-4 rounded-xl text-[11px] font-black uppercase italic tracking-widest">Activate Now</button>
                 </div>
             </div>
         </div>
 
         <div>
-            <span data-i18n="protocol" class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500 block mb-4">Activation Protocol</span>
-            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 mb-6">
-                <div id="s1" class="step-card next-focus" onclick="handleStep(1)"><p data-i18n="st1" class="text-[7px] font-black text-orange-500 uppercase">01 Market</p><p id="v1" data-i18n="sel" class="text-[10px] text-white/30 font-bold uppercase truncate">Select</p></div>
-                <div id="s2" class="step-card" onclick="handleStep(2)"><p data-i18n="st2" class="text-[7px] font-black text-orange-500 uppercase">02 Industry</p><p id="v2" data-i18n="sel" class="text-[10px] text-white/30 font-bold uppercase truncate">Select</p></div>
-                <div id="s3" class="step-card" onclick="handleStep(3)"><p data-i18n="st3" class="text-[7px] font-black text-orange-500 uppercase">03 Business</p><p id="v3" data-i18n="sync" class="text-[10px] text-white/30 font-bold uppercase truncate">Sync</p></div>
-                <div id="s4" class="step-card" onclick="handleStep(4)"><p data-i18n="st4" class="text-[7px] font-black text-orange-500 uppercase">04 Role</p><p id="v4" data-i18n="sel" class="text-[10px] text-white/30 font-bold uppercase truncate">Choose</p></div>
-                <div id="s5" class="step-card" onclick="handleStep(5)"><p data-i18n="st5" class="text-[7px] font-black text-orange-500 uppercase">05 Demo</p><p id="v5" data-i18n="sand" class="text-[10px] text-white/30 font-bold uppercase truncate italic">Sandbox</p></div>
-                <div id="s6" class="step-card" onclick="handleStep(6)"><p data-i18n="st6" class="text-[7px] font-black text-orange-500 uppercase">06 Deploy</p><p id="v6" data-i18n="inst" class="text-[10px] text-white/30 font-bold uppercase truncate italic">Instant</p></div>
+            <span data-i18n="protocol" class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500 block mb-4 text-center lg:text-left">Activation Protocol</span>
+            <div class="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+                <div id="s1" class="step-card next-focus" onclick="handleStep(1)"><p data-i18n="st1" class="text-[8px] font-black text-orange-500 uppercase mb-0.5">01 Market</p><p id="v1" data-i18n="sel" class="text-[11px] text-white/30 font-bold uppercase truncate">Select</p></div>
+                <div id="s2" class="step-card" onclick="handleStep(2)"><p data-i18n="st2" class="text-[8px] font-black text-orange-500 uppercase mb-0.5">02 Industry</p><p id="v2" data-i18n="sel" class="text-[11px] text-white/30 font-bold uppercase truncate">Select</p></div>
+                <div id="s3" class="step-card" onclick="handleStep(3)"><p data-i18n="st3" class="text-[8px] font-black text-orange-500 uppercase mb-0.5">03 Business</p><p id="v3" data-i18n="sync" class="text-[11px] text-white/30 font-bold uppercase truncate">Sync</p></div>
+                <div id="s4" class="step-card" onclick="handleStep(4)"><p data-i18n="st4" class="text-[8px] font-black text-orange-500 uppercase mb-0.5">04 Agent Role</p><p id="v4" data-i18n="sel" class="text-[11px] text-white/30 font-bold uppercase truncate">Choose</p></div>
+                <div id="s5" class="step-card" onclick="handleStep(5)"><p data-i18n="st5" class="text-[8px] font-black text-orange-500 uppercase mb-0.5">05 Demo</p><p id="v5" data-i18n="sand" class="text-[11px] text-white/30 font-bold uppercase truncate italic">Sandbox</p></div>
+                <div id="s6" class="step-card" onclick="handleStep(6)"><p data-i18n="st6" class="text-[8px] font-black text-orange-500 uppercase mb-0.5">06 Deploy</p><p id="v6" data-i18n="inst" class="text-[11px] text-white/30 font-bold uppercase truncate italic">Instant</p></div>
             </div>
 
-            <footer class="text-[8px] text-slate-700 flex justify-between items-center font-bold">
+            <footer class="text-[9px] text-slate-700 flex justify-between items-center">
                 <span>© 2026 GLOBAL AI OPERATIONS</span>
                 <span class="flex items-center gap-2"><div class="w-1 h-1 bg-green-500 rounded-full"></div> ZERO-HUMAN PROTOCOL 1.0.4</span>
             </footer>
@@ -164,7 +167,7 @@
         ];
 
         const i18n = {
-            EN: { h1_raw: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p_raw: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment.</span>", start: "Start Activation", now: "Activate Now", beta_access: "BETA ACCESS", reg: "Regular", live: "Global Live", f1: "Unlimited Calling", f2: "Pay Monthly", f3: "No Contract", protocol: "Activation Protocol", st1: "01 Market", st2: "02 Industry", st3: "03 Business", st4: "04 Role", st5: "05 Demo", st6: "06 Deploy", sel: "Select", sync: "Sync", sand: "Sandbox", inst: "Instant", close: "Close" },
+            EN: { h1_raw: "GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p_raw: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start: "Start Activation", now: "Activate Now", beta_access: "BETA ACCESS", reg: "Regular", live: "Global Live", f1: "Unlimited Calling", f2: "Pay Monthly", f3: "No Contract", protocol: "Activation Protocol", st1: "01 Market", st2: "02 Industry", st3: "03 Business", st4: "04 Role", st5: "05 Demo", st6: "06 Deploy", sel: "Select", sync: "Sync", sand: "Sandbox", inst: "Instant", close: "Close" },
             ES: { h1_raw: "RECEPCIONISTA IA GLOBAL<br> SIN HUMANOS", p_raw: "Activación Instantánea <span class='text-orange-500'>PEQUEÑAS EMPRESAS</span>. <span class='text-orange-500'>Despliegue Mundial.</span>", start: "Iniciar Activación", now: "Activar Ahora", beta_access: "ACCESO BETA", reg: "Regular", live: "En Vivo", f1: "Llamadas Ilimitadas", f2: "Pago Mensual", f3: "Sin Contrato", protocol: "Protocolo de Activación", st1: "01 Mercado", st2: "02 Industria", st3: "03 Negocio", st4: "04 Rol", st5: "05 Demo", st6: "06 Desplegar", sel: "Seleccionar", sync: "Sincronizar", sand: "Pruebas", inst: "Instantáneo", close: "Cerrar" }
         };
 
