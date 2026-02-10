@@ -9,66 +9,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; scroll-behavior: smooth; } 
+        html, body { width: 100%; min-height: 100vh; background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; overflow-x: hidden; display: flex; flex-direction: column; }
+        body { padding: 12px; }
+        @media (min-width: 1024px) { body { padding: 24px; } }
         
-        /* FULL SCREEN RESET */
-        html, body { 
-            width: 100vw; 
-            height: 100vh; 
-            background: #06080f; 
-            color: #e2e8f0; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            overflow: hidden; /* Prevents scrollbars */
-            display: flex; 
-            flex-direction: column;
-        }
+        .bg-glow { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%); pointer-events: none; }
+        .console-container { width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 24px; position: relative; z-index: 10; margin: 0 auto 40px auto; flex-grow: 1; }
         
-        /* Interactive Parallax Background */
-        .bg-glow { 
-            position: fixed; 
-            inset: 0; 
-            z-index: -1; 
-            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.12) 0%, transparent 60%); 
-            pointer-events: none; 
-        }
-        
-        /* Main Container - Fills screen */
-        .console-container { 
-            width: 100%; 
-            height: 100%;
-            background: rgba(10, 12, 18, 0.7); 
-            backdrop-filter: blur(12px); 
-            padding: 2vh 2vw; /* Use viewport units for scaling */
-            display: flex; 
-            flex-direction: column;
-            justify-content: space-between; /* Pushes footer to bottom */
-        }
-        
-        /* Typography */
         .hero-title { background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: 0.2s; color: white; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2); }
         .orange-btn:active { transform: scale(0.98); }
         
-        /* Step Cards */
-        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5vh 1vw; border-radius: 12px; opacity: 0.3; transition: 0.4s; cursor: pointer; }
+        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 16px; opacity: 0.3; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; opacity: 1 !important; }
         .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
         
-        @keyframes border-glow { 0%, 100% { border-color: rgba(249, 115, 22, 0.3); } 50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); } }
+        @keyframes border-glow { 0%, 100% { border-color: rgba(249, 115, 22, 0.3); } 50% { border-color: #f97316; box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); } }
 
-        /* Floating Nav & Modals */
-        .floating-lang { position: fixed; top: 2vh; right: 2vw; z-index: 1000; }
-        .lang-trigger { background: rgba(10, 12, 18, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 12px; border-radius: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; backdrop-filter: blur(5px); }
-        #langMenu { position: absolute; top: 50px; right: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 10px; display: none; flex-direction: column; gap: 4px; width: 200px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .floating-lang { position: fixed; top: 15px; right: 15px; z-index: 1000; }
+        .lang-trigger { background: rgba(10, 12, 18, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); padding: 10px 14px; border-radius: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; backdrop-filter: blur(10px); }
+        #langMenu { position: absolute; top: 55px; right: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 12px; display: none; flex-direction: column; gap: 8px; width: 220px; box-shadow: 0 25px 50px rgba(0,0,0,0.6); }
         
-        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal-scroll { max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding: 10px; }
-        .modal-btn { width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: white; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .modal-btn:hover { background: rgba(249, 115, 22, 0.1); border-color: #f97316; }
+        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(6px); }
+        .modal-scroll { max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+        .modal-btn { width: 100%; padding: 14px; border-radius: 14px; font-weight: 800; text-transform: uppercase; font-size: 11px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: white; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+        .modal-btn:hover { background: rgba(249, 115, 22, 0.15); border-color: #f97316; }
 
-        /* Footer - Compact for full screen */
-        footer { padding: 2vh 2vw; border-top: 1px solid rgba(255,255,255,0.05); }
+        /* Footer Styling */
+        footer { width: 100%; max-width: 1100px; margin: 40px auto; padding: 40px 20px; border-top: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body onmousemove="updateParallax(event)">
@@ -77,7 +45,7 @@
     <div class="floating-lang">
         <button onclick="toggleLangMenu()" class="lang-trigger">
             <img id="curFlag" src="https://flagcdn.com/us.svg" class="w-4" alt="Flag">
-            <span id="curLangText" class="text-[9px] font-black text-white uppercase tracking-wider">US | EN</span>
+            <span id="curLangText" class="text-[10px] font-black text-white uppercase tracking-wider">US | EN</span>
         </button>
         <div id="langMenu">
             <div class="modal-scroll" id="langList"></div>
@@ -85,68 +53,97 @@
     </div>
 
     <div class="console-container">
-        <div class="flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="font-black italic text-xl uppercase text-white tracking-tighter">AI CALL <span class="text-orange-500">PORT</span></span>
-                <div class="px-2 py-0.5 bg-orange-500 rounded text-[8px] font-black text-black">BETA</div>
+        <div class="flex justify-between items-center mb-12">
+            <div class="flex items-center gap-3">
+                <span class="font-black italic text-2xl uppercase text-white tracking-tighter">AI CALL <span class="text-orange-500">PORT</span></span>
+                <div class="px-2 py-0.5 bg-orange-500 rounded text-[9px] font-black text-black">BETA</div>
             </div>
-            <div class="bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full flex items-center gap-2">
-                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                <span data-i18n="live" class="text-[8px] font-black text-orange-500 uppercase tracking-[0.2em]">Global Live</span>
+            <div class="bg-orange-500/10 border border-orange-500/20 px-4 py-1.5 rounded-full flex items-center gap-2">
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span data-i18n="live" class="text-[9px] font-black text-orange-500 uppercase tracking-[0.2em]">Global Live</span>
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-5 gap-10 items-center my-auto">
+        <div class="grid lg:grid-cols-5 gap-16 items-center">
             <div class="lg:col-span-3 text-center lg:text-left">
-                <h1 id="hero-h1" class="text-4xl lg:text-5xl font-black italic uppercase leading-[0.95] mb-4 hero-title" data-i18n="h1_raw">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
-                <p id="hero-p" class="text-slate-400 text-xs mb-6 max-w-md mx-auto lg:mx-0 font-bold uppercase tracking-widest leading-relaxed" data-i18n="p_raw">Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Worldwide Deployment. No Humans.</span></p>
-                <button onclick="handleStep(1)" data-i18n="start" class="orange-btn px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] italic">Start Activation</button>
+                <h1 id="hero-h1" class="text-4xl lg:text-6xl font-black italic uppercase leading-[0.95] mb-8 hero-title" data-i18n="h1_raw">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
+                <p id="hero-p" class="text-slate-400 text-sm lg:text-base mb-10 max-w-lg mx-auto lg:mx-0 font-bold uppercase tracking-widest leading-relaxed" data-i18n="p_raw">Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Worldwide Deployment. No Humans.</span></p>
+                <button onclick="handleStep(1)" data-i18n="start" class="orange-btn px-12 py-6 rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] italic">Start Activation</button>
             </div>
             
             <div class="lg:col-span-2">
-                <div class="bg-black/40 border border-white/10 rounded-3xl p-6 text-center backdrop-blur-md">
-                    <h3 data-i18n="beta_access" class="text-[9px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]">BETA ACCESS</h3>
-                    <div class="flex flex-col items-center mb-4">
+                <div class="bg-black/40 border border-white/10 rounded-[32px] p-10 text-center backdrop-blur-md">
+                    <h3 data-i18n="beta_access" class="text-[10px] uppercase mb-3 font-black text-orange-500 tracking-[0.3em]">BETA ACCESS</h3>
+                    <div class="flex flex-col items-center mb-8">
                         <span id="reg-txt" class="text-slate-600 line-through text-xs font-bold mb-1">$399 Regular</span>
                         <div class="flex items-baseline gap-1 text-white">
-                            <span id="main-currency" class="text-5xl font-black">$</span>
-                            <span id="main-price" class="text-5xl font-black">199</span>
-                            <span class="text-orange-500 font-bold text-sm">/mo</span>
+                            <span id="main-currency" class="text-5xl lg:text-6xl font-black">$</span>
+                            <span id="main-price" class="text-5xl lg:text-6xl font-black">199</span>
+                            <span class="text-orange-500 font-bold text-xl">/mo</span>
                         </div>
                     </div>
-                    <div class="space-y-2 mb-6 text-left max-w-[200px] mx-auto border-y border-white/5 py-4 text-white font-bold uppercase text-[10px]">
-                        <div class="flex items-center gap-3"><div class="w-1.5 h-1.5 bg-orange-500 rotate-45"></div><span data-i18n="f1">Unlimited Calling</span></div>
-                        <div class="flex items-center gap-3"><div class="w-1.5 h-1.5 bg-orange-500 rotate-45"></div><span data-i18n="f2">Pay Monthly</span></div>
-                        <div class="flex items-center gap-3"><div class="w-1.5 h-1.5 bg-orange-500 rotate-45"></div><span data-i18n="f3">No Contract</span></div>
+                    <div class="space-y-4 mb-10 text-left max-w-[240px] mx-auto border-y border-white/5 py-8 text-white font-bold uppercase text-[11px]">
+                        <div class="flex items-center gap-4"><div class="w-2 h-2 bg-orange-500 rotate-45"></div><span data-i18n="f1">Unlimited Calling</span></div>
+                        <div class="flex items-center gap-4"><div class="w-2 h-2 bg-orange-500 rotate-45"></div><span data-i18n="f2">Pay Monthly</span></div>
+                        <div class="flex items-center gap-4"><div class="w-2 h-2 bg-orange-500 rotate-45"></div><span data-i18n="f3">No Contract</span></div>
                     </div>
-                    <button onclick="handleStep(1)" data-i18n="now" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic tracking-widest">Activate Now</button>
+                    <button onclick="handleStep(1)" data-i18n="now" class="orange-btn w-full py-5 rounded-2xl text-[11px] font-black uppercase italic tracking-widest">Activate Now</button>
                 </div>
             </div>
         </div>
 
-        <div>
-            <span data-i18n="protocol" class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500 block mb-4 text-center lg:text-left">Activation Protocol</span>
-            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 mb-4">
-                <div id="s1" class="step-card next-focus" onclick="handleStep(1)"><p data-i18n="st1" class="text-[7px] font-black text-orange-500 uppercase mb-0.5">01 Market</p><p id="v1" data-i18n="sel" class="text-[10px] text-white/30 font-bold uppercase truncate">Select</p></div>
-                <div id="s2" class="step-card" onclick="handleStep(2)"><p data-i18n="st2" class="text-[7px] font-black text-orange-500 uppercase mb-0.5">02 Industry</p><p id="v2" data-i18n="sel" class="text-[10px] text-white/30 font-bold uppercase truncate">Select</p></div>
-                <div id="s3" class="step-card" onclick="handleStep(3)"><p data-i18n="st3" class="text-[7px] font-black text-orange-500 uppercase mb-0.5">03 Business</p><p id="v3" data-i18n="sync" class="text-[10px] text-white/30 font-bold uppercase truncate">Sync</p></div>
-                <div id="s4" class="step-card" onclick="handleStep(4)"><p data-i18n="st4" class="text-[7px] font-black text-orange-500 uppercase mb-0.5">04 Agent Role</p><p id="v4" data-i18n="sel" class="text-[10px] text-white/30 font-bold uppercase truncate">Choose</p></div>
-                <div id="s5" class="step-card" onclick="handleStep(5)"><p data-i18n="st5" class="text-[7px] font-black text-orange-500 uppercase mb-0.5">05 Demo</p><p id="v5" data-i18n="sand" class="text-[10px] text-white/30 font-bold uppercase truncate italic">Sandbox</p></div>
-                <div id="s6" class="step-card" onclick="handleStep(6)"><p data-i18n="st6" class="text-[7px] font-black text-orange-500 uppercase mb-0.5">06 Deploy</p><p id="v6" data-i18n="inst" class="text-[10px] text-white/30 font-bold uppercase truncate italic">Instant</p></div>
+        <div class="mt-20">
+            <span data-i18n="protocol" class="text-[11px] font-black uppercase tracking-[0.4em] text-orange-500 block mb-8 text-center lg:text-left">Activation Protocol</span>
+            <div class="grid grid-cols-2 lg:grid-cols-6 gap-5">
+                <div id="s1" class="step-card next-focus" onclick="handleStep(1)"><p data-i18n="st1" class="text-[8px] font-black text-orange-500 uppercase mb-1">01 Market</p><p id="v1" data-i18n="sel" class="text-[11px] text-white/30 font-bold uppercase truncate">Select</p></div>
+                <div id="s2" class="step-card" onclick="handleStep(2)"><p data-i18n="st2" class="text-[8px] font-black text-orange-500 uppercase mb-1">02 Industry</p><p id="v2" data-i18n="sel" class="text-[11px] text-white/30 font-bold uppercase truncate">Select</p></div>
+                <div id="s3" class="step-card" onclick="handleStep(3)"><p data-i18n="st3" class="text-[8px] font-black text-orange-500 uppercase mb-1">03 Business</p><p id="v3" data-i18n="sync" class="text-[11px] text-white/30 font-bold uppercase truncate">Sync</p></div>
+                <div id="s4" class="step-card" onclick="handleStep(4)"><p data-i18n="st4" class="text-[8px] font-black text-orange-500 uppercase mb-1">04 Agent Role</p><p id="v4" data-i18n="sel" class="text-[11px] text-white/30 font-bold uppercase truncate">Choose</p></div>
+                <div id="s5" class="step-card" onclick="handleStep(5)"><p data-i18n="st5" class="text-[8px] font-black text-orange-500 uppercase mb-1">05 Demo</p><p id="v5" data-i18n="sand" class="text-[11px] text-white/30 font-bold uppercase truncate italic">Sandbox</p></div>
+                <div id="s6" class="step-card" onclick="handleStep(6)"><p data-i18n="st6" class="text-[8px] font-black text-orange-500 uppercase mb-1">06 Deploy</p><p id="v6" data-i18n="inst" class="text-[11px] text-white/30 font-bold uppercase truncate italic">Instant</p></div>
             </div>
-
-            <footer class="text-[8px] text-slate-700 flex justify-between items-center">
-                <span>© 2026 GLOBAL AI OPERATIONS</span>
-                <span class="flex items-center gap-2"><div class="w-1 h-1 bg-green-500 rounded-full"></div> ZERO-HUMAN PROTOCOL 1.0.4</span>
-            </footer>
         </div>
     </div>
 
+    <footer>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-12">
+            <div>
+                <p class="text-white font-black text-[11px] uppercase mb-6 tracking-widest">System Status</p>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div><span class="text-[9px] text-slate-500 uppercase font-bold">API Gateway: Online</span></div>
+                    <div class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div><span class="text-[9px] text-slate-500 uppercase font-bold">Voice Synthesis: 22ms</span></div>
+                    <div class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div><span class="text-[9px] text-slate-500 uppercase font-bold">Global Load: Moderate</span></div>
+                </div>
+            </div>
+            <div>
+                <p class="text-white font-black text-[11px] uppercase mb-6 tracking-widest">Quick Links</p>
+                <div class="flex flex-col gap-2">
+                    <a href="#" class="text-[9px] text-slate-500 hover:text-orange-500 uppercase font-bold transition">Documentation</a>
+                    <a href="#" class="text-[9px] text-slate-500 hover:text-orange-500 uppercase font-bold transition">API Reference</a>
+                    <a href="#" class="text-[9px] text-slate-500 hover:text-orange-500 uppercase font-bold transition">Beta Roadmap</a>
+                </div>
+            </div>
+            <div>
+                <p class="text-white font-black text-[11px] uppercase mb-6 tracking-widest">Legal</p>
+                <div class="flex flex-col gap-2">
+                    <a href="#" class="text-[9px] text-slate-500 hover:text-orange-500 uppercase font-bold transition">Privacy Policy</a>
+                    <a href="#" class="text-[9px] text-slate-500 hover:text-orange-500 uppercase font-bold transition">Terms of Service</a>
+                    <a href="#" class="text-[9px] text-slate-500 hover:text-orange-500 uppercase font-bold transition">Cookie Policy</a>
+                </div>
+            </div>
+            <div class="text-right flex flex-col items-end">
+                <span class="font-black italic text-sm uppercase text-white/20 mb-4">AI CALL <span class="text-orange-500/20">PORT</span></span>
+                <p class="text-[9px] text-slate-600 font-bold uppercase">© 2026 Global AI Operations</p>
+                <p class="text-[8px] text-slate-700 font-bold uppercase mt-1">Zero-Human Protocol 1.0.4</p>
+            </div>
+        </div>
+    </footer>
+
     <div id="setupModal">
-        <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center">
-            <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-4">Setup</h2>
+        <div class="bg-[#0f172a] border border-white/10 p-10 rounded-[40px] max-w-md w-full text-center">
+            <h2 id="mTitle" class="text-2xl font-black uppercase text-white mb-8">Setup</h2>
             <div id="mContent" class="modal-scroll"></div>
-            <button data-i18n="close" onclick="closeModal()" class="mt-4 text-[9px] text-slate-500 uppercase font-black hover:text-white transition tracking-widest">Close</button>
+            <button data-i18n="close" onclick="closeModal()" class="mt-8 text-[11px] text-slate-500 uppercase font-black hover:text-white transition tracking-widest">Close</button>
         </div>
     </div>
 
