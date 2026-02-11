@@ -3,111 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Build</title>
+    <title>Website Base</title>
+    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.browser.js"></script>
     <style>
-        :root {
-            --bg-flag: none;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: sans-serif;
-            background-color: #ffffff; /* Default background */
-            transition: background 0.5s ease;
-        }
-
-        /* The Flag Overlay Layer */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background-image: var(--bg-flag);
-            background-position: center;
-            background-size: cover;
-            background-repeat: no-repeat;
-            /* Control "brightness" here: 0.1 is very subtle, 0.2 is stronger */
-            opacity: 0.12; 
-            filter: saturate(0.8); /* Desaturates the flag slightly for a professional look */
-            transition: background-image 0.8s ease-in-out;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            text-align: center;
-            padding: 20px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 10px;
-        }
-
-        #demo-section {
-            margin-top: 50px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.8); /* Semi-transparent white to keep text readable */
-        }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .hidden { display: none; }
+        #controls { margin-top: 20px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Market Selector</h1>
-    
-    <div class="market-buttons">
-        <button onclick="changeMarket('us')">USA</button>
-        <button onclick="changeMarket('gb')">UK</button>
-        <button onclick="changeMarket('es')">Spain</button>
-        <button onclick="changeMarket('fr')">France</button>
+    <h1>Market Selection</h1>
+    <div id="controls">
+        <button onclick="setMarket('US')">USA</button>
+        <button onclick="setMarket('UK')">UK</button>
+        <button onclick="setMarket('ES')">Spain</button>
     </div>
+
+    <hr>
 
     <div id="demo-section">
         <h2>05 Demo</h2>
-        <button onclick="runVoice()">START DEMO CALL</button>
-        <p><a href="YOUR_STRIPE_LINK" id="stripe-link">Get it now</a></p>
+        <button id="vapiButton" onclick="runVoice()">START DEMO CALL</button>
+        <br><br>
+        <a id="stripe-link" href="https://buy.stripe.com/test_default" target="_blank">Get it now</a>
     </div>
-</div>
 
-<script>
-    function changeMarket(countryCode) {
-        console.log("Switching market to:", countryCode);
+    <script>
+        const vapi = new Vapi('YOUR_VAPI_PUBLIC_KEY');
 
-        // 1. Update the Background Flag (The New Part)
-        // Using flagcdn.com for high-quality, reliable flag images
-        const flagUrl = `url('https://flagcdn.com/w1280/${countryCode.toLowerCase()}.png')`;
-        document.documentElement.style.setProperty('--bg-flag', flagUrl);
-
-        // 2. Your Existing Logic (Placeholder for your currency/language switches)
-        updateLocalization(countryCode);
-    }
-
-    function updateLocalization(code) {
-        // This is where your existing logic for Stripe and text changes lives
-        const stripeLink = document.getElementById('stripe-link');
-        
-        if(code === 'us') {
-            stripeLink.href = "STRIPE_US_LINK";
-        } else if(code === 'gb') {
-            stripeLink.href = "STRIPE_UK_LINK";
+        function setMarket(market) {
+            const stripeLink = document.getElementById('stripe-link');
+            if (market === 'US') {
+                stripeLink.href = "https://buy.stripe.com/us_link";
+                console.log("Market set to US");
+            } else if (market === 'UK') {
+                stripeLink.href = "https://buy.stripe.com/uk_link";
+                console.log("Market set to UK");
+            } else if (market === 'ES') {
+                stripeLink.href = "https://buy.stripe.com/es_link";
+                console.log("Market set to Spain");
+            }
         }
-        // ... etc
-    }
 
-    function runVoice() {
-        // Your working Vapi code
-        console.log("Vapi Voice Call Started");
-    }
-</script>
+        function runVoice() {
+            vapi.start('YOUR_ASSISTANT_ID');
+            console.log("Vapi call started");
+        }
+
+        vapi.on('call-start', () => {
+            document.getElementById('vapiButton').innerText = "CALL IN PROGRESS";
+        });
+
+        vapi.on('call-end', () => {
+            document.getElementById('vapiButton').innerText = "START DEMO CALL";
+        });
+    </script>
 
 </body>
 </html>
