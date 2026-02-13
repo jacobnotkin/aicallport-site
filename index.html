@@ -123,7 +123,8 @@
       width: 100%;
       margin-bottom: 8px;
     }
-    .modal-scroll { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+
+    .modal-scroll { max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
 
     #setupModal {
       position: fixed;
@@ -138,8 +139,8 @@
     .modal-btn {
       width: 100%;
       padding: 10px;
-      border-radius: 8px;
-      font-weight: 800;
+      border-radius: 12px;
+      font-weight: 900;
       text-transform: uppercase;
       font-size: 9px;
       background: rgba(255,255,255,0.05);
@@ -159,6 +160,93 @@
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
       70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    /* Step 4 additions (same theme) */
+    .panel {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .tiny-label {
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(249,115,22,0.95);
+    }
+    .help-text {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: rgba(148,163,184,0.9);
+      letter-spacing: 0.08em;
+      line-height: 1.4;
+    }
+    .ghost-input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px;
+      padding: 10px;
+      color: white;
+      outline: none;
+      font-weight: 800;
+      font-size: 11px;
+      text-transform: none;
+    }
+    .script-area {
+      width: 100%;
+      min-height: 140px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      padding: 12px;
+      color: white;
+      outline: none;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(249,115,22,0.35);
+      background: rgba(249,115,22,0.10);
+      color: rgba(255,255,255,0.95);
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .mini-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 14px;
+      font-weight: 900;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .mini-btn:hover { border-color: rgba(249,115,22,0.55); background: rgba(255,255,255,0.10); }
+    .mini-btn:active { transform: scale(0.99); }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 460px) {
+      .row2 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -248,11 +336,17 @@
     </div>
   </div>
 
+  <!-- Main Modal -->
   <div id="setupModal">
     <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
-      <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
+      <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-3">Setup</h2>
+
+      <!-- Step 4 helper subtitle (hidden by default) -->
+      <div id="mSub" class="help-text mb-4" style="display:none;"></div>
+
       <div id="modalSearchContainer"></div>
       <div id="mContent" class="modal-scroll"></div>
+
       <button id="mClose" onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white">Close</button>
     </div>
   </div>
@@ -295,6 +389,12 @@
     };
 
     let completedSteps = 0, currentIndustryIdx = 8, currentLang = "EN", selectedMarket = "United States";
+
+    // NEW: Step 4 state
+    let selectedRole = null;
+    let selectedTemplateName = null;
+    let scriptText = "";
+    let selectedVoice = "Browser Preview"; // placeholder for now (we preview via SpeechSynthesis)
 
     const marketCurrency = {
       "United States": { cur: "$", price: "199", reg: "399", prefix: "+1", active: true },
@@ -395,6 +495,52 @@
       TH: { h1:"พนักงานต้อนรับ AI<br> ไร้มนุษย์", p:"เปิดใช้งาน <span class='text-orange-500'>ธุรกิจขนาดเล็ก</span> ทันที", start:"เริ่มต้น", now:"เปิดใช้งาน", beta:"เบต้า", reg:"ปกติ", live:"สด", priceFeats:["โทรไม่จำกัด","จ่ายรายเดือน","ไม่มีสัญญา"], steps:["01 ตลาด","02 อุตสาหกรรม","03 ธุรกิจ","04 บทบาท","05 เดโม","06 ติดตั้ง"], roles:["พนักงานต้อนรับ","พนักงานขาย","ฝ่ายสนับสนุน"], demoBtn:"เริ่มโทรสาธิต", deployBtn:"รับหมายเลขของฉัน", industries:["บัญชี","นอกเวลา","ซ่อมรถ","เบเกอรี่","บูติก","ล้างรถ","เช่ารถ","ทันตกรรม","ไฟฟ้า","อิเล็กทรอนิกส์","ดอกไม้","เฟอร์นิเจอร์","แอร์","ร้านทำผม","ช่างซ่อม","ทำความสะอาด","ประกัน","จิวเวลรี่","จัดสวน","กฎหมาย","ช่างกุญแจ","นวด","สปา","ทำเล็บ","กำจัดแมลง","ประปา","อสังหา","ร้านอาหาร","หลังคา","รถยก","ฉุกเฉิน","สัตวแพทย์","หน้าต่าง"], soon:"เร็วๆ นี้", emailPlaceholder:"กรอกอีเมลเพื่อรับแจ้งเตือน", submit:"เข้าร่วมรายการรอ" }
     };
 
+    // ========= Step 4 templates =========
+    const roleTemplates = {
+      "Receptionist": [
+        {
+          name: "Book Appointment + Collect Details",
+          script: `You are the AI Receptionist for {BUSINESS_NAME}.\n\nGoal:\n- Greet the caller warmly.\n- Collect: Name, phone, reason for calling, preferred date/time.\n- Confirm details and summarize.\n\nRules:\n- Keep answers short.\n- Ask one question at a time.\n- If caller is upset: apologize and focus on solutions.\n\nStart:\n“Thank you for calling {BUSINESS_NAME}. How can I help you today?”`
+        },
+        {
+          name: "Quote Request + Lead Capture",
+          script: `You are the AI Receptionist for {BUSINESS_NAME}.\n\nGoal:\n- Capture lead for a quote.\n- Collect: Name, phone/email, service needed, address/location, urgency.\n- Ask best time to call back.\n\nEnd:\n- Confirm: “I have your details. We’ll follow up shortly.”\n\nStart:\n“Thanks for calling {BUSINESS_NAME}. Are you calling for a quote or to book service?”`
+        },
+        {
+          name: "After Hours + Emergency Routing",
+          script: `You are the After-Hours AI Receptionist for {BUSINESS_NAME}.\n\nGoal:\n- Determine if emergency.\n- If emergency: collect details and advise next steps.\n- If non-emergency: take message + schedule callback.\n\nCollect:\n- Name, phone, issue, location, urgency.\n\nStart:\n“You’ve reached {BUSINESS_NAME} after hours. Is this an emergency?”`
+        }
+      ],
+      "Sales Agent": [
+        {
+          name: "Inbound Lead Qualification",
+          script: `You are the AI Sales Agent for {BUSINESS_NAME}.\n\nGoal:\n- Qualify inbound lead.\n- Collect: Name, company (if any), need, timeline, budget range.\n- Offer next step: schedule appointment.\n\nStart:\n“Thanks for calling {BUSINESS_NAME}. What are you looking to achieve today?”`
+        },
+        {
+          name: "Pricing + Upsell",
+          script: `You are the AI Sales Agent for {BUSINESS_NAME}.\n\nGoal:\n- Explain pricing clearly.\n- Recommend best option based on need.\n- Offer upsell only if helpful.\n\nRules:\n- Never be pushy.\n- Always ask: “Does that fit what you had in mind?”\n\nStart:\n“Happy to help. What service are you interested in, and what problem are you trying to solve?”`
+        },
+        {
+          name: "Follow-up + Appointment Setter",
+          script: `You are the AI Sales Agent for {BUSINESS_NAME}.\n\nGoal:\n- Re-engage a past inquiry.\n- Confirm if they still want service.\n- Book appointment or callback.\n\nStart:\n“Hi! This is {BUSINESS_NAME}. I’m following up on your recent inquiry. Do you still need help?”`
+        }
+      ],
+      "Support Agent": [
+        {
+          name: "Troubleshooting + Ticket Creation",
+          script: `You are the AI Support Agent for {BUSINESS_NAME}.\n\nGoal:\n- Identify issue.\n- Try 1–2 quick troubleshooting steps.\n- If unresolved: create a ticket summary.\n\nCollect:\n- Name, phone/email, product/service, issue details, best callback time.\n\nStart:\n“Thanks for calling {BUSINESS_NAME} Support. What issue are you experiencing?”`
+        },
+        {
+          name: "Status Updates + FAQ",
+          script: `You are the AI Support Agent for {BUSINESS_NAME}.\n\nGoal:\n- Answer common questions.\n- If caller wants status, collect order/ticket number.\n- Provide next steps.\n\nStart:\n“Hello, this is {BUSINESS_NAME} Support. Are you calling about a current order or a general question?”`
+        },
+        {
+          name: "Escalate + SMS Summary",
+          script: `You are the AI Support Agent for {BUSINESS_NAME}.\n\nGoal:\n- Calmly gather details.\n- Escalate to human when needed.\n- Confirm summary back to caller.\n\nStart:\n“I can help with that. Please tell me what happened, and I’ll make sure it gets to the right person.”`
+        }
+      ]
+    };
+
     // ========= LANGUAGE SWITCH =========
     function setLang(cc, langCode) {
       currentLang = langCode;
@@ -427,11 +573,14 @@
       const c = document.getElementById('mContent');
       const s = document.getElementById('modalSearchContainer');
       const tEl = document.getElementById('mTitle');
+      const subEl = document.getElementById('mSub');
       const lang = i18n[currentLang] || i18n.EN;
 
       m.style.display = 'flex';
       c.innerHTML = "";
       s.innerHTML = "";
+      subEl.style.display = "none";
+      subEl.innerHTML = "";
 
       if (step === 'waitlist') {
         tEl.innerText = (countryName || "").toUpperCase();
@@ -486,9 +635,12 @@
           <button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>
         `;
       } else if (step === 4) {
-        tEl.innerText = lang.steps[3];
-        const roles = lang.roles || i18n.EN.roles;
-        roles.forEach(r => c.appendChild(createBtn(r, () => finish(4, r))));
+        // ====== NEW Step 4 (Role + Template + Script editor + Voice preview) ======
+        tEl.innerText = "Choose Role + Template";
+        subEl.style.display = "block";
+        subEl.innerHTML = "PICK A ROLE • SELECT A TEMPLATE • EDIT SCRIPT • PREVIEW VOICE";
+
+        renderRoleTemplateUI(c);
       } else if (step === 5) {
         tEl.innerText = lang.steps[4];
         c.appendChild(createBtn(lang.demoBtn || i18n.EN.demoBtn, runVoice));
@@ -499,6 +651,188 @@
           finish(6, "READY");
           setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1200);
         }));
+      }
+    }
+
+    function renderRoleTemplateUI(container) {
+      // Default role if not set
+      if (!selectedRole) selectedRole = "Receptionist";
+
+      const businessName = (document.getElementById('v3')?.innerText || "").trim();
+      const safeBiz = (businessName && businessName !== "Sync") ? businessName : "YOUR BUSINESS";
+
+      const wrap = document.createElement('div');
+      wrap.className = "flex flex-col gap-3";
+
+      // Role selector
+      const rolePanel = document.createElement('div');
+      rolePanel.className = "panel text-left";
+      rolePanel.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <div class="tiny-label">Agent Role</div>
+          <div class="pill" id="rolePill">${selectedRole}</div>
+        </div>
+        <div class="help-text mb-3">Choose the agent role that matches your calls.</div>
+        <div class="row2" id="roleButtons"></div>
+      `;
+      wrap.appendChild(rolePanel);
+
+      // Template selector
+      const templatePanel = document.createElement('div');
+      templatePanel.className = "panel text-left";
+      templatePanel.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <div class="tiny-label">Templates</div>
+          <div class="pill" id="tplPill">${selectedTemplateName ? selectedTemplateName : "Select Template"}</div>
+        </div>
+        <div class="help-text mb-3">Pick a ready script, then edit it below.</div>
+        <div class="flex flex-col gap-2" id="templateButtons"></div>
+      `;
+      wrap.appendChild(templatePanel);
+
+      // Script editor
+      const editorPanel = document.createElement('div');
+      editorPanel.className = "panel text-left";
+      editorPanel.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <div class="tiny-label">Script Editor</div>
+          <div class="pill" id="voicePill">${selectedVoice}</div>
+        </div>
+        <div class="help-text mb-2">Edit your script. Placeholders: {BUSINESS_NAME}</div>
+        <textarea id="scriptArea" class="script-area" placeholder="Your script will appear here..."></textarea>
+        <div class="row2 mt-3">
+          <button class="mini-btn" onclick="previewVoice()">Preview Voice (10 sec)</button>
+          <button class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic" onclick="saveRoleTemplateAndContinue()">Save + Continue</button>
+        </div>
+      `;
+      wrap.appendChild(editorPanel);
+
+      // Inject
+      container.appendChild(wrap);
+
+      // Build role buttons (3)
+      const rb = rolePanel.querySelector("#roleButtons");
+      const roleOptions = ["Receptionist", "Sales Agent", "Support Agent"];
+      roleOptions.forEach(r => {
+        const b = document.createElement("button");
+        b.className = "modal-btn";
+        b.innerHTML = `<div class="w-1.5 h-1.5 rounded-full ${r === selectedRole ? 'bg-orange-500' : 'bg-slate-700'}"></div> ${r}`;
+        b.onclick = () => {
+          selectedRole = r;
+          selectedTemplateName = null;
+          scriptText = "";
+          rolePanel.querySelector("#rolePill").innerText = selectedRole;
+          // re-render templates + editor
+          renderTemplatesAndEditor(templatePanel, editorPanel, safeBiz);
+          // recolor role dots
+          rolePanel.querySelectorAll("button.modal-btn").forEach(btn => {
+            const dot = btn.querySelector("div");
+            const label = btn.innerText.trim();
+            dot.className = `w-1.5 h-1.5 rounded-full ${label === selectedRole ? 'bg-orange-500' : 'bg-slate-700'}`;
+          });
+        };
+        rb.appendChild(b);
+      });
+
+      // render templates & editor initial
+      renderTemplatesAndEditor(templatePanel, editorPanel, safeBiz);
+    }
+
+    function renderTemplatesAndEditor(templatePanel, editorPanel, safeBiz) {
+      const tplWrap = templatePanel.querySelector("#templateButtons");
+      const tplPill = templatePanel.querySelector("#tplPill");
+      const area = editorPanel.querySelector("#scriptArea");
+
+      tplWrap.innerHTML = "";
+      const list = roleTemplates[selectedRole] || [];
+
+      list.forEach(tpl => {
+        const b = document.createElement("button");
+        b.className = "modal-btn";
+        const active = (selectedTemplateName === tpl.name);
+        b.innerHTML = `<div class="w-1.5 h-1.5 rounded-full ${active ? 'bg-orange-500' : 'bg-slate-700'}"></div> ${tpl.name}`;
+        b.onclick = () => {
+          selectedTemplateName = tpl.name;
+          tplPill.innerText = selectedTemplateName;
+          // put script with business replacement
+          scriptText = (tpl.script || "").replaceAll("{BUSINESS_NAME}", safeBiz);
+          area.value = scriptText;
+
+          // update dots
+          tplWrap.querySelectorAll("button.modal-btn").forEach(btn => {
+            const dot = btn.querySelector("div");
+            const label = btn.innerText.trim();
+            dot.className = `w-1.5 h-1.5 rounded-full ${label === selectedTemplateName ? 'bg-orange-500' : 'bg-slate-700'}`;
+          });
+        };
+        tplWrap.appendChild(b);
+      });
+
+      // If no template selected yet, auto-select first template for better UX
+      if (!selectedTemplateName && list[0]) {
+        selectedTemplateName = list[0].name;
+        tplPill.innerText = selectedTemplateName;
+        scriptText = (list[0].script || "").replaceAll("{BUSINESS_NAME}", safeBiz);
+      }
+
+      area.value = scriptText || "";
+      // keep scriptText in sync if user edits
+      area.oninput = () => { scriptText = area.value; };
+    }
+
+    function saveRoleTemplateAndContinue() {
+      // Persist step 4 selection
+      const roleShort =
+        (selectedRole || "").toUpperCase().includes("RECEP") ? "RECEPTIONIST" :
+        (selectedRole || "").toUpperCase().includes("SALES") ? "SALES" :
+        (selectedRole || "").toUpperCase().includes("SUPPORT") ? "SUPPORT" : "ROLE";
+
+      // Put something nice in Step 4 card
+      finish(4, roleShort);
+
+      // If they haven't edited script yet, ensure scriptText is set
+      const area = document.getElementById("scriptArea");
+      if (area) scriptText = area.value || scriptText || "";
+
+      // Close modal already done by finish(). Next step gets focus automatically.
+    }
+
+    // Voice preview (browser speech synthesis)
+    function previewVoice() {
+      try {
+        const area = document.getElementById("scriptArea");
+        const txt = (area?.value || scriptText || "").trim();
+
+        if (!txt) {
+          alert("Please select a template or add a script first.");
+          return;
+        }
+
+        if (!("speechSynthesis" in window)) {
+          alert("Voice preview is not supported in this browser.");
+          return;
+        }
+
+        // Stop anything currently speaking
+        window.speechSynthesis.cancel();
+
+        // Take first ~2-3 sentences / ~250 chars for a short preview
+        const snippet = txt.replace(/\s+/g, " ").slice(0, 260);
+
+        const u = new SpeechSynthesisUtterance(snippet);
+        u.rate = 1.0;
+        u.pitch = 1.0;
+        u.volume = 1.0;
+
+        // Try to pick an English-ish voice if available, otherwise default
+        const voices = window.speechSynthesis.getVoices?.() || [];
+        const pick = voices.find(v => /en/i.test(v.lang)) || voices[0];
+        if (pick) u.voice = pick;
+
+        window.speechSynthesis.speak(u);
+      } catch (e) {
+        console.error(e);
+        alert("Voice preview error. Check console.");
       }
     }
 
@@ -583,6 +917,8 @@
         const apiKey = await loadVapiKey();
 
         if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
+          // In the next phase we can pass your scriptText into your assistant via variables/server.
+          // For now this keeps your working behavior.
           window.vapiSDK.run({ apiKey, assistant: assistantId });
           closeModal();
           finish(5, "ACTIVE");
@@ -612,6 +948,11 @@
 
     // ========= INIT =========
     initLangList();
+
+    // Fix for some browsers: voices list loads async
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = () => {};
+    }
 
     // Vapi html-script-tag (provides window.vapiSDK.run)
     (function(d, t) {
