@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- Vapi (keep both: html-script-tag gives window.vapiSDK, web sdk can exist too) -->
+  <!-- Vapi -->
   <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest"></script>
 
   <style>
@@ -123,7 +123,7 @@
       width: 100%;
       margin-bottom: 8px;
     }
-    .modal-scroll { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+    .modal-scroll { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
 
     #setupModal {
       position: fixed;
@@ -136,26 +136,26 @@
       padding: 20px;
     }
 
-    /* modal shell kept same theme */
     .modal-shell {
-      background: #0f172a;
+      background: rgba(10, 12, 18, 0.92);
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 24px;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       padding: 18px;
       text-align: center;
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
     }
-    .modal-shell.role-wide {
-      max-width: 820px; /* larger for Role step (less scrolling) */
-    }
+    .modal-shell.role-wide { max-width: 980px; }
+    .modal-shell.info-wide { max-width: 860px; }
+    .modal-shell.dashboard-wide { max-width: 980px; }
 
     .modal-btn {
       width: 100%;
       padding: 10px;
-      border-radius: 8px;
-      font-weight: 800;
+      border-radius: 12px;
+      font-weight: 900;
       text-transform: uppercase;
       font-size: 9px;
       background: rgba(255,255,255,0.05);
@@ -166,6 +166,7 @@
       gap: 8px;
       cursor: pointer;
       text-align: left;
+      letter-spacing: 0.14em;
     }
     .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: #f97316; }
     .modal-btn.disabled { opacity: 0.3; cursor: not-allowed; }
@@ -173,8 +174,9 @@
     .pill {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
-      padding: 8px 10px;
+      padding: 8px 12px;
       border-radius: 999px;
       border: 1px solid rgba(249,115,22,0.25);
       background: rgba(249,115,22,0.08);
@@ -183,28 +185,18 @@
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.18em;
-      justify-content: center;
       width: 100%;
     }
 
-    .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
-    @keyframes pulse-green {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-    }
-
-    /* small helper */
     .muted-hint {
       font-size: 10px;
-      font-weight: 800;
+      font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.18em;
       color: rgba(148,163,184,0.85);
       line-height: 1.4;
     }
 
-    /* dropdown styling (theme) */
     .select-theme {
       width: 100%;
       background: rgba(255,255,255,0.05);
@@ -218,9 +210,43 @@
       text-transform: uppercase;
       letter-spacing: 0.12em;
     }
-    .select-theme option {
-      background: #0b1224;
+    .select-theme option { background: #0b1224; color: white; }
+
+    .textarea-theme {
+      width: 100%;
+      min-height: 190px;
+      resize: vertical;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      padding: 12px;
       color: white;
+      outline: none;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
+    @keyframes pulse-green {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .card-theme {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 20px;
+      padding: 16px;
+    }
+
+    .mini {
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(148,163,184,0.9);
     }
   </style>
 </head>
@@ -257,9 +283,14 @@
         <p id="hero-p" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider">
           Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Fully Automated Worldwide Deployment. Multiligual. No Humans.</span>
         </p>
-        <button onclick="handleStep(1)" id="hero-cta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">
-          Start Activation
-        </button>
+        <div class="grid gap-2 sm:flex sm:gap-3 sm:items-center">
+          <button onclick="handleStep(1)" id="hero-cta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">
+            Start Activation
+          </button>
+          <button onclick="openActivationInfo()" class="w-full sm:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition">
+            Activation Steps Info
+          </button>
+        </div>
       </div>
 
       <div class="lg:col-span-2">
@@ -295,7 +326,44 @@
       </div>
     </div>
 
-    <div class="mt-10 lg:mt-20">
+    <!-- NEW: Activation Steps Info column -->
+    <div class="mt-8 lg:mt-12 grid lg:grid-cols-3 gap-4">
+      <div class="card-theme lg:col-span-2 text-left">
+        <div class="flex items-center justify-between gap-3 mb-2">
+          <div class="mini">Activation Steps Info</div>
+          <button onclick="openActivationInfo()" class="text-[9px] font-black uppercase tracking-widest text-orange-500 hover:text-white transition">
+            Open Info
+          </button>
+        </div>
+        <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
+          Learn exactly what happens at each step. Choose a market, select an industry, connect your business, choose a role + template, pick an ElevenLabs voice, run a demo call, then deploy.
+        </div>
+        <div class="mt-4 grid sm:grid-cols-2 gap-3">
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
+            <div class="mini mb-1 text-orange-500">Templates</div>
+            <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
+              Templates guide customers so they feel confident to activate. They can edit before demo, and later inside dashboard.
+            </div>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
+            <div class="mini mb-1 text-orange-500">Dashboard</div>
+            <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
+              After activation, customer gets a dashboard to edit role, script, voice, routing, and business info any time.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-theme text-left">
+        <div class="mini mb-2">Quick Start</div>
+        <button onclick="handleStep(1)" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic">Start Activation</button>
+        <button onclick="openActivationInfo()" class="mt-2 w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition">
+          View Activation Info
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-10 lg:mt-16">
       <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
         <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Ai Receptionist Activation Protocol</span>
       </div>
@@ -310,11 +378,12 @@
     </div>
   </div>
 
+  <!-- MODAL -->
   <div id="setupModal">
     <div id="modalShell" class="modal-shell">
       <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-4">Setup</h2>
       <div id="modalSearchContainer"></div>
-      <div id="mContent" class="modal-scroll"></div>
+      <div id="mContent" class=""></div>
       <button id="mClose" onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white">Close</button>
     </div>
   </div>
@@ -337,7 +406,6 @@
   <script>
     // ========= VAPI KEY (NO HARDCODE) =========
     let vapiApiKey = null;
-
     async function loadVapiKey() {
       if (vapiApiKey) return vapiApiKey;
       const res = await fetch("/api/config", { cache: "no-store" });
@@ -356,12 +424,18 @@
       "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f"
     };
 
-    let completedSteps = 0, currentIndustryIdx = 8, currentLang = "EN", selectedMarket = "United States";
+    // ========= STATE =========
+    let completedSteps = 0;
+    let currentIndustryIdx = 8;
+    let currentLang = "EN";
+    let selectedMarket = "United States";
 
-    // ========= VOICE (ELEVENLABS via Vapi voice provider "11labs") =========
-    // IMPORTANT: Voice must exist in your ElevenLabs Voice Library.
-    // The Vapi schema uses provider: "11labs" and a voiceId string.
-    // (Source: Vapi client-side example types)
+    // ROLE + TEMPLATE + SCRIPT STATE
+    let selectedRole = null;
+    let selectedTemplateKey = null;
+    let agentScript = ""; // editable
+
+    // ========= ELEVENLABS VOICE (via Vapi provider "11labs") =========
     const elevenVoices = [
       { id: "sarah",    label: "Sarah (Warm / Natural)" },
       { id: "andrea",   label: "Andrea (Confident)" },
@@ -374,8 +448,6 @@
       { id: "mark",     label: "Mark (Professional)" },
       { id: "matilda",  label: "Matilda (Energetic)" }
     ];
-
-    // Defaults tuned for less "robotic" output
     let selectedVoiceId = "sarah";
     let selectedVoiceSettings = {
       stability: 0.45,
@@ -384,19 +456,11 @@
       useSpeakerBoost: true,
       optimizeStreamingLatency: 4
     };
-
     function getSelectedVapiVoice() {
-      // Model: ElevenLabs default is often chosen by Vapi based on language,
-      // but you can set it explicitly if you want.
-      // We'll set it to eleven_turbo_v2 for speed; you can switch to eleven_multilingual_v2 if you want.
-      return {
-        provider: "11labs",
-        voiceId: selectedVoiceId,
-        model: "eleven_turbo_v2",
-        ...selectedVoiceSettings
-      };
+      return { provider: "11labs", voiceId: selectedVoiceId, model: "eleven_turbo_v2", ...selectedVoiceSettings };
     }
 
+    // ========= MARKET =========
     const marketCurrency = {
       "United States": { cur: "$", price: "199", reg: "399", prefix: "+1", active: true },
       "United Kingdom": { cur: "£", price: "155", reg: "310", prefix: "+44", active: true },
@@ -443,6 +507,7 @@
       "United Arab Emirates": { cur: "AED", price: "---", reg: "---", prefix: "+971", active: false }
     };
 
+    // ========= LANG MENU =========
     const languages = [
       { id: 'EN', n: 'English', f: 'us' },
       { id: 'ES', n: 'Spanish', f: 'mx' },
@@ -468,32 +533,98 @@
 
     const industryKeys = ["Accounting","After Hours","Auto Repair","Bakery","Boutique","Car Detailing","Car Rental","Dental","Electrical","Electronics","Flower Shop","Furniture","HVAC","Hair Salon","Handyman","Home Cleaning","Insurance","Jewelry","Landscaping","Legal","Locksmith","Massage","Med Spa","Nail Salon","Pest Control","Plumbing","Real Estate","Restaurant","Roofing","Towing","Urgent Care","Veterinary","Windows"];
 
-    // ========= i18n =========
+    // ========= TEMPLATES =========
+    // Role templates: choose one, then customer edits it.
+    const roleTemplates = {
+      Receptionist: [
+        {
+          key: "rec_basic",
+          title: "Basic Receptionist (Appointments + Info)",
+          script:
+`You are the AI receptionist for {{BUSINESS_NAME}}.
+Goal: Answer calls, be friendly, collect caller info, and book an appointment or take a message.
+
+Rules:
+- Greet, confirm business name, ask how you can help.
+- If caller asks about services: give a short overview and offer to schedule.
+- If caller wants appointment: ask for preferred date/time, name, phone, email, and reason.
+- If emergency: advise caller to call local emergency services.
+
+Always end with: “Is there anything else I can help you with today?”`
+        },
+        {
+          key: "rec_afterhours",
+          title: "After-Hours Receptionist (Message Capture)",
+          script:
+`You are the after-hours AI receptionist for {{BUSINESS_NAME}}.
+Goal: Capture messages and promise a callback.
+
+Collect:
+- Full name
+- Best callback number
+- Email (optional)
+- Reason for calling
+- Best time to call back
+
+Confirm details back to the caller and say:
+“We’re currently closed. A team member will contact you as soon as possible.”`
+        }
+      ],
+      "Sales Agent": [
+        {
+          key: "sales_leads",
+          title: "Sales Lead Qualifier (Fast)",
+          script:
+`You are the AI sales agent for {{BUSINESS_NAME}}.
+Goal: Qualify leads quickly and book a sales call.
+
+Ask:
+1) What service are you looking for?
+2) Where are you located?
+3) What is the timeline?
+4) Budget range (optional)
+
+If qualified: offer to schedule a call. Collect contact details and confirm next steps.`
+        },
+        {
+          key: "sales_booking",
+          title: "Sales Booking (Schedule + Follow-up)",
+          script:
+`You are the AI sales agent for {{BUSINESS_NAME}}.
+Goal: Book appointments and reduce no-shows.
+
+Process:
+- Confirm what they need.
+- Offer 2–3 time options.
+- Collect name, phone, email.
+- Confirm and summarize appointment details.
+- Remind them they will receive a confirmation message.`
+        }
+      ],
+      "Support Agent": [
+        {
+          key: "support_triage",
+          title: "Support Triage (Issue + Routing)",
+          script:
+`You are the AI support agent for {{BUSINESS_NAME}}.
+Goal: Identify the issue and route it.
+
+Ask:
+- What problem are you experiencing?
+- When did it start?
+- Any error messages?
+- Best callback number
+
+If urgent: prioritize and mark as urgent. If simple: provide basic steps and offer follow-up.`
+        }
+      ]
+    };
+
+    // ========= i18n (kept from your code) =========
     const i18n = {
       EN: { h1:"GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p:"Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start:"Start Activation", now:"Activate Now", beta:"BETA ACCESS", reg:"Regular", live:"Global Live", priceFeats:["Unlimited Calling","Pay Monthly","No Contract"], steps:["01 Market","02 Industry","03 Business","04 Role","05 Demo","06 Deploy"], roles:["Receptionist","Sales Agent","Support Agent"], demoBtn:"START DEMO CALL", deployBtn:"GET MY NUMBER", industries:industryKeys, soon:"Coming Soon", emailPlaceholder:"ENTER EMAIL FOR NOTIFICATION", submit:"JOIN WAITLIST" },
       ES: { h1:"RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p:"Activación Instantánea de <span class='text-orange-500'>NEGOCIOS</span>. <span class='text-orange-500'>Sin Humanos.</span>", start:"Iniciar", now:"Activar", beta:"ACCESO BETA", reg:"Regular", live:"En Vivo", priceFeats:["Llamadas Ilimitadas","Pago Mensual","Sin Contrato"], steps:["01 Mercado","02 Industria","03 Empresa","04 Rol","05 Demo","06 Desplegar"], roles:["Recepcionista","Agente de Ventas","Soporte"], demoBtn:"INICIAR LLAMADA DEMO", deployBtn:"OBTENER MI NÚMERO", industries:["Contabilidad","Fuera de Horas","Taller Mecánico","Panadería","Boutique","Lavado Autos","Renta Autos","Dental","Electricidad","Electrónica","Florería","Muebles","HVAC","Salón Belleza","Handyman","Limpieza","Seguros","Joyería","Paisajismo","Legal","Cerrajería","Masajes","Med Spa","Uñas","Plagas","Plomería","Inmuebles","Restaurante","Techos","Grúa","Urgencias","Veterinaria","Ventanas"], soon:"Próximamente", emailPlaceholder:"INGRESE CORREO PARA NOTIFICACIÓN", submit:"UNIRSE A LISTA" },
-      FR: { h1:"RÉCEPTIONNISTE IA<br> SANS HUMAINS", p:"Activation <span class='text-orange-500'>PETITE ENTREPRISE</span>. <span class='text-orange-500'>Déploiement mondial.</span>", start:"Démarrer", now:"Activer", beta:"ACCÈS BÉTA", reg:"Régulier", live:"En Direct", priceFeats:["Appels Illimités","Payer Mensuellement","Sans Contrat"], steps:["01 Marché","02 Industrie","03 Entreprise","04 Rôle","05 Démo","06 Déployer"], roles:["Réceptionniste","Agent de Vente","Support"], demoBtn:"LANCER L'APPEL DÉMO", deployBtn:"OBTENIR MON NUMÉRO", industries:["Comptabilité","Après Heures","Garage","Boulangerie","Boutique","Lavage Auto","Location Auto","Dentaire","Électricité","Électronique","Fleuriste","Meubles","HVAC","Salon Coiffure","Bricoleur","Nettoyage","Assurances","Bijouterie","Paysage","Juridique","Serrurier","Massage","Med Spa","Ongles","Nuisibles","Plomberie","Immobilier","Restaurant","Toiture","Remorquage","Urgences","Vétérinaire","Fenêtres"], soon:"Bientôt Disponible", emailPlaceholder:"ENTRER EMAIL POUR NOTIFICATION", submit:"REJOINDRE LA LISTE" },
-
-      DE: { h1:"KI-EMPFANGSCHEF<br> OHNE MENSCHEN", p:"Sofortige <span class='text-orange-500'>KLEINUNTERNEHMEN</span> Aktivierung.", start:"Start", now:"Aktivieren", beta:"BETA-ZUGANG", reg:"Regulär", live:"Live", priceFeats:["Unbegrenzte Anrufe","Monatliche Zahlung","Kein Vertrag"], steps:["01 Markt","02 Branche","03 Geschäft","04 Rolle","05 Demo","06 Aktivieren"], roles:["Empfang","Verkauf","Support"], demoBtn:"DEMO-ANRUF STARTEN", deployBtn:"NUMMER ERHALTEN", industries:["Buchhaltung","After Hours","Werkstatt","Bäckerei","Boutique","Aufbereitung","Mietwagen","Zahnarzt","Elektrik","Elektronik","Blumen","Möbel","HVAC","Friseur","Handwerker","Reinigung","Versicherung","Schmuck","Gartenbau","Recht","Schlüsseldienst","Massage","Med Spa","Nägel","Schädlingsbekämpfung","Sanitär","Immobilien","Restaurant","Dach","Abschleppdienst","Notaufnahme","Tierarzt","Fenster"], soon:"Demnächst Verfügbar", emailPlaceholder:"E-MAIL FÜR BENACHRICHTIGUNG", submit:"WARTELISTE BEITRETEN" },
-      IT: { h1:"RECEPTIONIST AI<br> SENZA UMANI", p:"Attivazione Istantanea <span class='text-orange-500'>PICCOLE IMPRESE</span>.", start:"Inizia", now:"Attiva", beta:"ACCESSO BETA", reg:"Regolare", live:"Dal Vivo", priceFeats:["Chiamate Illimitate","Pagamento Mensile","Senza Contratto"], steps:["01 Mercato","02 Settore","03 Azienda","04 Ruolo","05 Demo","06 Distribuisci"], roles:["Receptionist","Agente Vendite","Supporto"], demoBtn:"AVVIA CHIAMATA DEMO", deployBtn:"OTTENI IL MIO NUMERO", industries:["Contabilità","Dopo Orario","Meccanico","Forno","Boutique","Lavaggio Auto","Noleggio Auto","Dentista","Elettricista","Elettronica","Fiorista","Mobili","HVAC","Parrucchiere","Tuttofare","Pulizie","Assicurazione","Gioielleria","Paesaggistica","Legale","Fabbro","Massaggi","Med Spa","Unghie","Disinfestazione","Idraulico","Immobiliare","Ristorante","Tetti","Rimorchio","Urgenze","Veterinario","Finestre"], soon:"In Arrivo", emailPlaceholder:"INSERISCI EMAIL PER NOTIFICHE", submit:"UNISCITI ALLA LISTA" },
-      PT: { h1:"RECEPCIONISTA IA<br> SEM HUMANOS", p:"Ativação Instantânea <span class='text-orange-500'>PEQUENAS EMPRESAS</span>.", start:"Começar", now:"Ativar", beta:"ACESSO BETA", reg:"Regular", live:"Ao Vivo", priceFeats:["Chamadas Ilimitadas","Pagamento Mensal","Sem Contrato"], steps:["01 Mercado","02 Indústria","03 Empresa","04 Função","05 Demo","06 Implantar"], roles:["Recepcionista","Vendedor","Suporte"], demoBtn:"INICIAR CHAMADA DEMO", deployBtn:"OBTENER MEU NÚMERO", industries:["Contabilidade","Pós-Horário","Oficina","Padaria","Boutique","Lavagem","Aluguel Carro","Dentista","Elétrica","Eletrônicos","Floricultura","Móveis","HVAC","Salão","Handyman","Limpeza","Seguros","Joalheria","Jardinagem","Jurídico","Chaveiro","Massagem","Med Spa","Unhas","Pragas","Encanador","Imobiliária","Restaurante","Telhados","Guincho","Urgência","Veterinário","Janelas"], soon:"Em Breve", emailPlaceholder:"DIGITE EMAIL PARA NOTIFICAÇÃO", submit:"ENTRAR NA LISTA" },
-
-      RU: { h1:"AI-РЕЦЕПЦИЯ<br> БЕЗ ЛЮДЕЙ", p:"Мгновенная активация <span class='text-orange-500'>МАЛОГО БИЗНЕСА</span>.", start:"Начать", now:"Активировать", beta:"БЕТА-ДОСТУП", reg:"Обычная", live:"В прямом эфире", priceFeats:["Безлимитные звонки","Ежемесячная оплата","Без контракта"], steps:["01 Рынок","02 Отрасль","03 Бизнес","04 Роль","05 Демо","06 Запуск"], roles:["Рецепционист","Менеджер по продажам","Поддержка"], demoBtn:"НАЧАТЬ ДЕМО-ЗВОНОК", deployBtn:"ПОЛУЧИТЬ НОМЕР", industries:["Бухгалтерия","Внеурочное время","Авторемонт","Пекарня","Бутик","Детейлиинг","Прокат авто","Стоматология","Электрика","Электроника","Цветы","Мебель","ОВК","Салон красоты","Мастер","Уборка","Страхование","Ювелир","Ландшафт","Юрист","Слесарь","Массаж","Мед-спа","Ногти","Дезинфекция","Сантехник","Недвижимость","Ресторан","Кровля","Эвакуатор","Срочная помощь","Ветеринар","Окна"], soon:"Скоро", emailPlaceholder:"EMAIL ДЛЯ УВЕДОМЛЕНИЯ", submit:"В СПИСОК ОЖИДАНИЯ" },
-      JP: { h1:"グローバル・ゼロヒューマン<br> AI受付係", p:"<span class='text-orange-500'>SMALL BUSINESS</span> 即時有効化。", start:"開始", now:"有効化", beta:"ベータアクセス", reg:"通常", live:"ライブ", priceFeats:["無制限通話","月払い","契約なし"], steps:["01 市場","02 業種","03 ビジネス","04 役割","05 デモ","06 展開"], roles:["受付","営業","サポート"], demoBtn:"デモ通話を開始", deployBtn:"番号を取得", industries:["会計","時間外サポート","自動車修理","ベーカリー","ブティック","洗車","レンタカー","歯科","電気","電子機器","花屋","家具","空調","美容室","便利屋","ハウスクリーニング","保険","宝石","造園","法律","鍵屋","マッサージ","メドスパ","ネイル","害虫駆除","配管","不動産","レストラン","屋根","レッカー","急患","獣医","窓"], soon:"近日公開", emailPlaceholder:"通知用メールアドレス", submit:"待機リストに登録" },
-      CN: { h1:"全球零人工<br> AI 接待員", p:"即時 <span class='text-orange-500'>SMALL BUSINESS</span> 激活。", start:"開始", now:"立即激活", beta:"測試版", reg:"定期", live:"直播中", priceFeats:["無限通話","按月付款","無合約"], steps:["01 市場","02 行業","03 業務","04 角色","05 演示","06 部署"], roles:["接待員","銷售","客服"], demoBtn:"開始演示通話", deployBtn:"獲取我的號碼", industries:["會計","售後","汽修","烘焙","精品","洗車","租車","牙科","電力","電子","花店","家具","暖通","沙龍","修繕","保潔","保險","珠寶","園林","法律","鎖匠","按摩","醫美","美甲","除蟲","管道","房產","餐飲","屋頂","拖車","急診","獸醫","門窗"], soon:"即將推出", emailPlaceholder:"輸入郵箱以獲取通知", submit:"加入候補名單" },
-      KR: { h1:"AI 리셉셔니스트<br> 인력 제로", p:"<span class='text-orange-500'>소상공인</span> 즉시 활성화.", start:"시작", now:"활성화", beta:"베타 액세스", reg:"정가", live:"라이브", priceFeats:["무제한 통화","월 결제","무약정"], steps:["01 시장","02 업종","03 비즈니스","04 역할","05 데모","06 배포"], roles:["리셉셔니스트","영업 사원","지원팀"], demoBtn:"데모 전화 시작", deployBtn:"번호 받기", industries:["회계","업무외시간","자동차 정비","베이커리","부티크","세차","렌터카","치과","전기","전자제품","꽃집","가구","냉난방","헤어살롱","핸디맨","청소","보험","보석","조경","법률","열쇠","마사지","메드스파","네일","해충방제","배관","부동산","레스토랑","지붕","견인","응급실","수의사","창문"], soon:"출시 예정", emailPlaceholder:"알림을 받을 이메일 입력", submit:"대기 명단 합류" },
-
-      AR: { h1:"موظف استقبال ذكاء اصطناعي<br> بدون بشر", p:"تفعيل فوري <span class='text-orange-500'>للأعمال الصغيرة</span>.", start:"ابدأ", now:"تفعيل", beta:"وصول بيتا", reg:"عادي", live:"مباشر", priceFeats:["مكالمات غير محدودة","دفع شهري","بدون عقد"], steps:["01 السوق","02 الصناعة","03 العمل","04 الدور","05 عرض","06 نشر"], roles:["موظف استقبال","وكيل مبيعات","دعم"], demoBtn:"بدء مكالمة تجريبية", deployBtn:"احصل على رقمي", industries:["المحاسبة","بعد الساعات","تصليح سيارات","مخبز","بوتيك","غسيل سيارات","تأجير سيارات","أسنان","كهرباء","إلكترونيات","زهور","أثاث","تكييف","صالون شعر","عامل صيانة","تنظيف منازل","تأمين","مجوهرات","تنسيق حدائق","قانوني","نجار","تدليك","سبا","أظافر","مكافحة حشرات","سباكة","عقارات","مطعم","سقف","سحب","طوارئ","بيطري","نوافذ"], soon:"قريباً", emailPlaceholder:"أدخل البريد للتنبيه", submit:"انضم للقائمة" },
-      IN: { h1:"AI रिसेप्शनिस्ट<br> बिना किसी मानव के", p:"<span class='text-orange-500'>छोटे व्यवसायों</span> के लिए तत्काल सक्रियण।", start:"शुरू करें", now:"सक्रिय करें", beta:"बीटा एक्सेस", reg:"नियमित", live:"लाइव", priceFeats:["असीमित कॉलिंग","मासिक भुगतान","कोई अनुबंध नहीं"], steps:["01 बाजार","02 उद्योग","03 व्यवसाय","04 भूमिका","05 डेमो","06 तैनात करें"], roles:["रिसेप्शनिस्ट","सेल्स एजेंट","सपोर्ट"], demoBtn:"डेमो कॉल शुरू करें", deployBtn:"मेरा नंबर प्राप्त करें", industries:["लेखांकन","समय के बाद","ऑटो मरम्मत","बेकरी","बुटीक","कार डिटेलिंग","कार किराए पर लेना","दंत","इलेक्ट्रिकल","इलेक्ट्रॉनिक्स","फूलों की दुकान","फर्नीचर","HVAC","हेयर सैलून","हैंडीमैन","घर की सफाई","बीमा","आभूषण","लैंडस्केपिंग","कानूनी","ताला बनाने वाला","मालिश","मेड स्पा","नेल सैलून","कीट नियंत्रण","पाइपिंग","रियल एस्टेट","रेस्तरां","छत","टोइंग","तत्काल देखभाल","पशु चिकित्सक","खिड़कियां"], soon:"जल्द आ रहा है", emailPlaceholder:"सूचना के लिए ईमेल डालें", submit:"प्रतीक्षा सूची में शामिल हों" },
-
-      NL: { h1:"AI RECEPTIONIST<br> ZONDER MENSEN", p:"Directe <span class='text-orange-500'>MKB</span> Activering.", start:"Start", now:"Activeer", beta:"BETA TOEGANG", reg:"Normaal", live:"Live", priceFeats:["Onbeperkt Bellen","Maandelijkse Betaling","Geen Contract"], steps:["01 Markt","02 Branche","03 Bedrijf","04 Rol","05 Demo","06 Implementeren"], roles:["Receptionist","Sales Agent","Support Agent"], demoBtn:"START DEMO OPROEP", deployBtn:"KRIJG MIJN NUMMER", industries:["Boekhouding","Na Sluitingstijd","Autoreparatie","Bakkerij","Boutique","Car Detailing","Autoverhuur","Tandheelkunde","Elektra","Elektronica","Bloemist","Meubels","HVAC","Kapsalon","Klusjesman","Schoonmaak","Verzekeringen","Juwelier","Tuinieren","Juridisch","Slotenmaker","Massage","Med Spa","Nagels","Ongediertebestrijding","Loodgieter","Vastgoed","Restaurant","Dakdekker","Slepen","Spoedeisende Hulp","Dierenarts","Ramen"], soon:"Binnenkort", emailPlaceholder:"E-MAIL FOR MELDING", submit:"OP WACHTLIJST" },
-      PL: { h1:"RECEPCJONISTA AI<br> BEZ LUDZI", p:"Natychmiastowa aktywacja <span class='text-orange-500'>MAŁYCH FIRM</span>.", start:"Start", now:"Aktywuj", beta:"DOSTĘP BETA", reg:"Normalny", live:"Na Żywo", priceFeats:["Nielimitowane Połączenia","Płatność Miesięczna","Bez Umowy"], steps:["01 Rynek","02 Branża","03 Firma","04 Rola","05 Demo","06 Wdróż"], roles:["Recepcjonista","Agent Sprzedaży","Wsparcie"], demoBtn:"URUCHOM DEMO", deployBtn:"POBIERZ NUMER", industries:["Księgowość","Po Godzinach","Naprawa Aut","Piekarnia","Butik","Czyszczenie Aut","Wynajem Aut","Stomatolog","Elektryka","Elektronika","Kwiaciarnia","Meble","Klimatyzacja","Fryzjer","Złota Rączka","Sprzątanie","Ubezpieczenia","Jubiler","Ogrodnik","Prawnik","Ślusarz","Masaż","Med Spa","Paznokcie","Dezynfekcja","Hydraulik","Nieruchomości","Restauracja","Dachy","Holowanie","Pomoc Doraźna","Weterynarz","Okna"], soon:"Wkrótce", emailPlaceholder:"WPISZ EMAIL DLA POWIADOMIENIA", submit:"DOŁĄCZ DO LISTY" },
-      TR: { h1:"INSANSIZ AI<br> RESEPSİYONİST", p:"Hızlı <span class='text-orange-500'>KÜÇÜK İŞLETME</span> Aktivasyonu.", start:"Başlat", now:"Aktive Et", beta:"BETA ERİŞİMI", reg:"Normal", live:"Canlı", priceFeats:["Sınırsız Arama","Aylık Ödeme","Sözleşmesiz"], steps:["01 Pazar","02 Sektör","03 İşletme","04 Rol","05 Demo","06 Kurulum"], roles:["Resepsiyonist","Satış Temsilcisi","Destek"], demoBtn:"DEMO ARAMAYI BAŞLAT", deployBtn:"NUMARAMI AL", industries:["Muhasebe","Mesai Dışı","Oto Tamir","Fırın","Butik","Araç Bakım","Araç Kiralama","Dişçi","Elektrik","Elektronik","Çiçekçi","Mobilya","HVAC","Kuaför","Tamirci","Ev Temizliği","Sigorta","Kuyumcu","Peyzaj","Hukuk","Çilingir","Masaj","Med Spa","Nail Salon","Haşere Kontrol","Tesisatçı","Emlak","Restoran","Çatı","Çekici","Acil Servis","Veteriner","Pencere"], soon:"Yakında", emailPlaceholder:"BİLDİRİM İÇİN E-POSTA", submit:"LİSTEYE KATIL" },
-      SE: { h1:"AI RECEPTIONIST<br> UTAN MÄNNISKOR", p:"Snabb aktivering för <span class='text-orange-500'>SMÅFÖRETAG</span>.", start:"Starta", now:"Aktivera", beta:"BETA-TILLGÅNG", reg:"Ordinarie", live:"Live", priceFeats:["Obegränsade Samtal","Betala Månadsvis","Inget Avtal"], steps:["01 Marknad","02 Bransch","03 Företag","04 Roll","05 Demo","06 Driftsätt"], roles:["Receptionist","Säljare","Support"], demoBtn:"STARTA DEMO-SAMTAL", deployBtn:"FÅ MITT NUMMER", industries:["Bokföring","Efter Stängning","Bilverkstad","Bageri","Butik","Rekond","Biluthyrning","Tandläkare","El","Elektronik","Blomsterbutik","Möbler","HVAC","Frisör","Handyman","Hemstädning","Försäkring","Smycken","Trädgård","Juridik","Låssmed","Massage","Med Spa","Naglar","Skadedjur","Rörmokare","Fastigheter","Restaurang","Tak","Bärgning","Akutvård","Veterinär","Fönster"], soon:"Kommer Snart", emailPlaceholder:"ANGE E-POST FÖR NOTIS", submit:"GÅ MED I KÖN" },
-      NO: { h1:"AI-RESEPSJONIST<br> UTEN MENNESKER", p:"Øyeblikkelig aktivering for <span class='text-orange-500'>BEDRIFTER</span>.", start:"Start", now:"Aktiver", beta:"BETA-TILGANG", reg:"Vanlig", live:"Direkte", priceFeats:["Ubegrensede Ringing","Betal Månedlig","Ingen Kontrakt"], steps:["01 Marked","02 Bransje","03 Bedrift","04 Rolle","05 Demo","06 Distribuer"], roles:["Resepsjonist","Selger","Support"], demoBtn:"START DEMO-SAMTALE", deployBtn:"FÅ MITT NUMMER", industries:["Regnskap","Etter Stengetid","Bilverkstad","Bakeri","Butikk","Bilpleie","Bilutleie","Tannlege","Elektriker","Elektronikk","Blomster","Møbler","HVAC","Frisør","Vaktmester","Rengjøring","Forsikring","Smykker","Hage","Juridisk","Låsesmed","Massasje","Med Spa","Negler","Skadedyr","Rørlegger","Eiendom","Restaurant","Tak","Bilberging","Legevakt","Veterinær","Vinduer"], soon:"Kommer Snart", emailPlaceholder:"E-POST FOR VARSEL", submit:"STÅ PÅ VENTELISTE" },
-      DK: { h1:"AI RECEPTIONIST<br> UDEN MENNESKER", p:"Hurtig aktivering for <span class='text-orange-500'>SMÅ VIRKSOMHEDER</span>.", start:"Start", now:"Aktiver", beta:"BETA ADGANG", reg:"Normal", live:"Live", priceFeats:["Ubegrænset Opkald","Betal Månedligt","Ingen Kontrakt"], steps:["01 Marked","02 Branche","03 Virksomhed","04 Rolle","05 Demo","06 Udrul"], roles:["Receptionist","Sælger","Support"], demoBtn:"START DEMO-OPKALD", deployBtn:"FÅ MIT MIT NUMMER", industries:["Bogføring","Efter Lukketid","Bilværksted","Bageri","Butik","Bilpleie","Biludlejning","Tandlæge","Elektriker","Elektronik","Blomster","Møbler","HVAC","Frisør","Handyman","Rengøring","Forsikring","Smykker","Have","Juridisk","Låsesmed","Massage","Med Spa","Negle","Skadedyr","VVS","Ejendom","Restaurant","Tag","Autohjælp","Skadestue","Dyrlæge","Vinduer"], soon:"Kommer Snart", emailPlaceholder:"INDTAST EMAIL FOR NOTITS", submit:"KOM PÅ VENTELISTE" },
-      IL: { h1:"פקיד קבלה AI<br> ללא בני אדם", p:"הפעלה מיידית <span class='text-orange-500'>לעסקים קטנים</span>.", start:"התחל", now:"הפעל", beta:"גישת בטא", reg:"רגיל", live:"בשידור חי", priceFeats:["שיחות ללא הגבלה","תשלום חודשי","ללא חוזה"], steps:["01 שוק","02 ענף","03 עסק","04 תפקיד","05 דמו","06 הפצה"], roles:["פקיד קבלה","איש מכירות","תמיכה"], demoBtn:"התחל שיחת דמו", deployBtn:"קבל את המספר שלי", industries:["חשבונאות","אחרי שעות","תיקון רכב","מאפייה","בוטיק","דיטיילינג","השכרת רכב","רופא שיניים","חשמלאי","אלקטרוניקה","חנות פרחים","רהיטים","מיזוג אוויר","מספרה","הנדימן","ניקיון","ביטוח","תכשיטים","גינון","משפטי","מנעולן","עיסוי","ספא","ציפורניים","הדברה","אינסטלטור","נדל\"ן","מסעדה","גגות","גרירה","רפואה דחופה","וטרינר","חלונות"], soon:"בקרוב", emailPlaceholder:"הזן אימייל לעעדכון", submit:"הצטרף לרשימה" },
-      TH: { h1:"พนักงานต้อนรับ AI<br> ไร้มนุษย์", p:"เปิดใช้งาน <span class='text-orange-500'>ธุรกิจขนาดเล็ก</span> ทันที", start:"เริ่มต้น", now:"เปิดใช้งาน", beta:"เบต้า", reg:"ปกติ", live:"สด", priceFeats:["โทรไม่จำกัด","จ่ายรายเดือน","ไม่มีสัญญา"], steps:["01 ตลาด","02 อุตสาหกรรม","03 ธุรกิจ","04 บทบาท","05 เดโม","06 ติดตั้ง"], roles:["พนักงานต้อนรับ","พนักงานขาย","ฝ่ายสนับสนุน"], demoBtn:"เริ่มโทรสาธิต", deployBtn:"รับหมายเลขของฉัน", industries:["บัญชี","นอกเวลา","ซ่อมรถ","เบเกอรี่","บูติก","ล้างรถ","เช่ารถ","ทันตกรรม","ไฟฟ้า","อิเล็กทรอนิกส์","ดอกไม้","เฟอร์นิเจอร์","แอร์","ร้านทำผม","ช่างซ่อม","ทำความสะอาด","ประกัน","จิวเวลรี่","จัดสวน","กฎหมาย","ช่างกุญแจ","นวด","สปา","ทำเล็บ","กำจัดแมลง","ประปา","อสังหา","ร้านอาหาร","หลังคา","รถยก","ฉุกเฉิน","สัตวแพทย์","หน้าต่าง"], soon:"เร็วๆ นี้", emailPlaceholder:"กรอกอีเมลเพื่อรับแจ้งเตือน", submit:"เข้าร่วมรายการรอ" }
+      FR: { h1:"RÉCEPTIONNISTE IA<br> SANS HUMAINS", p:"Activation <span class='text-orange-500'>PETITE ENTREPRISE</span>. <span class='text-orange-500'>Déploiement mondial.</span>", start:"Démarrer", now:"Activer", beta:"ACCÈS BÉTA", reg:"Régulier", live:"En Direct", priceFeats:["Appels Illimités","Payer Mensuellement","Sans Contrat"], steps:["01 Marché","02 Industrie","03 Entreprise","04 Rôle","05 Démo","06 Déployer"], roles:["Réceptionniste","Agent de Vente","Support"], demoBtn:"LANCER L'APPEL DÉMO", deployBtn:"OBTENIR MON NUMÉRO", industries:["Comptabilité","Après Heures","Garage","Boulangerie","Boutique","Lavage Auto","Location Auto","Dentaire","Électricité","Électronique","Fleuriste","Meubles","HVAC","Salon Coiffure","Bricoleur","Nettoyage","Assurances","Bijouterie","Paysage","Juridique","Serrurier","Massage","Med Spa","Ongles","Nuisibles","Plomberie","Immobilier","Restaurant","Toiture","Remorquage","Urgences","Vétérinaire","Fenêtres"], soon:"Bientôt Disponible", emailPlaceholder:"ENTRER EMAIL POUR NOTIFICATION", submit:"REJOINDRE LA LISTE" }
     };
 
     // ========= LANGUAGE SWITCH =========
@@ -522,6 +653,54 @@
       toggleLangMenu(false);
     }
 
+    // ========= ACTIVATION INFO WIZARD =========
+    const activationInfoSlides = [
+      { title: "STEP 1 — MARKET", text: "Choose the country/market. Pricing and deployment routing adjust automatically based on your selection." },
+      { title: "STEP 2 — INDUSTRY", text: "Select your business industry. This helps us choose the best starting assistant behavior." },
+      { title: "STEP 3 — BUSINESS", text: "Enter your business name. This is used in your scripts and greeting." },
+      { title: "STEP 4 — ROLE + TEMPLATE + VOICE", text: "Choose the agent role. Pick a template script and edit it. Choose an ElevenLabs voice and preview it before demo." },
+      { title: "STEP 5 — DEMO", text: "Run a test call. The demo uses your selected role, template/script, and voice." },
+      { title: "STEP 6 — DEPLOY + DASHBOARD", text: "After payment, your agent is deployed. Customer receives a dashboard where they can edit role, script, voice, and settings anytime." }
+    ];
+    let infoIdx = 0;
+
+    function openActivationInfo() {
+      infoIdx = 0;
+      triggerModal("info");
+    }
+
+    function renderInfoSlide() {
+      const slide = activationInfoSlides[infoIdx];
+      const c = document.getElementById('mContent');
+      c.innerHTML = `
+        <div class="pill mb-4">ACTIVATION STEPS INFO</div>
+        <div class="card-theme text-left">
+          <div class="mini text-orange-500 mb-2">${slide.title}</div>
+          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${slide.text}</div>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-2 mt-4">
+          <button class="modal-btn justify-center text-center" onclick="infoPrev()" ${infoIdx===0 ? 'style="opacity:.35;pointer-events:none"' : ''}>GO BACK</button>
+          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="infoNext()">
+            ${infoIdx === activationInfoSlides.length - 1 ? "START ACTIVATION" : "NEXT"}
+          </button>
+          <button class="modal-btn justify-center text-center" onclick="closeModal()">CLOSE</button>
+        </div>
+        <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
+          ${infoIdx+1} / ${activationInfoSlides.length}
+        </div>
+      `;
+    }
+    function infoPrev() { if (infoIdx > 0) { infoIdx--; renderInfoSlide(); } }
+    function infoNext() {
+      if (infoIdx < activationInfoSlides.length - 1) {
+        infoIdx++;
+        renderInfoSlide();
+      } else {
+        closeModal();
+        handleStep(1);
+      }
+    }
+
     // ========= MODAL FLOW =========
     function triggerModal(step, countryName = null) {
       const m = document.getElementById('setupModal');
@@ -531,13 +710,26 @@
       const shell = document.getElementById('modalShell');
       const lang = i18n[currentLang] || i18n.EN;
 
-      // default shell size
-      shell.classList.remove('role-wide');
+      // reset shell sizes
+      shell.classList.remove('role-wide', 'info-wide', 'dashboard-wide');
 
       m.style.display = 'flex';
       c.innerHTML = "";
       s.innerHTML = "";
-      c.className = "modal-scroll"; // reset (role step will override)
+
+      if (step === "info") {
+        shell.classList.add('info-wide');
+        tEl.innerText = "Info";
+        renderInfoSlide();
+        return;
+      }
+
+      if (step === "dashboard") {
+        shell.classList.add('dashboard-wide');
+        tEl.innerText = "Dashboard";
+        renderDashboard();
+        return;
+      }
 
       if (step === 'waitlist') {
         tEl.innerText = (countryName || "").toUpperCase();
@@ -552,6 +744,7 @@
       if (step === 1) {
         tEl.innerText = lang.steps[0];
         s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH COUNTRIES..." onkeyup="filterList('mContent', this.value)">`;
+        c.className = "modal-scroll";
 
         const countries = Object.keys(marketCurrency);
         const activeOnes = countries.filter(k => marketCurrency[k].active).sort();
@@ -579,6 +772,7 @@
       } else if (step === 2) {
         tEl.innerText = lang.steps[1];
         s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH INDUSTRIES..." onkeyup="filterList('mContent', this.value)">`;
+        c.className = "modal-scroll";
 
         const industryList = lang.industries || i18n.EN.industries;
         industryList.forEach((name, idx) => {
@@ -589,121 +783,260 @@
 
       } else if (step === 3) {
         tEl.innerText = lang.steps[2];
+        c.className = "";
         c.innerHTML = `
           <input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
           <button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>
         `;
 
       } else if (step === 4) {
-        // ROLE step: larger, less cluttered, includes ElevenLabs voice selector + preview button
+        // ROLE step: big, includes templates + script editor + voice selector
         shell.classList.add('role-wide');
         tEl.innerText = lang.steps[3];
-
-        // Replace scroll with fixed layout
-        c.className = ""; // remove modal-scroll
+        c.className = "";
         c.innerHTML = `
-          <div class="pill mb-4">CHOOSE ROLE + VOICE</div>
+          <div class="pill mb-4">CHOOSE ROLE • TEMPLATE • VOICE</div>
 
-          <div class="grid lg:grid-cols-2 gap-4 text-left">
-            <div class="bg-black/30 border border-white/10 rounded-2xl p-4">
+          <div class="grid lg:grid-cols-3 gap-4 text-left">
+            <!-- Role -->
+            <div class="card-theme">
               <div class="muted-hint mb-3">Agent Role</div>
               <div id="roleList" class="grid gap-2"></div>
+              <div class="mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
+                After activation, role can be changed anytime in the dashboard.
+              </div>
             </div>
 
-            <div class="bg-black/30 border border-white/10 rounded-2xl p-4">
+            <!-- Templates + Script -->
+            <div class="card-theme">
+              <div class="muted-hint mb-3">Templates</div>
+              <select id="templateSelect" class="select-theme" onchange="onTemplateChange(this.value)"></select>
+              <div class="mt-3 muted-hint">Editable Script</div>
+              <textarea id="scriptBox" class="textarea-theme mt-2" oninput="onScriptEdit()"></textarea>
+              <div class="grid grid-cols-2 gap-2 mt-3">
+                <button class="modal-btn justify-center text-center" onclick="resetTemplate()">RESET TEMPLATE</button>
+                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="saveScriptOnly()">SAVE SCRIPT</button>
+              </div>
+              <div class="mt-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
+                Your demo call will use this script as the agent's behavior instructions.
+              </div>
+            </div>
+
+            <!-- Voice -->
+            <div class="card-theme">
               <div class="muted-hint mb-3">Voice (ElevenLabs)</div>
+              <select id="voiceSelect" class="select-theme" onchange="onVoiceChange(this.value)"></select>
 
-              <div class="grid gap-2">
-                <select id="voiceSelect" class="select-theme" onchange="onVoiceChange(this.value)"></select>
+              <div class="grid grid-cols-2 gap-2 mt-3">
+                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="previewVoice()">PREVIEW VOICE</button>
+                <button class="modal-btn justify-center text-center" onclick="saveVoiceOnly()">SAVE VOICE</button>
+              </div>
 
+              <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mt-4">
+                <div class="muted-hint mb-2">Voice Tuning</div>
                 <div class="grid grid-cols-2 gap-2">
-                  <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase" onclick="previewVoice()">
-                    Preview Voice
-                  </button>
-                  <button class="modal-btn w-full justify-center text-center" onclick="applyVoiceOnly()">
-                    Save Voice
-                  </button>
+                  <label class="text-[9px] font-black uppercase text-slate-400">Stability
+                    <input id="stabilityRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.stability}" oninput="onVoiceTuningChange()" class="w-full">
+                  </label>
+                  <label class="text-[9px] font-black uppercase text-slate-400">Similarity
+                    <input id="simRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.similarityBoost}" oninput="onVoiceTuningChange()" class="w-full">
+                  </label>
+                  <label class="text-[9px] font-black uppercase text-slate-400">Style
+                    <input id="styleRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.style}" oninput="onVoiceTuningChange()" class="w-full">
+                  </label>
+                  <label class="text-[9px] font-black uppercase text-slate-400">Speaker Boost
+                    <select id="boostSelect" class="select-theme" onchange="onVoiceTuningChange()">
+                      <option value="true">ON</option>
+                      <option value="false">OFF</option>
+                    </select>
+                  </label>
                 </div>
+              </div>
 
-                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed mt-2">
-                  Preview plays a short demo call using your selected voice.
-                  <span class="text-orange-500">No changes to layout.</span>
-                </div>
-
-                <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mt-2">
-                  <div class="muted-hint mb-2">Voice Tuning</div>
-                  <div class="grid grid-cols-2 gap-2">
-                    <label class="text-[9px] font-black uppercase text-slate-400">Stability
-                      <input id="stabilityRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.stability}"
-                        oninput="onVoiceTuningChange()"
-                        class="w-full">
-                    </label>
-                    <label class="text-[9px] font-black uppercase text-slate-400">Similarity
-                      <input id="simRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.similarityBoost}"
-                        oninput="onVoiceTuningChange()"
-                        class="w-full">
-                    </label>
-                    <label class="text-[9px] font-black uppercase text-slate-400">Style
-                      <input id="styleRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.style}"
-                        oninput="onVoiceTuningChange()"
-                        class="w-full">
-                    </label>
-                    <label class="text-[9px] font-black uppercase text-slate-400">Speaker Boost
-                      <select id="boostSelect" class="select-theme" onchange="onVoiceTuningChange()">
-                        <option value="true">ON</option>
-                        <option value="false">OFF</option>
-                      </select>
-                    </label>
-                  </div>
-                </div>
-
+              <div class="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
+                Preview is a short demo call using your selected voice.
               </div>
             </div>
           </div>
+
+          <div class="grid sm:grid-cols-2 gap-2 mt-4">
+            <button class="modal-btn justify-center text-center" onclick="closeModal()">CLOSE</button>
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="confirmRoleStep()">
+              CONFIRM ROLE + TEMPLATE + VOICE
+            </button>
+          </div>
         `;
 
-        // Populate roles
+        // roles
         const roleList = document.getElementById('roleList');
-        const roles = lang.roles || i18n.EN.roles;
+        const roles = (lang.roles || i18n.EN.roles);
+        roleList.innerHTML = "";
         roles.forEach(r => {
-          const b = createBtn(r, () => finish(4, r));
+          const b = createBtn(r, () => setRole(r));
           b.style.fontSize = "10px";
           b.style.padding = "12px";
+          b.innerHTML = `${r}${selectedRole === r ? " ✓" : ""}`;
           roleList.appendChild(b);
         });
 
-        // Populate voice selector
-        const voiceSelect = document.getElementById('voiceSelect');
-        voiceSelect.innerHTML = "";
-        elevenVoices.forEach(v => {
-          const opt = document.createElement('option');
-          opt.value = v.id;
-          opt.textContent = v.label;
-          voiceSelect.appendChild(opt);
-        });
-        voiceSelect.value = selectedVoiceId;
+        // templates
+        initTemplateDropdown();
 
-        // sync boost select
-        const boostSelect = document.getElementById('boostSelect');
-        boostSelect.value = String(!!selectedVoiceSettings.useSpeakerBoost);
+        // voices
+        initVoiceDropdown();
 
       } else if (step === 5) {
         tEl.innerText = lang.steps[4];
-        c.appendChild(createBtn(lang.demoBtn || i18n.EN.demoBtn, runVoice));
+        c.className = "modal-scroll";
+        const btn = createBtn(lang.demoBtn || i18n.EN.demoBtn, runVoice);
+        c.appendChild(btn);
+
+        const note = document.createElement('div');
+        note.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2 text-center";
+        note.innerText = "Demo uses your chosen role, script template, and ElevenLabs voice.";
+        c.appendChild(note);
 
       } else if (step === 6) {
         tEl.innerText = lang.steps[5];
+        c.className = "modal-scroll";
         c.appendChild(createBtn(lang.deployBtn || i18n.EN.deployBtn, () => {
           confetti();
           finish(6, "READY");
-          setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1200);
+          // show sample dashboard instantly (demo UX)
+          setTimeout(() => {
+            triggerModal("dashboard");
+          }, 900);
+
+          // stripe checkout (your existing link)
+          setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1400);
         }));
       }
     }
 
-    function onVoiceChange(id) {
-      selectedVoiceId = id;
+    // ========= ROLE / TEMPLATE / SCRIPT =========
+    function setRole(roleName) {
+      selectedRole = roleName;
+      // if role changes: set a default template + script
+      const templates = roleTemplates[roleName] || [];
+      if (templates.length) {
+        selectedTemplateKey = templates[0].key;
+        agentScript = applyVars(templates[0].script);
+      } else {
+        selectedTemplateKey = null;
+        agentScript = "";
+      }
+      // refresh step 4 UI
+      triggerModal(4);
     }
+
+    function initTemplateDropdown() {
+      const templateSelect = document.getElementById('templateSelect');
+      const scriptBox = document.getElementById('scriptBox');
+
+      templateSelect.innerHTML = "";
+
+      const role = selectedRole || "Receptionist";
+      const templates = roleTemplates[role] || [];
+
+      if (!selectedRole) selectedRole = role;
+
+      if (!templates.length) {
+        const opt = document.createElement('option');
+        opt.value = "";
+        opt.textContent = "NO TEMPLATES AVAILABLE";
+        templateSelect.appendChild(opt);
+        scriptBox.value = agentScript || "";
+        return;
+      }
+
+      templates.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.key;
+        opt.textContent = t.title.toUpperCase();
+        templateSelect.appendChild(opt);
+      });
+
+      if (!selectedTemplateKey || !templates.find(x => x.key === selectedTemplateKey)) {
+        selectedTemplateKey = templates[0].key;
+      }
+      templateSelect.value = selectedTemplateKey;
+
+      const chosen = templates.find(x => x.key === selectedTemplateKey);
+      if (!agentScript || agentScript.trim().length < 10) {
+        agentScript = applyVars(chosen.script);
+      }
+      scriptBox.value = agentScript;
+    }
+
+    function onTemplateChange(key) {
+      const role = selectedRole || "Receptionist";
+      const templates = roleTemplates[role] || [];
+      const chosen = templates.find(x => x.key === key);
+      if (!chosen) return;
+      selectedTemplateKey = key;
+      agentScript = applyVars(chosen.script);
+      document.getElementById('scriptBox').value = agentScript;
+    }
+
+    function onScriptEdit() {
+      const box = document.getElementById('scriptBox');
+      agentScript = box.value;
+    }
+
+    function resetTemplate() {
+      const role = selectedRole || "Receptionist";
+      const templates = roleTemplates[role] || [];
+      const chosen = templates.find(x => x.key === selectedTemplateKey) || templates[0];
+      if (!chosen) return;
+      agentScript = applyVars(chosen.script);
+      document.getElementById('scriptBox').value = agentScript;
+    }
+
+    function saveScriptOnly() {
+      onScriptEdit();
+      // no server needed; stored in memory for this demo UX
+      closeModal();
+      // keep step 4 not finished unless they confirm
+      triggerModal(4);
+    }
+
+    function confirmRoleStep() {
+      // ensure role chosen
+      if (!selectedRole) selectedRole = "Receptionist";
+      if (!agentScript || agentScript.trim().length < 10) {
+        // ensure there is something
+        const templates = roleTemplates[selectedRole] || [];
+        if (templates[0]) agentScript = applyVars(templates[0].script);
+      }
+      finish(4, selectedRole);
+    }
+
+    function applyVars(text) {
+      const businessName = (document.getElementById('v3')?.innerText && document.getElementById('v3').innerText !== "Sync")
+        ? document.getElementById('v3').innerText
+        : "YOUR BUSINESS";
+      return (text || "")
+        .replaceAll("{{BUSINESS_NAME}}", businessName)
+        .replaceAll("{{MARKET}}", selectedMarket || "YOUR MARKET");
+    }
+
+    // ========= VOICE UI =========
+    function initVoiceDropdown() {
+      const voiceSelect = document.getElementById('voiceSelect');
+      voiceSelect.innerHTML = "";
+      elevenVoices.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.id;
+        opt.textContent = v.label.toUpperCase();
+        voiceSelect.appendChild(opt);
+      });
+      voiceSelect.value = selectedVoiceId;
+
+      const boostSelect = document.getElementById('boostSelect');
+      boostSelect.value = String(!!selectedVoiceSettings.useSpeakerBoost);
+    }
+
+    function onVoiceChange(id) { selectedVoiceId = id; }
 
     function onVoiceTuningChange() {
       const st = document.getElementById('stabilityRange');
@@ -717,20 +1050,11 @@
       selectedVoiceSettings.useSpeakerBoost = (boost.value === "true");
     }
 
-    function applyVoiceOnly() {
-      // just closes modal; voice is already saved in variables
-      closeModal();
-      // optional: show on step label for role step, but we keep it clean
-      // you can uncomment to show voice:
-      // document.getElementById('v4').innerText = `${document.getElementById('v4').innerText} + VOICE`;
-    }
+    function saveVoiceOnly() { closeModal(); triggerModal(4); }
 
     async function previewVoice() {
-      // Preview voice by starting a short demo call with the selected voice override.
-      // This is the only "safe" fully-client method without exposing ElevenLabs API key.
       try {
         const apiKey = await loadVapiKey();
-
         const key = industryKeys[currentIndustryIdx];
         const assistantId = assistants[key] || assistants["Electrical"];
 
@@ -738,7 +1062,6 @@
           window.vapiSDK.run({
             apiKey,
             assistant: assistantId,
-            // if supported by your Vapi SDK: overrides applied at runtime
             assistantOverrides: {
               voice: getSelectedVapiVoice(),
               firstMessage: "Hi! This is a quick voice preview. How does this voice sound to you?"
@@ -754,6 +1077,81 @@
       }
     }
 
+    // ========= DASHBOARD (SAMPLE) =========
+    function renderDashboard() {
+      const c = document.getElementById('mContent');
+
+      const market = selectedMarket || "—";
+      const industry = document.getElementById('v2')?.innerText || "—";
+      const biz = document.getElementById('v3')?.innerText || "—";
+      const role = selectedRole || document.getElementById('v4')?.innerText || "—";
+      const voice = selectedVoiceId || "—";
+
+      c.innerHTML = `
+        <div class="pill mb-4">CUSTOMER DASHBOARD (SAMPLE)</div>
+
+        <div class="grid lg:grid-cols-3 gap-4 text-left">
+          <div class="card-theme">
+            <div class="mini text-orange-500 mb-2">Account</div>
+            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
+              <div><span class="mini">Market:</span> ${market}</div>
+              <div class="mt-1"><span class="mini">Industry:</span> ${industry}</div>
+              <div class="mt-1"><span class="mini">Business:</span> ${biz}</div>
+            </div>
+          </div>
+
+          <div class="card-theme">
+            <div class="mini text-orange-500 mb-2">Agent</div>
+            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
+              <div><span class="mini">Role:</span> ${role}</div>
+              <div class="mt-1"><span class="mini">Voice:</span> ${voice}</div>
+              <div class="mt-1"><span class="mini">Template:</span> ${selectedTemplateKey || "custom"}</div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mt-4">
+              <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">EDIT ROLE</button>
+              <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">EDIT SCRIPT</button>
+              <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">EDIT VOICE</button>
+            </div>
+          </div>
+
+          <div class="card-theme">
+            <div class="mini text-orange-500 mb-2">Deployment</div>
+            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
+              After activation, deployment settings allow:
+              <ul class="mt-2 list-disc pl-5 text-slate-400">
+                <li>Change role completely</li>
+                <li>Edit script anytime</li>
+                <li>Change voice anytime</li>
+                <li>Routing / forwarding settings</li>
+                <li>Business hours + after-hours behavior</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-theme mt-4 text-left">
+          <div class="mini text-orange-500 mb-2">Current Script (Editable Later)</div>
+          <pre class="whitespace-pre-wrap text-[11px] text-slate-300 font-semibold leading-relaxed bg-white/5 border border-white/10 rounded-2xl p-3 max-h-[240px] overflow-auto">${escapeHtml(agentScript || "—")}</pre>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-2 mt-4">
+          <button class="modal-btn justify-center text-center" onclick="closeModal()">CLOSE</button>
+          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="handleStep(1)">
+            START NEW ACTIVATION
+          </button>
+        </div>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    // ========= WAITLIST =========
     function submitLead(country) {
       const email = document.getElementById('waitEmail').value;
       if (email && email.includes('@')) {
@@ -766,6 +1164,7 @@
       }
     }
 
+    // ========= GENERIC HELPERS =========
     function filterList(containerId, query) {
       const q = (query || "").toUpperCase();
       document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
@@ -790,7 +1189,16 @@
       closeModal();
       if (s < 6) document.getElementById(`s${s + 1}`).classList.add('next-focus');
     }
-    function saveB() { const v = document.getElementById('bn').value; if (v) finish(3, v); }
+
+    function saveB() {
+      const v = document.getElementById('bn').value;
+      if (v) {
+        finish(3, v);
+        // update script variables if script exists
+        if (agentScript) agentScript = applyVars(agentScript);
+      }
+    }
+
     function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
 
     function toggleLangMenu(force) {
@@ -820,7 +1228,6 @@
       });
     }
 
-    // ✅ FIXED: e.clientY (not e.innerHeight)
     function updateParallax(e) {
       document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
       document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
@@ -831,16 +1238,22 @@
       try {
         const key = industryKeys[currentIndustryIdx];
         const assistantId = assistants[key] || assistants["Electrical"];
-
         const apiKey = await loadVapiKey();
+
+        const businessName = document.getElementById('v3')?.innerText || "YOUR BUSINESS";
+        const finalScript = applyVars(agentScript || "");
 
         if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
           window.vapiSDK.run({
             apiKey,
             assistant: assistantId,
-            // Apply ElevenLabs voice override to reduce robotic sound
             assistantOverrides: {
-              voice: getSelectedVapiVoice()
+              voice: getSelectedVapiVoice(),
+              // Use script to make it feel consistent with selected template
+              // Many Vapi assistants accept "systemPrompt" or "instructions".
+              // If your assistant expects a different field, tell me and I’ll match it.
+              systemPrompt: finalScript,
+              firstMessage: `Hi! Thank you for calling ${businessName}. How can I help you today?`
             }
           });
           closeModal();
@@ -871,6 +1284,10 @@
 
     // ========= INIT =========
     initLangList();
+    // default role/template/script so Step 4 is ready
+    selectedRole = "Receptionist";
+    selectedTemplateKey = roleTemplates.Receptionist[0].key;
+    agentScript = applyVars(roleTemplates.Receptionist[0].script);
 
     // Vapi html-script-tag (provides window.vapiSDK.run)
     (function(d, t) {
