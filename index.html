@@ -123,7 +123,7 @@
       width: 100%;
       margin-bottom: 8px;
     }
-    .modal-scroll { max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+    .modal-scroll { max-height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
 
     #setupModal {
       position: fixed;
@@ -147,9 +147,9 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       backdrop-filter: blur(10px);
     }
-    .modal-shell.role-wide { max-width: 1040px; }
+    .modal-shell.role-wide { max-width: 1080px; }
     .modal-shell.info-wide { max-width: 860px; }
-    .modal-shell.dashboard-wide { max-width: 1040px; }
+    .modal-shell.dashboard-wide { max-width: 1080px; }
 
     .modal-btn {
       width: 100%;
@@ -291,7 +291,7 @@
       <div class="lg:col-span-3 text-center lg:text-left">
         <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title">GLOBAL ZERO-HUMAN<br /> AI RECEPTIONIST</h1>
         <p id="hero-p" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider">
-          Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Fully Automated Worldwide Deployment. Multiligual. No Humans.</span>
+          Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>
         </p>
         <div class="grid gap-2 sm:flex sm:gap-3 sm:items-center">
           <button onclick="handleStep(1)" id="hero-cta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">
@@ -338,7 +338,7 @@
 
     <div class="mt-10 lg:mt-16">
       <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
-        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Ai Receptionist Activation Protocol</span>
+        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">AI Receptionist Activation Protocol</span>
       </div>
       <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
         <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">01 Market</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
@@ -355,7 +355,7 @@
     <div id="modalShell" class="modal-shell">
       <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-4">Setup</h2>
       <div id="modalSearchContainer"></div>
-      <div id="mContent" class=""></div>
+      <div id="mContent"></div>
       <button id="mClose" onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white">Close</button>
     </div>
   </div>
@@ -388,7 +388,8 @@
       return vapiApiKey;
     }
 
-    // ========= ASSISTANTS =========
+    // ========= ASSISTANTS (fallback mapping) =========
+    // You can add more assistant IDs later and map by industry key.
     const assistants = {
       "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
       "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
@@ -398,7 +399,7 @@
 
     // ========= STATE =========
     let completedSteps = 0;
-    let currentIndustryIdx = 8; // default "Electrical" index from industryKeys
+    let currentIndustryIdx = 0;
     let currentLang = "EN";
     let selectedMarket = "United States";
 
@@ -456,7 +457,6 @@
       "Netherlands": { cur: "€", price: "185", reg: "370", prefix: "+31", active: true },
       "Portugal": { cur: "€", price: "185", reg: "370", prefix: "+351", active: true },
       "Israel": { cur: "₪", price: "720", reg: "1440", prefix: "+972", active: true },
-      "Russia": { cur: "₽", price: "18500", reg: "37000", prefix: "+7", active: true },
       "Turkey": { cur: "₺", price: "6500", reg: "13000", prefix: "+90", active: true },
       "Thailand": { cur: "฿", price: "6800", reg: "13600", prefix: "+66", active: true },
 
@@ -490,7 +490,6 @@
       { id: 'DE', n: 'German', f: 'de' },
       { id: 'IT', n: 'Italian', f: 'it' },
       { id: 'PT', n: 'Portuguese', f: 'pt' },
-      { id: 'RU', n: 'Russian', f: 'ru' },
       { id: 'JP', n: 'Japanese', f: 'jp' },
       { id: 'KR', n: 'Korean', f: 'kr' },
       { id: 'CN', n: 'Chinese', f: 'cn' },
@@ -506,44 +505,7 @@
       { id: 'TH', n: 'Thai', f: 'th' }
     ];
 
-    // ========= INDUSTRIES =========
-    // Keep keys stable (used by template packs). Display uses these.
-    const industryKeys = [
-      "Accounting","After Hours","Auto Repair","Bakery","Boutique","Car Detailing","Car Rental",
-      "Dental","Electrical","Electronics","Flower Shop","Furniture","HVAC","Hair Salon","Handyman",
-      "Home Cleaning","Insurance","Jewelry","Landscaping","Legal","Locksmith","Massage","Med Spa",
-      "Nail Salon","Pest Control","Plumbing","Real Estate","Restaurant","Roofing","Towing",
-      "Urgent Care","Veterinary","Windows"
-    ];
-
-    // Categorization for Step 2 (industry selection)
-    const industryCategories = {
-      "Home Services": ["Plumbing","Electrical","HVAC","Roofing","Windows","Handyman","Home Cleaning","Pest Control","Locksmith","Landscaping"],
-      "Healthcare": ["Dental","Urgent Care","Veterinary","Med Spa","Massage","Hair Salon","Nail Salon"],
-      "Legal & Finance": ["Legal","Accounting","Insurance"],
-      "Automotive": ["Auto Repair","Car Detailing","Car Rental","Towing"],
-      "Property": ["Real Estate"],
-      "Retail": ["Boutique","Flower Shop","Jewelry","Furniture","Electronics","Bakery"],
-      "Hospitality": ["Restaurant"],
-      "Other": ["After Hours"]
-    };
-
-    // Build a categorized list (dedupe + keep consistent ordering)
-    function buildCategorizedIndustryList() {
-      const all = new Set(industryKeys);
-      const out = [];
-      Object.keys(industryCategories).forEach(cat => {
-        const items = (industryCategories[cat] || []).filter(x => all.has(x));
-        if (items.length) out.push({ cat, items });
-      });
-      // Anything not covered
-      const covered = new Set(out.flatMap(g => g.items));
-      const leftovers = industryKeys.filter(x => !covered.has(x));
-      if (leftovers.length) out.push({ cat: "Uncategorized", items: leftovers });
-      return out;
-    }
-
-    // ========= i18n (minimal for this flow) =========
+    // ========= i18n (English-only for UI text in this version) =========
     const i18n = {
       EN: {
         steps:["01 Market","02 Industry","03 Business","04 Role","05 Demo","06 Deploy"],
@@ -559,10 +521,10 @@
     // ========= ACTIVATION INFO =========
     const activationInfoSlides = [
       { title: "STEP 1 — MARKET", text: "Choose the country/market. Pricing and deployment routing adjust automatically based on your selection." },
-      { title: "STEP 2 — INDUSTRY", text: "Select your industry. Industry packs determine the scripts/templates you will start with." },
+      { title: "STEP 2 — INDUSTRY", text: "Select your industry. Industry packs determine the scripts/templates you start with." },
       { title: "STEP 3 — BUSINESS", text: "Enter your business name. Used in greetings and scripts." },
-      { title: "STEP 4 — ROLE + TEMPLATES + VOICE", text: "Pick the role. Choose an industry template pack, search templates by category, edit script, pick an ElevenLabs voice, preview it." },
-      { title: "STEP 5 — DEMO", text: "Run a test call using your selected role + template script + voice." },
+      { title: "STEP 4 — ROLE + TEMPLATES + VOICE", text: "Pick the role. Choose an industry template pack, search templates by category, edit script, choose an ElevenLabs voice, preview it." },
+      { title: "STEP 5 — DEMO", text: "Run a test call using your selected role + script + voice." },
       { title: "STEP 6 — DEPLOY + DASHBOARD", text: "After payment, your agent deploys. Customer gets a dashboard to edit role, script, voice, routing, and business info anytime." }
     ];
     let infoIdx = 0;
@@ -590,9 +552,124 @@
     function infoPrev(){ if(infoIdx>0){ infoIdx--; renderInfoSlide(); } }
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
-    // ========= TEMPLATE PACKS (EXPANDED) =========
-    // Each template includes: { key, title, category, script }
-    // Categories used for template filtering in Step 4.
+    // ========= COMMON SMB INDUSTRIES (AS MANY AS POSSIBLE) =========
+    // This list is intentionally large for broad SMB coverage.
+    // Note: Templates use GLOBAL fallback if an industry doesn't have a dedicated pack yet.
+    const industryKeys = [
+      // Home Services / Trades
+      "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door","Appliance Repair","Handyman","Home Cleaning","Commercial Cleaning","Janitorial",
+      "Carpet Cleaning","Pressure Washing","Window Cleaning","Pest Control","Termite Control","Landscaping","Lawn Care","Tree Service","Irrigation","Pool Service",
+      "Fence & Gate","Concrete","Paving","Asphalt","Masonry","Drywall","Painting","Flooring","Tile & Stone","Carpentry","General Contractor","Construction",
+      "Remodeling","Kitchen Remodeling","Bathroom Remodeling","Basement Finishing","Deck & Patio","Solar","Generator","Smart Home","Security Systems",
+      "Locksmith","Moving Company","Storage Facility","Junk Removal","Courier/Delivery","Water Damage Restoration","Mold Remediation","Fire Restoration",
+
+      // Automotive
+      "Auto Repair","Tire Shop","Oil Change","Auto Body Shop","Car Detailing","Car Wash","Car Rental","Towing","Auto Glass","Transmission Shop",
+      "Brake Shop","Diesel Repair","Motorcycle Repair","RV Repair","Boat Repair",
+
+      // Healthcare
+      "Dental","Orthodontics","Chiropractic","Physical Therapy","Occupational Therapy","Optometry","Ophthalmology","Pediatrics","Family Medicine",
+      "Urgent Care","Primary Care","Dermatology","ENT Clinic","Mental Health Clinic","Therapy & Counseling","Psychiatry","Massage Therapy",
+      "Med Spa","Day Spa","IV Therapy","Weight Loss Clinic","Nutritionist/Dietitian","Pharmacy","Medical Imaging","Home Health",
+
+      // Beauty
+      "Hair Salon","Barbershop","Nail Salon","Beauty Studio","Tattoo Studio","Piercing Studio","Cosmetics",
+
+      // Pets
+      "Veterinary","Animal Hospital","Pet Grooming","Pet Boarding","Dog Training","Pet Store",
+
+      // Legal & Finance
+      "Law Firm","Accounting","Bookkeeping","Tax Preparation","Payroll Services","Insurance Agency","Financial Advisor","Mortgage Broker",
+      "Real Estate","Property Management","Title Company",
+
+      // Professional Services / B2B
+      "IT Services","Managed IT","Cybersecurity","Web Design","Marketing Agency","Advertising Agency","Printing Services","Sign Shop","Photography Studio",
+      "Videography Studio","Event Planning","Recruiting/Staffing","Consulting","Architect","Engineering Firm",
+
+      // Education
+      "Daycare","Preschool","Tutoring Center","Driving School","Music School","Dance Studio","Martial Arts","Gym/Fitness","Yoga Studio",
+
+      // Retail
+      "Boutique","Clothing Store","Shoe Store","Jewelry Store","Flower Shop","Bakery","Cafe","Coffee Shop","Restaurant","Fast Food",
+      "Catering","Food Truck","Grocery Store","Convenience Store","Hardware Store","Furniture Store","Electronics Store","Mobile Phone Store",
+      "Bike Shop","Sporting Goods","Bookstore","Thrift Store","Pharmacy Retail",
+
+      // Hospitality / Travel
+      "Hotel","Motel","Bed & Breakfast","Travel Agency","Tour Operator",
+
+      // Community / Other
+      "Nonprofit","Church","Community Center","After Hours"
+    ];
+
+    // ========= INDUSTRY CATEGORIES (SEARCHABLE) =========
+    const industryCategories = {
+      "Home Services": [
+        "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door","Appliance Repair","Handyman","Home Cleaning","Commercial Cleaning","Janitorial",
+        "Carpet Cleaning","Pressure Washing","Window Cleaning","Pest Control","Termite Control","Landscaping","Lawn Care","Tree Service","Irrigation","Pool Service",
+        "Fence & Gate","Concrete","Paving","Asphalt","Masonry","Drywall","Painting","Flooring","Tile & Stone","Carpentry","General Contractor","Construction",
+        "Remodeling","Kitchen Remodeling","Bathroom Remodeling","Basement Finishing","Deck & Patio","Solar","Generator","Smart Home","Security Systems",
+        "Locksmith","Moving Company","Storage Facility","Junk Removal","Courier/Delivery","Water Damage Restoration","Mold Remediation","Fire Restoration"
+      ],
+      "Automotive": [
+        "Auto Repair","Tire Shop","Oil Change","Auto Body Shop","Car Detailing","Car Wash","Car Rental","Towing","Auto Glass","Transmission Shop",
+        "Brake Shop","Diesel Repair","Motorcycle Repair","RV Repair","Boat Repair"
+      ],
+      "Healthcare": [
+        "Dental","Orthodontics","Chiropractic","Physical Therapy","Occupational Therapy","Optometry","Ophthalmology","Pediatrics","Family Medicine",
+        "Urgent Care","Primary Care","Dermatology","ENT Clinic","Mental Health Clinic","Therapy & Counseling","Psychiatry","Massage Therapy",
+        "Med Spa","Day Spa","IV Therapy","Weight Loss Clinic","Nutritionist/Dietitian","Pharmacy","Medical Imaging","Home Health"
+      ],
+      "Beauty & Wellness": [
+        "Hair Salon","Barbershop","Nail Salon","Beauty Studio","Tattoo Studio","Piercing Studio","Cosmetics","Gym/Fitness","Yoga Studio","Martial Arts","Dance Studio"
+      ],
+      "Pets": [
+        "Veterinary","Animal Hospital","Pet Grooming","Pet Boarding","Dog Training","Pet Store"
+      ],
+      "Legal & Finance": [
+        "Law Firm","Accounting","Bookkeeping","Tax Preparation","Payroll Services","Insurance Agency","Financial Advisor","Mortgage Broker",
+        "Real Estate","Property Management","Title Company"
+      ],
+      "Professional Services": [
+        "IT Services","Managed IT","Cybersecurity","Web Design","Marketing Agency","Advertising Agency","Printing Services","Sign Shop","Photography Studio",
+        "Videography Studio","Event Planning","Recruiting/Staffing","Consulting","Architect","Engineering Firm"
+      ],
+      "Education": [
+        "Daycare","Preschool","Tutoring Center","Driving School","Music School"
+      ],
+      "Retail": [
+        "Boutique","Clothing Store","Shoe Store","Jewelry Store","Flower Shop","Bakery","Cafe","Coffee Shop","Grocery Store","Convenience Store",
+        "Hardware Store","Furniture Store","Electronics Store","Mobile Phone Store","Bike Shop","Sporting Goods","Bookstore","Thrift Store","Pharmacy Retail"
+      ],
+      "Food & Hospitality": [
+        "Restaurant","Fast Food","Catering","Food Truck","Hotel","Motel","Bed & Breakfast"
+      ],
+      "Travel": [
+        "Travel Agency","Tour Operator"
+      ],
+      "Community": [
+        "Nonprofit","Church","Community Center","After Hours"
+      ]
+    };
+
+    function buildCategorizedIndustryList() {
+      const all = new Set(industryKeys);
+      const out = [];
+      Object.keys(industryCategories).forEach(cat => {
+        const items = (industryCategories[cat] || []).filter(x => all.has(x));
+        if (items.length) out.push({ cat, items });
+      });
+      const covered = new Set(out.flatMap(g => g.items));
+      const leftovers = industryKeys.filter(x => !covered.has(x));
+      if (leftovers.length) out.push({ cat: "Uncategorized", items: leftovers });
+      return out;
+    }
+
+    // ========= TEMPLATE CATEGORIES =========
+    const templateCategories = ["ALL","Appointments","Emergency","After Hours","Sales","Support","Intake","Info"];
+
+    // ========= INDUSTRY TEMPLATE PACKS =========
+    // IMPORTANT: For MOST industries we use GLOBAL fallback templates.
+    // Dedicated packs are added for the most common industries. You can keep expanding packs later.
     const industryPacks = {
       GLOBAL: {
         Receptionist: [
@@ -648,8 +725,8 @@ If urgent, mark urgent. Otherwise create a ticket and schedule a callback.`}
         ]
       },
 
-      // HOME SERVICES
-      Plumbing: {
+      // MOST COMMON PACKS
+      "Plumbing": {
         Receptionist: [
           { key:"pl_rec_dispatch", title:"Plumbing Dispatcher (Urgent + Standard)", category:"Emergency",
             script:`You are the AI receptionist/dispatcher for {{BUSINESS_NAME}} (Plumbing).
@@ -671,7 +748,7 @@ Collect name, phone, address, prior job date, issue. If urgent leak: escalate di
         ]
       },
 
-      Electrical: {
+      "Electrical": {
         Receptionist: [
           { key:"el_rec_safety", title:"Electrical Dispatcher (Safety First)", category:"Emergency",
             script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electrical).
@@ -692,7 +769,7 @@ Ask what happened, breaker trips, smell/sparking. Collect contact + address and 
         ]
       },
 
-      HVAC: {
+      "HVAC": {
         Receptionist: [
           { key:"hv_rec_noheat", title:"No Heat/No AC Triage", category:"Emergency",
             script:`You are the AI receptionist for {{BUSINESS_NAME}} (HVAC).
@@ -713,125 +790,20 @@ Collect name, phone, address, issue, prior service date. Route.`}
         ]
       },
 
-      Roofing: {
+      "Auto Repair": {
         Receptionist: [
-          { key:"rf_rec_leak", title:"Roof Leak Emergency Intake", category:"Emergency",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Roofing).
-Ask: active leak, interior damage, address, roof type, safe access, contact. Schedule urgent inspection.`},
-          { key:"rf_rec_inspect", title:"Inspection Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Roofing).
-Book inspections. Collect address, roof type, reason (repair/replacement), contact, preferred times.`}
-        ],
-        "Sales Agent": [
-          { key:"rf_sales_replace", title:"Replacement Quote Intake", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Roofing).
-Collect roof size/type (if known), timeline, insurance claim (yes/no), contact. Schedule estimate.`}
+          { key:"au_rec_booking", title:"Diagnostics Booking", category:"Appointments",
+            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Auto Repair).
+Collect vehicle year/make/model, symptoms, warning lights, name + phone. Schedule diagnostics.`}
         ],
         "Support Agent": [
-          { key:"rf_support_claim", title:"Claim / Job Status Support", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Roofing).
-Collect name, phone, address, claim status, questions. Route to team.`}
+          { key:"au_support_status", title:"Repair Status + Pickup", category:"Support",
+            script:`You are support for {{BUSINESS_NAME}} (Auto Repair).
+Collect name, phone, vehicle, drop-off date. Route for update.`}
         ]
       },
 
-      Windows: {
-        Receptionist: [
-          { key:"wd_rec_quote", title:"Windows Quote Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Windows & Doors).
-Collect: number of windows/doors, property type, timeline, address, contact. Schedule measurement visit.`}
-        ],
-        "Sales Agent": [
-          { key:"wd_sales_upgrade", title:"Upgrade Sales Intake", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Windows & Doors).
-Ask goals (energy/noise/security), number of openings, timeline, budget range (optional). Schedule consultation.`}
-        ],
-        "Support Agent": [
-          { key:"wd_support_warranty", title:"Warranty / Service Request", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Windows & Doors).
-Collect name, phone, address, install date (approx), issue (draft/leak/hardware). Route service.`}
-        ]
-      },
-
-      Locksmith: {
-        Receptionist: [
-          { key:"ls_rec_lockout", title:"Lockout Emergency Intake", category:"Emergency",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Locksmith).
-Ask: car/home/commercial lockout, location, urgency, ID availability, contact. Dispatch ASAP.`},
-          { key:"ls_rec_booking", title:"Appointment Booking (Rekey/Install)", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Locksmith).
-Book rekeys/installs. Collect address, job type, preferred time, contact.`}
-        ],
-        "Sales Agent": [
-          { key:"ls_sales_commercial", title:"Commercial Security Sales Intake", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Locksmith).
-Ask: business type, locks/access control needs, locations, timeline. Schedule consultation.`}
-        ],
-        "Support Agent": [
-          { key:"ls_support_followup", title:"Follow-up / Warranty Support", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Locksmith).
-Collect name, phone, service date, issue. Route.`}
-        ]
-      },
-
-      "Home Cleaning": {
-        Receptionist: [
-          { key:"hc_rec_booking", title:"Cleaning Booking (Standard/Deep/Move-out)", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Home Cleaning).
-Ask: type (standard/deep/move-out), bedrooms/bathrooms, pets, address, preferred time, contact.`}
-        ],
-        "Sales Agent": [
-          { key:"hc_sales_recurring", title:"Recurring Plan Sales", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Home Cleaning).
-Ask: frequency (weekly/biweekly/monthly), home size, priorities, contact. Schedule estimate/intro.`}
-        ],
-        "Support Agent": [
-          { key:"hc_support_reschedule", title:"Reschedule + Issue Support", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Home Cleaning).
-Collect name, phone, appointment date, request/issue. Route.`}
-        ]
-      },
-
-      "Pest Control": {
-        Receptionist: [
-          { key:"pc_rec_urgent", title:"Urgent Pest Intake", category:"Emergency",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Pest Control).
-Ask: pest type, severity, kids/pets, address, contact. Schedule ASAP inspection.`},
-          { key:"pc_rec_booking", title:"Inspection Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Pest Control).
-Book inspections and treatments. Collect address, pest type, contact, preferred time.`}
-        ],
-        "Sales Agent": [
-          { key:"pc_sales_plan", title:"Protection Plan Sales Intake", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Pest Control).
-Ask: property type, issues, desired plan frequency, contact. Schedule consultation.`}
-        ],
-        "Support Agent": [
-          { key:"pc_support_followup", title:"Follow-up Treatment Support", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Pest Control).
-Collect name, phone, address, treatment date, concerns. Route.`}
-        ]
-      },
-
-      Landscaping: {
-        Receptionist: [
-          { key:"la_rec_booking", title:"Landscape Estimate Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Landscaping).
-Ask: service (mowing/design/cleanup/irrigation), address, property size (approx), timeline, contact. Schedule estimate.`}
-        ],
-        "Sales Agent": [
-          { key:"la_sales_design", title:"Design/Build Sales Intake", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Landscaping).
-Ask: goals, budget range (optional), timeline, photos available, contact. Schedule consult.`}
-        ],
-        "Support Agent": [
-          { key:"la_support_schedule", title:"Service Schedule Support", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Landscaping).
-Collect name, address, request (reschedule/issue). Route.`}
-        ]
-      },
-
-      // HEALTHCARE
-      Dental: {
+      "Dental": {
         Receptionist: [
           { key:"de_rec_new", title:"New Patient Intake + Booking", category:"Appointments",
             script:`You are the AI receptionist for {{BUSINESS_NAME}} (Dental).
@@ -852,89 +824,12 @@ Collect patient name, contact, what they need (reschedule/billing/records). Rout
         ]
       },
 
-      "Urgent Care": {
-        Receptionist: [
-          { key:"uc_rec_info", title:"Hours + Services + Wait Time", category:"Info",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Urgent Care).
-Provide hours, location, services. If emergency symptoms: advise calling emergency services.
-Collect name + phone if they want a callback.`}
-        ],
-        "Support Agent": [
-          { key:"uc_support_records", title:"Records + Follow-up Support", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Urgent Care).
-Help with records requests and follow-ups. Collect name, phone, visit date (approx). Route.`}
-        ]
-      },
-
-      Veterinary: {
-        Receptionist: [
-          { key:"vet_rec_booking", title:"Vet Appointment Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Veterinary).
-Ask: pet type, issue, urgency, preferred time. Collect owner name, phone, email. For emergencies: advise emergency vet.`},
-          { key:"vet_rec_emg", title:"Pet Emergency Triage", category:"Emergency",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Veterinary).
-Ask symptoms. If life-threatening: advise emergency vet immediately. Collect contact + pet details.`}
-        ],
-        "Support Agent": [
-          { key:"vet_support_refill", title:"Refills + Follow-up Support", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Veterinary).
-Handle refills and follow-up questions. Collect owner name, pet name, contact, medication. Route.`}
-        ]
-      },
-
-      "Med Spa": {
-        Receptionist: [
-          { key:"ms_rec_booking", title:"Service Booking + Consult", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Med Spa).
-Ask: service (Botox/fillers/facial/laser), new/existing, preferred time. Collect name, phone, email.`}
-        ],
-        "Sales Agent": [
-          { key:"ms_sales_packages", title:"Membership/Package Sales", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Med Spa).
-Ask desired outcomes, timeline, contact. Schedule consult.`}
-        ],
-        "Support Agent": [
-          { key:"ms_support_aftercare", title:"Aftercare Routing", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Med Spa).
-Ask what service they received and symptoms. If serious: advise urgent care. Route to staff.`}
-        ]
-      },
-
-      Massage: {
-        Receptionist: [
-          { key:"ma_rec_booking", title:"Massage Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Massage).
-Ask: type (deep tissue/swedish), duration, preferred time, new/existing. Collect name, phone, email.`}
-        ]
-      },
-
-      "Hair Salon": {
-        Receptionist: [
-          { key:"hs_rec_booking", title:"Salon Booking (Cut/Color/Style)", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Hair Salon).
-Ask: service, stylist preference, preferred time. Collect name, phone, email.`}
-        ]
-      },
-
-      "Nail Salon": {
-        Receptionist: [
-          { key:"ns_rec_booking", title:"Nails Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Nail Salon).
-Ask: service (manicure/pedicure/gel), preferred time, name and phone.`}
-        ]
-      },
-
-      // LEGAL & FINANCE
-      Legal: {
+      "Law Firm": {
         Receptionist: [
           { key:"le_rec_intake", title:"Legal Intake + Consultation Booking", category:"Intake",
             script:`You are the AI receptionist for {{BUSINESS_NAME}} (Law Firm).
-Collect case type, urgency, opposing party name (conflict check), contact info. Do NOT provide legal advice. Schedule consult.`}
-        ],
-        "Sales Agent": [
-          { key:"le_sales_consult", title:"Consultation Booking + Document Reminder", category:"Sales",
-            script:`You are the AI intake agent for {{BUSINESS_NAME}} (Law Firm).
-Book consultations and remind to bring relevant documents. No legal advice.`}
+Collect case type, urgency, opposing party name (conflict check), contact info.
+Do NOT provide legal advice. Schedule consult.`}
         ],
         "Support Agent": [
           { key:"le_support_status", title:"Existing Client Status Routing", category:"Support",
@@ -943,85 +838,7 @@ Collect client name, phone, matter reference (if any). Route for callback.`}
         ]
       },
 
-      Accounting: {
-        Receptionist: [
-          { key:"ac_rec_booking", title:"Accounting Intake + Booking", category:"Intake",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Accounting).
-Ask: service (tax/bookkeeping/payroll), timeline, business/individual, contact. Schedule consultation.`}
-        ],
-        "Sales Agent": [
-          { key:"ac_sales_monthly", title:"Monthly Bookkeeping Sales Intake", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Accounting).
-Ask: business type, monthly volume (approx), software used, timeline. Collect contact and book a call.`}
-        ]
-      },
-
-      Insurance: {
-        Receptionist: [
-          { key:"in_rec_quote", title:"Insurance Quote Intake", category:"Intake",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Insurance).
-Ask: policy type, current insurer (optional), timeline, contact. Schedule agent callback.`}
-        ],
-        "Support Agent": [
-          { key:"in_support_claim", title:"Claims Routing Support", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Insurance).
-Ask: policy holder name, phone, claim type, urgency. Route to claims team.`}
-        ]
-      },
-
-      // AUTOMOTIVE
-      "Auto Repair": {
-        Receptionist: [
-          { key:"au_rec_booking", title:"Diagnostics Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Auto Repair).
-Collect vehicle year/make/model, symptoms, warning lights, name + phone. Schedule diagnostics.`}
-        ],
-        "Support Agent": [
-          { key:"au_support_status", title:"Repair Status + Pickup", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Auto Repair).
-Collect name, phone, vehicle, drop-off date. Route for update.`}
-        ]
-      },
-
-      Towing: {
-        Receptionist: [
-          { key:"tw_rec_dispatch", title:"Towing Dispatch Intake", category:"Emergency",
-            script:`You are the AI dispatcher for {{BUSINESS_NAME}} (Towing).
-Ask: location, vehicle type, situation (accident/breakdown), safety status, destination, contact. Dispatch.`}
-        ]
-      },
-
-      "Car Detailing": {
-        Receptionist: [
-          { key:"cd_rec_booking", title:"Detailing Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Car Detailing).
-Ask: interior/exterior/full, vehicle type, preferred time, contact. Book appointment.`}
-        ]
-      },
-
-      "Car Rental": {
-        Receptionist: [
-          { key:"cr_rec_booking", title:"Rental Booking Intake", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Car Rental).
-Ask: pickup location, dates, vehicle size, contact. Route to booking.`}
-        ]
-      },
-
-      // PROPERTY / HOSPITALITY / RETAIL
-      "Real Estate": {
-        Receptionist: [
-          { key:"re_rec_intake", title:"Buyer/Seller Intake + Booking", category:"Intake",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Real Estate).
-Ask: buying or selling, location, timeline, budget (optional). Collect contact and book agent call.`}
-        ],
-        "Sales Agent": [
-          { key:"re_sales_qual", title:"Lead Qualifier (Pre-approval + Needs)", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Real Estate).
-Ask: budget, pre-approved, must-haves, timeline. Collect contact and book call.`}
-        ]
-      },
-
-      Restaurant: {
+      "Restaurant": {
         Receptionist: [
           { key:"rs_rec_res", title:"Reservations + Hours", category:"Appointments",
             script:`You are the AI host for {{BUSINESS_NAME}} (Restaurant).
@@ -1034,67 +851,22 @@ Collect order name/number (if any), issue, phone. Route.`}
         ]
       },
 
-      Bakery: {
+      "Real Estate": {
         Receptionist: [
-          { key:"ba_rec_orders", title:"Custom Orders Intake", category:"Sales",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Bakery).
-Ask: item (cake/pastries), date needed, servings, allergies, contact. Route to staff.`}
-        ]
-      },
-
-      Boutique: {
-        Receptionist: [
-          { key:"bo_rec_info", title:"Store Info + Holds", category:"Info",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Boutique).
-Provide hours/location. If item inquiry: collect item name/size and contact for callback.`}
-        ]
-      },
-
-      "Flower Shop": {
-        Receptionist: [
-          { key:"fl_rec_orders", title:"Flower Order Intake", category:"Sales",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Flower Shop).
-Ask: occasion, delivery date, address, budget, contact. Route.`}
-        ]
-      },
-
-      Jewelry: {
-        Receptionist: [
-          { key:"jw_rec_appt", title:"Jewelry Appointment Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Jewelry).
-Book appointments for repair/custom pieces. Collect contact and preferred time.`}
-        ]
-      },
-
-      Furniture: {
-        Receptionist: [
-          { key:"fu_rec_delivery", title:"Delivery + Store Info", category:"Support",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Furniture).
-Help with delivery questions and store info. Collect order name/number and phone. Route.`}
-        ]
-      },
-
-      Electronics: {
-        Receptionist: [
-          { key:"elx_rec_support", title:"Electronics Service Intake", category:"Support",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electronics).
-Ask device type, issue, warranty status (optional), contact. Route.`}
-        ]
-      },
-
-      "After Hours": {
-        Receptionist: [
-          { key:"ah_rec_msg", title:"After-Hours Universal Message Capture", category:"After Hours",
-            script:`You are the after-hours AI receptionist for {{BUSINESS_NAME}}.
-Collect name, phone, reason, best callback time. Confirm and end.`}
+          { key:"re_rec_intake", title:"Buyer/Seller Intake + Booking", category:"Intake",
+            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Real Estate).
+Ask: buying or selling, location, timeline, budget (optional).
+Collect contact and book agent call.`}
+        ],
+        "Sales Agent": [
+          { key:"re_sales_qual", title:"Lead Qualifier (Pre-approval + Needs)", category:"Sales",
+            script:`You are sales for {{BUSINESS_NAME}} (Real Estate).
+Ask: budget, pre-approved, must-haves, timeline. Collect contact and book call.`}
         ]
       }
     };
 
-    // ========= TEMPLATE CATEGORIES =========
-    const templateCategories = ["ALL","Appointments","Emergency","After Hours","Sales","Support","Intake","Info"];
-
-    // ========= UTIL: ensure pack exists for industry =========
+    // ========= TEMPLATE RESOLUTION (fallback to GLOBAL) =========
     function getCurrentIndustryKey() { return industryKeys[currentIndustryIdx] || "GLOBAL"; }
     function getPackFor(industryKey) { return industryPacks[industryKey] || industryPacks.GLOBAL; }
     function getTemplatesFor(roleName) {
@@ -1106,14 +878,6 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
         return { templates: globalRoleList, packName: "GLOBAL" };
       }
       return { templates: roleList, packName: industryKey };
-    }
-
-    // ========= LANGUAGE SWITCH =========
-    function setLang(cc, langCode) {
-      currentLang = langCode;
-      document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
-      document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
-      toggleLangMenu(false);
     }
 
     // ========= MODAL FLOW =========
@@ -1181,7 +945,7 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
         });
 
       } else if (step === 2) {
-        // ✅ Categorized + Searchable Industries
+        // ✅ Categorized + Searchable Industries (very large list)
         tEl.innerText = i18n.EN.steps[1];
         s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH INDUSTRIES..." onkeyup="filterIndustryCategories(this.value)">`;
         c.className = "modal-scroll";
@@ -1203,20 +967,20 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
         const currentIndustryKey = getCurrentIndustryKey();
 
         c.innerHTML = `
-          <div class="pill mb-4">ROLE • INDUSTRY TEMPLATES (CATEGORIZED + SEARCH) • VOICE</div>
+          <div class="pill mb-4">ROLE • TEMPLATES (CATEGORIZED + SEARCH) • VOICE</div>
 
           <div class="grid lg:grid-cols-3 gap-4 text-left">
             <div class="card-theme">
               <div class="muted-hint mb-3">Agent Role</div>
               <div id="roleList" class="grid gap-2"></div>
               <div class="mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
-                Current Industry Pack: <span class="text-orange-500">${currentIndustryKey}</span><br>
-                You can change role anytime in the dashboard.
+                Current Industry: <span class="text-orange-500">${currentIndustryKey}</span><br>
+                Template pack uses industry-specific templates when available, otherwise GLOBAL fallback.
               </div>
             </div>
 
             <div class="card-theme">
-              <div class="muted-hint mb-3">Industry Templates</div>
+              <div class="muted-hint mb-3">Templates</div>
 
               <div class="grid grid-cols-2 gap-2 mb-2">
                 <select id="templateCategory" class="select-theme" onchange="onTemplateCategoryChange(this.value)"></select>
@@ -1231,10 +995,6 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
               <div class="grid grid-cols-2 gap-2 mt-3">
                 <button class="modal-btn justify-center text-center" onclick="resetTemplate()">RESET TEMPLATE</button>
                 <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="saveScriptOnly()">SAVE SCRIPT</button>
-              </div>
-
-              <div class="mt-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
-                Demo call uses this script.
               </div>
             </div>
 
@@ -1266,10 +1026,6 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
                     </select>
                   </label>
                 </div>
-              </div>
-
-              <div class="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
-                Preview plays a short demo call.
               </div>
             </div>
           </div>
@@ -1303,7 +1059,7 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
         c.appendChild(createBtn(i18n.EN.demoBtn, runVoice));
         const note = document.createElement('div');
         note.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2 text-center";
-        note.innerText = "Demo uses your chosen role, template/script, and ElevenLabs voice.";
+        note.innerText = "Demo uses your chosen role, script, and ElevenLabs voice.";
         c.appendChild(note);
 
       } else if (step === 6) {
@@ -1326,7 +1082,6 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
 
       const groups = buildCategorizedIndustryList();
       groups.forEach(g => {
-        // Filter items by search
         const filtered = g.items.filter(name => name.toUpperCase().includes(q));
         if (!filtered.length) return;
 
@@ -1347,7 +1102,6 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
         });
       });
 
-      // If nothing matches, show hint
       if (!c.children.length) {
         const hint = document.createElement('div');
         hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
@@ -1429,7 +1183,6 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
         return;
       }
 
-      // If selected template disappears due to filters, pick first.
       if (!selectedTemplateKey || !filtered.find(x => x.key === selectedTemplateKey)) {
         selectedTemplateKey = filtered[0].key;
         agentScript = applyVars(filtered[0].script);
@@ -1444,20 +1197,13 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
 
       templateSelect.value = selectedTemplateKey;
 
-      // Load script
       const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
       if (!agentScript || agentScript.trim().length < 10) agentScript = applyVars(chosen.script);
       scriptBox.value = agentScript;
     }
 
-    function onTemplateCategoryChange(cat) {
-      templateCategoryFilter = cat;
-      initTemplateDropdown();
-    }
-    function onTemplateSearchChange(q) {
-      templateSearchQuery = q || "";
-      initTemplateDropdown();
-    }
+    function onTemplateCategoryChange(cat) { templateCategoryFilter = cat; initTemplateDropdown(); }
+    function onTemplateSearchChange(q) { templateSearchQuery = q || ""; initTemplateDropdown(); }
 
     function onTemplateChange(key) {
       const filtered = getFilteredTemplates();
@@ -1526,8 +1272,8 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
     async function previewVoice() {
       try {
         const apiKey = await loadVapiKey();
-        const key = industryKeys[currentIndustryIdx];
-        const assistantId = assistants[key] || assistants["Electrical"];
+        const industry = getCurrentIndustryKey();
+        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
 
         if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
           window.vapiSDK.run({
@@ -1593,7 +1339,7 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
               After activation, customer can:
               <ul class="mt-2 list-disc pl-5 text-slate-400">
                 <li>Change role completely</li>
-                <li>Swap template packs</li>
+                <li>Swap template packs (industry-specific when available)</li>
                 <li>Edit script anytime</li>
                 <li>Change voice anytime</li>
                 <li>Routing / forwarding settings</li>
@@ -1674,6 +1420,12 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
       else if (force === false) d.style.display = 'none';
       else d.style.display = (d.style.display === 'flex') ? 'none' : 'flex';
     }
+    function setLang(cc, langCode) {
+      currentLang = langCode;
+      document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
+      document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
+      toggleLangMenu(false);
+    }
     function updateCurrencyUI(m) {
       selectedMarket = m;
       const data = marketCurrency[m];
@@ -1700,9 +1452,9 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
     // ========= VAPI DEMO CALL =========
     async function runVoice() {
       try {
-        const key = industryKeys[currentIndustryIdx];
-        const assistantId = assistants[key] || assistants["Electrical"];
         const apiKey = await loadVapiKey();
+        const industry = getCurrentIndustryKey();
+        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
 
         const businessName = document.getElementById('v3')?.innerText || "YOUR BUSINESS";
         const finalScript = applyVars(agentScript || "");
@@ -1746,13 +1498,16 @@ Collect name, phone, reason, best callback time. Confirm and end.`}
     // ========= INIT =========
     initLangList();
 
-    // set a safe default industry index if missing
-    if (industryKeys.indexOf("Electrical") >= 0) currentIndustryIdx = industryKeys.indexOf("Electrical");
+    // set a safe default industry index
+    const defaultIndustry = "Electrical";
+    currentIndustryIdx = Math.max(0, industryKeys.indexOf(defaultIndustry));
 
-    // initial template
-    refreshTemplatesForCurrentSelection(true);
-    const initTemplates = getTemplatesFor(selectedRole).templates;
-    if (initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
+    // initial template state
+    (function initTemplates() {
+      refreshTemplatesForCurrentSelection(true);
+      const initTemplates = getTemplatesFor(selectedRole).templates;
+      if (initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
+    })();
 
     // Vapi html-script-tag (provides window.vapiSDK.run)
     (function(d, t) {
