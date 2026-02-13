@@ -326,7 +326,6 @@
       </div>
     </div>
 
-    <!-- NEW: Activation Steps Info column -->
     <div class="mt-8 lg:mt-12 grid lg:grid-cols-3 gap-4">
       <div class="card-theme lg:col-span-2 text-left">
         <div class="flex items-center justify-between gap-3 mb-2">
@@ -336,13 +335,13 @@
           </button>
         </div>
         <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
-          Learn exactly what happens at each step. Choose a market, select an industry, connect your business, choose a role + template, pick an ElevenLabs voice, run a demo call, then deploy.
+          Learn exactly what happens at each step. Choose a market, select an industry, connect your business, choose a role + industry templates, pick an ElevenLabs voice, run a demo call, then deploy.
         </div>
         <div class="mt-4 grid sm:grid-cols-2 gap-3">
           <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
-            <div class="mini mb-1 text-orange-500">Templates</div>
+            <div class="mini mb-1 text-orange-500">Industry Packs</div>
             <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
-              Templates guide customers so they feel confident to activate. They can edit before demo, and later inside dashboard.
+              Templates automatically adjust based on your industry and role — start fast, then customize.
             </div>
           </div>
           <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
@@ -378,7 +377,6 @@
     </div>
   </div>
 
-  <!-- MODAL -->
   <div id="setupModal">
     <div id="modalShell" class="modal-shell">
       <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-4">Setup</h2>
@@ -430,12 +428,11 @@
     let currentLang = "EN";
     let selectedMarket = "United States";
 
-    // ROLE + TEMPLATE + SCRIPT STATE
-    let selectedRole = null;
+    let selectedRole = "Receptionist";
     let selectedTemplateKey = null;
-    let agentScript = ""; // editable
+    let agentScript = "";
 
-    // ========= ELEVENLABS VOICE (via Vapi provider "11labs") =========
+    // ========= ELEVENLABS VOICE =========
     const elevenVoices = [
       { id: "sarah",    label: "Sarah (Warm / Natural)" },
       { id: "andrea",   label: "Andrea (Confident)" },
@@ -533,15 +530,21 @@
 
     const industryKeys = ["Accounting","After Hours","Auto Repair","Bakery","Boutique","Car Detailing","Car Rental","Dental","Electrical","Electronics","Flower Shop","Furniture","HVAC","Hair Salon","Handyman","Home Cleaning","Insurance","Jewelry","Landscaping","Legal","Locksmith","Massage","Med Spa","Nail Salon","Pest Control","Plumbing","Real Estate","Restaurant","Roofing","Towing","Urgent Care","Veterinary","Windows"];
 
-    // ========= TEMPLATES =========
-    // Role templates: choose one, then customer edits it.
-    const roleTemplates = {
-      Receptionist: [
-        {
-          key: "rec_basic",
-          title: "Basic Receptionist (Appointments + Info)",
-          script:
-`You are the AI receptionist for {{BUSINESS_NAME}}.
+    // ========= i18n =========
+    const i18n = {
+      EN: { h1:"GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p:"Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start:"Start Activation", now:"Activate Now", beta:"BETA ACCESS", reg:"Regular", live:"Global Live", priceFeats:["Unlimited Calling","Pay Monthly","No Contract"], steps:["01 Market","02 Industry","03 Business","04 Role","05 Demo","06 Deploy"], roles:["Receptionist","Sales Agent","Support Agent"], demoBtn:"START DEMO CALL", deployBtn:"GET MY NUMBER", industries:industryKeys, soon:"Coming Soon", emailPlaceholder:"ENTER EMAIL FOR NOTIFICATION", submit:"JOIN WAITLIST" },
+      ES: { h1:"RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p:"Activación Instantánea de <span class='text-orange-500'>NEGOCIOS</span>. <span class='text-orange-500'>Sin Humanos.</span>", start:"Iniciar", now:"Activar", beta:"ACCESO BETA", reg:"Regular", live:"En Vivo", priceFeats:["Llamadas Ilimitadas","Pago Mensual","Sin Contrato"], steps:["01 Mercado","02 Industria","03 Empresa","04 Rol","05 Demo","06 Desplegar"], roles:["Recepcionista","Agente de Ventas","Soporte"], demoBtn:"INICIAR LLAMADA DEMO", deployBtn:"OBTENER MI NÚMERO", industries:["Contabilidad","Fuera de Horas","Taller Mecánico","Panadería","Boutique","Lavado Autos","Renta Autos","Dental","Electricidad","Electrónica","Florería","Muebles","HVAC","Salón Belleza","Handyman","Limpieza","Seguros","Joyería","Paisajismo","Legal","Cerrajería","Masajes","Med Spa","Uñas","Plagas","Plomería","Inmuebles","Restaurante","Techos","Grúa","Urgencias","Veterinaria","Ventanas"], soon:"Próximamente", emailPlaceholder:"INGRESE CORREO PARA NOTIFICACIÓN", submit:"UNIRSE A LISTA" },
+      FR: { h1:"RÉCEPTIONNISTE IA<br> SANS HUMAINS", p:"Activation <span class='text-orange-500'>PETITE ENTREPRISE</span>. <span class='text-orange-500'>Déploiement mondial.</span>", start:"Démarrer", now:"Activer", beta:"ACCÈS BÉTA", reg:"Régulier", live:"En Direct", priceFeats:["Appels Illimités","Payer Mensuellement","Sans Contrat"], steps:["01 Marché","02 Industrie","03 Entreprise","04 Rôle","05 Démo","06 Déployer"], roles:["Réceptionniste","Agent de Vente","Support"], demoBtn:"LANCER L'APPEL DÉMO", deployBtn:"OBTENIR MON NUMÉRO", industries:["Comptabilité","Après Heures","Garage","Boulangerie","Boutique","Lavage Auto","Location Auto","Dentaire","Électricité","Électronique","Fleuriste","Meubles","HVAC","Salon Coiffure","Bricoleur","Nettoyage","Assurances","Bijouterie","Paysage","Juridique","Serrurier","Massage","Med Spa","Ongles","Nuisibles","Plomberie","Immobilier","Restaurant","Toiture","Remorquage","Urgences","Vétérinaire","Fenêtres"], soon:"Bientôt Disponible", emailPlaceholder:"ENTRER EMAIL POUR NOTIFICATION", submit:"REJOINDRE LA LISTE" }
+    };
+
+    // ========= INDUSTRY TEMPLATE PACKS =========
+    // Structure: packs[Industry][Role] = [{key,title,script}, ...]
+    // Fallback: packs["GLOBAL"] used when industry not found.
+    const industryPacks = {
+      GLOBAL: {
+        Receptionist: [
+          { key:"g_rec_basic", title:"Basic Receptionist (Appointments + Info)", script:
+`You are the AI receptionist for {{BUSINESS_NAME}} in {{MARKET}}.
 Goal: Answer calls, be friendly, collect caller info, and book an appointment or take a message.
 
 Rules:
@@ -550,12 +553,8 @@ Rules:
 - If caller wants appointment: ask for preferred date/time, name, phone, email, and reason.
 - If emergency: advise caller to call local emergency services.
 
-Always end with: “Is there anything else I can help you with today?”`
-        },
-        {
-          key: "rec_afterhours",
-          title: "After-Hours Receptionist (Message Capture)",
-          script:
+Always end with: “Is there anything else I can help you with today?”`},
+          { key:"g_rec_afterhours", title:"After-Hours Receptionist (Message Capture)", script:
 `You are the after-hours AI receptionist for {{BUSINESS_NAME}}.
 Goal: Capture messages and promise a callback.
 
@@ -567,14 +566,10 @@ Collect:
 - Best time to call back
 
 Confirm details back to the caller and say:
-“We’re currently closed. A team member will contact you as soon as possible.”`
-        }
-      ],
-      "Sales Agent": [
-        {
-          key: "sales_leads",
-          title: "Sales Lead Qualifier (Fast)",
-          script:
+“We’re currently closed. A team member will contact you as soon as possible.”`}
+        ],
+        "Sales Agent": [
+          { key:"g_sales_qual", title:"Sales Lead Qualifier (Fast)", script:
 `You are the AI sales agent for {{BUSINESS_NAME}}.
 Goal: Qualify leads quickly and book a sales call.
 
@@ -584,12 +579,8 @@ Ask:
 3) What is the timeline?
 4) Budget range (optional)
 
-If qualified: offer to schedule a call. Collect contact details and confirm next steps.`
-        },
-        {
-          key: "sales_booking",
-          title: "Sales Booking (Schedule + Follow-up)",
-          script:
+If qualified: offer to schedule a call. Collect contact details and confirm next steps.`},
+          { key:"g_sales_booking", title:"Sales Booking (Schedule + Follow-up)", script:
 `You are the AI sales agent for {{BUSINESS_NAME}}.
 Goal: Book appointments and reduce no-shows.
 
@@ -598,14 +589,10 @@ Process:
 - Offer 2–3 time options.
 - Collect name, phone, email.
 - Confirm and summarize appointment details.
-- Remind them they will receive a confirmation message.`
-        }
-      ],
-      "Support Agent": [
-        {
-          key: "support_triage",
-          title: "Support Triage (Issue + Routing)",
-          script:
+- Remind them they will receive a confirmation message.`}
+        ],
+        "Support Agent": [
+          { key:"g_support_triage", title:"Support Triage (Issue + Routing)", script:
 `You are the AI support agent for {{BUSINESS_NAME}}.
 Goal: Identify the issue and route it.
 
@@ -615,17 +602,423 @@ Ask:
 - Any error messages?
 - Best callback number
 
-If urgent: prioritize and mark as urgent. If simple: provide basic steps and offer follow-up.`
-        }
-      ]
+If urgent: prioritize and mark as urgent. If simple: provide basic steps and offer follow-up.`}
+        ]
+      },
+
+      Plumbing: {
+        Receptionist: [
+          { key:"pl_rec_dispatch", title:"Plumbing Dispatcher (Emergency + Scheduling)", script:
+`You are the AI receptionist/dispatcher for {{BUSINESS_NAME}} (Plumbing).
+Goal: Identify emergency vs standard job, collect details, and schedule dispatch.
+
+Ask:
+- What is the issue (leak, clogged drain, water heater, sewer backup)?
+- Is water actively leaking or flooding? (If YES: advise shutoff valve + prioritize urgent dispatch.)
+- Address/location and access notes.
+- Caller name + callback number.
+- Preferred time window.
+
+If emergency: mark URGENT and confirm they should shut off water if safe.
+Close by confirming details and next steps.`},
+          { key:"pl_rec_afterhours", title:"After-Hours Plumbing (Urgent Triage)", script:
+`You are the after-hours AI receptionist for {{BUSINESS_NAME}} (Plumbing).
+Goal: Capture urgent details and promise fast callback.
+
+Ask:
+- Is there active flooding/leak?
+- Can they safely shut off the main water valve?
+- Location/address
+- Name + callback number
+- Short description
+
+If safety risk: advise emergency services.
+Confirm and end.`}
+        ],
+        "Sales Agent": [
+          { key:"pl_sales_estimate", title:"Estimate Builder (Fixture + Remodel)", script:
+`You are the AI sales agent for {{BUSINESS_NAME}} (Plumbing).
+Goal: Qualify estimate requests (water heater, fixtures, remodel).
+
+Ask:
+- What are they installing/repairing?
+- Home type (house/condo) and age (approx).
+- Timing and preferred schedule.
+- Photos available? (Offer to send upload link later.)
+Collect contact details and schedule an estimate call.`}
+        ],
+        "Support Agent": [
+          { key:"pl_support_existing", title:"Existing Customer Support (Job Status + Warranty)", script:
+`You are the AI support agent for {{BUSINESS_NAME}} (Plumbing).
+Goal: Help existing customers with job status, warranty, or follow-up.
+
+Ask:
+- Name and phone
+- Address
+- Job date (approx)
+- What’s the issue now?
+
+If leak or flooding: triage urgent.
+Otherwise: create a service ticket and schedule callback.`}
+        ]
+      },
+
+      Electrical: {
+        Receptionist: [
+          { key:"el_rec_dispatch", title:"Electrical Dispatcher (Safety First)", script:
+`You are the AI receptionist/dispatcher for {{BUSINESS_NAME}} (Electrical).
+Goal: Collect details and prioritize safety.
+
+Ask:
+- Is there sparking, burning smell, or smoke? (If YES: advise turn off breaker if safe + call emergency services if needed.)
+- Issue type (outlet, panel, lights, EV charger).
+- Address/location and access notes.
+- Name + callback number.
+- Preferred time window.
+
+Confirm details and next steps.`}
+        ],
+        "Sales Agent": [
+          { key:"el_sales_projects", title:"Project Sales (Panel, EV Charger, Remodel)", script:
+`You are the AI sales agent for {{BUSINESS_NAME}} (Electrical).
+Goal: Qualify project requests and schedule estimate.
+
+Ask:
+- Project type (panel upgrade, EV charger, lighting, remodel)
+- Property type
+- Timeline
+- Budget range (optional)
+Collect contact info and book an estimate call.`}
+        ],
+        "Support Agent": [
+          { key:"el_support_existing", title:"Existing Customer Support (Troubleshooting)", script:
+`You are the AI support agent for {{BUSINESS_NAME}} (Electrical).
+Goal: Troubleshoot safely and route.
+
+Ask:
+- What’s happening and when started?
+- Any breaker trips?
+- Any burning smell/sparking? (If YES: safety instructions.)
+Collect name, phone, address, and schedule service.`}
+        ]
+      },
+
+      Dental: {
+        Receptionist: [
+          { key:"de_rec_newpatient", title:"Dental Receptionist (New Patient Intake)", script:
+`You are the AI receptionist for {{BUSINESS_NAME}} (Dental).
+Goal: Book appointments and collect intake details.
+
+Ask:
+- New patient or existing?
+- Reason: cleaning, pain, cosmetic, emergency.
+- Preferred day/time.
+Collect:
+- Full name
+- Phone
+- Email
+- Insurance provider (optional)
+
+If severe pain/swelling/bleeding: advise urgent care/ER and escalate.`},
+          { key:"de_rec_emergency", title:"Dental Emergency Triage", script:
+`You are the AI receptionist for {{BUSINESS_NAME}} (Dental).
+Goal: Identify emergency and schedule ASAP.
+
+Ask:
+- Pain level (1–10)
+- Swelling/fever/bleeding?
+- Broken tooth/trauma?
+Collect name + callback and schedule the earliest available slot.
+If life-threatening symptoms: advise emergency services.`}
+        ],
+        "Sales Agent": [
+          { key:"de_sales_cosmetic", title:"Cosmetic Dentistry Sales (Consult Booking)", script:
+`You are the AI sales agent for {{BUSINESS_NAME}} (Dental).
+Goal: Book cosmetic consultations (veneers, whitening, Invisalign).
+
+Ask:
+- Which service they’re interested in
+- Timeline
+- Previous treatments (optional)
+Collect contact info and schedule consultation.`}
+        ],
+        "Support Agent": [
+          { key:"de_support_existing", title:"Existing Patient Support (Reschedule + Billing)", script:
+`You are the AI support agent for {{BUSINESS_NAME}} (Dental).
+Goal: Help with rescheduling, reminders, or billing questions.
+
+Ask:
+- Full name + date of birth (if needed)
+- What do they need (reschedule, payment, records)?
+Confirm next steps and route to staff if necessary.`}
+        ]
+      },
+
+      Legal: {
+        Receptionist: [
+          { key:"le_rec_intake", title:"Legal Intake (Case Type + Conflict Check)", script:
+`You are the AI receptionist for {{BUSINESS_NAME}} (Law Firm).
+Goal: Intake, identify case type, and schedule consultation.
+
+Ask:
+- What type of matter (family, criminal, immigration, business, injury)?
+- Opposing party name (for conflict check).
+- Timeline/urgency.
+Collect:
+- Full name
+- Phone
+- Email
+Offer to schedule a consultation.
+Do NOT give legal advice. Always keep neutral language.`}
+        ],
+        "Sales Agent": [
+          { key:"le_sales_consult", title:"Consultation Booking (Paid/Free Policy)", script:
+`You are the AI intake/sales agent for {{BUSINESS_NAME}} (Law Firm).
+Goal: Book consultation, explain next steps and required documents.
+
+Ask:
+- Matter type and urgency
+- Conflicts: opposing party name
+Collect contact info and schedule.
+Mention they may need to bring documents and ID (no legal advice).`}
+        ],
+        "Support Agent": [
+          { key:"le_support_existing", title:"Existing Client Support (Status + Scheduling)", script:
+`You are the AI support agent for {{BUSINESS_NAME}} (Law Firm).
+Goal: Assist existing clients with scheduling and case status requests.
+
+Ask:
+- Full name
+- Best callback number
+- Matter reference (if known)
+Explain that updates will be provided by the legal team and schedule a callback.`}
+        ]
+      },
+
+      HVAC: {
+        Receptionist: [
+          { key:"hv_rec_service", title:"HVAC Service Booking (No Heat/No AC)", script:
+`You are the AI receptionist for {{BUSINESS_NAME}} (HVAC).
+Goal: Book service calls and triage urgency.
+
+Ask:
+- No heat / no AC / strange noise / thermostat issue?
+- Any smell of gas? (If YES: advise leaving area + call gas company/emergency services.)
+- Address, system type (if known), and access notes.
+Collect name + callback and schedule.`}
+        ],
+        "Sales Agent": [
+          { key:"hv_sales_install", title:"HVAC Install Sales (Replacement/Upgrade)", script:
+`You are the AI sales agent for {{BUSINESS_NAME}} (HVAC).
+Goal: Qualify replacement/upgrade leads and schedule estimate.
+
+Ask:
+- System age (approx)
+- Issues and goals (efficiency, noise)
+- Home size (approx)
+Collect contact info and schedule estimate.`}
+        ],
+        "Support Agent": [
+          { key:"hv_support_existing", title:"HVAC Support (Maintenance + Warranty)", script:
+`You are the AI support agent for {{BUSINESS_NAME}} (HVAC).
+Goal: Help with maintenance scheduling and warranty.
+
+Ask:
+- Name + phone
+- Address
+- Service request
+Schedule maintenance or route urgent no-heat/no-AC calls.`}
+        ]
+      },
+
+      "Auto Repair": {
+        Receptionist: [
+          { key:"au_rec_booking", title:"Auto Shop Receptionist (Diagnostics + Booking)", script:
+`You are the AI receptionist for {{BUSINESS_NAME}} (Auto Repair).
+Goal: Book appointments and collect vehicle details.
+
+Ask:
+- Vehicle year/make/model
+- Issue symptoms + when started
+- Any warning lights?
+Collect name + phone and schedule diagnostic or service appointment.`}
+        ],
+        "Sales Agent": [
+          { key:"au_sales_quote", title:"Service Quote (Basic)", script:
+`You are the AI sales agent for {{BUSINESS_NAME}} (Auto Repair).
+Goal: Provide high-level estimate ranges (no promises) and book appointment.
+
+Ask for vehicle details and symptoms.
+Explain final pricing requires inspection.
+Schedule appointment and collect contact info.`}
+        ],
+        "Support Agent": [
+          { key:"au_support_status", title:"Repair Status + Pickup", script:
+`You are the AI support agent for {{BUSINESS_NAME}} (Auto Repair).
+Goal: Help customers check status and coordinate pickup.
+
+Ask:
+- Name + phone
+- Vehicle make/model
+- Drop-off date
+Offer callback with update and confirm pickup options.`}
+        ]
+      },
+
+      Restaurant: {
+        Receptionist: [
+          { key:"re_rec_reservations", title:"Restaurant Host (Reservations + Hours)", script:
+`You are the AI host for {{BUSINESS_NAME}} (Restaurant).
+Goal: Handle reservations, hours, and basic info.
+
+Ask:
+- Date/time
+- Party size
+- Name + callback
+If fully booked: offer alternate times.
+Provide hours/location and note dietary requests.`}
+        ],
+        "Sales Agent": [
+          { key:"re_sales_events", title:"Events + Catering Lead Intake", script:
+`You are the AI sales agent for {{BUSINESS_NAME}} (Restaurant).
+Goal: Capture catering/event leads and schedule a manager callback.
+
+Ask:
+- Event type
+- Date
+- Guest count
+- Budget range
+Collect name/email/phone and promise callback.`}
+        ],
+        "Support Agent": [
+          { key:"re_support_orders", title:"Order Support (Pickup/Delivery Issues)", script:
+`You are the AI support agent for {{BUSINESS_NAME}} (Restaurant).
+Goal: Help with order issues and route appropriately.
+
+Ask:
+- Order name/number (if any)
+- What went wrong
+- Best callback number
+Apologize and promise staff will follow up.`}
+        ]
+      },
+
+      "Real Estate": {
+        Receptionist: [
+          { key:"rs_rec_leads", title:"Real Estate Receptionist (Buyer/Seller Intake)", script:
+`You are the AI receptionist for {{BUSINESS_NAME}} (Real Estate).
+Goal: Identify buyer vs seller and schedule consultation.
+
+Ask:
+- Are you buying or selling?
+- Preferred location
+- Timeline
+Collect name, phone, email and schedule a call.`}
+        ],
+        "Sales Agent": [
+          { key:"rs_sales_qual", title:"Lead Qualifier (Pre-Approval + Needs)", script:
+`You are the AI sales agent for {{BUSINESS_NAME}} (Real Estate).
+Goal: Qualify leads and book agent call.
+
+Ask:
+- Budget range
+- Pre-approved? (yes/no)
+- Must-haves (beds/baths)
+- Timeline
+Collect contact info and schedule.`}
+        ],
+        "Support Agent": [
+          { key:"rs_support_existing", title:"Existing Client Support (Showings + Updates)", script:
+`You are the AI support agent for {{BUSINESS_NAME}} (Real Estate).
+Goal: Help existing clients with showings, reschedules, and updates.
+
+Ask:
+- Name + phone
+- Address/listing (if applicable)
+Collect request and schedule callback.`}
+        ]
+      },
+
+      "Med Spa": {
+        Receptionist: [
+          { key:"ms_rec_booking", title:"Med Spa Booking (Services + Consult)", script:
+`You are the AI receptionist for {{BUSINESS_NAME}} (Med Spa).
+Goal: Book appointments and recommend consult when needed.
+
+Ask:
+- Which service (Botox, fillers, facial, laser)
+- New or existing client?
+- Preferred date/time
+Collect name, phone, email and schedule. If medical questions: suggest consult.`}
+        ],
+        "Sales Agent": [
+          { key:"ms_sales_packages", title:"Packages + Membership Sales", script:
+`You are the AI sales agent for {{BUSINESS_NAME}} (Med Spa).
+Goal: Explain packages at high level and book consultation.
+
+Ask:
+- Desired outcome
+- Timeline
+Collect contact and schedule consultation.`}
+        ],
+        "Support Agent": [
+          { key:"ms_support_aftercare", title:"Aftercare + Reschedule Support", script:
+`You are the AI support agent for {{BUSINESS_NAME}} (Med Spa).
+Goal: Assist with rescheduling and basic aftercare routing.
+
+Ask:
+- What service they received
+- When was it done
+- Symptoms/concerns
+If serious symptoms: advise urgent care and escalate.`}
+        ]
+      },
+
+      Wellness: {
+        Receptionist: [
+          { key:"we_rec_booking", title:"Wellness Receptionist (Booking + Intake)", script:
+`You are the AI receptionist for {{BUSINESS_NAME}} (Wellness).
+Goal: Book sessions and capture goals.
+
+Ask:
+- Service type (massage, therapy, coaching)
+- New or existing client
+- Preferred date/time
+Collect name, phone, email, and any preferences.`}
+        ],
+        "Sales Agent": [
+          { key:"we_sales_membership", title:"Membership/Package Sales", script:
+`You are the AI sales agent for {{BUSINESS_NAME}} (Wellness).
+Goal: Explain packages and schedule a discovery call.
+
+Ask:
+- What they want to improve
+- Timeline
+Collect contact info and book a call.`}
+        ],
+        "Support Agent": [
+          { key:"we_support_reschedule", title:"Reschedule + FAQ Support", script:
+`You are the AI support agent for {{BUSINESS_NAME}} (Wellness).
+Goal: Help with rescheduling and FAQs.
+
+Ask:
+- Name + phone
+- Appointment date/time (if known)
+Confirm reschedule request and route.`}
+        ]
+      }
     };
 
-    // ========= i18n (kept from your code) =========
-    const i18n = {
-      EN: { h1:"GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p:"Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start:"Start Activation", now:"Activate Now", beta:"BETA ACCESS", reg:"Regular", live:"Global Live", priceFeats:["Unlimited Calling","Pay Monthly","No Contract"], steps:["01 Market","02 Industry","03 Business","04 Role","05 Demo","06 Deploy"], roles:["Receptionist","Sales Agent","Support Agent"], demoBtn:"START DEMO CALL", deployBtn:"GET MY NUMBER", industries:industryKeys, soon:"Coming Soon", emailPlaceholder:"ENTER EMAIL FOR NOTIFICATION", submit:"JOIN WAITLIST" },
-      ES: { h1:"RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p:"Activación Instantánea de <span class='text-orange-500'>NEGOCIOS</span>. <span class='text-orange-500'>Sin Humanos.</span>", start:"Iniciar", now:"Activar", beta:"ACCESO BETA", reg:"Regular", live:"En Vivo", priceFeats:["Llamadas Ilimitadas","Pago Mensual","Sin Contrato"], steps:["01 Mercado","02 Industria","03 Empresa","04 Rol","05 Demo","06 Desplegar"], roles:["Recepcionista","Agente de Ventas","Soporte"], demoBtn:"INICIAR LLAMADA DEMO", deployBtn:"OBTENER MI NÚMERO", industries:["Contabilidad","Fuera de Horas","Taller Mecánico","Panadería","Boutique","Lavado Autos","Renta Autos","Dental","Electricidad","Electrónica","Florería","Muebles","HVAC","Salón Belleza","Handyman","Limpieza","Seguros","Joyería","Paisajismo","Legal","Cerrajería","Masajes","Med Spa","Uñas","Plagas","Plomería","Inmuebles","Restaurante","Techos","Grúa","Urgencias","Veterinaria","Ventanas"], soon:"Próximamente", emailPlaceholder:"INGRESE CORREO PARA NOTIFICACIÓN", submit:"UNIRSE A LISTA" },
-      FR: { h1:"RÉCEPTIONNISTE IA<br> SANS HUMAINS", p:"Activation <span class='text-orange-500'>PETITE ENTREPRISE</span>. <span class='text-orange-500'>Déploiement mondial.</span>", start:"Démarrer", now:"Activer", beta:"ACCÈS BÉTA", reg:"Régulier", live:"En Direct", priceFeats:["Appels Illimités","Payer Mensuellement","Sans Contrat"], steps:["01 Marché","02 Industrie","03 Entreprise","04 Rôle","05 Démo","06 Déployer"], roles:["Réceptionniste","Agent de Vente","Support"], demoBtn:"LANCER L'APPEL DÉMO", deployBtn:"OBTENIR MON NUMÉRO", industries:["Comptabilité","Après Heures","Garage","Boulangerie","Boutique","Lavage Auto","Location Auto","Dentaire","Électricité","Électronique","Fleuriste","Meubles","HVAC","Salon Coiffure","Bricoleur","Nettoyage","Assurances","Bijouterie","Paysage","Juridique","Serrurier","Massage","Med Spa","Ongles","Nuisibles","Plomberie","Immobilier","Restaurant","Toiture","Remorquage","Urgences","Vétérinaire","Fenêtres"], soon:"Bientôt Disponible", emailPlaceholder:"ENTRER EMAIL POUR NOTIFICATION", submit:"REJOINDRE LA LISTE" }
-    };
+    // ========= ACTIVATION INFO =========
+    const activationInfoSlides = [
+      { title: "STEP 1 — MARKET", text: "Choose the country/market. Pricing and deployment routing adjust automatically based on your selection." },
+      { title: "STEP 2 — INDUSTRY", text: "Select your business industry. This automatically loads the best role + industry template packs." },
+      { title: "STEP 3 — BUSINESS", text: "Enter your business name. This is used in your scripts and greeting." },
+      { title: "STEP 4 — ROLE + TEMPLATE + VOICE", text: "Choose the agent role. Pick an industry template and edit it. Choose an ElevenLabs voice and preview it before demo." },
+      { title: "STEP 5 — DEMO", text: "Run a test call. The demo uses your selected role, template/script, and voice." },
+      { title: "STEP 6 — DEPLOY + DASHBOARD", text: "After payment, your agent is deployed. Customer receives a dashboard where they can edit role, script, voice, and settings anytime." }
+    ];
+    let infoIdx = 0;
 
     // ========= LANGUAGE SWITCH =========
     function setLang(cc, langCode) {
@@ -652,17 +1045,6 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
 
       toggleLangMenu(false);
     }
-
-    // ========= ACTIVATION INFO WIZARD =========
-    const activationInfoSlides = [
-      { title: "STEP 1 — MARKET", text: "Choose the country/market. Pricing and deployment routing adjust automatically based on your selection." },
-      { title: "STEP 2 — INDUSTRY", text: "Select your business industry. This helps us choose the best starting assistant behavior." },
-      { title: "STEP 3 — BUSINESS", text: "Enter your business name. This is used in your scripts and greeting." },
-      { title: "STEP 4 — ROLE + TEMPLATE + VOICE", text: "Choose the agent role. Pick a template script and edit it. Choose an ElevenLabs voice and preview it before demo." },
-      { title: "STEP 5 — DEMO", text: "Run a test call. The demo uses your selected role, template/script, and voice." },
-      { title: "STEP 6 — DEPLOY + DASHBOARD", text: "After payment, your agent is deployed. Customer receives a dashboard where they can edit role, script, voice, and settings anytime." }
-    ];
-    let infoIdx = 0;
 
     function openActivationInfo() {
       infoIdx = 0;
@@ -692,13 +1074,31 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
     }
     function infoPrev() { if (infoIdx > 0) { infoIdx--; renderInfoSlide(); } }
     function infoNext() {
-      if (infoIdx < activationInfoSlides.length - 1) {
-        infoIdx++;
-        renderInfoSlide();
-      } else {
-        closeModal();
-        handleStep(1);
+      if (infoIdx < activationInfoSlides.length - 1) { infoIdx++; renderInfoSlide(); }
+      else { closeModal(); handleStep(1); }
+    }
+
+    // ========= TEMPLATE SELECTION HELPERS =========
+    function getCurrentIndustryKey() {
+      // industryKeys[currentIndustryIdx] is always English key.
+      return industryKeys[currentIndustryIdx] || "GLOBAL";
+    }
+
+    function getPackFor(industryKey) {
+      return industryPacks[industryKey] || industryPacks.GLOBAL;
+    }
+
+    function getTemplatesFor(roleName) {
+      const industryKey = getCurrentIndustryKey();
+      const pack = getPackFor(industryKey);
+      const roleList = pack[roleName] || [];
+
+      // fallback to GLOBAL if industry pack doesn't include that role
+      if (!roleList.length) {
+        const globalRoleList = industryPacks.GLOBAL[roleName] || [];
+        return { templates: globalRoleList, packName: "GLOBAL" };
       }
+      return { templates: roleList, packName: industryKey };
     }
 
     // ========= MODAL FLOW =========
@@ -710,7 +1110,6 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
       const shell = document.getElementById('modalShell');
       const lang = i18n[currentLang] || i18n.EN;
 
-      // reset shell sizes
       shell.classList.remove('role-wide', 'info-wide', 'dashboard-wide');
 
       m.style.display = 'flex';
@@ -776,7 +1175,12 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
 
         const industryList = lang.industries || i18n.EN.industries;
         industryList.forEach((name, idx) => {
-          const btn = createBtn(name, () => { currentIndustryIdx = idx; finish(2, name); });
+          const btn = createBtn(name, () => {
+            currentIndustryIdx = idx;
+            finish(2, name);
+            // When industry changes, reset templates for current role to new pack
+            refreshTemplatesForCurrentSelection(true);
+          });
           btn.setAttribute('data-n', name);
           c.appendChild(btn);
         });
@@ -790,26 +1194,27 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
         `;
 
       } else if (step === 4) {
-        // ROLE step: big, includes templates + script editor + voice selector
         shell.classList.add('role-wide');
         tEl.innerText = lang.steps[3];
         c.className = "";
+
+        const currentIndustryKey = getCurrentIndustryKey();
+
         c.innerHTML = `
-          <div class="pill mb-4">CHOOSE ROLE • TEMPLATE • VOICE</div>
+          <div class="pill mb-4">ROLE • INDUSTRY TEMPLATES • VOICE</div>
 
           <div class="grid lg:grid-cols-3 gap-4 text-left">
-            <!-- Role -->
             <div class="card-theme">
               <div class="muted-hint mb-3">Agent Role</div>
               <div id="roleList" class="grid gap-2"></div>
               <div class="mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
+                Current Industry Pack: <span class="text-orange-500">${currentIndustryKey}</span><br>
                 After activation, role can be changed anytime in the dashboard.
               </div>
             </div>
 
-            <!-- Templates + Script -->
             <div class="card-theme">
-              <div class="muted-hint mb-3">Templates</div>
+              <div class="muted-hint mb-3">Industry Templates</div>
               <select id="templateSelect" class="select-theme" onchange="onTemplateChange(this.value)"></select>
               <div class="mt-3 muted-hint">Editable Script</div>
               <textarea id="scriptBox" class="textarea-theme mt-2" oninput="onScriptEdit()"></textarea>
@@ -822,7 +1227,6 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
               </div>
             </div>
 
-            <!-- Voice -->
             <div class="card-theme">
               <div class="muted-hint mb-3">Voice (ElevenLabs)</div>
               <select id="voiceSelect" class="select-theme" onchange="onVoiceChange(this.value)"></select>
@@ -867,7 +1271,6 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
           </div>
         `;
 
-        // roles
         const roleList = document.getElementById('roleList');
         const roles = (lang.roles || i18n.EN.roles);
         roleList.innerHTML = "";
@@ -879,10 +1282,7 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
           roleList.appendChild(b);
         });
 
-        // templates
         initTemplateDropdown();
-
-        // voices
         initVoiceDropdown();
 
       } else if (step === 5) {
@@ -893,7 +1293,7 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
 
         const note = document.createElement('div');
         note.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2 text-center";
-        note.innerText = "Demo uses your chosen role, script template, and ElevenLabs voice.";
+        note.innerText = "Demo uses your chosen role, industry template/script, and ElevenLabs voice.";
         c.appendChild(note);
 
       } else if (step === 6) {
@@ -902,12 +1302,7 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
         c.appendChild(createBtn(lang.deployBtn || i18n.EN.deployBtn, () => {
           confetti();
           finish(6, "READY");
-          // show sample dashboard instantly (demo UX)
-          setTimeout(() => {
-            triggerModal("dashboard");
-          }, 900);
-
-          // stripe checkout (your existing link)
+          setTimeout(() => { triggerModal("dashboard"); }, 900);
           setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1400);
         }));
       }
@@ -916,17 +1311,30 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
     // ========= ROLE / TEMPLATE / SCRIPT =========
     function setRole(roleName) {
       selectedRole = roleName;
-      // if role changes: set a default template + script
-      const templates = roleTemplates[roleName] || [];
-      if (templates.length) {
-        selectedTemplateKey = templates[0].key;
-        agentScript = applyVars(templates[0].script);
-      } else {
-        selectedTemplateKey = null;
-        agentScript = "";
-      }
-      // refresh step 4 UI
+      refreshTemplatesForCurrentSelection(true);
       triggerModal(4);
+    }
+
+    function refreshTemplatesForCurrentSelection(forceResetScript) {
+      const { templates } = getTemplatesFor(selectedRole);
+      if (!templates.length) {
+        selectedTemplateKey = null;
+        if (forceResetScript) agentScript = "";
+        return;
+      }
+
+      // keep if exists
+      if (!selectedTemplateKey || !templates.find(t => t.key === selectedTemplateKey)) {
+        selectedTemplateKey = templates[0].key;
+      }
+
+      if (forceResetScript) {
+        const chosen = templates.find(t => t.key === selectedTemplateKey) || templates[0];
+        agentScript = applyVars(chosen.script);
+      } else {
+        // just re-apply variables (market/business)
+        agentScript = applyVars(agentScript);
+      }
     }
 
     function initTemplateDropdown() {
@@ -935,10 +1343,7 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
 
       templateSelect.innerHTML = "";
 
-      const role = selectedRole || "Receptionist";
-      const templates = roleTemplates[role] || [];
-
-      if (!selectedRole) selectedRole = role;
+      const { templates, packName } = getTemplatesFor(selectedRole);
 
       if (!templates.length) {
         const opt = document.createElement('option');
@@ -952,7 +1357,7 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
       templates.forEach(t => {
         const opt = document.createElement('option');
         opt.value = t.key;
-        opt.textContent = t.title.toUpperCase();
+        opt.textContent = (`${t.title} — ${packName}`).toUpperCase();
         templateSelect.appendChild(opt);
       });
 
@@ -961,16 +1366,17 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
       }
       templateSelect.value = selectedTemplateKey;
 
-      const chosen = templates.find(x => x.key === selectedTemplateKey);
+      const chosen = templates.find(x => x.key === selectedTemplateKey) || templates[0];
       if (!agentScript || agentScript.trim().length < 10) {
         agentScript = applyVars(chosen.script);
+      } else {
+        agentScript = applyVars(agentScript);
       }
       scriptBox.value = agentScript;
     }
 
     function onTemplateChange(key) {
-      const role = selectedRole || "Receptionist";
-      const templates = roleTemplates[role] || [];
+      const { templates } = getTemplatesFor(selectedRole);
       const chosen = templates.find(x => x.key === key);
       if (!chosen) return;
       selectedTemplateKey = key;
@@ -984,30 +1390,18 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
     }
 
     function resetTemplate() {
-      const role = selectedRole || "Receptionist";
-      const templates = roleTemplates[role] || [];
+      const { templates } = getTemplatesFor(selectedRole);
       const chosen = templates.find(x => x.key === selectedTemplateKey) || templates[0];
       if (!chosen) return;
       agentScript = applyVars(chosen.script);
       document.getElementById('scriptBox').value = agentScript;
     }
 
-    function saveScriptOnly() {
-      onScriptEdit();
-      // no server needed; stored in memory for this demo UX
-      closeModal();
-      // keep step 4 not finished unless they confirm
-      triggerModal(4);
-    }
+    function saveScriptOnly() { onScriptEdit(); closeModal(); triggerModal(4); }
 
     function confirmRoleStep() {
-      // ensure role chosen
       if (!selectedRole) selectedRole = "Receptionist";
-      if (!agentScript || agentScript.trim().length < 10) {
-        // ensure there is something
-        const templates = roleTemplates[selectedRole] || [];
-        if (templates[0]) agentScript = applyVars(templates[0].script);
-      }
+      if (!agentScript || agentScript.trim().length < 10) refreshTemplatesForCurrentSelection(true);
       finish(4, selectedRole);
     }
 
@@ -1035,9 +1429,7 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
       const boostSelect = document.getElementById('boostSelect');
       boostSelect.value = String(!!selectedVoiceSettings.useSpeakerBoost);
     }
-
     function onVoiceChange(id) { selectedVoiceId = id; }
-
     function onVoiceTuningChange() {
       const st = document.getElementById('stabilityRange');
       const sim = document.getElementById('simRange');
@@ -1049,7 +1441,6 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
       selectedVoiceSettings.style = Number(style.value);
       selectedVoiceSettings.useSpeakerBoost = (boost.value === "true");
     }
-
     function saveVoiceOnly() { closeModal(); triggerModal(4); }
 
     async function previewVoice() {
@@ -1086,6 +1477,7 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
       const biz = document.getElementById('v3')?.innerText || "—";
       const role = selectedRole || document.getElementById('v4')?.innerText || "—";
       const voice = selectedVoiceId || "—";
+      const pack = getTemplatesFor(selectedRole).packName || "GLOBAL";
 
       c.innerHTML = `
         <div class="pill mb-4">CUSTOMER DASHBOARD (SAMPLE)</div>
@@ -1105,6 +1497,7 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
             <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
               <div><span class="mini">Role:</span> ${role}</div>
               <div class="mt-1"><span class="mini">Voice:</span> ${voice}</div>
+              <div class="mt-1"><span class="mini">Template Pack:</span> ${pack}</div>
               <div class="mt-1"><span class="mini">Template:</span> ${selectedTemplateKey || "custom"}</div>
             </div>
 
@@ -1172,7 +1565,6 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
         b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
       });
     }
-
     function createBtn(txt, fn) {
       const b = document.createElement('button');
       b.className = "modal-btn";
@@ -1180,7 +1572,6 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
       b.onclick = fn;
       return b;
     }
-
     function handleStep(s) { if (s === 1 || completedSteps >= s - 1) triggerModal(s); }
     function finish(s, v) {
       completedSteps = s;
@@ -1189,25 +1580,20 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
       closeModal();
       if (s < 6) document.getElementById(`s${s + 1}`).classList.add('next-focus');
     }
-
     function saveB() {
       const v = document.getElementById('bn').value;
       if (v) {
         finish(3, v);
-        // update script variables if script exists
-        if (agentScript) agentScript = applyVars(agentScript);
+        agentScript = applyVars(agentScript);
       }
     }
-
     function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
-
     function toggleLangMenu(force) {
       const d = document.getElementById('langMenu');
       if (force === true) d.style.display = 'flex';
       else if (force === false) d.style.display = 'none';
       else d.style.display = (d.style.display === 'flex') ? 'none' : 'flex';
     }
-
     function updateCurrencyUI(m) {
       selectedMarket = m;
       const data = marketCurrency[m];
@@ -1215,8 +1601,8 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
       document.getElementById('main-currency').innerText = data.cur;
       document.getElementById('main-price').innerText = data.price;
       document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} ${t.reg || i18n.EN.reg}`;
+      agentScript = applyVars(agentScript);
     }
-
     function initLangList() {
       const list = document.getElementById('langList');
       list.innerHTML = "";
@@ -1227,7 +1613,6 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
         list.appendChild(b);
       });
     }
-
     function updateParallax(e) {
       document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
       document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
@@ -1249,9 +1634,6 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
             assistant: assistantId,
             assistantOverrides: {
               voice: getSelectedVapiVoice(),
-              // Use script to make it feel consistent with selected template
-              // Many Vapi assistants accept "systemPrompt" or "instructions".
-              // If your assistant expects a different field, tell me and I’ll match it.
               systemPrompt: finalScript,
               firstMessage: `Hi! Thank you for calling ${businessName}. How can I help you today?`
             }
@@ -1284,10 +1666,12 @@ If urgent: prioritize and mark as urgent. If simple: provide basic steps and off
 
     // ========= INIT =========
     initLangList();
-    // default role/template/script so Step 4 is ready
-    selectedRole = "Receptionist";
-    selectedTemplateKey = roleTemplates.Receptionist[0].key;
-    agentScript = applyVars(roleTemplates.Receptionist[0].script);
+
+    // initial template: based on current industry + default role
+    refreshTemplatesForCurrentSelection(true);
+    // pick first key for default dropdown usage later
+    const initTemplates = getTemplatesFor(selectedRole).templates;
+    if (initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
 
     // Vapi html-script-tag (provides window.vapiSDK.run)
     (function(d, t) {
