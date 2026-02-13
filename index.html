@@ -42,6 +42,211 @@
         @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
     </style>
 </head>
+    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest"></script>
+
+<body onmousemove="updateParallax(event)">
+    <div class="bg-glow"></div>
+
+    <div class="floating-lang">
+        <button onclick="toggleLangMenu()" class="lang-trigger">
+            <img id="curFlag" src="https://flagcdn.com/us.svg" class="w-4" alt="Flag">
+            <span id="curLangText" class="text-[9px] font-black text-white uppercase">US | EN</span>
+        </button>
+        <div id="langMenu">
+            <input type="text" id="langSearch" class="search-box" placeholder="SEARCH LANGUAGES..." onkeyup="filterList('langList', this.value)">
+            <div class="modal-scroll" id="langList"></div>
+        </div>
+    </div>
+
+    <div class="console-container">
+        <div class="flex justify-between items-center mb-6 lg:mb-12">
+            <div class="flex items-center gap-2">
+                <span class="font-black italic text-base lg:text-xl uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
+                <div class="ml-2 px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase leading-none">BETA</div>
+            </div>
+            <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
+                <div class="dot-blink"></div>
+                <span id="live-label" class="text-[7px] font-black text-orange-500 uppercase tracking-widest text-nowrap">Global Live</span>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-5 gap-6 lg:gap-12 items-center">
+            <div class="lg:col-span-3 text-center lg:text-left">
+                <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title">GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST</h1>
+                <p id="hero-p" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider">Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Worldwide Deployment. No Humans.</span></p>
+                <button onclick="handleStep(1)" id="hero-cta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">Start Activation</button>
+            </div>
+            
+            <div class="lg:col-span-2">
+                <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-6 text-center">
+                    <h3 id="beta-txt" class="text-[10px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]">BETA ACCESS</h3>
+                    <div class="flex flex-col items-center mb-4">
+                        <span id="reg-txt" class="text-slate-600 line-through text-xs font-bold">$399 Regular</span>
+                        <div class="flex items-baseline gap-1">
+                            <span id="main-currency" class="text-4xl lg:text-5xl font-black text-white">$</span>
+                            <span id="main-price" class="text-4xl lg:text-5xl font-black text-white">199</span>
+                            <span class="text-orange-500 font-bold">/mo</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mb-6 text-left max-w-[200px] mx-auto border-y border-white/5 py-4">
+                        <div class="flex items-center gap-2"><svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-black text-white uppercase tracking-tighter feat-txt">Unlimited Calling</span></div>
+                        <div class="flex items-center gap-2"><svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-black text-white uppercase tracking-tighter feat-txt">Pay Monthly</span></div>
+                        <div class="flex items-center gap-2"><svg class="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="text-[10px] font-black text-white uppercase tracking-tighter feat-txt">No Contract</span></div>
+                    </div>
+                    <div id="timer" class="text-xs font-mono text-white/30 mb-4">00:00:00</div>
+                    <button onclick="handleStep(1)" id="side-cta" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic">Activate Now</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10 lg:mt-20">
+            <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
+                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Activation Protocol</span>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+                <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">01 Market</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
+                <div id="s2" class="step-card" onclick="handleStep(2)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">02 Industry</p><p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
+                <div id="s3" class="step-card" onclick="handleStep(3)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">03 Business</p><p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Sync</p></div>
+                <div id="s4" class="step-card" onclick="handleStep(4)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">04 Agent Role</p><p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Choose</p></div>
+                <div id="s5" class="step-card" onclick="handleStep(5)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">05 Demo</p><p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label">Sandbox</p></div>
+                <div id="s6" class="step-card" onclick="handleStep(6)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">06 Deploy</p><p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label">Instant</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="setupModal">
+        <div class="bg-[#0f172a] border border-white/10 p-6 rounded-3xl max-w-sm w-full text-center">
+            <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-6">Setup</h2>
+            <div id="modalSearchContainer"></div>
+            <div id="mContent" class="modal-scroll"></div>
+            <button id="mClose" onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white">Close</button>
+        </div>
+    </div>
+
+    <footer class="mt-auto py-10 w-full text-center border-t border-white/5 bg-black/20">
+        <div class="max-w-xs mx-auto opacity-40 hover:opacity-100 transition-opacity duration-500">
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-[8px] font-black text-white uppercase tracking-widest"><span id="agentCount">14,202</span> ACTIVE AGENTS</span>
+            </div>
+            <div class="flex justify-center gap-6 text-[9px] font-black uppercase tracking-widest text-slate-500 mb-4">
+                <a href="#" class="hover:text-orange-500">Privacy</a>
+                <a href="#" class="hover:text-orange-500">Terms</a>
+                <a href="#" class="hover:text-orange-500">Support</a>
+            </div>
+            <p class="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">
+                &copy; 2026 AI CALL PORT. GLOBAL SMALL BUSINESS PROTOCOL.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        let vapiApiKey = null;
+
+async function loadVapiKey() {
+  if (vapiApiKey) return vapiApiKey;
+
+  const res = await fetch("/api/config");
+  if (!res.ok) throw new Error("Failed to load config");
+  const data = await res.json();
+
+  vapiApiKey = data.vapiPublicKey;
+  return vapiApiKey;
+}
+
+
+        const assistants = { "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a", "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c", "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65", "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f" };
+        let completedSteps = 0, currentIndustryIdx = 8, currentLang = "EN", selectedMarket = "United States";
+
+        const marketCurrency = {
+            "United States": { cur: "$", price: "199", reg: "399", prefix: "+1", active: true },
+            "United Kingdom": { cur: "£", price: "155", reg: "310", prefix: "+44", active: true },
+            "Canada": { cur: "$", price: "275", reg: "550", prefix: "+1", active: true },
+            "Australia": { cur: "$", price: "305", reg: "610", prefix: "+61", active: true },
+            "Germany": { cur: "€", price: "185", reg: "370", prefix: "+49", active: true },
+            "France": { cur: "€", price: "185", reg: "370", prefix: "+33", active: true },
+            "Italy": { cur: "€", price: "185", reg: "370", prefix: "+39", active: true },
+            "Japan": { cur: "¥", price: "30000", reg: "60000", prefix: "+81", active: true },
+            "Brazil": { cur: "R$", price: "990", reg: "1980", prefix: "+55", active: true },
+            "India": { cur: "₹", price: "16500", reg: "33000", prefix: "+91", active: true },
+            "China": { cur: "¥", price: "1450", reg: "2900", prefix: "+86", active: true },
+            "Korea": { cur: "₩", price: "260000", reg: "520000", prefix: "+82", active: true },
+            "Norway": { cur: "kr", price: "2000", reg: "4000", prefix: "+47", active: true },
+            "Sweden": { cur: "kr", price: "2000", reg: "4000", prefix: "+46", active: true },
+            "Denmark": { cur: "kr.", price: "1350", reg: "2700", prefix: "+45", active: true },
+            "Poland": { cur: "zł", price: "800", reg: "1600", prefix: "+48", active: true },
+            "Netherlands": { cur: "€", price: "185", reg: "370", prefix: "+31", active: true },
+            "Portugal": { cur: "€", price: "185", reg: "370", prefix: "+351", active: true },
+            "Israel": { cur: "₪", price: "720", reg: "1440", prefix: "+972", active: true },
+            "Russia": { cur: "₽", price: "18500", reg: "37000", prefix: "+7", active: true },
+            "Turkey": { cur: "₺", price: "6500", reg: "13000", prefix: "+90", active: true },
+            "Thailand": { cur: "฿", price: "6800", reg: "13600", prefix: "+66", active: true },
+            "Mexico": { cur: "$", price: "---", reg: "---", prefix: "+52", active: false },
+            "Spain": { cur: "€", price: "---", reg: "---", prefix: "+34", active: false },
+            "Vietnam": { cur: "₫", price: "---", reg: "---", prefix: "+84", active: false },
+            "Argentina": { cur: "$", price: "---", reg: "---", prefix: "+54", active: false },
+            "Austria": { cur: "€", price: "---", reg: "---", prefix: "+43", active: false },
+            "Belgium": { cur: "€", price: "---", reg: "---", prefix: "+32", active: false },
+            "Chile": { cur: "$", price: "---", reg: "---", prefix: "+56", active: false },
+            "Colombia": { cur: "$", price: "---", reg: "---", prefix: "+57", active: false },
+            "Finland": { cur: "€", price: "---", reg: "---", prefix: "+358", active: false },
+            "Greece": { cur: "€", price: "---", reg: "---", prefix: "+30", active: false },
+            "Hong Kong": { cur: "$", price: "---", reg: "---", prefix: "+852", active: false },
+            "Ireland": { cur: "€", price: "---", reg: "---", prefix: "+353", active: false },
+            "Malaysia": { cur: "RM", price: "---", reg: "---", prefix: "+60", active: false },
+            "New Zealand": { cur: "$", price: "---", reg: "---", prefix: "+64", active: false },
+            "Philippines": { cur: "₱", price: "---", reg: "---", prefix: "+63", active: false },
+            "Singapore": { cur: "$", price: "---", reg: "---", prefix: "+65", active: false },
+            "South Africa": { cur: "R", price: "---", reg: "---", prefix: "+27", active: false },
+            "Switzerland": { cur: "CHF", price: "---", reg: "---", prefix: "+41", active: false },
+            "Taiwan": { cur: "$", price: "---", reg: "---", prefix: "+886", active: false },
+            "United Arab Emirates": { cur: "AED", price: "---", reg: "---", prefix: "+971", active: false }
+        };
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>AI CALL PORT | Global SMALL BUSINESS Activation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; } 
+        html, body { width: 100%; min-height: 100vh; position: relative; background: #06080f; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; overflow-x: hidden; display: flex; flex-direction: column; }
+        body { padding: 12px; }
+        @media (min-width: 1024px) { body { padding: 24px; } }
+        
+        .bg-glow { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%); pointer-events: none; }
+        .console-container { width: 100%; max-width: 1100px; background: rgba(10, 12, 18, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; position: relative; z-index: 10; margin: 0 auto 40px auto; }
+        
+        .hero-title { background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .orange-btn { background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: 0.2s; color: white; }
+        .orange-btn:active { transform: scale(0.98); }
+        
+        .step-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; opacity: 0.3; transition: 0.3s; cursor: pointer; }
+        .step-card.active { border-color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important; opacity: 1 !important; }
+        .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
+        
+        @keyframes border-glow { 0%, 100% { border-color: rgba(249, 115, 22, 0.3); } 50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); } }
+        
+        .floating-lang { position: fixed; top: 15px; right: 15px; z-index: 1000; }
+        .lang-trigger { background: rgba(10, 12, 18, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 12px; border-radius: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; backdrop-filter: blur(5px); }
+        #langMenu { position: absolute; top: 50px; right: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; display: none; flex-direction: column; gap: 8px; width: 220px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        
+        .search-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px; color: white; font-size: 11px; outline: none; width: 100%; margin-bottom: 8px; }
+        .modal-scroll { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        
+        #setupModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; }
+        .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: #f97316; }
+        .modal-btn.disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
+        @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+    </style>
+</head>
 <body onmousemove="updateParallax(event)">
     <div class="bg-glow"></div>
 
@@ -227,14 +432,14 @@
             currentLang = langCode; 
             const t = i18n[currentLang] || i18n.EN;
             const marketData = marketCurrency[selectedMarket] || marketCurrency["United States"];
-            document.getElementById('curFlag').src = https://flagcdn.com/${cc}.svg;
-            document.getElementById('curLangText').innerText = ${cc.toUpperCase()} | ${currentLang};
+            document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
+            document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
             document.getElementById('hero-h1').innerHTML = t.h1 || i18n.EN.h1;
             document.getElementById('hero-p').innerHTML = t.p || i18n.EN.p;
             document.getElementById('hero-cta').innerText = t.start || i18n.EN.start;
             document.getElementById('side-cta').innerText = t.now || i18n.EN.now;
             document.getElementById('beta-txt').innerText = t.beta || i18n.EN.beta;
-            document.getElementById('reg-txt').innerText = ${marketData.cur}${marketData.reg} ${t.reg || i18n.EN.reg};
+            document.getElementById('reg-txt').innerText = `${marketData.cur}${marketData.reg} ${t.reg || i18n.EN.reg}`;
             const feats = t.priceFeats || i18n.EN.priceFeats;
             document.querySelectorAll('.feat-txt').forEach((el, i) => { if (feats[i]) el.innerText = feats[i]; });
             document.getElementById('live-label').innerText = t.live || i18n.EN.live;
@@ -249,24 +454,24 @@
             
             if (step === 'waitlist') {
                 t.innerText = countryName.toUpperCase();
-                c.innerHTML = 
+                c.innerHTML = `
                     <p class="text-[10px] text-slate-400 mb-4 uppercase font-bold">${lang.soon}</p>
                     <input id="waitEmail" type="email" placeholder="${lang.emailPlaceholder}" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs font-black outline-none">
                     <button onclick="submitLead('${countryName}')" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">${lang.submit}</button>
-                ;
+                `;
                 return;
             }
 
             if(step === 1) { 
                 t.innerText = lang.steps[0];
-                s.innerHTML = <input type="text" class="search-box" placeholder="SEARCH COUNTRIES..." onkeyup="filterList('mContent', this.value)">;
+                s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH COUNTRIES..." onkeyup="filterList('mContent', this.value)">`;
                 const countries = Object.keys(marketCurrency);
                 const activeOnes = countries.filter(k => marketCurrency[k].active).sort();
                 const soonOnes = countries.filter(k => !marketCurrency[k].active).sort();
 
                 activeOnes.forEach(name => {
                     const btn = createBtn(name, () => { updateCurrencyUI(name); finish(1, name); });
-                    btn.innerHTML = <div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${name};
+                    btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${name}`;
                     btn.setAttribute('data-n', name);
                     c.appendChild(btn);
                 });
@@ -278,13 +483,13 @@
 
                 soonOnes.forEach(name => {
                     const btn = createBtn(name, () => triggerModal('waitlist', name));
-                    btn.innerHTML = <div class="w-1.5 h-1.5 rounded-full bg-slate-700"></div> ${name};
+                    btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-slate-700"></div> ${name}`;
                     btn.setAttribute('data-n', name);
                     c.appendChild(btn);
                 });
             } else if (step === 2) {
                 t.innerText = lang.steps[1];
-                s.innerHTML = <input type="text" class="search-box" placeholder="SEARCH INDUSTRIES..." onkeyup="filterList('mContent', this.value)">;
+                s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH INDUSTRIES..." onkeyup="filterList('mContent', this.value)">`;
                 const industryList = lang.industries || i18n.EN.industries;
                 industryList.forEach((name, idx) => {
                     const btn = createBtn(name, () => { currentIndustryIdx = idx; finish(2, name); });
@@ -293,7 +498,7 @@
                 });
             } else if (step === 3) {
                 t.innerText = lang.steps[2];
-                c.innerHTML = <input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>;
+                c.innerHTML = `<input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none"><button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>`;
             } else if (step === 4) {
                 t.innerText = lang.steps[3];
                 const roles = lang.roles || i18n.EN.roles;
@@ -310,9 +515,9 @@
         function submitLead(country) {
             const email = document.getElementById('waitEmail').value;
             if(email && email.includes('@')) {
-                console.log(Lead Captured: ${email} for ${country});
+                console.log(`Lead Captured: ${email} for ${country}`);
                 const c = document.getElementById('mContent');
-                c.innerHTML = <div class="py-10"><p class="text-orange-500 font-black italic text-xs uppercase">PROTOCOL INITIATED</p><p class="text-[9px] text-slate-400 mt-2">WE WILL NOTIFY YOU VIA ${email}</p></div>;
+                c.innerHTML = `<div class="py-10"><p class="text-orange-500 font-black italic text-xs uppercase">PROTOCOL INITIATED</p><p class="text-[9px] text-slate-400 mt-2">WE WILL NOTIFY YOU VIA ${email}</p></div>`;
                 setTimeout(closeModal, 2000);
             } else {
                 document.getElementById('waitEmail').style.borderColor = 'red';
@@ -321,7 +526,7 @@
 
         function filterList(containerId, query) {
             const q = query.toUpperCase();
-            document.querySelectorAll(#${containerId} .modal-btn).forEach(b => {
+            document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
                 const name = b.getAttribute('data-n') || b.innerText;
                 b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
             });
@@ -329,7 +534,7 @@
 
         function createBtn(txt, fn) { const b = document.createElement('button'); b.className = "modal-btn"; b.innerText = txt; b.onclick = fn; return b; }
         function handleStep(s) { if(s === 1 || completedSteps >= s-1) triggerModal(s); }
-        function finish(s, v) { completedSteps = s; document.getElementById(v${s}).innerText = v; document.getElementById(s${s}).classList.add('active'); closeModal(); if(s<6) document.getElementById(s${s+1}).classList.add('next-focus'); }
+        function finish(s, v) { completedSteps = s; document.getElementById(`v${s}`).innerText = v; document.getElementById(`s${s}`).classList.add('active'); closeModal(); if(s<6) document.getElementById(`s${s+1}`).classList.add('next-focus'); }
         function saveB() { const v = document.getElementById('bn').value; if(v) finish(3, v); }
         function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
         function toggleLangMenu(force) { const d = document.getElementById('langMenu'); d.style.display = (force !== undefined ? force : d.style.display !== 'flex') ? 'flex' : 'none'; }
@@ -338,7 +543,7 @@
             selectedMarket = m; const data = marketCurrency[m]; const t = i18n[currentLang] || i18n.EN;
             document.getElementById('main-currency').innerText = data.cur; 
             document.getElementById('main-price').innerText = data.price;
-            document.getElementById('reg-txt').innerText = ${data.cur}${data.reg} ${t.reg || i18n.EN.reg};
+            document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} ${t.reg || i18n.EN.reg}`;
         }
 
         function initLangList() {
@@ -346,7 +551,7 @@
             languages.forEach(l => {
                 const b = createBtn(l.n, () => setLang(l.f, l.id));
                 b.setAttribute('data-n', l.n);
-                b.innerHTML = <img src="https://flagcdn.com/${l.f}.svg" class="w-3"> ${l.n};
+                b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3"> ${l.n}`;
                 list.appendChild(b);
             });
         }
@@ -367,7 +572,7 @@
         
         setInterval(() => { 
             const now = new Date(), h = 23-now.getHours(), m = 59-now.getMinutes(), s = 59-now.getSeconds(); 
-            document.getElementById('timer').textContent = ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}; 
+            document.getElementById('timer').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; 
             if(Math.random() > 0.8) {
                 const el = document.getElementById('agentCount');
                 let count = parseInt(el.innerText.replace(',',''));
