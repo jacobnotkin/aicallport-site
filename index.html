@@ -5,9 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   <title>AI CALL PORT | Global SMALL BUSINESS Activation</title>
 
+  <!-- Tailwind (CDN OK for prototype) -->
+  <script>
+    // Optional: small tailwind config (keeps it predictable)
+    window.tailwind = window.tailwind || {};
+    tailwind.config = {
+      theme: { extend: {} },
+      corePlugins: { preflight: true }
+    };
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
+
+  <!-- Vapi Web SDK (preferred). If it doesn't expose window.Vapi, we fallback to script-tag SDK dynamically. -->
   <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest"></script>
 
   <style>
@@ -81,6 +93,10 @@
       opacity: 1 !important;
     }
     .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
+
+    /* ✅ NEW: locked state */
+    .step-card.locked { opacity: 0.22; cursor: not-allowed; }
+    .step-card.locked:hover { border-color: rgba(255, 255, 255, 0.1); }
 
     @keyframes border-glow {
       0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
@@ -301,7 +317,7 @@
     }
   </style>
 
-  <!-- ✅ FIXED + EXPANDED LANGUAGE ENGINE -->
+  <!-- ✅ Language Engine -->
   <script>
     const LANG_STORAGE_KEY = "aicallport_lang";
     const I18N_CACHE_KEY = "aicallport_i18n_cache_v1";
@@ -341,10 +357,8 @@
 
     window.APP_I18N = { current: "EN" };
 
-    // ✅ Base dictionaries (you can expand anytime; all missing keys fallback to EN)
     const translations = {
       EN: {
-        // Global UI
         community: "Community",
         newsletter_no_deploy: "Join Newsletter (No Deploy)",
         activation_steps_info: "Activation Steps Info",
@@ -361,7 +375,6 @@
         search_templates: "SEARCH TEMPLATES...",
         no_matching: "NO MATCHING RESULTS",
 
-        // Common labels (previously hardcoded)
         setup: "Setup",
         dashboard: "Dashboard",
         post: "Post",
@@ -376,7 +389,6 @@
         thinking: "Thinking...",
         needs_backend: "This feature needs a backend endpoint.",
 
-        // Hero / pricing
         hero_h1: "GLOBAL ZERO-HUMAN<br>AI RECEPTIONIST",
         hero_p:
           "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. " +
@@ -386,12 +398,10 @@
         global_live: "Global Live",
         per_month: "/mo",
 
-        // Features
         feat_1: "Unlimited Inbound Calling",
         feat_2: "Pay Monthly",
         feat_3: "No Contract",
 
-        // Steps
         step_01: "01 Market",
         step_02: "02 Industry",
         step_03: "03 Business",
@@ -399,14 +409,12 @@
         step_05: "05 Demo",
         step_06: "06 Deploy",
 
-        // Step values placeholders
         select: "Select",
         sync: "Sync",
         choose: "Choose",
         sandbox: "Sandbox",
         instant: "Instant",
 
-        // Role / templates / voice
         role_templates_voice: "ROLE • TEMPLATES • VOICE",
         agent_role: "Agent Role",
         templates: "Templates",
@@ -430,7 +438,6 @@
         demo_call: "START DEMO CALL",
         deploy_get_number: "GET MY NUMBER",
 
-        // Dashboard
         dashboard_sample: "CUSTOMER DASHBOARD (SAMPLE)",
         account: "Account",
         agent: "Agent",
@@ -440,7 +447,6 @@
         edit_script: "Edit Script",
         edit_voice: "Edit Voice",
 
-        // Community
         community_portal: "Community Portal",
         newsletter: "Newsletter",
         forum: "Forum",
@@ -448,13 +454,11 @@
         join_list: "Join List",
         ask_ai: "Ask AI",
 
-        // Footer
         privacy: "Privacy",
         terms: "Terms",
         support: "Support",
         active_agents: "ACTIVE AGENTS",
 
-        // Business step
         business_name: "Business Name"
       },
 
@@ -721,7 +725,12 @@
         support: "الدعم",
         active_agents: "وكلاء نشطون",
 
-        business_name: "اسم النشاط"
+        business_name: "اسم النشاط",
+
+        /* ✅ FIX: role labels */
+        receptionist: "موظف استقبال",
+        sales_agent: "مندوب مبيعات",
+        support_agent: "دعم"
       },
 
       HE: {
@@ -781,16 +790,17 @@
         support: "תמיכה",
         active_agents: "סוכנים פעילים",
 
-        business_name: "שם העסק"
+        business_name: "שם העסק",
+
+        /* ✅ FIX: role labels */
+        receptionist: "פקיד קבלה",
+        sales_agent: "איש מכירות",
+        support_agent: "תמיכה"
       }
     };
 
-    // Ensure every supported language exists as object (fallback will still show EN)
     SUPPORTED_LANGS.forEach(code => { if (!translations[code]) translations[code] = {}; });
 
-    // ---- Optional dynamic translation via backend ----
-    // If you create: POST /api/i18n-batch { lang:"ES", items:["Plumbing","Electrical",...], namespace:"industries" }
-    // Return: { map: { "Plumbing":"Fontanería", ... } }
     function loadI18nCache(){
       try { return JSON.parse(localStorage.getItem(I18N_CACHE_KEY) || "{}"); }
       catch { return {}; }
@@ -814,12 +824,11 @@
 
     async function ensureDynamicTranslations(lang, namespace, items){
       const code = (lang || "EN").toUpperCase();
-      if (code === "EN") return; // no need
+      if (code === "EN") return;
 
       const missing = (items || []).filter(x => !dynGet(code, namespace, x));
       if (!missing.length) return;
 
-      // Try backend translation (optional)
       try{
         const res = await fetch("/api/i18n-batch", {
           method: "POST",
@@ -830,7 +839,7 @@
         const data = await res.json();
         if (data && data.map) dynSet(code, namespace, data.map);
       } catch(e){
-        // No backend available: silently keep EN fallback (still "works")
+        // no backend: keep EN fallback
       }
     }
 
@@ -988,23 +997,23 @@
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_01">01 Market</p>
           <p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
         </div>
-        <div id="s2" class="step-card">
+        <div id="s2" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_02">02 Industry</p>
           <p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
         </div>
-        <div id="s3" class="step-card">
+        <div id="s3" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_03">03 Business</p>
           <p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="sync">Sync</p>
         </div>
-        <div id="s4" class="step-card">
+        <div id="s4" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_04">04 Agent Role</p>
           <p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="choose">Choose</p>
         </div>
-        <div id="s5" class="step-card">
+        <div id="s5" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_05">05 Demo</p>
           <p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="sandbox">Sandbox</p>
         </div>
-        <div id="s6" class="step-card">
+        <div id="s6" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_06">06 Deploy</p>
           <p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="instant">Instant</p>
         </div>
@@ -1052,6 +1061,67 @@
     }
 
     // ============================
+    // ✅ VAPI LOADER (ROBUST)
+    // Prefer window.Vapi (web SDK). If missing, fallback to html-script-tag SDK and window.vapiSDK.run.
+    // - Web SDK usage: new Vapi('publicKey'); vapi.start('assistantId', overrides) :contentReference[oaicite:2]{index=2}
+    // - Script-tag usage: window.vapiSDK.run({ apiKey, assistant, assistantOverrides }) :contentReference[oaicite:3]{index=3}
+    // ============================
+    let vapiClient = null;
+    let vapiFallbackInstance = null;
+
+    function loadScriptOnce(src) {
+      return new Promise((resolve, reject) => {
+        const existing = [...document.scripts].find(s => s.src === src);
+        if (existing) return resolve();
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.defer = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("Failed to load: " + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    async function getVapiClientOrFallback() {
+      const apiKey = await loadVapiKey();
+
+      // Preferred: window.Vapi class
+      if (window.Vapi) {
+        if (!vapiClient) vapiClient = new window.Vapi(apiKey);
+        return { mode: "class", apiKey, client: vapiClient };
+      }
+
+      // Fallback: load html-script-tag SDK
+      await loadScriptOnce("https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js");
+      if (!window.vapiSDK || typeof window.vapiSDK.run !== "function") {
+        throw new Error("Vapi fallback SDK did not initialize");
+      }
+      return { mode: "script", apiKey, client: null };
+    }
+
+    async function vapiStartCall(assistantId, assistantOverrides) {
+      const { mode, apiKey, client } = await getVapiClientOrFallback();
+
+      if (mode === "class") {
+        // According to the SDK docs/repo: start('assistantId', assistantOverrides) :contentReference[oaicite:4]{index=4}
+        return client.start(assistantId, assistantOverrides || {});
+      }
+
+      // script-tag instance: run() creates/controls a widget/call session
+      // Keep a single instance to avoid multiple overlays
+      if (vapiFallbackInstance && vapiFallbackInstance.stop) {
+        try { vapiFallbackInstance.stop(); } catch {}
+      }
+      vapiFallbackInstance = window.vapiSDK.run({
+        apiKey,
+        assistant: assistantId,
+        assistantOverrides: assistantOverrides || {}
+      });
+      return vapiFallbackInstance;
+    }
+
+    // ============================
     // ASSISTANTS (fallback mapping)
     // ============================
     const assistants = {
@@ -1066,6 +1136,10 @@
     // ============================
     let completedSteps = 0;
     let currentIndustryIdx = 0;
+
+    // ✅ Canonical industry key (not translated UI label)
+    let selectedIndustryKey = "Electrical";
+
     let selectedMarket = "United States";
 
     let selectedRole = "Receptionist";
@@ -1163,10 +1237,6 @@
       "Paraguay":"₲","Peru":"S/","Suriname":"$","Uruguay":"$","Venezuela":"Bs"
     };
 
-    const phonePrefix = {
-      "United States":"+1","Canada":"+1","Mexico":"+52","United Kingdom":"+44","Ireland":"+353","France":"+33","Germany":"+49","Spain":"+34","Portugal":"+351","Italy":"+39"
-    };
-
     const marketCurrency = {};
     Object.entries(marketsByContinent).forEach(([continent, list]) => {
       list.forEach(country => {
@@ -1175,7 +1245,7 @@
           cur: currencySymbol[country] || "$",
           price: DEFAULT_PRICE,
           reg: DEFAULT_REG,
-          prefix: phonePrefix[country] || "",
+          prefix: "",
           active: true
         };
       });
@@ -1191,7 +1261,7 @@
     }
 
     // ============================
-    // LANG MENU (30+HE) — always “works”
+    // LANG MENU
     // ============================
     const languageList = [
       { id:"EN", n:"English", f:"us" },
@@ -1227,7 +1297,6 @@
       { id:"HE", n:"Hebrew", f:"il" }
     ];
 
-    // When language changes: re-render open modals + refresh currency text
     window.onLanguageChanged = async () => {
       const curModalOpen = document.getElementById("setupModal").style.display === "flex";
       if (curModalOpen && lastModalStep != null) {
@@ -1250,6 +1319,13 @@
     ];
     let infoIdx = 0;
     function openActivationInfo(){ infoIdx = 0; triggerModal("info"); }
+
+    function escapeHtml(str){
+      return String(str || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+    }
 
     function renderInfoSlide(){
       const slide = activationInfoSlides[infoIdx];
@@ -1275,7 +1351,7 @@
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
     // ============================
-    // INDUSTRIES (SMB list)
+    // INDUSTRIES
     // ============================
     const industryKeys = [
       "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door Repair","Locksmith","Handyman","Appliance Repair",
@@ -1335,8 +1411,14 @@
       return out;
     }
 
+    function dt(namespace, key, fallback){
+      const lang = (window.APP_I18N.current || "EN").toUpperCase();
+      const v = i18n.dynGet(lang, namespace, key);
+      return v != null ? v : (fallback != null ? fallback : key);
+    }
+
     // ============================
-    // TEMPLATES (Popular/Recommended)
+    // TEMPLATES
     // ============================
     const templateCategories = ["ALL","Popular","Recommended","Appointments","Emergency","After Hours","Sales","Support","Intake","Info"];
 
@@ -1408,7 +1490,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       }
     };
 
-    function getCurrentIndustryKey(){ return industryKeys[currentIndustryIdx] || "GLOBAL"; }
+    function getCurrentIndustryKey(){ return selectedIndustryKey || "GLOBAL"; }
     function getPackFor(industryKey){ return industryPacks[industryKey] || industryPacks.GLOBAL; }
 
     function getTemplatesFor(roleName){
@@ -1422,8 +1504,158 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       return { templates: roleList, packName: industryKey };
     }
 
+    function applyVars(text){
+      const businessName = (document.getElementById('v3')?.innerText && document.getElementById('v3').innerText !== i18n.t("sync"))
+        ? document.getElementById('v3').innerText
+        : "YOUR BUSINESS";
+      return (text || "")
+        .replaceAll("{{BUSINESS_NAME}}", businessName)
+        .replaceAll("{{MARKET}}", selectedMarket || "YOUR MARKET");
+    }
+
+    function refreshTemplatesForCurrentSelection(forceResetScript){
+      const { templates } = getTemplatesFor(selectedRole);
+      if(!templates.length){
+        selectedTemplateKey = null;
+        if(forceResetScript) agentScript = "";
+        return;
+      }
+      if(!selectedTemplateKey || !templates.find(t => t.key === selectedTemplateKey)){
+        selectedTemplateKey = templates[0].key;
+      }
+      if(forceResetScript){
+        const chosen = templates.find(t => t.key === selectedTemplateKey) || templates[0];
+        agentScript = applyVars(chosen.script);
+      } else {
+        agentScript = applyVars(agentScript);
+      }
+    }
+
+    function initTemplateCategoryDropdown(){
+      const dd = document.getElementById('templateCategory');
+      dd.innerHTML = "";
+      templateCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat.toUpperCase();
+        dd.appendChild(opt);
+      });
+      dd.value = templateCategoryFilter || "ALL";
+      const search = document.getElementById('templateSearch');
+      search.value = templateSearchQuery || "";
+    }
+
+    function getFilteredTemplates(){
+      const { templates } = getTemplatesFor(selectedRole);
+      const cat = templateCategoryFilter || "ALL";
+      const q = (templateSearchQuery || "").trim().toUpperCase();
+      return templates.filter(tpl => {
+        const catOk = (cat === "ALL") ? true : (String(tpl.category || "").toUpperCase() === cat);
+        const text = `${tpl.title} ${tpl.category}`.toUpperCase();
+        const qOk = q ? text.includes(q) : true;
+        return catOk && qOk;
+      });
+    }
+
+    async function initTemplateDropdown(){
+      const templateSelect = document.getElementById('templateSelect');
+      const scriptBox = document.getElementById('scriptBox');
+      templateSelect.innerHTML = "";
+
+      const { packName } = getTemplatesFor(selectedRole);
+      const filtered = getFilteredTemplates();
+
+      const tplTitles = filtered.map(x => x.title);
+      const tplScripts = filtered.map(x => x.script);
+      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "template_titles", tplTitles);
+      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "template_scripts", tplScripts);
+
+      if(!filtered.length){
+        const opt = document.createElement('option');
+        opt.value = "";
+        opt.textContent = i18n.t("no_matching");
+        templateSelect.appendChild(opt);
+        scriptBox.value = agentScript || "";
+        return;
+      }
+
+      if(!selectedTemplateKey || !filtered.find(x => x.key === selectedTemplateKey)){
+        selectedTemplateKey = filtered[0].key;
+        agentScript = applyVars(filtered[0].script);
+      }
+
+      filtered.forEach(tpl => {
+        const opt = document.createElement('option');
+        opt.value = tpl.key;
+        const shownTitle = dt("template_titles", tpl.title, tpl.title);
+        opt.textContent = `${shownTitle} — ${tpl.category} — ${packName}`.toUpperCase();
+        templateSelect.appendChild(opt);
+      });
+
+      templateSelect.value = selectedTemplateKey;
+
+      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      if(!agentScript || agentScript.trim().length < 10) agentScript = applyVars(shownScript);
+      scriptBox.value = agentScript;
+    }
+
+    function onTemplateCategoryChange(cat){ templateCategoryFilter = cat; initTemplateDropdown(); }
+    function onTemplateSearchChange(q){ templateSearchQuery = q || ""; initTemplateDropdown(); }
+    function onTemplateChange(key){
+      const filtered = getFilteredTemplates();
+      const chosen = filtered.find(x => x.key === key);
+      if(!chosen) return;
+      selectedTemplateKey = key;
+
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      agentScript = applyVars(shownScript);
+
+      document.getElementById('scriptBox').value = agentScript;
+    }
+    function onScriptEdit(){ agentScript = document.getElementById('scriptBox').value; }
+    function resetTemplate(){
+      const filtered = getFilteredTemplates();
+      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
+      if(!chosen) return;
+
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      agentScript = applyVars(shownScript);
+      document.getElementById('scriptBox').value = agentScript;
+    }
+
     // ============================
-    // COMMUNITY (Newsletter + Forum + AI Q&A)
+    // VOICE UI
+    // ============================
+    function initVoiceDropdown(){
+      const voiceSelect = document.getElementById('voiceSelect');
+      voiceSelect.innerHTML = "";
+      elevenVoices.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.id;
+        opt.textContent = v.label.toUpperCase();
+        voiceSelect.appendChild(opt);
+      });
+      voiceSelect.value = selectedVoiceId;
+
+      const boostSelect = document.getElementById('boostSelect');
+      if(boostSelect) boostSelect.value = String(!!selectedVoiceSettings.useSpeakerBoost);
+    }
+    function onVoiceChange(id){ selectedVoiceId = id; }
+    function onVoiceTuningChange(){
+      const st = document.getElementById('stabilityRange');
+      const sim = document.getElementById('simRange');
+      const style = document.getElementById('styleRange');
+      const boost = document.getElementById('boostSelect');
+      if(!st || !sim || !style || !boost) return;
+      selectedVoiceSettings.stability = Number(st.value);
+      selectedVoiceSettings.similarityBoost = Number(sim.value);
+      selectedVoiceSettings.style = Number(style.value);
+      selectedVoiceSettings.useSpeakerBoost = (boost.value === "true");
+    }
+
+    // ============================
+    // COMMUNITY
     // ============================
     let communityTab = "NEWSLETTER";
     function openCommunity(){ communityTab = "NEWSLETTER"; triggerModal("community"); }
@@ -1438,6 +1670,10 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
     function loadNewsletter(){ try { return JSON.parse(localStorage.getItem(LS_NEWSLETTER) || "[]"); } catch { return []; } }
     function saveNewsletter(list){ localStorage.setItem(LS_NEWSLETTER, JSON.stringify(list || [])); }
 
+    function maskEmail(email){
+      return String(email || "").replace(/^(.)(.*)(@.*)$/, (_, a, b, c) => a + "*".repeat(Math.min(8, b.length)) + c);
+    }
+
     async function submitNewsletter(){
       const email = document.getElementById("nlEmail")?.value || "";
       const name = document.getElementById("nlName")?.value || "";
@@ -1450,14 +1686,17 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       const payload = {
         email, name, note,
         market: selectedMarket,
-        industry: document.getElementById("v2")?.innerText || "",
+        industryKey: selectedIndustryKey,
+        industryLabel: document.getElementById("v2")?.innerText || "",
         deployed: isDeployed()
       };
 
+      // ✅ Store only masked email locally
       const list = loadNewsletter();
-      list.unshift({ ...payload, ts: Date.now() });
+      list.unshift({ ...payload, email: maskEmail(email), ts: Date.now() });
       saveNewsletter(list);
 
+      // Send real email only to backend
       try {
         await fetch("/api/newsletter", {
           method: "POST",
@@ -1470,6 +1709,15 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       if(msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">Subscribed</div>
         <div class="text-slate-400 font-bold text-[10px] uppercase tracking-wider mt-1">You are on the list.</div>`;
       setTimeout(() => { renderCommunity(); }, 900);
+    }
+
+    function cryptoRandomId(){
+      try {
+        const a = crypto.getRandomValues(new Uint8Array(10));
+        return Array.from(a).map(x => x.toString(16).padStart(2,"0")).join("");
+      } catch {
+        return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
+      }
     }
 
     function addForumPost(){
@@ -1513,7 +1761,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
             question: q,
             context: {
               market: selectedMarket,
-              industry: document.getElementById("v2")?.innerText || "",
+              industryKey: selectedIndustryKey,
               role: selectedRole,
               deployed: isDeployed()
             }
@@ -1534,6 +1782,43 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
             </div>
           </div>`;
       }
+    }
+
+    function renderNewsletterListHtml(){
+      const list = loadNewsletter().slice(0, 8);
+      if(!list.length) return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-6">No signups yet</div>`;
+      return list.map(x => `
+        <div class="flex items-start justify-between gap-3 py-2 border-b border-white/5">
+          <div>
+            <div class="text-[10px] font-black uppercase tracking-wider text-white">${escapeHtml(x.email)}</div>
+            <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">${escapeHtml(x.name || "—")} • ${escapeHtml(x.market || "—")} • ${escapeHtml(x.industryLabel || x.industryKey || "—")}</div>
+          </div>
+          <div class="text-[9px] font-black uppercase tracking-widest ${x.deployed ? "text-green-400" : "text-slate-400"}">
+            ${x.deployed ? "DEPLOYED" : "NO DEPLOY"}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderForumHtml(){
+      const posts = loadForumPosts().slice(0, 20);
+      if(!posts.length) return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10">No posts yet</div>`;
+      return posts.map(p => `
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mb-3">
+          <div class="text-[10px] font-black uppercase tracking-wider text-orange-500">${escapeHtml(p.title)}</div>
+          <div class="text-[11px] text-slate-300 font-semibold leading-relaxed mt-1 whitespace-pre-wrap">${escapeHtml(p.body)}</div>
+          <div class="divider mt-3">Replies</div>
+          <div class="space-y-2">
+            ${(p.replies||[]).slice(-3).map(r => `
+              <div class="text-[11px] text-slate-300 font-semibold leading-relaxed bg-black/20 border border-white/5 rounded-xl p-2 whitespace-pre-wrap">${escapeHtml(r.text)}</div>
+            `).join("") || `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-2">No replies yet</div>`}
+          </div>
+          <div class="grid grid-cols-4 gap-2 mt-3">
+            <input id="reply_${p.id}" class="select-theme col-span-3" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="write_reply" placeholder="${escapeHtml(i18n.t("write_reply"))}" />
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="addForumReply('${p.id}')">${escapeHtml(i18n.t("reply"))}</button>
+          </div>
+        </div>
+      `).join("");
     }
 
     function renderCommunity(){
@@ -1625,327 +1910,23 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       i18n.applyTranslations(document.getElementById("setupModal"));
     }
 
-    function renderNewsletterListHtml(){
-      const list = loadNewsletter().slice(0, 8);
-      if(!list.length) return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-6">No signups yet</div>`;
-      return list.map(x => `
-        <div class="flex items-start justify-between gap-3 py-2 border-b border-white/5">
-          <div>
-            <div class="text-[10px] font-black uppercase tracking-wider text-white">${escapeHtml(x.email)}</div>
-            <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">${escapeHtml(x.name || "—")} • ${escapeHtml(x.market || "—")} • ${escapeHtml(x.industry || "—")}</div>
-          </div>
-          <div class="text-[9px] font-black uppercase tracking-widest ${x.deployed ? "text-green-400" : "text-slate-400"}">
-            ${x.deployed ? "DEPLOYED" : "NO DEPLOY"}
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function renderForumHtml(){
-      const posts = loadForumPosts().slice(0, 20);
-      if(!posts.length) return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10">No posts yet</div>`;
-      return posts.map(p => `
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mb-3">
-          <div class="text-[10px] font-black uppercase tracking-wider text-orange-500">${escapeHtml(p.title)}</div>
-          <div class="text-[11px] text-slate-300 font-semibold leading-relaxed mt-1 whitespace-pre-wrap">${escapeHtml(p.body)}</div>
-          <div class="divider mt-3">Replies</div>
-          <div class="space-y-2">
-            ${(p.replies||[]).slice(-3).map(r => `
-              <div class="text-[11px] text-slate-300 font-semibold leading-relaxed bg-black/20 border border-white/5 rounded-xl p-2 whitespace-pre-wrap">${escapeHtml(r.text)}</div>
-            `).join("") || `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-2">No replies yet</div>`}
-          </div>
-          <div class="grid grid-cols-4 gap-2 mt-3">
-            <input id="reply_${p.id}" class="select-theme col-span-3" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="write_reply" placeholder="${escapeHtml(i18n.t("write_reply"))}" />
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="addForumReply('${p.id}')">${escapeHtml(i18n.t("reply"))}</button>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function cryptoRandomId(){
-      try {
-        const a = crypto.getRandomValues(new Uint8Array(10));
-        return Array.from(a).map(x => x.toString(16).padStart(2,"0")).join("");
-      } catch {
-        return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
-      }
-    }
-
-    // ============================
-    // Dynamic translation helpers
-    // ============================
-    function escapeHtml(str){
-      return String(str || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;");
-    }
-
-    // Translate dynamic strings (industries, templates) using cache or backend
-    function dt(namespace, key, fallback){
-      const lang = (window.APP_I18N.current || "EN").toUpperCase();
-      const v = i18n.dynGet(lang, namespace, key);
-      return v != null ? v : (fallback != null ? fallback : key);
-    }
-
-    // ============================
-    // ROLE/TEMPLATE/SCRIPT
-    // ============================
-    function applyVars(text){
-      const businessName = (document.getElementById('v3')?.innerText && document.getElementById('v3').innerText !== i18n.t("sync"))
-        ? document.getElementById('v3').innerText
-        : "YOUR BUSINESS";
-      return (text || "")
-        .replaceAll("{{BUSINESS_NAME}}", businessName)
-        .replaceAll("{{MARKET}}", selectedMarket || "YOUR MARKET");
-    }
-
-    function refreshTemplatesForCurrentSelection(forceResetScript){
-      const { templates } = getTemplatesFor(selectedRole);
-      if(!templates.length){
-        selectedTemplateKey = null;
-        if(forceResetScript) agentScript = "";
-        return;
-      }
-      if(!selectedTemplateKey || !templates.find(t => t.key === selectedTemplateKey)){
-        selectedTemplateKey = templates[0].key;
-      }
-      if(forceResetScript){
-        const chosen = templates.find(t => t.key === selectedTemplateKey) || templates[0];
-        agentScript = applyVars(chosen.script);
-      } else {
-        agentScript = applyVars(agentScript);
-      }
-    }
-
-    function initTemplateCategoryDropdown(){
-      const dd = document.getElementById('templateCategory');
-      dd.innerHTML = "";
-      templateCategories.forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat;
-        opt.textContent = cat.toUpperCase();
-        dd.appendChild(opt);
-      });
-      dd.value = templateCategoryFilter || "ALL";
-      const search = document.getElementById('templateSearch');
-      search.value = templateSearchQuery || "";
-    }
-
-    function getFilteredTemplates(){
-      const { templates } = getTemplatesFor(selectedRole);
-      const cat = templateCategoryFilter || "ALL";
-      const q = (templateSearchQuery || "").trim().toUpperCase();
-      return templates.filter(tpl => {
-        const catOk = (cat === "ALL") ? true : (String(tpl.category || "").toUpperCase() === cat);
-        const text = `${tpl.title} ${tpl.category}`.toUpperCase();
-        const qOk = q ? text.includes(q) : true;
-        return catOk && qOk;
-      });
-    }
-
-    async function initTemplateDropdown(){
-      const templateSelect = document.getElementById('templateSelect');
-      const scriptBox = document.getElementById('scriptBox');
-      templateSelect.innerHTML = "";
-
-      const { packName } = getTemplatesFor(selectedRole);
-      const filtered = getFilteredTemplates();
-
-      // Ensure dynamic translations for template titles/scripts (optional backend)
-      const tplTitles = filtered.map(x => x.title);
-      const tplScripts = filtered.map(x => x.script);
-      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "template_titles", tplTitles);
-      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "template_scripts", tplScripts);
-
-      if(!filtered.length){
-        const opt = document.createElement('option');
-        opt.value = "";
-        opt.textContent = i18n.t("no_matching");
-        templateSelect.appendChild(opt);
-        scriptBox.value = agentScript || "";
-        return;
-      }
-
-      if(!selectedTemplateKey || !filtered.find(x => x.key === selectedTemplateKey)){
-        selectedTemplateKey = filtered[0].key;
-        agentScript = applyVars(filtered[0].script);
-      }
-
-      filtered.forEach(tpl => {
-        const opt = document.createElement('option');
-        opt.value = tpl.key;
-
-        const shownTitle = dt("template_titles", tpl.title, tpl.title);
-        opt.textContent = `${shownTitle} — ${tpl.category} — ${packName}`.toUpperCase();
-        templateSelect.appendChild(opt);
-      });
-
-      templateSelect.value = selectedTemplateKey;
-
-      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
-
-      // script translation (optional)
-      const shownScript = dt("template_scripts", chosen.script, chosen.script);
-      if(!agentScript || agentScript.trim().length < 10) agentScript = applyVars(shownScript);
-      scriptBox.value = agentScript;
-    }
-
-    function onTemplateCategoryChange(cat){ templateCategoryFilter = cat; initTemplateDropdown(); }
-    function onTemplateSearchChange(q){ templateSearchQuery = q || ""; initTemplateDropdown(); }
-    function onTemplateChange(key){
-      const filtered = getFilteredTemplates();
-      const chosen = filtered.find(x => x.key === key);
-      if(!chosen) return;
-      selectedTemplateKey = key;
-
-      const shownScript = dt("template_scripts", chosen.script, chosen.script);
-      agentScript = applyVars(shownScript);
-
-      document.getElementById('scriptBox').value = agentScript;
-    }
-    function onScriptEdit(){ agentScript = document.getElementById('scriptBox').value; }
-    function resetTemplate(){
-      const filtered = getFilteredTemplates();
-      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
-      if(!chosen) return;
-
-      const shownScript = dt("template_scripts", chosen.script, chosen.script);
-      agentScript = applyVars(shownScript);
-
-      document.getElementById('scriptBox').value = agentScript;
-    }
-
-    // ============================
-    // VOICE UI
-    // ============================
-    function initVoiceDropdown(){
-      const voiceSelect = document.getElementById('voiceSelect');
-      voiceSelect.innerHTML = "";
-      elevenVoices.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v.id;
-        opt.textContent = v.label.toUpperCase();
-        voiceSelect.appendChild(opt);
-      });
-      voiceSelect.value = selectedVoiceId;
-
-      const boostSelect = document.getElementById('boostSelect');
-      if(boostSelect) boostSelect.value = String(!!selectedVoiceSettings.useSpeakerBoost);
-    }
-    function onVoiceChange(id){ selectedVoiceId = id; }
-    function onVoiceTuningChange(){
-      const st = document.getElementById('stabilityRange');
-      const sim = document.getElementById('simRange');
-      const style = document.getElementById('styleRange');
-      const boost = document.getElementById('boostSelect');
-      if(!st || !sim || !style || !boost) return;
-      selectedVoiceSettings.stability = Number(st.value);
-      selectedVoiceSettings.similarityBoost = Number(sim.value);
-      selectedVoiceSettings.style = Number(style.value);
-      selectedVoiceSettings.useSpeakerBoost = (boost.value === "true");
-    }
-
-    async function previewVoice(){
-      try{
-        const apiKey = await loadVapiKey();
-        const industry = getCurrentIndustryKey();
-        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
-
-        if(window.vapiSDK && typeof window.vapiSDK.run === "function"){
-          window.vapiSDK.run({
-            apiKey,
-            assistant: assistantId,
-            assistantOverrides: {
-              voice: getSelectedVapiVoice(),
-              firstMessage: "Hi! This is a quick voice preview. How does this voice sound to you?"
-            }
-          });
-          closeModal();
-          return;
-        }
-        alert("Voice SDK still loading. Please try again in 2 seconds.");
-      } catch(e){
-        console.error(e);
-        alert("Preview failed. Check console + /api/config.");
-      }
-    }
-
-    // ============================
-    // DASHBOARD
-    // ============================
-    function renderDashboard(){
-      const c = document.getElementById('mContent');
-      const market = selectedMarket || "—";
-      const industry = document.getElementById('v2')?.innerText || "—";
-      const biz = document.getElementById('v3')?.innerText || "—";
-      const role = selectedRole || document.getElementById('v4')?.innerText || "—";
-      const voice = selectedVoiceId || "—";
-      const pack = getTemplatesFor(selectedRole).packName || "GLOBAL";
-
-      c.innerHTML = `
-        <div class="pill mb-4">${escapeHtml(i18n.t("dashboard_sample"))}</div>
-
-        <div class="grid lg:grid-cols-3 gap-4 text-left">
-          <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("account"))}</div>
-            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
-              <div><span class="mini">Market:</span> ${escapeHtml(market)}</div>
-              <div class="mt-1"><span class="mini">Industry:</span> ${escapeHtml(industry)}</div>
-              <div class="mt-1"><span class="mini">Business:</span> ${escapeHtml(biz)}</div>
-            </div>
-          </div>
-
-          <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("agent"))}</div>
-            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
-              <div><span class="mini">Role:</span> ${escapeHtml(role)}</div>
-              <div class="mt-1"><span class="mini">${escapeHtml(i18n.t("voice"))}:</span> ${escapeHtml(voice)}</div>
-              <div class="mt-1"><span class="mini">${escapeHtml(i18n.t("template_pack"))}:</span> ${escapeHtml(pack)}</div>
-              <div class="mt-1"><span class="mini">Template:</span> ${escapeHtml(selectedTemplateKey || "custom")}</div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-2 mt-4">
-              <button class="modal-btn justify-center text-center" type="button" onclick="triggerModal(4)">${escapeHtml(i18n.t("edit_role"))}</button>
-              <button class="modal-btn justify-center text-center" type="button" onclick="triggerModal(4)">${escapeHtml(i18n.t("edit_script"))}</button>
-              <button class="modal-btn justify-center text-center" type="button" onclick="triggerModal(4)">${escapeHtml(i18n.t("edit_voice"))}</button>
-            </div>
-          </div>
-
-          <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("community"))}</div>
-            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
-              ${escapeHtml(i18n.t("newsletter_no_deploy"))} + Forum + AI Q&amp;A
-            </div>
-            <div class="grid grid-cols-2 gap-2 mt-4">
-              <button class="modal-btn justify-center text-center" type="button" onclick="openNewsletterPortal()">${escapeHtml(i18n.t("newsletter"))}</button>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="openCommunity()">${escapeHtml(i18n.t("community"))}</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-theme mt-4 text-left">
-          <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("current_script"))}</div>
-          <pre class="whitespace-pre-wrap text-[11px] text-slate-300 font-semibold leading-relaxed bg-white/5 border border-white/10 rounded-2xl p-3 max-h-[240px] overflow-auto">${escapeHtml(agentScript || "—")}</pre>
-        </div>
-
-        <div class="grid sm:grid-cols-2 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="handleStep(1)">
-            ${escapeHtml(i18n.t("start_activation"))}
-          </button>
-        </div>
-      `;
-
-      i18n.applyTranslations(document.getElementById("setupModal"));
-    }
-
     // ============================
     // MODAL FLOW
     // ============================
     let lastModalStep = null;
 
-    async function triggerModal(step, opts = {}){
+    function createBtn(txt, fn){
+      const b = document.createElement('button');
+      b.type = "button";
+      b.className = "modal-btn";
+      b.innerText = txt;
+      b.onclick = fn;
+      return b;
+    }
+
+    function closeModal(){ document.getElementById('setupModal').style.display = 'none'; }
+
+    async function triggerModal(step){
       lastModalStep = step;
 
       const m = document.getElementById('setupModal');
@@ -1966,12 +1947,6 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
         renderInfoSlide();
         return;
       }
-      if(step === "dashboard"){
-        shell.classList.add('dashboard-wide');
-        tEl.innerText = i18n.t("dashboard");
-        renderDashboard();
-        return;
-      }
       if(step === "community"){
         shell.classList.add('community-wide');
         tEl.innerText = i18n.t("community");
@@ -1990,10 +1965,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       if(step === 2){
         tEl.innerText = i18n.t("step_02");
         s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_industries" placeholder="${escapeHtml(i18n.t("search_industries"))}" onkeyup="filterIndustryCategories(this.value)">`;
-
-        // Pre-fetch dynamic translations for industries (optional backend)
         await i18n.ensureDynamicTranslations(window.APP_I18N.current, "industries", industryKeys);
-
         renderIndustryCategoryList("");
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
@@ -2131,14 +2103,19 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
           confetti();
           setDeployed(true);
           finish(6, "READY");
-          setTimeout(() => { triggerModal("dashboard"); }, 900);
-          setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1400);
+
+          // ✅ FIX: avoid popup blockers, redirect same tab
+          setTimeout(() => {
+            window.location.href = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
+          }, 900);
         }));
         return;
       }
     }
 
+    // ============================
     // Step 1 rendering
+    // ============================
     function renderMarketByContinent(searchQuery){
       const c = document.getElementById('mContent');
       c.innerHTML = "";
@@ -2171,7 +2148,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
     }
     function filterMarket(query){ renderMarketByContinent(query); }
 
-    // Step 2 rendering: industry (translated names if backend exists, otherwise EN)
+    // Step 2 rendering
     function renderIndustryCategoryList(searchQuery){
       const c = document.getElementById('mContent');
       c.innerHTML = "";
@@ -2196,7 +2173,8 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
 
           const btn = createBtn(shown, () => {
             currentIndustryIdx = idx >= 0 ? idx : currentIndustryIdx;
-            finish(2, shown);
+            selectedIndustryKey = name; // ✅ Canonical key
+            finish(2, shown);           // UI label
             refreshTemplatesForCurrentSelection(true);
           });
           btn.setAttribute('data-n', shown);
@@ -2214,17 +2192,36 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
     function filterIndustryCategories(query){ renderIndustryCategoryList(query); }
 
     // ============================
-    // ACTIONS
+    // ACTIONS + LOCK STATE
     // ============================
-    function handleStep(s){ if(s === 1 || completedSteps >= s - 1) triggerModal(s); }
+    function refreshStepLocks(){
+      for(let i=1;i<=6;i++){
+        const el = document.getElementById(`s${i}`);
+        if(!el) continue;
+        const unlocked = completedSteps >= i-1;
+        el.classList.toggle("locked", !unlocked);
+      }
+    }
+
+    function handleStep(s){
+      if (s === 1 || completedSteps >= s - 1) triggerModal(s);
+    }
 
     function finish(s, v){
-      completedSteps = s;
+      completedSteps = Math.max(completedSteps, s);
       const valEl = document.getElementById(`v${s}`);
       if(valEl) valEl.innerText = v;
+
       document.getElementById(`s${s}`)?.classList.add('active');
       closeModal();
+
+      // next focus
+      for(let i=1;i<=6;i++){
+        document.getElementById(`s${i}`)?.classList.remove("next-focus");
+      }
       if(s < 6) document.getElementById(`s${s + 1}`)?.classList.add('next-focus');
+
+      refreshStepLocks();
     }
 
     function saveB(){
@@ -2235,10 +2232,8 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       }
     }
 
-    function closeModal(){ document.getElementById('setupModal').style.display = 'none'; }
-
     // ============================
-    // Language menu behavior (fixed)
+    // Language menu
     // ============================
     function toggleLangMenu(force){
       const d = document.getElementById('langMenu');
@@ -2273,27 +2268,14 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       });
     }
 
-    function createBtn(txt, fn){
-      const b = document.createElement('button');
-      b.type = "button";
-      b.className = "modal-btn";
-      b.innerText = txt;
-      b.onclick = fn;
-      return b;
-    }
-
     function initLangList(){
       const list = document.getElementById('langList');
       list.innerHTML = "";
       languageList.forEach(l => {
         const b = createBtn(l.n, () => setLang(l.f, l.id));
         b.setAttribute('data-n', l.n);
-
-        // If no static dictionary exists, it still works via EN fallback (so keep enabled).
-        // Optional: show a hint that it will fallback until backend translation is added.
         const hasStatic = !!(i18n.translations[l.id] && Object.keys(i18n.translations[l.id]).length > 0);
         const hint = (l.id !== "EN" && !hasStatic) ? ` <span style="opacity:.55">• EN fallback</span>` : "";
-
         b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3" alt=""> <span>${escapeHtml(l.n)}</span>${hint}`;
         list.appendChild(b);
       });
@@ -2307,32 +2289,41 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
     }
 
     // ============================
-    // VAPI DEMO CALL
+    // VAPI: Preview + Demo
     // ============================
+    async function previewVoice(){
+      try{
+        const industry = getCurrentIndustryKey();
+        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
+
+        await vapiStartCall(assistantId, {
+          voice: getSelectedVapiVoice(),
+          firstMessage: "Hi! This is a quick voice preview. How does this voice sound to you?"
+        });
+
+        closeModal();
+      } catch(e){
+        console.error(e);
+        alert("Preview failed. Check console + /api/config.");
+      }
+    }
+
     async function runVoice(){
       try{
-        const apiKey = await loadVapiKey();
         const industry = getCurrentIndustryKey();
         const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
 
         const businessName = document.getElementById('v3')?.innerText || "YOUR BUSINESS";
         const finalScript = applyVars(agentScript || "");
 
-        if(window.vapiSDK && typeof window.vapiSDK.run === "function"){
-          window.vapiSDK.run({
-            apiKey,
-            assistant: assistantId,
-            assistantOverrides: {
-              voice: getSelectedVapiVoice(),
-              systemPrompt: finalScript,
-              firstMessage: `Hi! Thank you for calling ${businessName}. How can I help you today?`
-            }
-          });
-          closeModal();
-          finish(5, "ACTIVE");
-          return;
-        }
-        alert("Voice SDK still loading. Please try again in 2 seconds.");
+        await vapiStartCall(assistantId, {
+          voice: getSelectedVapiVoice(),
+          systemPrompt: finalScript,
+          firstMessage: `Hi! Thank you for calling ${businessName}. How can I help you today?`
+        });
+
+        closeModal();
+        finish(5, "ACTIVE");
       } catch(err){
         console.error(err);
         alert("Error starting demo call. Check console + /api/config.");
@@ -2365,7 +2356,6 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       document.getElementById("communityBtn").addEventListener("click", openCommunity);
       document.getElementById("newsletterBtn").addEventListener("click", openNewsletterPortal);
 
-      // Step cards click
       document.getElementById("s1").addEventListener("click", () => handleStep(1));
       document.getElementById("s2").addEventListener("click", () => handleStep(2));
       document.getElementById("s3").addEventListener("click", () => handleStep(3));
@@ -2373,16 +2363,13 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       document.getElementById("s5").addEventListener("click", () => handleStep(5));
       document.getElementById("s6").addEventListener("click", () => handleStep(6));
 
-      // Modal close button
       document.getElementById("mClose").addEventListener("click", closeModal);
 
-      // Lang trigger
       document.getElementById("langTrigger").addEventListener("click", (e) => {
         e.stopPropagation();
         toggleLangMenu();
       });
 
-      // Click outside closes lang menu (fix for “buttons not responsive” due to overlay)
       document.addEventListener("click", (e) => {
         const menu = document.getElementById("langMenu");
         const wrap = document.getElementById("langWrap");
@@ -2391,7 +2378,6 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
         }
       });
 
-      // Escape closes modal + lang menu
       document.addEventListener("keydown", (e) => {
         if(e.key === "Escape"){
           closeModal();
@@ -2403,8 +2389,9 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
     initLangList();
     wireTopButtons();
 
-    const defaultIndustry = "Electrical";
-    currentIndustryIdx = Math.max(0, industryKeys.indexOf(defaultIndustry)); 
+    // Default industry
+    selectedIndustryKey = "Electrical";
+    currentIndustryIdx = Math.max(0, industryKeys.indexOf(selectedIndustryKey));
     refreshTemplatesForCurrentSelection(true);
     const initTemplates = getTemplatesFor(selectedRole).templates;
     if(initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
@@ -2414,17 +2401,11 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
     if(isDeployed()){
       document.getElementById('v6').innerText = "READY";
       document.getElementById('s6').classList.add('active');
+      completedSteps = Math.max(completedSteps, 6);
     }
 
+    refreshStepLocks();
     i18n.applyTranslations(document);
-
-    (function(d, t) {
-      var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-      g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
-      g.defer = true;
-      g.async = true;
-      s.parentNode.insertBefore(g, s);
-    })(document, "script");
   </script>
 </body>
 </html>
