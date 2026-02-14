@@ -8,8 +8,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
-
-  <!-- Vapi -->
   <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest"></script>
 
   <style>
@@ -37,6 +35,7 @@
       background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%);
       pointer-events: none;
     }
+
     .console-container {
       width: 100%;
       max-width: 1100px;
@@ -55,6 +54,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
     .orange-btn {
       background: linear-gradient(90deg, #f97316, #ea580c);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -69,10 +69,11 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 10px;
       border-radius: 12px;
-      opacity: 0.3;
+      opacity: 0.35;
       transition: 0.3s;
       cursor: pointer;
       user-select: none;
+      pointer-events: auto;
     }
     .step-card.active {
       border-color: #f97316 !important;
@@ -97,6 +98,7 @@
       gap: 8px;
       cursor: pointer;
       backdrop-filter: blur(5px);
+      pointer-events: auto;
     }
     #langMenu {
       position: absolute;
@@ -109,8 +111,9 @@
       display: none;
       flex-direction: column;
       gap: 8px;
-      width: 260px;
+      width: 280px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      pointer-events: auto;
     }
 
     .search-box {
@@ -124,6 +127,7 @@
       width: 100%;
       margin-bottom: 8px;
     }
+
     .modal-scroll {
       max-height: 520px;
       overflow-y: auto;
@@ -143,6 +147,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      pointer-events: auto;
     }
 
     .modal-shell {
@@ -179,9 +184,10 @@
       text-align: left;
       letter-spacing: 0.14em;
       line-height: 1.1;
+      pointer-events: auto;
     }
     .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: #f97316; }
-    .modal-btn.disabled { opacity: 0.3; cursor: not-allowed; }
+    .modal-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
 
     .pill {
       display: inline-flex;
@@ -271,7 +277,6 @@
       padding-bottom: 6px;
     }
 
-    /* community tabs */
     .tabbar {
       display: flex;
       gap: 8px;
@@ -296,9 +301,10 @@
     }
   </style>
 
-  <!-- ✅ LANGUAGE ENGINE (added) -->
+  <!-- ✅ FIXED + EXPANDED LANGUAGE ENGINE -->
   <script>
     const LANG_STORAGE_KEY = "aicallport_lang";
+    const I18N_CACHE_KEY = "aicallport_i18n_cache_v1";
     const SUPPORTED_LANGS = [
       "EN","ZH","HI","ES","FR","AR","BN","PT","RU","UR",
       "ID","DE","JA","PCM","MR","TE","TR","TA","YUE","VI",
@@ -335,6 +341,7 @@
 
     window.APP_I18N = { current: "EN" };
 
+    // ✅ Base dictionaries (you can expand anytime; all missing keys fallback to EN)
     const translations = {
       EN: {
         // Global UI
@@ -354,6 +361,21 @@
         search_templates: "SEARCH TEMPLATES...",
         no_matching: "NO MATCHING RESULTS",
 
+        // Common labels (previously hardcoded)
+        setup: "Setup",
+        dashboard: "Dashboard",
+        post: "Post",
+        reply: "Reply",
+        title: "Title",
+        email: "Email",
+        name_optional: "Name (Optional)",
+        tell_us_updates: "Tell us what you want updates about (optional)",
+        write_question: "Write your question or feedback...",
+        write_reply: "Write a reply...",
+        ask_question: "Ask a question...",
+        thinking: "Thinking...",
+        needs_backend: "This feature needs a backend endpoint.",
+
         // Hero / pricing
         hero_h1: "GLOBAL ZERO-HUMAN<br>AI RECEPTIONIST",
         hero_p:
@@ -362,6 +384,7 @@
         beta_access: "BETA ACCESS - SMALL BUSINESS",
         regular: "Regular",
         global_live: "Global Live",
+        per_month: "/mo",
 
         // Features
         feat_1: "Unlimited Inbound Calling",
@@ -429,7 +452,10 @@
         privacy: "Privacy",
         terms: "Terms",
         support: "Support",
-        active_agents: "ACTIVE AGENTS"
+        active_agents: "ACTIVE AGENTS",
+
+        // Business step
+        business_name: "Business Name"
       },
 
       ES: {
@@ -449,6 +475,19 @@
         search_templates: "BUSCAR PLANTILLAS...",
         no_matching: "SIN RESULTADOS",
 
+        setup: "Configuración",
+        dashboard: "Panel",
+        post: "Publicar",
+        reply: "Responder",
+        title: "Título",
+        email: "Correo",
+        name_optional: "Nombre (Opcional)",
+        tell_us_updates: "Dinos sobre qué quieres actualizaciones (opcional)",
+        write_question: "Escribe tu pregunta o comentario...",
+        write_reply: "Escribe una respuesta...",
+        ask_question: "Haz una pregunta...",
+        thinking: "Pensando...",
+
         hero_h1: "RECEPCIONISTA IA GLOBAL<br>SIN HUMANOS",
         hero_p:
           "Activación instantánea para <span class='text-orange-500'>NEGOCIOS</span>. " +
@@ -456,6 +495,7 @@
         beta_access: "ACCESO BETA - PEQUEÑAS EMPRESAS",
         regular: "Regular",
         global_live: "En Vivo",
+        per_month: "/mes",
 
         feat_1: "Llamadas Ilimitadas",
         feat_2: "Pago Mensual",
@@ -516,7 +556,9 @@
         privacy: "Privacidad",
         terms: "Términos",
         support: "Soporte",
-        active_agents: "AGENTES ACTIVOS"
+        active_agents: "AGENTES ACTIVOS",
+
+        business_name: "Nombre de la empresa"
       },
 
       FR: {
@@ -536,6 +578,19 @@
         search_templates: "RECHERCHER MODÈLES...",
         no_matching: "AUCUN RÉSULTAT",
 
+        setup: "Configuration",
+        dashboard: "Tableau de bord",
+        post: "Publier",
+        reply: "Répondre",
+        title: "Titre",
+        email: "Email",
+        name_optional: "Nom (Optionnel)",
+        tell_us_updates: "Dites-nous les mises à jour souhaitées (optionnel)",
+        write_question: "Écrivez votre question ou avis...",
+        write_reply: "Écrire une réponse...",
+        ask_question: "Poser une question...",
+        thinking: "Réflexion...",
+
         hero_h1: "RÉCEPTIONNISTE IA GLOBAL<br>SANS HUMAINS",
         hero_p:
           "Activation instantanée <span class='text-orange-500'>PETITE ENTREPRISE</span>. " +
@@ -543,6 +598,7 @@
         beta_access: "ACCÈS BÊTA - PETITES ENTREPRISES",
         regular: "Régulier",
         global_live: "En Direct",
+        per_month: "/mois",
 
         feat_1: "Appels Illimités",
         feat_2: "Paiement Mensuel",
@@ -603,7 +659,9 @@
         privacy: "Confidentialité",
         terms: "Conditions",
         support: "Support",
-        active_agents: "AGENTS ACTIFS"
+        active_agents: "AGENTS ACTIFS",
+
+        business_name: "Nom de l’entreprise"
       },
 
       AR: {
@@ -619,11 +677,28 @@
         search_countries: "ابحث عن الدول...",
         search_industries: "ابحث عن الصناعات...",
         search_templates: "ابحث عن القوالب...",
+        no_matching: "لا نتائج",
+
+        setup: "إعداد",
+        dashboard: "لوحة التحكم",
+        post: "نشر",
+        reply: "رد",
+        title: "العنوان",
+        email: "البريد",
+        name_optional: "الاسم (اختياري)",
+        tell_us_updates: "أخبرنا عن التحديثات التي تريدها (اختياري)",
+        write_question: "اكتب سؤالك أو ملاحظتك...",
+        write_reply: "اكتب ردًا...",
+        ask_question: "اسأل سؤالاً...",
+        thinking: "جارٍ التفكير...",
+
         hero_h1: "موظف استقبال ذكاء اصطناعي عالمي<br>بدون بشر",
         hero_p: "تفعيل فوري <span class='text-orange-500'>للأعمال الصغيرة</span>. <span class='text-orange-500'>نشر عالمي. متعدد اللغات.</span>",
         beta_access: "وصول تجريبي - أعمال صغيرة",
         regular: "عادي",
         global_live: "مباشر",
+        per_month: "/شهر",
+
         feat_1: "مكالمات غير محدودة",
         feat_2: "دفع شهري",
         feat_3: "بدون عقد",
@@ -636,12 +711,17 @@
         select: "اختر",
         sync: "مزامنة",
         choose: "اختر",
+        sandbox: "Sandbox",
+        instant: "فوري",
+
         demo_call: "ابدأ مكالمة تجريبية",
         deploy_get_number: "احصل على رقمي",
         privacy: "الخصوصية",
         terms: "الشروط",
         support: "الدعم",
-        active_agents: "وكلاء نشطون"
+        active_agents: "وكلاء نشطون",
+
+        business_name: "اسم النشاط"
       },
 
       HE: {
@@ -657,11 +737,28 @@
         search_countries: "חפש מדינות...",
         search_industries: "חפש תעשיות...",
         search_templates: "חפש תבניות...",
+        no_matching: "אין תוצאות",
+
+        setup: "הגדרה",
+        dashboard: "לוח בקרה",
+        post: "פרסם",
+        reply: "השב",
+        title: "כותרת",
+        email: "אימייל",
+        name_optional: "שם (אופציונלי)",
+        tell_us_updates: "ספר לנו על עדכונים שתרצה (אופציונלי)",
+        write_question: "כתוב שאלה או משוב...",
+        write_reply: "כתוב תגובה...",
+        ask_question: "שאל שאלה...",
+        thinking: "חושב...",
+
         hero_h1: "פקיד קבלה AI גלובלי<br>ללא בני אדם",
         hero_p: "הפעלה מיידית <span class='text-orange-500'>לעסקים קטנים</span>. <span class='text-orange-500'>פריסה עולמית. רב-לשוני.</span>",
         beta_access: "גישה ניסיונית - עסקים קטנים",
         regular: "רגיל",
         global_live: "שידור חי",
+        per_month: "/חודש",
+
         feat_1: "שיחות ללא הגבלה",
         feat_2: "תשלום חודשי",
         feat_3: "ללא חוזה",
@@ -674,16 +771,68 @@
         select: "בחר",
         sync: "סנכרון",
         choose: "בחר",
+        sandbox: "Sandbox",
+        instant: "מיידי",
+
         demo_call: "התחל דמו",
         deploy_get_number: "קבל מספר",
         privacy: "פרטיות",
         terms: "תנאים",
         support: "תמיכה",
-        active_agents: "סוכנים פעילים"
+        active_agents: "סוכנים פעילים",
+
+        business_name: "שם העסק"
       }
     };
 
+    // Ensure every supported language exists as object (fallback will still show EN)
     SUPPORTED_LANGS.forEach(code => { if (!translations[code]) translations[code] = {}; });
+
+    // ---- Optional dynamic translation via backend ----
+    // If you create: POST /api/i18n-batch { lang:"ES", items:["Plumbing","Electrical",...], namespace:"industries" }
+    // Return: { map: { "Plumbing":"Fontanería", ... } }
+    function loadI18nCache(){
+      try { return JSON.parse(localStorage.getItem(I18N_CACHE_KEY) || "{}"); }
+      catch { return {}; }
+    }
+    function saveI18nCache(cache){
+      try { localStorage.setItem(I18N_CACHE_KEY, JSON.stringify(cache || {})); } catch {}
+    }
+    const dynamicCache = loadI18nCache();
+
+    function dynGet(lang, namespace, key){
+      return dynamicCache?.[lang]?.[namespace]?.[key] || null;
+    }
+    function dynSet(lang, namespace, map){
+      dynamicCache[lang] ||= {};
+      dynamicCache[lang][namespace] ||= {};
+      Object.entries(map || {}).forEach(([k,v]) => {
+        if (v != null && String(v).trim().length) dynamicCache[lang][namespace][k] = v;
+      });
+      saveI18nCache(dynamicCache);
+    }
+
+    async function ensureDynamicTranslations(lang, namespace, items){
+      const code = (lang || "EN").toUpperCase();
+      if (code === "EN") return; // no need
+
+      const missing = (items || []).filter(x => !dynGet(code, namespace, x));
+      if (!missing.length) return;
+
+      // Try backend translation (optional)
+      try{
+        const res = await fetch("/api/i18n-batch", {
+          method: "POST",
+          headers: { "content-type":"application/json" },
+          body: JSON.stringify({ lang: code, namespace, items: missing })
+        });
+        if (!res.ok) throw new Error("no backend");
+        const data = await res.json();
+        if (data && data.map) dynSet(code, namespace, data.map);
+      } catch(e){
+        // No backend available: silently keep EN fallback (still "works")
+      }
+    }
 
     function getDict(lang) { return translations[lang] || translations.EN; }
     function t(key) {
@@ -733,15 +882,18 @@
       setLanguage(stored);
     })();
 
-    window.i18n = { t, setLanguage, applyTranslations, translations };
+    window.i18n = {
+      t, setLanguage, applyTranslations, translations,
+      ensureDynamicTranslations, dynGet
+    };
   </script>
 </head>
 
 <body onmousemove="updateParallax(event)">
   <div class="bg-glow"></div>
 
-  <div class="floating-lang">
-    <button onclick="toggleLangMenu()" class="lang-trigger">
+  <div class="floating-lang" id="langWrap">
+    <button id="langTrigger" class="lang-trigger" type="button">
       <img id="curFlag" src="https://flagcdn.com/us.svg" class="w-4" alt="Flag" />
       <span id="curLangText" class="text-[9px] font-black text-white uppercase">US | EN</span>
     </button>
@@ -758,7 +910,7 @@
         <div class="ml-2 px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase leading-none">BETA</div>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="openCommunity()" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="community">
+        <button id="communityBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="community" type="button">
           Community
         </button>
         <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
@@ -778,10 +930,10 @@
           <span class="text-orange-500">Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>
         </p>
         <div class="grid gap-2 sm:flex sm:gap-3 sm:items-center">
-          <button onclick="handleStep(1)" id="hero-cta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic" data-i18n="start_activation">
+          <button id="heroCta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic" data-i18n="start_activation" type="button">
             Start Activation
           </button>
-          <button onclick="openActivationInfo()" class="w-full sm:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="activation_steps_info">
+          <button id="activationInfoBtn" class="w-full sm:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="activation_steps_info" type="button">
             Activation Steps Info
           </button>
         </div>
@@ -797,7 +949,7 @@
             <div class="flex items-baseline gap-1">
               <span id="main-currency" class="text-4xl lg:text-5xl font-black text-white">$</span>
               <span id="main-price" class="text-4xl lg:text-5xl font-black text-white">199</span>
-              <span class="text-orange-500 font-bold">/mo</span>
+              <span class="text-orange-500 font-bold" data-i18n="per_month">/mo</span>
             </div>
           </div>
 
@@ -817,10 +969,10 @@
           </div>
 
           <div id="timer" class="text-xs font-mono text-white/30 mb-4">00:00:00</div>
-          <button onclick="handleStep(1)" id="side-cta" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic" data-i18n="start_activation">
+          <button id="sideCta" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic" data-i18n="start_activation" type="button">
             Start Activation
           </button>
-          <button onclick="openNewsletterPortal()" class="mt-2 w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 bg-white/5 hover:bg-white/10 transition" data-i18n="newsletter_no_deploy">
+          <button id="newsletterBtn" class="mt-2 w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 bg-white/5 hover:bg-white/10 transition" data-i18n="newsletter_no_deploy" type="button">
             Join Newsletter (No Deploy)
           </button>
         </div>
@@ -832,27 +984,27 @@
         <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">AI Receptionist Activation Protocol</span>
       </div>
       <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
-        <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)">
+        <div id="s1" class="step-card unlocked next-focus">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_01">01 Market</p>
           <p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
         </div>
-        <div id="s2" class="step-card" onclick="handleStep(2)">
+        <div id="s2" class="step-card">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_02">02 Industry</p>
           <p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
         </div>
-        <div id="s3" class="step-card" onclick="handleStep(3)">
+        <div id="s3" class="step-card">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_03">03 Business</p>
           <p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="sync">Sync</p>
         </div>
-        <div id="s4" class="step-card" onclick="handleStep(4)">
+        <div id="s4" class="step-card">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_04">04 Agent Role</p>
           <p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="choose">Choose</p>
         </div>
-        <div id="s5" class="step-card" onclick="handleStep(5)">
+        <div id="s5" class="step-card">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_05">05 Demo</p>
           <p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="sandbox">Sandbox</p>
         </div>
-        <div id="s6" class="step-card" onclick="handleStep(6)">
+        <div id="s6" class="step-card">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_06">06 Deploy</p>
           <p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="instant">Instant</p>
         </div>
@@ -862,10 +1014,10 @@
 
   <div id="setupModal">
     <div id="modalShell" class="modal-shell">
-      <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-4">Setup</h2>
+      <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-4" data-i18n="setup">Setup</h2>
       <div id="modalSearchContainer"></div>
       <div id="mContent" class="modal-scroll"></div>
-      <button id="mClose" onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white" data-i18n="close">Close</button>
+      <button id="mClose" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white" data-i18n="close" type="button">Close</button>
     </div>
   </div>
 
@@ -885,7 +1037,9 @@
   </footer>
 
   <script>
-    // ========= VAPI KEY (NO HARDCODE) =========
+    // ============================
+    // VAPI KEY (NO HARDCODE)
+    // ============================
     let vapiApiKey = null;
     async function loadVapiKey() {
       if (vapiApiKey) return vapiApiKey;
@@ -897,7 +1051,9 @@
       return vapiApiKey;
     }
 
-    // ========= ASSISTANTS (fallback mapping) =========
+    // ============================
+    // ASSISTANTS (fallback mapping)
+    // ============================
     const assistants = {
       "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
       "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
@@ -905,7 +1061,9 @@
       "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f"
     };
 
-    // ========= STATE =========
+    // ============================
+    // STATE
+    // ============================
     let completedSteps = 0;
     let currentIndustryIdx = 0;
     let selectedMarket = "United States";
@@ -917,12 +1075,13 @@
     let templateCategoryFilter = "ALL";
     let templateSearchQuery = "";
 
-    // deployment tracking (UX only)
     const LS_DEPLOYED = "aicallport_deployed";
     function setDeployed(v) { localStorage.setItem(LS_DEPLOYED, v ? "1" : "0"); }
     function isDeployed() { return localStorage.getItem(LS_DEPLOYED) === "1"; }
 
-    // ========= ELEVENLABS VOICE (via Vapi voice provider=11labs) =========
+    // ============================
+    // ELEVENLABS VOICE
+    // ============================
     const elevenVoices = [
       { id: "sarah",    label: "Sarah (Warm / Natural)" },
       { id: "andrea",   label: "Andrea (Confident)" },
@@ -947,9 +1106,9 @@
       return { provider: "11labs", voiceId: selectedVoiceId, model: "eleven_turbo_v2", ...selectedVoiceSettings };
     }
 
-    // ========= MARKETS (YOUR CONTINENT LIST — ACTIVE) =========
-    // Note: Currency symbols are set to the most common official currency used in that country/territory.
-    // Pricing uses a default number (you can later override per market).
+    // ============================
+    // MARKETS (continent list)
+    // ============================
     const DEFAULT_PRICE = "199";
     const DEFAULT_REG = "399";
 
@@ -979,44 +1138,35 @@
       ]
     };
 
-    // Currency symbol mapping (minimal but accurate for listed regions/territories)
-    // If you want currency codes shown instead, set symbol to the code.
     const currencySymbol = {
-      // Europe
       "Albania":"L","Andorra":"€","Armenia":"֏","Austria":"€","Azerbaijan":"₼","Belarus":"Br","Belgium":"€","Bosnia and Herzegovina":"KM",
       "Bulgaria":"лв","Croatia":"€","Cyprus":"€","Czech Republic":"Kč","Denmark":"kr","Estonia":"€","Finland":"€","France":"€","Georgia":"₾",
       "Germany":"€","Greece":"€","Hungary":"Ft","Iceland":"kr","Ireland":"€","Italy":"€","Latvia":"€","Lithuania":"€","Luxembourg":"€","Malta":"€",
       "Moldova":"L","Monaco":"€","Montenegro":"€","Netherlands":"€","North Macedonia":"ден","Norway":"kr","Poland":"zł","Portugal":"€","Romania":"lei",
       "San Marino":"€","Serbia":"дин","Slovakia":"€","Slovenia":"€","Spain":"€","Sweden":"kr","Switzerland":"CHF","Ukraine":"₴","United Kingdom":"£",
 
-      // Asia & Oceania
       "Australia":"$","Bahrain":"BD","Bangladesh":"৳","Cambodia":"៛","China":"¥","Fiji":"$","Hong Kong":"$","India":"₹","Indonesia":"Rp","Iraq":"د.ع",
       "Israel":"₪","Japan":"¥","Jordan":"JD","Kazakhstan":"₸","Kuwait":"KD","Kyrgyzstan":"сом","Laos":"₭","Lebanon":"ل.ل","Macao":"$","Malaysia":"RM",
       "Maldives":"Rf","Mongolia":"₮","New Zealand":"$","Oman":"OMR","Pakistan":"₨","Papua New Guinea":"K","Philippines":"₱","Qatar":"QAR",
       "Saudi Arabia":"﷼","Singapore":"$","South Korea":"₩","Sri Lanka":"Rs","Taiwan":"$","Thailand":"฿","Turkey":"₺","United Arab Emirates":"AED",
       "Uzbekistan":"so'm","Vietnam":"₫",
 
-      // North America & Caribbean
       "Antigua and Barbuda":"$","Bahamas":"$","Barbados":"$","Belize":"$","Bermuda":"$","Canada":"$","Costa Rica":"₡","Cuba":"$","Dominican Republic":"RD$",
       "El Salvador":"$","Greenland":"kr","Grenada":"$","Guatemala":"Q","Haiti":"G","Honduras":"L","Jamaica":"J$","Mexico":"$","Nicaragua":"C$","Panama":"B/.",
       "Puerto Rico":"$","Saint Kitts and Nevis":"$","Saint Lucia":"$","Saint Vincent and the Grenadines":"$","Trinidad and Tobago":"TT$","United States":"$",
 
-      // Africa
       "Angola":"Kz","Benin":"CFA","Botswana":"P","Burkina Faso":"CFA","Cameroon":"CFA","Egypt":"E£","Ethiopia":"Br","Gabon":"CFA","Ghana":"₵","Ivory Coast":"CFA",
       "Kenya":"KSh","Madagascar":"Ar","Malawi":"MK","Mali":"CFA","Mauritius":"₨","Morocco":"DH","Namibia":"$","Nigeria":"₦","Rwanda":"FRw","Senegal":"CFA",
       "Seychelles":"₨","South Africa":"R","Tanzania":"TSh","Togo":"CFA","Tunisia":"DT","Uganda":"USh","Zambia":"ZK","Zimbabwe":"$",
 
-      // South America
       "Argentina":"$","Bolivia":"Bs","Brazil":"R$","Chile":"$","Colombia":"$","Ecuador":"$","Falkland Islands":"£","French Guiana":"€","Guyana":"$",
       "Paraguay":"₲","Peru":"S/","Suriname":"$","Uruguay":"$","Venezuela":"Bs"
     };
 
-    // phone prefix mapping (optional; used later for number UX; keep empty if unknown)
     const phonePrefix = {
       "United States":"+1","Canada":"+1","Mexico":"+52","United Kingdom":"+44","Ireland":"+353","France":"+33","Germany":"+49","Spain":"+34","Portugal":"+351","Italy":"+39"
     };
 
-    // Build a single lookup object for UI
     const marketCurrency = {};
     Object.entries(marketsByContinent).forEach(([continent, list]) => {
       list.forEach(country => {
@@ -1040,7 +1190,9 @@
       return out;
     }
 
-    // ========= LANG MENU LIST (Top 30 + Hebrew) =========
+    // ============================
+    // LANG MENU (30+HE) — always “works”
+    // ============================
     const languageList = [
       { id:"EN", n:"English", f:"us" },
       { id:"ZH", n:"Mandarin Chinese", f:"cn" },
@@ -1075,19 +1227,19 @@
       { id:"HE", n:"Hebrew", f:"il" }
     ];
 
-    // Keep language switch fully working across dynamic modals:
-    window.onLanguageChanged = () => {
-      // Update live label translation + any open modal content re-render:
+    // When language changes: re-render open modals + refresh currency text
+    window.onLanguageChanged = async () => {
       const curModalOpen = document.getElementById("setupModal").style.display === "flex";
       if (curModalOpen && lastModalStep != null) {
-        // re-render current modal with new language strings
-        triggerModal(lastModalStep, { preserve: true });
+        await triggerModal(lastModalStep, { preserve: true });
       }
-      // Update reg text (contains translated "Regular")
       updateCurrencyUI(selectedMarket);
+      i18n.applyTranslations(document);
     };
 
-    // ========= ACTIVATION INFO =========
+    // ============================
+    // ACTIVATION INFO
+    // ============================
     const activationInfoSlides = [
       { keyTitle:"STEP 1 — MARKET", keyText:"Choose the country/market. Pricing and deployment routing adjust automatically based on your selection." },
       { keyTitle:"STEP 2 — INDUSTRY", keyText:"Select your industry. Industry packs determine the scripts/templates you start with." },
@@ -1109,64 +1261,43 @@
           <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(slide.keyText)}</div>
         </div>
         <div class="grid sm:grid-cols-3 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" onclick="infoPrev()" ${infoIdx===0 ? 'style="opacity:.35;pointer-events:none"' : ''}>${escapeHtml(i18n.t("go_back"))}</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="infoNext()">
+          <button class="modal-btn justify-center text-center" type="button" onclick="infoPrev()" ${infoIdx===0 ? 'style="opacity:.35;pointer-events:none"' : ''}>${escapeHtml(i18n.t("go_back"))}</button>
+          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="infoNext()">
             ${escapeHtml(infoIdx === activationInfoSlides.length - 1 ? i18n.t("start_activation") : i18n.t("next"))}
           </button>
-          <button class="modal-btn justify-center text-center" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
         </div>
         <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">${infoIdx+1} / ${activationInfoSlides.length}</div>
       `;
+      i18n.applyTranslations(document.getElementById("setupModal"));
     }
     function infoPrev(){ if(infoIdx>0){ infoIdx--; renderInfoSlide(); } }
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
-    // ========= INDUSTRIES (expanded: common SMB industries) =========
-    // You can add more anytime; the engine supports search + category grouping.
+    // ============================
+    // INDUSTRIES (SMB list)
+    // ============================
     const industryKeys = [
-      // Home services
       "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door Repair","Locksmith","Handyman","Appliance Repair",
       "Home Cleaning","Commercial Cleaning","Carpet Cleaning","Pressure Washing","Gutter Cleaning","Chimney Sweep","Junk Removal",
       "Pest Control","Landscaping","Lawn Care","Tree Service","Irrigation","Pool Service","Septic Service","Moving Company",
       "Solar Installer","General Contractor","Remodeling","Painter","Flooring","Tile & Stone","Concrete","Fencing","Masonry","Drywall",
       "Insulation","Paving","Glass Repair","Water Damage Restoration","Fire Damage Restoration","Mold Remediation",
-
-      // Automotive
       "Auto Repair","Tire Shop","Oil Change","Auto Body Shop","Car Detailing","Car Wash","Car Rental","Towing","Motorcycle Repair","Boat Repair",
-
-      // Healthcare
       "Dental","Orthodontics","Chiropractic","Physical Therapy","Massage Therapy","Urgent Care","Primary Care","Dermatology","Optometry",
       "Mental Health Clinic","Counseling","Med Spa","Aesthetics Clinic","IV Therapy","Home Health Care","Senior Care","Pharmacy",
-
-      // Beauty
       "Hair Salon","Barbershop","Nail Salon","Spa","Esthetics","Tattoo Studio","Cosmetology School",
-
-      // Pets
       "Veterinary","Pet Grooming","Pet Boarding","Dog Training","Pet Daycare","Animal Rescue",
-
-      // Legal & finance
       "Law Firm","Personal Injury Law","Family Law","Immigration Law","Accounting","Bookkeeping","Tax Prep","Insurance Agency",
       "Financial Advisor","Mortgage Broker","Real Estate","Property Management","Title Company",
-
-      // Professional services
       "IT Services","Managed IT","Cybersecurity","Marketing Agency","SEO Agency","Web Design","Graphic Design","Photography Studio",
       "Videography","Event Planning","Staffing Agency","Recruiting","Consulting","Translation Services","Printing Services",
-
-      // Education
       "Daycare","Preschool","Tutoring Center","Driving School","Music School","Dance Studio","Martial Arts School","Language School",
-
-      // Retail & food
       "Boutique","Jewelry Store","Florist","Bakery","Cafe","Coffee Shop","Restaurant","Catering","Food Truck","Grocery Store",
       "Liquor Store","Convenience Store","Pharmacy Retail","Furniture Store","Mattress Store","Electronics Store","Cell Phone Shop",
       "Smoke Shop","Pet Store",
-
-      // Hospitality & travel
       "Hotel","Motel","Bed & Breakfast","Vacation Rental Management","Travel Agency","Tour Operator",
-
-      // Fitness
       "Gym","Personal Training","Yoga Studio","Pilates Studio","CrossFit","Sports Club",
-
-      // Construction / B2B
       "Warehouse","Logistics","Courier Service","Manufacturing","Wholesale","B2B Sales","Call Center","After Hours"
     ];
 
@@ -1204,7 +1335,9 @@
       return out;
     }
 
-    // ========= TEMPLATE CATEGORIES + PACKS (Popular/Recommended added) =========
+    // ============================
+    // TEMPLATES (Popular/Recommended)
+    // ============================
     const templateCategories = ["ALL","Popular","Recommended","Appointments","Emergency","After Hours","Sales","Support","Intake","Info"];
 
     const industryPacks = {
@@ -1289,7 +1422,9 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       return { templates: roleList, packName: industryKey };
     }
 
-    // ========= COMMUNITY (NEWSLETTER + FORUM + AI Q&A) =========
+    // ============================
+    // COMMUNITY (Newsletter + Forum + AI Q&A)
+    // ============================
     let communityTab = "NEWSLETTER";
     function openCommunity(){ communityTab = "NEWSLETTER"; triggerModal("community"); }
     function openNewsletterPortal(){ communityTab = "NEWSLETTER"; triggerModal("community"); }
@@ -1329,9 +1464,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
           headers: { "content-type": "application/json" },
           body: JSON.stringify(payload)
         });
-      } catch (e) {
-        console.warn("Newsletter endpoint not available:", e);
-      }
+      } catch (e) {}
 
       const msg = document.getElementById("nlMsg");
       if(msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">Subscribed</div>
@@ -1370,7 +1503,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       if(q.length < 5) return;
 
       const out = document.getElementById("qaAnswer");
-      out.innerHTML = `<div class="text-slate-500 font-black uppercase text-[10px] tracking-widest">Thinking...</div>`;
+      out.innerHTML = `<div class="text-slate-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("thinking"))}</div>`;
 
       try{
         const res = await fetch("/api/ai-qa", {
@@ -1392,11 +1525,10 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
         out.innerHTML = `<div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
           <div class="text-[12px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap">${escapeHtml(answer)}</div>`;
       } catch(e){
-        console.warn(e);
         out.innerHTML = `
-          <div class="mini text-orange-500 mb-2">AI Q&A Needs Backend</div>
+          <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
           <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-            Add endpoint:
+            ${escapeHtml(i18n.t("needs_backend"))}
             <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 text-[11px] text-slate-300 font-semibold">
               POST <span class="text-orange-500">/api/ai-qa</span> → { answer: "..." }
             </div>
@@ -1426,8 +1558,8 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
         <div id="communityBody"></div>
 
         <div class="grid sm:grid-cols-2 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="handleStep(1)">${escapeHtml(i18n.t("start_activation"))}</button>
+          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="handleStep(1)">${escapeHtml(i18n.t("start_activation"))}</button>
         </div>
       `;
 
@@ -1438,12 +1570,12 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
             <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("newsletter"))}</div>
 
             <div class="grid sm:grid-cols-2 gap-2 mt-3">
-              <input id="nlName" class="select-theme" style="text-transform:none;letter-spacing:.06em" placeholder="NAME (OPTIONAL)" />
-              <input id="nlEmail" class="select-theme" style="text-transform:none;letter-spacing:.06em" placeholder="EMAIL" />
+              <input id="nlName" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="name_optional" placeholder="${escapeHtml(i18n.t("name_optional"))}" />
+              <input id="nlEmail" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="email" placeholder="${escapeHtml(i18n.t("email"))}" />
             </div>
-            <textarea id="nlNote" class="textarea-theme mt-2" style="min-height:110px" placeholder="Tell us what you want updates about (optional)"></textarea>
+            <textarea id="nlNote" class="textarea-theme mt-2" style="min-height:110px" data-i18n-placeholder="tell_us_updates" placeholder="${escapeHtml(i18n.t("tell_us_updates"))}"></textarea>
             <div id="nlMsg" class="mt-2"></div>
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" onclick="submitNewsletter()">
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="submitNewsletter()">
               ${escapeHtml(i18n.t("join_list"))}
             </button>
 
@@ -1460,10 +1592,10 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
           <div class="grid lg:grid-cols-2 gap-4 text-left">
             <div class="card-theme">
               <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("forum"))}</div>
-              <input id="fpTitle" class="select-theme" style="text-transform:none;letter-spacing:.06em" placeholder="TITLE" />
-              <textarea id="fpBody" class="textarea-theme mt-2" placeholder="Write your question or feedback..."></textarea>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" onclick="addForumPost()">
-                Post
+              <input id="fpTitle" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="title" placeholder="${escapeHtml(i18n.t("title"))}" />
+              <textarea id="fpBody" class="textarea-theme mt-2" data-i18n-placeholder="write_question" placeholder="${escapeHtml(i18n.t("write_question"))}"></textarea>
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="addForumPost()">
+                ${escapeHtml(i18n.t("post"))}
               </button>
             </div>
 
@@ -1481,14 +1613,16 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
         body.innerHTML = `
           <div class="card-theme text-left">
             <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
-            <textarea id="qaQuestion" class="textarea-theme mt-2" style="min-height:110px" placeholder="Ask a question..."></textarea>
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" onclick="askAiQuestion()">
+            <textarea id="qaQuestion" class="textarea-theme mt-2" style="min-height:110px" data-i18n-placeholder="ask_question" placeholder="${escapeHtml(i18n.t("ask_question"))}"></textarea>
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="askAiQuestion()">
               ${escapeHtml(i18n.t("ask_ai"))}
             </button>
             <div id="qaAnswer" class="mt-4"></div>
           </div>
         `;
       }
+
+      i18n.applyTranslations(document.getElementById("setupModal"));
     }
 
     function renderNewsletterListHtml(){
@@ -1521,8 +1655,8 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
             `).join("") || `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-2">No replies yet</div>`}
           </div>
           <div class="grid grid-cols-4 gap-2 mt-3">
-            <input id="reply_${p.id}" class="select-theme col-span-3" style="text-transform:none;letter-spacing:.06em" placeholder="Write a reply..." />
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="addForumReply('${p.id}')">Reply</button>
+            <input id="reply_${p.id}" class="select-theme col-span-3" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="write_reply" placeholder="${escapeHtml(i18n.t("write_reply"))}" />
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="addForumReply('${p.id}')">${escapeHtml(i18n.t("reply"))}</button>
           </div>
         </div>
       `).join("");
@@ -1537,7 +1671,26 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       }
     }
 
-    // ========= ROLE/TEMPLATE/SCRIPT =========
+    // ============================
+    // Dynamic translation helpers
+    // ============================
+    function escapeHtml(str){
+      return String(str || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+    }
+
+    // Translate dynamic strings (industries, templates) using cache or backend
+    function dt(namespace, key, fallback){
+      const lang = (window.APP_I18N.current || "EN").toUpperCase();
+      const v = i18n.dynGet(lang, namespace, key);
+      return v != null ? v : (fallback != null ? fallback : key);
+    }
+
+    // ============================
+    // ROLE/TEMPLATE/SCRIPT
+    // ============================
     function applyVars(text){
       const businessName = (document.getElementById('v3')?.innerText && document.getElementById('v3').innerText !== i18n.t("sync"))
         ? document.getElementById('v3').innerText
@@ -1591,13 +1744,19 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       });
     }
 
-    function initTemplateDropdown(){
+    async function initTemplateDropdown(){
       const templateSelect = document.getElementById('templateSelect');
       const scriptBox = document.getElementById('scriptBox');
       templateSelect.innerHTML = "";
 
       const { packName } = getTemplatesFor(selectedRole);
       const filtered = getFilteredTemplates();
+
+      // Ensure dynamic translations for template titles/scripts (optional backend)
+      const tplTitles = filtered.map(x => x.title);
+      const tplScripts = filtered.map(x => x.script);
+      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "template_titles", tplTitles);
+      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "template_scripts", tplScripts);
 
       if(!filtered.length){
         const opt = document.createElement('option');
@@ -1616,14 +1775,19 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       filtered.forEach(tpl => {
         const opt = document.createElement('option');
         opt.value = tpl.key;
-        opt.textContent = `${tpl.title} — ${tpl.category} — ${packName}`.toUpperCase();
+
+        const shownTitle = dt("template_titles", tpl.title, tpl.title);
+        opt.textContent = `${shownTitle} — ${tpl.category} — ${packName}`.toUpperCase();
         templateSelect.appendChild(opt);
       });
 
       templateSelect.value = selectedTemplateKey;
 
       const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
-      if(!agentScript || agentScript.trim().length < 10) agentScript = applyVars(chosen.script);
+
+      // script translation (optional)
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      if(!agentScript || agentScript.trim().length < 10) agentScript = applyVars(shownScript);
       scriptBox.value = agentScript;
     }
 
@@ -1634,7 +1798,10 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       const chosen = filtered.find(x => x.key === key);
       if(!chosen) return;
       selectedTemplateKey = key;
-      agentScript = applyVars(chosen.script);
+
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      agentScript = applyVars(shownScript);
+
       document.getElementById('scriptBox').value = agentScript;
     }
     function onScriptEdit(){ agentScript = document.getElementById('scriptBox').value; }
@@ -1642,11 +1809,16 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       const filtered = getFilteredTemplates();
       const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
       if(!chosen) return;
-      agentScript = applyVars(chosen.script);
+
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      agentScript = applyVars(shownScript);
+
       document.getElementById('scriptBox').value = agentScript;
     }
 
-    // ========= VOICE UI =========
+    // ============================
+    // VOICE UI
+    // ============================
     function initVoiceDropdown(){
       const voiceSelect = document.getElementById('voiceSelect');
       voiceSelect.innerHTML = "";
@@ -1699,7 +1871,9 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       }
     }
 
-    // ========= DASHBOARD =========
+    // ============================
+    // DASHBOARD
+    // ============================
     function renderDashboard(){
       const c = document.getElementById('mContent');
       const market = selectedMarket || "—";
@@ -1732,9 +1906,9 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
             </div>
 
             <div class="grid grid-cols-3 gap-2 mt-4">
-              <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">${escapeHtml(i18n.t("edit_role"))}</button>
-              <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">${escapeHtml(i18n.t("edit_script"))}</button>
-              <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">${escapeHtml(i18n.t("edit_voice"))}</button>
+              <button class="modal-btn justify-center text-center" type="button" onclick="triggerModal(4)">${escapeHtml(i18n.t("edit_role"))}</button>
+              <button class="modal-btn justify-center text-center" type="button" onclick="triggerModal(4)">${escapeHtml(i18n.t("edit_script"))}</button>
+              <button class="modal-btn justify-center text-center" type="button" onclick="triggerModal(4)">${escapeHtml(i18n.t("edit_voice"))}</button>
             </div>
           </div>
 
@@ -1744,8 +1918,8 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
               ${escapeHtml(i18n.t("newsletter_no_deploy"))} + Forum + AI Q&amp;A
             </div>
             <div class="grid grid-cols-2 gap-2 mt-4">
-              <button class="modal-btn justify-center text-center" onclick="openNewsletterPortal()">${escapeHtml(i18n.t("newsletter"))}</button>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="openCommunity()">${escapeHtml(i18n.t("community"))}</button>
+              <button class="modal-btn justify-center text-center" type="button" onclick="openNewsletterPortal()">${escapeHtml(i18n.t("newsletter"))}</button>
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="openCommunity()">${escapeHtml(i18n.t("community"))}</button>
             </div>
           </div>
         </div>
@@ -1756,25 +1930,22 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
         </div>
 
         <div class="grid sm:grid-cols-2 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="handleStep(1)">
+          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="handleStep(1)">
             ${escapeHtml(i18n.t("start_activation"))}
           </button>
         </div>
       `;
+
+      i18n.applyTranslations(document.getElementById("setupModal"));
     }
 
-    function escapeHtml(str){
-      return String(str || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;");
-    }
-
-    // ========= MODAL FLOW =========
+    // ============================
+    // MODAL FLOW
+    // ============================
     let lastModalStep = null;
 
-    function triggerModal(step, opts = {}){
+    async function triggerModal(step, opts = {}){
       lastModalStep = step;
 
       const m = document.getElementById('setupModal');
@@ -1797,7 +1968,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       }
       if(step === "dashboard"){
         shell.classList.add('dashboard-wide');
-        tEl.innerText = "Dashboard";
+        tEl.innerText = i18n.t("dashboard");
         renderDashboard();
         return;
       }
@@ -1811,9 +1982,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       if(step === 1){
         tEl.innerText = i18n.t("step_01");
         s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_countries" placeholder="${escapeHtml(i18n.t("search_countries"))}" onkeyup="filterMarket(this.value)">`;
-
         renderMarketByContinent("");
-        // apply placeholder translation to newly injected input
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
@@ -1821,6 +1990,10 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       if(step === 2){
         tEl.innerText = i18n.t("step_02");
         s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_industries" placeholder="${escapeHtml(i18n.t("search_industries"))}" onkeyup="filterIndustryCategories(this.value)">`;
+
+        // Pre-fetch dynamic translations for industries (optional backend)
+        await i18n.ensureDynamicTranslations(window.APP_I18N.current, "industries", industryKeys);
+
         renderIndustryCategoryList("");
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
@@ -1829,9 +2002,10 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       if(step === 3){
         tEl.innerText = i18n.t("step_03");
         c.innerHTML = `
-          <input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
-          <button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">${escapeHtml(i18n.t("save"))}</button>
+          <input id="bn" data-i18n-placeholder="business_name" placeholder="${escapeHtml(i18n.t("business_name"))}" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
+          <button type="button" onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">${escapeHtml(i18n.t("save"))}</button>
         `;
+        i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
 
@@ -1865,8 +2039,8 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
               <textarea id="scriptBox" class="textarea-theme mt-2" oninput="onScriptEdit()"></textarea>
 
               <div class="grid grid-cols-2 gap-2 mt-3">
-                <button class="modal-btn justify-center text-center" onclick="resetTemplate()">${escapeHtml(i18n.t("reset_template"))}</button>
-                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="closeModal()">${escapeHtml(i18n.t("save"))}</button>
+                <button class="modal-btn justify-center text-center" type="button" onclick="resetTemplate()">${escapeHtml(i18n.t("reset_template"))}</button>
+                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="closeModal()">${escapeHtml(i18n.t("save"))}</button>
               </div>
             </div>
 
@@ -1875,8 +2049,8 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
               <select id="voiceSelect" class="select-theme" onchange="onVoiceChange(this.value)"></select>
 
               <div class="grid grid-cols-2 gap-2 mt-3">
-                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="previewVoice()">${escapeHtml(i18n.t("preview_voice"))}</button>
-                <button class="modal-btn justify-center text-center" onclick="closeModal()">${escapeHtml(i18n.t("save"))}</button>
+                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="previewVoice()">${escapeHtml(i18n.t("preview_voice"))}</button>
+                <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("save"))}</button>
               </div>
 
               <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mt-4">
@@ -1903,8 +2077,8 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
           </div>
 
           <div class="grid sm:grid-cols-2 gap-2 mt-4">
-            <button class="modal-btn justify-center text-center" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="finish(4, selectedRole)">
+            <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="finish(4, selectedRole)">
               ${escapeHtml(i18n.t("confirm_role_template_voice"))}
             </button>
           </div>
@@ -1933,9 +2107,8 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
         });
 
         initTemplateCategoryDropdown();
-        initTemplateDropdown();
+        await initTemplateDropdown();
         initVoiceDropdown();
-
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
@@ -1965,7 +2138,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       }
     }
 
-    // Step 1 rendering: continent + alphabetical
+    // Step 1 rendering
     function renderMarketByContinent(searchQuery){
       const c = document.getElementById('mContent');
       c.innerHTML = "";
@@ -1984,7 +2157,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
         filtered.forEach(name => {
           const btn = createBtn(name, () => { updateCurrencyUI(name); finish(1, name); });
           btn.setAttribute('data-n', name);
-          btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${name}`;
+          btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${escapeHtml(name)}`;
           c.appendChild(btn);
         });
       });
@@ -1998,7 +2171,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
     }
     function filterMarket(query){ renderMarketByContinent(query); }
 
-    // Step 2 rendering: category + search
+    // Step 2 rendering: industry (translated names if backend exists, otherwise EN)
     function renderIndustryCategoryList(searchQuery){
       const c = document.getElementById('mContent');
       c.innerHTML = "";
@@ -2006,7 +2179,10 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
 
       const groups = buildCategorizedIndustryList();
       groups.forEach(g => {
-        const filtered = g.items.filter(name => name.toUpperCase().includes(q));
+        const filtered = g.items.filter(name => {
+          const shown = dt("industries", name, name);
+          return shown.toUpperCase().includes(q) || name.toUpperCase().includes(q);
+        });
         if(!filtered.length) return;
 
         const div = document.createElement('div');
@@ -2016,12 +2192,14 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
 
         filtered.forEach(name => {
           const idx = industryKeys.indexOf(name);
-          const btn = createBtn(name, () => {
+          const shown = dt("industries", name, name);
+
+          const btn = createBtn(shown, () => {
             currentIndustryIdx = idx >= 0 ? idx : currentIndustryIdx;
-            finish(2, name);
+            finish(2, shown);
             refreshTemplatesForCurrentSelection(true);
           });
-          btn.setAttribute('data-n', name);
+          btn.setAttribute('data-n', shown);
           c.appendChild(btn);
         });
       });
@@ -2035,7 +2213,9 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
     }
     function filterIndustryCategories(query){ renderIndustryCategoryList(query); }
 
-    // ========= ACTIONS =========
+    // ============================
+    // ACTIONS
+    // ============================
     function handleStep(s){ if(s === 1 || completedSteps >= s - 1) triggerModal(s); }
 
     function finish(s, v){
@@ -2057,6 +2237,9 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
 
     function closeModal(){ document.getElementById('setupModal').style.display = 'none'; }
 
+    // ============================
+    // Language menu behavior (fixed)
+    // ============================
     function toggleLangMenu(force){
       const d = document.getElementById('langMenu');
       if(force === true) d.style.display = 'flex';
@@ -2065,10 +2248,8 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
     }
 
     function setLang(cc, langCode){
-      // UI badge
       document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
       document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${langCode}`;
-      // apply translations (engine)
       i18n.setLanguage(langCode);
       toggleLangMenu(false);
     }
@@ -2079,8 +2260,6 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
 
       document.getElementById('main-currency').innerText = data.cur;
       document.getElementById('main-price').innerText = data.price;
-
-      // translated "Regular"
       document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} ${i18n.t("regular")}`;
 
       agentScript = applyVars(agentScript);
@@ -2096,6 +2275,7 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
 
     function createBtn(txt, fn){
       const b = document.createElement('button');
+      b.type = "button";
       b.className = "modal-btn";
       b.innerText = txt;
       b.onclick = fn;
@@ -2108,17 +2288,27 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       languageList.forEach(l => {
         const b = createBtn(l.n, () => setLang(l.f, l.id));
         b.setAttribute('data-n', l.n);
-        b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3" alt=""> ${l.n}`;
+
+        // If no static dictionary exists, it still works via EN fallback (so keep enabled).
+        // Optional: show a hint that it will fallback until backend translation is added.
+        const hasStatic = !!(i18n.translations[l.id] && Object.keys(i18n.translations[l.id]).length > 0);
+        const hint = (l.id !== "EN" && !hasStatic) ? ` <span style="opacity:.55">• EN fallback</span>` : "";
+
+        b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3" alt=""> <span>${escapeHtml(l.n)}</span>${hint}`;
         list.appendChild(b);
       });
+      i18n.applyTranslations(document);
     }
 
     function updateParallax(e){
+      if(!e) return;
       document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
       document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
     }
 
-    // ========= VAPI DEMO CALL =========
+    // ============================
+    // VAPI DEMO CALL
+    // ============================
     async function runVoice(){
       try{
         const apiKey = await loadVapiKey();
@@ -2149,7 +2339,9 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       }
     }
 
-    // ========= TIMER + COUNTER =========
+    // ============================
+    // TIMER + COUNTER
+    // ============================
     setInterval(() => {
       const now = new Date();
       const h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds();
@@ -2163,29 +2355,69 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
       }
     }, 1000);
 
-    // ========= INIT =========
-    initLangList();
+    // ============================
+    // INIT
+    // ============================
+    function wireTopButtons(){
+      document.getElementById("heroCta").addEventListener("click", () => handleStep(1));
+      document.getElementById("sideCta").addEventListener("click", () => handleStep(1));
+      document.getElementById("activationInfoBtn").addEventListener("click", openActivationInfo);
+      document.getElementById("communityBtn").addEventListener("click", openCommunity);
+      document.getElementById("newsletterBtn").addEventListener("click", openNewsletterPortal);
 
-    // defaults
+      // Step cards click
+      document.getElementById("s1").addEventListener("click", () => handleStep(1));
+      document.getElementById("s2").addEventListener("click", () => handleStep(2));
+      document.getElementById("s3").addEventListener("click", () => handleStep(3));
+      document.getElementById("s4").addEventListener("click", () => handleStep(4));
+      document.getElementById("s5").addEventListener("click", () => handleStep(5));
+      document.getElementById("s6").addEventListener("click", () => handleStep(6));
+
+      // Modal close button
+      document.getElementById("mClose").addEventListener("click", closeModal);
+
+      // Lang trigger
+      document.getElementById("langTrigger").addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleLangMenu();
+      });
+
+      // Click outside closes lang menu (fix for “buttons not responsive” due to overlay)
+      document.addEventListener("click", (e) => {
+        const menu = document.getElementById("langMenu");
+        const wrap = document.getElementById("langWrap");
+        if(menu.style.display === "flex" && !wrap.contains(e.target)){
+          toggleLangMenu(false);
+        }
+      });
+
+      // Escape closes modal + lang menu
+      document.addEventListener("keydown", (e) => {
+        if(e.key === "Escape"){
+          closeModal();
+          toggleLangMenu(false);
+        }
+      });
+    }
+
+    initLangList();
+    wireTopButtons();
+
     const defaultIndustry = "Electrical";
     currentIndustryIdx = Math.max(0, industryKeys.indexOf(defaultIndustry));
     refreshTemplatesForCurrentSelection(true);
     const initTemplates = getTemplatesFor(selectedRole).templates;
     if(initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
 
-    // default market
     updateCurrencyUI("United States");
 
-    // If user deployed previously, show state (UX only)
     if(isDeployed()){
       document.getElementById('v6').innerText = "READY";
       document.getElementById('s6').classList.add('active');
     }
 
-    // Apply translations to base UI after engine init
     i18n.applyTranslations(document);
 
-    // Vapi html-script-tag (provides window.vapiSDK.run)
     (function(d, t) {
       var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
       g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
