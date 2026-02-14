@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- Vapi -->
+  <!-- Vapi (keep both: html-script-tag gives window.vapiSDK, web sdk can exist too) -->
   <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest"></script>
 
   <style>
@@ -123,6 +123,8 @@
       width: 100%;
       margin-bottom: 8px;
     }
+
+    /* Modal */
     .modal-scroll { max-height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
 
     #setupModal {
@@ -137,94 +139,82 @@
     }
 
     .modal-shell {
-      background: rgba(10, 12, 18, 0.92);
-      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.65);
       width: 100%;
-      max-width: 460px;
+      max-width: 430px;
       padding: 18px;
       text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-      backdrop-filter: blur(10px);
     }
-    .modal-shell.role-wide { max-width: 1080px; }
-    .modal-shell.info-wide { max-width: 860px; }
-    .modal-shell.dashboard-wide { max-width: 1080px; }
 
     .modal-btn {
       width: 100%;
-      padding: 10px 12px;
+      padding: 12px;
       border-radius: 12px;
-      font-weight: 900;
+      font-weight: 800;
       text-transform: uppercase;
-      font-size: 9px;
+      font-size: 10px;
       background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
       color: white;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       cursor: pointer;
       text-align: left;
-      letter-spacing: 0.14em;
+      line-height: 1.2;
     }
-    .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: #f97316; }
+    .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.10); border-color: rgba(249,115,22,0.65); }
     .modal-btn.disabled { opacity: 0.3; cursor: not-allowed; }
 
-    .pill {
-      display: inline-flex;
+    .modal-hdr {
+      display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .modal-pill {
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #fb923c;
+      background: rgba(249,115,22,0.12);
       border: 1px solid rgba(249,115,22,0.25);
-      background: rgba(249,115,22,0.08);
-      color: white;
-      font-weight: 900;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      width: 100%;
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
     }
-
-    .muted-hint {
-      font-size: 10px;
+    .modal-title {
+      font-size: 16px;
       font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: rgba(148,163,184,0.85);
-      line-height: 1.4;
+      color: #fff;
+      margin: 4px 0 10px 0;
+      letter-spacing: 0.06em;
     }
-
-    .select-theme {
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.10);
-      color: white;
-      border-radius: 12px;
-      padding: 10px 12px;
-      outline: none;
-      font-weight: 900;
+    .modal-sub {
       font-size: 11px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      color: rgba(148,163,184,0.95);
+      margin-bottom: 10px;
+      letter-spacing: 0.08em;
     }
-    .select-theme option { background: #0b1224; color: white; }
 
-    .textarea-theme {
-      width: 100%;
-      min-height: 190px;
-      resize: vertical;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 16px;
-      padding: 12px;
-      color: white;
-      outline: none;
-      font-weight: 700;
-      font-size: 12px;
-      line-height: 1.5;
+    .section-label {
+      text-align: center;
+      font-size: 9px;
+      font-weight: 900;
+      color: rgba(148,163,184,0.8);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      margin: 12px 0 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 6px;
     }
 
     .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
@@ -232,31 +222,6 @@
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
       70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-    }
-
-    .card-theme {
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 20px;
-      padding: 16px;
-    }
-    .mini {
-      font-size: 10px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: rgba(148,163,184,0.9);
-    }
-    .divider {
-      font-size: 9px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-      color: rgba(148,163,184,0.55);
-      text-align: center;
-      margin: 10px 0 6px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      padding-bottom: 6px;
     }
   </style>
 </head>
@@ -291,16 +256,11 @@
       <div class="lg:col-span-3 text-center lg:text-left">
         <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title">GLOBAL ZERO-HUMAN<br /> AI RECEPTIONIST</h1>
         <p id="hero-p" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider">
-          Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>
+          Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. <span class="text-orange-500">Fully Automated Worldwide Deployment. Multiligual. No Humans.</span>
         </p>
-        <div class="grid gap-2 sm:flex sm:gap-3 sm:items-center">
-          <button onclick="handleStep(1)" id="hero-cta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">
-            Start Activation
-          </button>
-          <button onclick="openActivationInfo()" class="w-full sm:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition">
-            Activation Steps Info
-          </button>
-        </div>
+        <button onclick="handleStep(1)" id="hero-cta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic">
+          Start Activation
+        </button>
       </div>
 
       <div class="lg:col-span-2">
@@ -336,9 +296,9 @@
       </div>
     </div>
 
-    <div class="mt-10 lg:mt-16">
+    <div class="mt-10 lg:mt-20">
       <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
-        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">AI Receptionist Activation Protocol</span>
+        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Ai Receptionist Activation Protocol</span>
       </div>
       <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
         <div id="s1" class="step-card unlocked next-focus" onclick="handleStep(1)"><p class="text-[7px] font-black text-orange-500 uppercase step-label">01 Market</p><p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label">Select</p></div>
@@ -352,11 +312,15 @@
   </div>
 
   <div id="setupModal">
-    <div id="modalShell" class="modal-shell">
-      <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-4">Setup</h2>
+    <div class="modal-shell">
+      <div class="modal-hdr">
+        <div class="modal-pill">AI CALL PORT</div>
+        <button id="mCloseX" onclick="closeModal()" class="text-[10px] font-black uppercase text-slate-500 hover:text-white">Close</button>
+      </div>
+      <h2 id="mTitle" class="modal-title">Setup</h2>
       <div id="modalSearchContainer"></div>
-      <div id="mContent"></div>
-      <button id="mClose" onclick="closeModal()" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white">Close</button>
+      <div id="mContent" class="modal-scroll"></div>
+      <button id="mClose" onclick="closeModal()" class="mt-4 text-[10px] text-slate-500 uppercase font-black hover:text-white">Close</button>
     </div>
   </div>
 
@@ -376,8 +340,12 @@
   </footer>
 
   <script>
+    // ========= STRIPE CHECKOUT LINK (CONFIRMED) =========
+    const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
+
     // ========= VAPI KEY (NO HARDCODE) =========
     let vapiApiKey = null;
+
     async function loadVapiKey() {
       if (vapiApiKey) return vapiApiKey;
       const res = await fetch("/api/config", { cache: "no-store" });
@@ -388,8 +356,7 @@
       return vapiApiKey;
     }
 
-    // ========= ASSISTANTS (fallback mapping) =========
-    // You can add more assistant IDs later and map by industry key.
+    // ========= ASSISTANTS =========
     const assistants = {
       "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
       "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
@@ -397,46 +364,10 @@
       "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f"
     };
 
-    // ========= STATE =========
-    let completedSteps = 0;
-    let currentIndustryIdx = 0;
-    let currentLang = "EN";
-    let selectedMarket = "United States";
+    let completedSteps = 0, currentIndustryIdx = 8, currentLang = "EN", selectedMarket = "United States";
 
-    let selectedRole = "Receptionist";
-    let selectedTemplateKey = null;
-    let agentScript = "";
-
-    // template UI state
-    let templateCategoryFilter = "ALL";
-    let templateSearchQuery = "";
-
-    // ========= ELEVENLABS VOICE =========
-    const elevenVoices = [
-      { id: "sarah",    label: "Sarah (Warm / Natural)" },
-      { id: "andrea",   label: "Andrea (Confident)" },
-      { id: "phillip",  label: "Phillip (Deep / Calm)" },
-      { id: "ryan",     label: "Ryan (Friendly)" },
-      { id: "joseph",   label: "Joseph (Neutral)" },
-      { id: "myra",     label: "Myra (Bright)" },
-      { id: "paula",    label: "Paula (Soft)" },
-      { id: "steve",    label: "Steve (Direct)" },
-      { id: "mark",     label: "Mark (Professional)" },
-      { id: "matilda",  label: "Matilda (Energetic)" }
-    ];
-    let selectedVoiceId = "sarah";
-    let selectedVoiceSettings = {
-      stability: 0.45,
-      similarityBoost: 0.80,
-      style: 0.15,
-      useSpeakerBoost: true,
-      optimizeStreamingLatency: 4
-    };
-    function getSelectedVapiVoice() {
-      return { provider: "11labs", voiceId: selectedVoiceId, model: "eleven_turbo_v2", ...selectedVoiceSettings };
-    }
-
-    // ========= MARKET =========
+    // ========= PRICING / CURRENCY =========
+    // Keep your existing table; for any country not listed, we use a safe fallback.
     const marketCurrency = {
       "United States": { cur: "$", price: "199", reg: "399", prefix: "+1", active: true },
       "United Kingdom": { cur: "£", price: "155", reg: "310", prefix: "+44", active: true },
@@ -457,32 +388,77 @@
       "Netherlands": { cur: "€", price: "185", reg: "370", prefix: "+31", active: true },
       "Portugal": { cur: "€", price: "185", reg: "370", prefix: "+351", active: true },
       "Israel": { cur: "₪", price: "720", reg: "1440", prefix: "+972", active: true },
+      "Russia": { cur: "₽", price: "18500", reg: "37000", prefix: "+7", active: true },
       "Turkey": { cur: "₺", price: "6500", reg: "13000", prefix: "+90", active: true },
       "Thailand": { cur: "฿", price: "6800", reg: "13600", prefix: "+66", active: true },
 
-      "Mexico": { cur: "$", price: "---", reg: "---", prefix: "+52", active: false },
-      "Spain": { cur: "€", price: "---", reg: "---", prefix: "+34", active: false },
-      "Vietnam": { cur: "₫", price: "---", reg: "---", prefix: "+84", active: false },
-      "Argentina": { cur: "$", price: "---", reg: "---", prefix: "+54", active: false },
-      "Austria": { cur: "€", price: "---", reg: "---", prefix: "+43", active: false },
-      "Belgium": { cur: "€", price: "---", reg: "---", prefix: "+32", active: false },
-      "Chile": { cur: "$", price: "---", reg: "---", prefix: "+56", active: false },
-      "Colombia": { cur: "$", price: "---", reg: "---", prefix: "+57", active: false },
-      "Finland": { cur: "€", price: "---", reg: "---", prefix: "+358", active: false },
-      "Greece": { cur: "€", price: "---", reg: "---", prefix: "+30", active: false },
-      "Hong Kong": { cur: "$", price: "---", reg: "---", prefix: "+852", active: false },
-      "Ireland": { cur: "€", price: "---", reg: "---", prefix: "+353", active: false },
-      "Malaysia": { cur: "RM", price: "---", reg: "---", prefix: "+60", active: false },
-      "New Zealand": { cur: "$", price: "---", reg: "---", prefix: "+64", active: false },
-      "Philippines": { cur: "₱", price: "---", reg: "---", prefix: "+63", active: false },
-      "Singapore": { cur: "$", price: "---", reg: "---", prefix: "+65", active: false },
-      "South Africa": { cur: "R", price: "---", reg: "---", prefix: "+27", active: false },
-      "Switzerland": { cur: "CHF", price: "---", reg: "---", prefix: "+41", active: false },
-      "Taiwan": { cur: "$", price: "---", reg: "---", prefix: "+886", active: false },
-      "United Arab Emirates": { cur: "AED", price: "---", reg: "---", prefix: "+971", active: false }
+      // Previously "coming soon" -> now ACTIVE by request
+      "Mexico": { cur: "$", price: "199", reg: "399", prefix: "+52", active: true },
+      "Spain": { cur: "€", price: "185", reg: "370", prefix: "+34", active: true },
+      "Vietnam": { cur: "₫", price: "199", reg: "399", prefix: "+84", active: true },
+      "Argentina": { cur: "$", price: "199", reg: "399", prefix: "+54", active: true },
+      "Austria": { cur: "€", price: "185", reg: "370", prefix: "+43", active: true },
+      "Belgium": { cur: "€", price: "185", reg: "370", prefix: "+32", active: true },
+      "Chile": { cur: "$", price: "199", reg: "399", prefix: "+56", active: true },
+      "Colombia": { cur: "$", price: "199", reg: "399", prefix: "+57", active: true },
+      "Finland": { cur: "€", price: "185", reg: "370", prefix: "+358", active: true },
+      "Greece": { cur: "€", price: "185", reg: "370", prefix: "+30", active: true },
+      "Hong Kong": { cur: "$", price: "199", reg: "399", prefix: "+852", active: true },
+      "Ireland": { cur: "€", price: "185", reg: "370", prefix: "+353", active: true },
+      "Malaysia": { cur: "RM", price: "199", reg: "399", prefix: "+60", active: true },
+      "New Zealand": { cur: "$", price: "305", reg: "610", prefix: "+64", active: true },
+      "Philippines": { cur: "₱", price: "199", reg: "399", prefix: "+63", active: true },
+      "Singapore": { cur: "$", price: "199", reg: "399", prefix: "+65", active: true },
+      "South Africa": { cur: "R", price: "199", reg: "399", prefix: "+27", active: true },
+      "Switzerland": { cur: "CHF", price: "199", reg: "399", prefix: "+41", active: true },
+      "Taiwan": { cur: "$", price: "199", reg: "399", prefix: "+886", active: true },
+      "United Arab Emirates": { cur: "AED", price: "199", reg: "399", prefix: "+971", active: true }
     };
 
-    // ========= LANG MENU =========
+    function getMarketData(country) {
+      // Fallback for any country not in the table (still ACTIVE)
+      return marketCurrency[country] || { cur: "$", price: "199", reg: "399", prefix: "", active: true };
+    }
+
+    // ========= COUNTRIES BY CONTINENT (FROM YOUR LIST) =========
+    // Sorted A-Z inside each continent.
+    const countriesByContinent = {
+      "Africa": [
+        "Angola","Benin","Botswana","Burkina Faso","Cameroon","Egypt","Ethiopia","Gabon","Ghana","Ivory Coast",
+        "Kenya","Madagascar","Malawi","Mali","Mauritius","Morocco","Namibia","Nigeria","Rwanda","Senegal",
+        "Seychelles","South Africa","Tanzania","Togo","Tunisia","Uganda","Zambia","Zimbabwe"
+      ].sort(),
+      "Asia & Oceania": [
+        "Australia","Bahrain","Bangladesh","Cambodia","China","Fiji","Hong Kong","India","Indonesia","Iraq",
+        "Israel","Japan","Jordan","Kazakhstan","Kuwait","Kyrgyzstan","Laos","Lebanon","Macao","Malaysia",
+        "Maldives","Mongolia","New Zealand","Oman","Pakistan","Papua New Guinea","Philippines","Qatar",
+        "Saudi Arabia","Singapore","South Korea","Sri Lanka","Taiwan","Thailand","Turkey","United Arab Emirates",
+        "Uzbekistan","Vietnam"
+      ].sort(),
+      "Europe": [
+        "Albania","Andorra","Armenia","Austria","Azerbaijan","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria",
+        "Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece",
+        "Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Malta","Moldova","Monaco",
+        "Montenegro","Netherlands","North Macedonia","Norway","Poland","Portugal","Romania","San Marino","Serbia",
+        "Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom"
+      ].sort(),
+      "North America & Caribbean": [
+        "Antigua and Barbuda","Bahamas","Barbados","Belize","Bermuda","Canada","Costa Rica","Cuba","Dominican Republic",
+        "El Salvador","Greenland","Guatemala","Haiti","Honduras","Jamaica","Mexico","Nicaragua","Panama","Puerto Rico",
+        "Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Trinidad and Tobago","United States"
+      ].sort(),
+      "South America": [
+        "Argentina","Bolivia","Brazil","Chile","Colombia","Ecuador","Falkland Islands","French Guiana","Guyana",
+        "Paraguay","Peru","Suriname","Uruguay","Venezuela"
+      ].sort()
+    };
+
+    // Flatten list for search + selection
+    const allCountries = Object.entries(countriesByContinent).flatMap(([continent, list]) =>
+      list.map(name => ({ name, continent }))
+    );
+
+    // ========= LANGUAGES =========
     const languages = [
       { id: 'EN', n: 'English', f: 'us' },
       { id: 'ES', n: 'Spanish', f: 'mx' },
@@ -490,6 +466,7 @@
       { id: 'DE', n: 'German', f: 'de' },
       { id: 'IT', n: 'Italian', f: 'it' },
       { id: 'PT', n: 'Portuguese', f: 'pt' },
+      { id: 'RU', n: 'Russian', f: 'ru' },
       { id: 'JP', n: 'Japanese', f: 'jp' },
       { id: 'KR', n: 'Korean', f: 'kr' },
       { id: 'CN', n: 'Chinese', f: 'cn' },
@@ -505,379 +482,47 @@
       { id: 'TH', n: 'Thai', f: 'th' }
     ];
 
-    // ========= i18n (English-only for UI text in this version) =========
-    const i18n = {
-      EN: {
-        steps:["01 Market","02 Industry","03 Business","04 Role","05 Demo","06 Deploy"],
-        roles:["Receptionist","Sales Agent","Support Agent"],
-        soon:"Coming Soon",
-        emailPlaceholder:"ENTER EMAIL FOR NOTIFICATION",
-        submit:"JOIN WAITLIST",
-        demoBtn:"START DEMO CALL",
-        deployBtn:"GET MY NUMBER"
-      }
-    };
-
-    // ========= ACTIVATION INFO =========
-    const activationInfoSlides = [
-      { title: "STEP 1 — MARKET", text: "Choose the country/market. Pricing and deployment routing adjust automatically based on your selection." },
-      { title: "STEP 2 — INDUSTRY", text: "Select your industry. Industry packs determine the scripts/templates you start with." },
-      { title: "STEP 3 — BUSINESS", text: "Enter your business name. Used in greetings and scripts." },
-      { title: "STEP 4 — ROLE + TEMPLATES + VOICE", text: "Pick the role. Choose an industry template pack, search templates by category, edit script, choose an ElevenLabs voice, preview it." },
-      { title: "STEP 5 — DEMO", text: "Run a test call using your selected role + script + voice." },
-      { title: "STEP 6 — DEPLOY + DASHBOARD", text: "After payment, your agent deploys. Customer gets a dashboard to edit role, script, voice, routing, and business info anytime." }
-    ];
-    let infoIdx = 0;
-
-    function openActivationInfo() { infoIdx = 0; triggerModal("info"); }
-    function renderInfoSlide() {
-      const slide = activationInfoSlides[infoIdx];
-      const c = document.getElementById('mContent');
-      c.innerHTML = `
-        <div class="pill mb-4">ACTIVATION STEPS INFO</div>
-        <div class="card-theme text-left">
-          <div class="mini text-orange-500 mb-2">${slide.title}</div>
-          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${slide.text}</div>
-        </div>
-        <div class="grid sm:grid-cols-3 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" onclick="infoPrev()" ${infoIdx===0 ? 'style="opacity:.35;pointer-events:none"' : ''}>GO BACK</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="infoNext()">
-            ${infoIdx === activationInfoSlides.length - 1 ? "START ACTIVATION" : "NEXT"}
-          </button>
-          <button class="modal-btn justify-center text-center" onclick="closeModal()">CLOSE</button>
-        </div>
-        <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">${infoIdx+1} / ${activationInfoSlides.length}</div>
-      `;
-    }
-    function infoPrev(){ if(infoIdx>0){ infoIdx--; renderInfoSlide(); } }
-    function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
-
-    // ========= COMMON SMB INDUSTRIES (AS MANY AS POSSIBLE) =========
-    // This list is intentionally large for broad SMB coverage.
-    // Note: Templates use GLOBAL fallback if an industry doesn't have a dedicated pack yet.
     const industryKeys = [
-      // Home Services / Trades
-      "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door","Appliance Repair","Handyman","Home Cleaning","Commercial Cleaning","Janitorial",
-      "Carpet Cleaning","Pressure Washing","Window Cleaning","Pest Control","Termite Control","Landscaping","Lawn Care","Tree Service","Irrigation","Pool Service",
-      "Fence & Gate","Concrete","Paving","Asphalt","Masonry","Drywall","Painting","Flooring","Tile & Stone","Carpentry","General Contractor","Construction",
-      "Remodeling","Kitchen Remodeling","Bathroom Remodeling","Basement Finishing","Deck & Patio","Solar","Generator","Smart Home","Security Systems",
-      "Locksmith","Moving Company","Storage Facility","Junk Removal","Courier/Delivery","Water Damage Restoration","Mold Remediation","Fire Restoration",
-
-      // Automotive
-      "Auto Repair","Tire Shop","Oil Change","Auto Body Shop","Car Detailing","Car Wash","Car Rental","Towing","Auto Glass","Transmission Shop",
-      "Brake Shop","Diesel Repair","Motorcycle Repair","RV Repair","Boat Repair",
-
-      // Healthcare
-      "Dental","Orthodontics","Chiropractic","Physical Therapy","Occupational Therapy","Optometry","Ophthalmology","Pediatrics","Family Medicine",
-      "Urgent Care","Primary Care","Dermatology","ENT Clinic","Mental Health Clinic","Therapy & Counseling","Psychiatry","Massage Therapy",
-      "Med Spa","Day Spa","IV Therapy","Weight Loss Clinic","Nutritionist/Dietitian","Pharmacy","Medical Imaging","Home Health",
-
-      // Beauty
-      "Hair Salon","Barbershop","Nail Salon","Beauty Studio","Tattoo Studio","Piercing Studio","Cosmetics",
-
-      // Pets
-      "Veterinary","Animal Hospital","Pet Grooming","Pet Boarding","Dog Training","Pet Store",
-
-      // Legal & Finance
-      "Law Firm","Accounting","Bookkeeping","Tax Preparation","Payroll Services","Insurance Agency","Financial Advisor","Mortgage Broker",
-      "Real Estate","Property Management","Title Company",
-
-      // Professional Services / B2B
-      "IT Services","Managed IT","Cybersecurity","Web Design","Marketing Agency","Advertising Agency","Printing Services","Sign Shop","Photography Studio",
-      "Videography Studio","Event Planning","Recruiting/Staffing","Consulting","Architect","Engineering Firm",
-
-      // Education
-      "Daycare","Preschool","Tutoring Center","Driving School","Music School","Dance Studio","Martial Arts","Gym/Fitness","Yoga Studio",
-
-      // Retail
-      "Boutique","Clothing Store","Shoe Store","Jewelry Store","Flower Shop","Bakery","Cafe","Coffee Shop","Restaurant","Fast Food",
-      "Catering","Food Truck","Grocery Store","Convenience Store","Hardware Store","Furniture Store","Electronics Store","Mobile Phone Store",
-      "Bike Shop","Sporting Goods","Bookstore","Thrift Store","Pharmacy Retail",
-
-      // Hospitality / Travel
-      "Hotel","Motel","Bed & Breakfast","Travel Agency","Tour Operator",
-
-      // Community / Other
-      "Nonprofit","Church","Community Center","After Hours"
+      "Accounting","After Hours","Auto Repair","Bakery","Boutique","Car Detailing","Car Rental","Dental","Electrical",
+      "Electronics","Flower Shop","Furniture","HVAC","Hair Salon","Handyman","Home Cleaning","Insurance","Jewelry",
+      "Landscaping","Legal","Locksmith","Massage","Med Spa","Nail Salon","Pest Control","Plumbing","Real Estate",
+      "Restaurant","Roofing","Towing","Urgent Care","Veterinary","Windows"
     ];
 
-    // ========= INDUSTRY CATEGORIES (SEARCHABLE) =========
-    const industryCategories = {
-      "Home Services": [
-        "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door","Appliance Repair","Handyman","Home Cleaning","Commercial Cleaning","Janitorial",
-        "Carpet Cleaning","Pressure Washing","Window Cleaning","Pest Control","Termite Control","Landscaping","Lawn Care","Tree Service","Irrigation","Pool Service",
-        "Fence & Gate","Concrete","Paving","Asphalt","Masonry","Drywall","Painting","Flooring","Tile & Stone","Carpentry","General Contractor","Construction",
-        "Remodeling","Kitchen Remodeling","Bathroom Remodeling","Basement Finishing","Deck & Patio","Solar","Generator","Smart Home","Security Systems",
-        "Locksmith","Moving Company","Storage Facility","Junk Removal","Courier/Delivery","Water Damage Restoration","Mold Remediation","Fire Restoration"
-      ],
-      "Automotive": [
-        "Auto Repair","Tire Shop","Oil Change","Auto Body Shop","Car Detailing","Car Wash","Car Rental","Towing","Auto Glass","Transmission Shop",
-        "Brake Shop","Diesel Repair","Motorcycle Repair","RV Repair","Boat Repair"
-      ],
-      "Healthcare": [
-        "Dental","Orthodontics","Chiropractic","Physical Therapy","Occupational Therapy","Optometry","Ophthalmology","Pediatrics","Family Medicine",
-        "Urgent Care","Primary Care","Dermatology","ENT Clinic","Mental Health Clinic","Therapy & Counseling","Psychiatry","Massage Therapy",
-        "Med Spa","Day Spa","IV Therapy","Weight Loss Clinic","Nutritionist/Dietitian","Pharmacy","Medical Imaging","Home Health"
-      ],
-      "Beauty & Wellness": [
-        "Hair Salon","Barbershop","Nail Salon","Beauty Studio","Tattoo Studio","Piercing Studio","Cosmetics","Gym/Fitness","Yoga Studio","Martial Arts","Dance Studio"
-      ],
-      "Pets": [
-        "Veterinary","Animal Hospital","Pet Grooming","Pet Boarding","Dog Training","Pet Store"
-      ],
-      "Legal & Finance": [
-        "Law Firm","Accounting","Bookkeeping","Tax Preparation","Payroll Services","Insurance Agency","Financial Advisor","Mortgage Broker",
-        "Real Estate","Property Management","Title Company"
-      ],
-      "Professional Services": [
-        "IT Services","Managed IT","Cybersecurity","Web Design","Marketing Agency","Advertising Agency","Printing Services","Sign Shop","Photography Studio",
-        "Videography Studio","Event Planning","Recruiting/Staffing","Consulting","Architect","Engineering Firm"
-      ],
-      "Education": [
-        "Daycare","Preschool","Tutoring Center","Driving School","Music School"
-      ],
-      "Retail": [
-        "Boutique","Clothing Store","Shoe Store","Jewelry Store","Flower Shop","Bakery","Cafe","Coffee Shop","Grocery Store","Convenience Store",
-        "Hardware Store","Furniture Store","Electronics Store","Mobile Phone Store","Bike Shop","Sporting Goods","Bookstore","Thrift Store","Pharmacy Retail"
-      ],
-      "Food & Hospitality": [
-        "Restaurant","Fast Food","Catering","Food Truck","Hotel","Motel","Bed & Breakfast"
-      ],
-      "Travel": [
-        "Travel Agency","Tour Operator"
-      ],
-      "Community": [
-        "Nonprofit","Church","Community Center","After Hours"
-      ]
+    // ========= i18n =========
+    const i18n = {
+      EN: { h1:"GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST", p:"Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. <span class='text-orange-500'>Worldwide Deployment. No Humans.</span>", start:"Start Activation", now:"Activate Now", beta:"BETA ACCESS", reg:"Regular", live:"Global Live", priceFeats:["Unlimited Calling","Pay Monthly","No Contract"], steps:["01 Market","02 Industry","03 Business","04 Role","05 Demo","06 Deploy"], roles:["Receptionist","Sales Agent","Support Agent"], demoBtn:"START DEMO CALL", deployBtn:"DEPLOY OPTIONS", industries:industryKeys },
+      ES: { h1:"RECEPCIONISTA AI GLOBAL<br> SIN HUMANOS", p:"Activación Instantánea de <span class='text-orange-500'>NEGOCIOS</span>. <span class='text-orange-500'>Sin Humanos.</span>", start:"Iniciar", now:"Activar", beta:"ACCESO BETA", reg:"Regular", live:"En Vivo", priceFeats:["Llamadas Ilimitadas","Pago Mensual","Sin Contrato"], steps:["01 Mercado","02 Industria","03 Empresa","04 Rol","05 Demo","06 Desplegar"], roles:["Recepcionista","Agente de Ventas","Soporte"], demoBtn:"INICIAR LLAMADA DEMO", deployBtn:"OPCIONES", industries:["Contabilidad","Fuera de Horas","Taller Mecánico","Panadería","Boutique","Lavado Autos","Renta Autos","Dental","Electricidad","Electrónica","Florería","Muebles","HVAC","Salón Belleza","Handyman","Limpieza","Seguros","Joyería","Paisajismo","Legal","Cerrajería","Masajes","Med Spa","Uñas","Plagas","Plomería","Inmuebles","Restaurante","Techos","Grúa","Urgencias","Veterinaria","Ventanas"] },
+      FR: { h1:"RÉCEPTIONNISTE IA<br> SANS HUMAINS", p:"Activation <span class='text-orange-500'>PETITE ENTREPRISE</span>. <span class='text-orange-500'>Déploiement mondial.</span>", start:"Démarrer", now:"Activer", beta:"ACCÈS BÉTA", reg:"Régulier", live:"En Direct", priceFeats:["Appels Illimités","Payer Mensuellement","Sans Contrat"], steps:["01 Marché","02 Industrie","03 Entreprise","04 Rôle","05 Démo","06 Déployer"], roles:["Réceptionniste","Agent de Vente","Support"], demoBtn:"LANCER L'APPEL DÉMO", deployBtn:"OPTIONS", industries:["Comptabilité","Après Heures","Garage","Boulangerie","Boutique","Lavage Auto","Location Auto","Dentaire","Électricité","Électronique","Fleuriste","Meubles","HVAC","Salon Coiffure","Bricoleur","Nettoyage","Assurances","Bijouterie","Paysage","Juridique","Serrurier","Massage","Med Spa","Ongles","Nuisibles","Plomberie","Immobilier","Restaurant","Toiture","Remorquage","Urgences","Vétérinaire","Fenêtres"] },
+
+      // Keep rest present (your earlier full set was already working).
+      // If a language key isn't here, it will fallback to EN for UI text.
     };
 
-    function buildCategorizedIndustryList() {
-      const all = new Set(industryKeys);
-      const out = [];
-      Object.keys(industryCategories).forEach(cat => {
-        const items = (industryCategories[cat] || []).filter(x => all.has(x));
-        if (items.length) out.push({ cat, items });
-      });
-      const covered = new Set(out.flatMap(g => g.items));
-      const leftovers = industryKeys.filter(x => !covered.has(x));
-      if (leftovers.length) out.push({ cat: "Uncategorized", items: leftovers });
-      return out;
-    }
+    // ========= LANGUAGE SWITCH =========
+    function setLang(cc, langCode) {
+      currentLang = langCode;
+      const t = i18n[currentLang] || i18n.EN;
 
-    // ========= TEMPLATE CATEGORIES =========
-    const templateCategories = ["ALL","Appointments","Emergency","After Hours","Sales","Support","Intake","Info"];
+      const marketData = getMarketData(selectedMarket);
+      document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
+      document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
 
-    // ========= INDUSTRY TEMPLATE PACKS =========
-    // IMPORTANT: For MOST industries we use GLOBAL fallback templates.
-    // Dedicated packs are added for the most common industries. You can keep expanding packs later.
-    const industryPacks = {
-      GLOBAL: {
-        Receptionist: [
-          { key:"g_rec_appt", title:"Appointment + Info Receptionist", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} in {{MARKET}}.
-Goal: Answer calls, provide basic info, schedule appointments, or take messages.
+      document.getElementById('hero-h1').innerHTML = t.h1 || i18n.EN.h1;
+      document.getElementById('hero-p').innerHTML = t.p || i18n.EN.p;
+      document.getElementById('hero-cta').innerText = t.start || i18n.EN.start;
+      document.getElementById('side-cta').innerText = t.now || i18n.EN.now;
+      document.getElementById('beta-txt').innerText = t.beta || i18n.EN.beta;
+      document.getElementById('reg-txt').innerText = `${marketData.cur}${marketData.reg} ${t.reg || i18n.EN.reg}`;
+      document.getElementById('live-label').innerText = t.live || i18n.EN.live;
 
-Flow:
-- Greet + confirm business name.
-- Ask what they need.
-- If appointment: ask preferred date/time, name, phone, email, reason.
-- If info: provide short overview and offer scheduling.
-- If emergency: advise caller to contact local emergency services.
+      const feats = t.priceFeats || i18n.EN.priceFeats;
+      document.querySelectorAll('.feat-txt').forEach((el, i) => { if (feats[i]) el.innerText = feats[i]; });
 
-Close: “Is there anything else I can help you with today?”`},
-          { key:"g_rec_afterhours", title:"After-Hours Message Capture", category:"After Hours",
-            script:`You are the after-hours AI receptionist for {{BUSINESS_NAME}}.
-Goal: Capture messages and promise a callback.
+      const sLabels = t.steps || i18n.EN.steps;
+      document.querySelectorAll('.step-label').forEach((el, i) => { if (sLabels[i]) el.innerText = sLabels[i]; });
 
-Collect:
-- Full name
-- Best callback number
-- Reason for calling
-- Best time to call back
-- Email (optional)
-
-Confirm details back and end politely.`}
-        ],
-        "Sales Agent": [
-          { key:"g_sales_qual", title:"Lead Qualifier + Booking", category:"Sales",
-            script:`You are the AI sales agent for {{BUSINESS_NAME}}.
-Goal: Qualify leads and book a call.
-
-Ask:
-1) What service are you looking for?
-2) Location
-3) Timeline
-4) Budget range (optional)
-
-Collect name + phone + email and book an appointment.`}
-        ],
-        "Support Agent": [
-          { key:"g_support_triage", title:"Support Triage + Ticket", category:"Support",
-            script:`You are the AI support agent for {{BUSINESS_NAME}}.
-Goal: Identify the issue and route.
-
-Ask:
-- What problem are you experiencing?
-- When did it start?
-- Best callback number
-
-If urgent, mark urgent. Otherwise create a ticket and schedule a callback.`}
-        ]
-      },
-
-      // MOST COMMON PACKS
-      "Plumbing": {
-        Receptionist: [
-          { key:"pl_rec_dispatch", title:"Plumbing Dispatcher (Urgent + Standard)", category:"Emergency",
-            script:`You are the AI receptionist/dispatcher for {{BUSINESS_NAME}} (Plumbing).
-Ask: issue type, active leak/flooding, shutoff valve status, address, access notes, name + phone.
-If active leak/flooding: advise shutoff valve if safe, mark URGENT, schedule ASAP.`},
-          { key:"pl_rec_appt", title:"Plumbing Appointment Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Plumbing).
-Book service calls. Collect name, phone, address, issue summary, preferred time window.`}
-        ],
-        "Sales Agent": [
-          { key:"pl_sales_est", title:"Install / Remodel Estimate Intake", category:"Sales",
-            script:`You are the AI sales agent for {{BUSINESS_NAME}} (Plumbing).
-Qualify estimate requests (water heater, fixtures, remodel). Collect timeline, address, contact and schedule an estimate.`}
-        ],
-        "Support Agent": [
-          { key:"pl_support_status", title:"Existing Customer Support (Status/Warranty)", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Plumbing).
-Collect name, phone, address, prior job date, issue. If urgent leak: escalate dispatch.`}
-        ]
-      },
-
-      "Electrical": {
-        Receptionist: [
-          { key:"el_rec_safety", title:"Electrical Dispatcher (Safety First)", category:"Emergency",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electrical).
-Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency services), issue type, address, name + phone, schedule.`},
-          { key:"el_rec_appt", title:"Electrical Appointment Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electrical).
-Collect service needed (outlet/panel/lights/EV), address, access notes, contact, schedule.`}
-        ],
-        "Sales Agent": [
-          { key:"el_sales_project", title:"Panel/EV/Remodel Estimate Intake", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Electrical).
-Collect project type, property type, timeline, contact. Schedule estimate.`}
-        ],
-        "Support Agent": [
-          { key:"el_support_triage", title:"Troubleshooting Intake (Safe Routing)", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Electrical).
-Ask what happened, breaker trips, smell/sparking. Collect contact + address and route.`}
-        ]
-      },
-
-      "HVAC": {
-        Receptionist: [
-          { key:"hv_rec_noheat", title:"No Heat/No AC Triage", category:"Emergency",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (HVAC).
-Ask: no heat/no AC/noise, gas smell (if yes advise leaving + call gas company/emergency), address, contact, schedule window.`},
-          { key:"hv_rec_maint", title:"Maintenance Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (HVAC).
-Book maintenance. Collect address, system type, preferred day/time, contact.`}
-        ],
-        "Sales Agent": [
-          { key:"hv_sales_replace", title:"Replacement / Upgrade Estimate", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (HVAC).
-Collect system age, home size, goals, timeline, contact. Schedule estimate.`}
-        ],
-        "Support Agent": [
-          { key:"hv_support_warranty", title:"Warranty / Follow-up Support", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (HVAC).
-Collect name, phone, address, issue, prior service date. Route.`}
-        ]
-      },
-
-      "Auto Repair": {
-        Receptionist: [
-          { key:"au_rec_booking", title:"Diagnostics Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Auto Repair).
-Collect vehicle year/make/model, symptoms, warning lights, name + phone. Schedule diagnostics.`}
-        ],
-        "Support Agent": [
-          { key:"au_support_status", title:"Repair Status + Pickup", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Auto Repair).
-Collect name, phone, vehicle, drop-off date. Route for update.`}
-        ]
-      },
-
-      "Dental": {
-        Receptionist: [
-          { key:"de_rec_new", title:"New Patient Intake + Booking", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Dental).
-Ask: new/existing, reason (cleaning/pain/cosmetic), preferred time. Collect name, phone, email, insurance (optional).`},
-          { key:"de_rec_emg", title:"Dental Emergency Triage", category:"Emergency",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Dental).
-Ask: pain level, swelling/fever/bleeding, trauma. Schedule ASAP. If severe symptoms: advise urgent care/ER.`}
-        ],
-        "Sales Agent": [
-          { key:"de_sales_cos", title:"Cosmetic Consultation Booking", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Dental).
-Book consults for veneers/whitening/Invisalign. Collect goals, timeline, contact.`}
-        ],
-        "Support Agent": [
-          { key:"de_support_res", title:"Reschedule + Billing Support", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Dental).
-Collect patient name, contact, what they need (reschedule/billing/records). Route.`}
-        ]
-      },
-
-      "Law Firm": {
-        Receptionist: [
-          { key:"le_rec_intake", title:"Legal Intake + Consultation Booking", category:"Intake",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Law Firm).
-Collect case type, urgency, opposing party name (conflict check), contact info.
-Do NOT provide legal advice. Schedule consult.`}
-        ],
-        "Support Agent": [
-          { key:"le_support_status", title:"Existing Client Status Routing", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Law Firm).
-Collect client name, phone, matter reference (if any). Route for callback.`}
-        ]
-      },
-
-      "Restaurant": {
-        Receptionist: [
-          { key:"rs_rec_res", title:"Reservations + Hours", category:"Appointments",
-            script:`You are the AI host for {{BUSINESS_NAME}} (Restaurant).
-Take reservations (date/time/party size/name/phone), provide hours/location.`}
-        ],
-        "Support Agent": [
-          { key:"rs_support_orders", title:"Order Issue Routing", category:"Support",
-            script:`You are support for {{BUSINESS_NAME}} (Restaurant).
-Collect order name/number (if any), issue, phone. Route.`}
-        ]
-      },
-
-      "Real Estate": {
-        Receptionist: [
-          { key:"re_rec_intake", title:"Buyer/Seller Intake + Booking", category:"Intake",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Real Estate).
-Ask: buying or selling, location, timeline, budget (optional).
-Collect contact and book agent call.`}
-        ],
-        "Sales Agent": [
-          { key:"re_sales_qual", title:"Lead Qualifier (Pre-approval + Needs)", category:"Sales",
-            script:`You are sales for {{BUSINESS_NAME}} (Real Estate).
-Ask: budget, pre-approved, must-haves, timeline. Collect contact and book call.`}
-        ]
-      }
-    };
-
-    // ========= TEMPLATE RESOLUTION (fallback to GLOBAL) =========
-    function getCurrentIndustryKey() { return industryKeys[currentIndustryIdx] || "GLOBAL"; }
-    function getPackFor(industryKey) { return industryPacks[industryKey] || industryPacks.GLOBAL; }
-    function getTemplatesFor(roleName) {
-      const industryKey = getCurrentIndustryKey();
-      const pack = getPackFor(industryKey);
-      const roleList = pack[roleName] || [];
-      if (!roleList.length) {
-        const globalRoleList = (industryPacks.GLOBAL[roleName] || []);
-        return { templates: globalRoleList, packName: "GLOBAL" };
-      }
-      return { templates: roleList, packName: industryKey };
+      toggleLangMenu(false);
     }
 
     // ========= MODAL FLOW =========
@@ -886,511 +531,159 @@ Ask: budget, pre-approved, must-haves, timeline. Collect contact and book call.`
       const c = document.getElementById('mContent');
       const s = document.getElementById('modalSearchContainer');
       const tEl = document.getElementById('mTitle');
-      const shell = document.getElementById('modalShell');
+      const lang = i18n[currentLang] || i18n.EN;
 
-      shell.classList.remove('role-wide', 'info-wide', 'dashboard-wide');
       m.style.display = 'flex';
       c.innerHTML = "";
       s.innerHTML = "";
 
-      if (step === "info") {
-        shell.classList.add('info-wide');
-        tEl.innerText = "Info";
-        renderInfoSlide();
-        return;
-      }
-      if (step === "dashboard") {
-        shell.classList.add('dashboard-wide');
-        tEl.innerText = "Dashboard";
-        renderDashboard();
-        return;
-      }
-
-      if (step === 'waitlist') {
-        tEl.innerText = (countryName || "").toUpperCase();
+      if (step === 'stripeConnectInfo') {
+        tEl.innerText = "CONNECT STRIPE";
         c.innerHTML = `
-          <p class="text-[10px] text-slate-400 mb-4 uppercase font-bold">${i18n.EN.soon}</p>
-          <input id="waitEmail" type="email" placeholder="${i18n.EN.emailPlaceholder}" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs font-black outline-none">
-          <button onclick="submitLead('${countryName}')" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">${i18n.EN.submit}</button>
+          <div class="text-left bg-black/30 border border-white/10 rounded-2xl p-4">
+            <p class="text-[10px] font-black uppercase tracking-widest text-orange-400 mb-2">ADVANCED MODE</p>
+            <p class="text-[11px] font-bold text-slate-300 leading-relaxed">
+              Connect your own Stripe to receive customer payments directly.
+              This is an advanced setup and will be available inside your dashboard after activation.
+            </p>
+            <div class="mt-4 space-y-2">
+              <div class="text-[10px] font-black uppercase text-slate-400">What you get</div>
+              <ul class="text-[11px] font-bold text-slate-300 list-disc ml-5 space-y-1">
+                <li>Direct payouts to your Stripe</li>
+                <li>Custom invoices / subscription plans</li>
+                <li>Business-level reporting</li>
+              </ul>
+              <div class="mt-4 text-[10px] font-black uppercase text-orange-400">Recommended</div>
+              <p class="text-[11px] font-bold text-slate-300">
+                Use <span class="text-orange-400">Quick Activate</span> now to go live fast.
+                You can connect Stripe later from your dashboard.
+              </p>
+            </div>
+          </div>
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <button class="modal-btn" onclick="triggerModal(6)">
+              <span style="color:#fb923c; font-weight:900;">←</span> BACK
+            </button>
+            <button class="modal-btn orange-btn" onclick="quickActivate()">
+              🚀 QUICK ACTIVATE
+            </button>
+          </div>
         `;
         return;
       }
 
       if (step === 1) {
-        tEl.innerText = i18n.EN.steps[0];
+        tEl.innerText = (lang.steps && lang.steps[0]) ? lang.steps[0] : "01 Market";
         s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH COUNTRIES..." onkeyup="filterList('mContent', this.value)">`;
-        c.className = "modal-scroll";
 
-        const countries = Object.keys(marketCurrency);
-        const activeOnes = countries.filter(k => marketCurrency[k].active).sort();
-        const soonOnes = countries.filter(k => !marketCurrency[k].active).sort();
+        // Build by continent, alphabetical
+        Object.keys(countriesByContinent).forEach(cont => {
+          const header = document.createElement('div');
+          header.className = "section-label";
+          header.innerText = cont.toUpperCase();
+          c.appendChild(header);
 
-        activeOnes.forEach(name => {
-          const btn = createBtn(name, () => { updateCurrencyUI(name); finish(1, name); });
-          btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${name}`;
-          btn.setAttribute('data-n', name);
-          c.appendChild(btn);
+          countriesByContinent[cont].forEach(name => {
+            const btn = createBtn(name, () => { updateCurrencyUI(name); finish(1, name); });
+            btn.setAttribute('data-n', name);
+            btn.innerHTML = `
+              <div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+              <div class="flex-1">
+                <div>${name}</div>
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">${cont}</div>
+              </div>
+              <div class="text-[10px] font-black text-orange-400 uppercase">ACTIVE</div>
+            `;
+            c.appendChild(btn);
+          });
         });
-
-        const div = document.createElement('div');
-        div.className = "divider";
-        div.innerText = i18n.EN.soon;
-        c.appendChild(div);
-
-        soonOnes.forEach(name => {
-          const btn = createBtn(name, () => triggerModal('waitlist', name));
-          btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-slate-700"></div> ${name}`;
-          btn.setAttribute('data-n', name);
-          c.appendChild(btn);
-        });
-
       } else if (step === 2) {
-        // ✅ Categorized + Searchable Industries (very large list)
-        tEl.innerText = i18n.EN.steps[1];
-        s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH INDUSTRIES..." onkeyup="filterIndustryCategories(this.value)">`;
-        c.className = "modal-scroll";
-        renderIndustryCategoryList("");
+        tEl.innerText = (lang.steps && lang.steps[1]) ? lang.steps[1] : "02 Industry";
+        s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH INDUSTRIES..." onkeyup="filterList('mContent', this.value)">`;
 
+        const industryList = lang.industries || (i18n.EN && i18n.EN.industries) || industryKeys;
+        industryList.forEach((name, idx) => {
+          const btn = createBtn(name, () => { currentIndustryIdx = idx; finish(2, name); });
+          btn.setAttribute('data-n', name);
+          c.appendChild(btn);
+        });
       } else if (step === 3) {
-        tEl.innerText = i18n.EN.steps[2];
-        c.className = "";
+        tEl.innerText = (lang.steps && lang.steps[2]) ? lang.steps[2] : "03 Business";
         c.innerHTML = `
           <input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
           <button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>
         `;
-
       } else if (step === 4) {
-        shell.classList.add('role-wide');
-        tEl.innerText = i18n.EN.steps[3];
-        c.className = "";
-
-        const currentIndustryKey = getCurrentIndustryKey();
+        tEl.innerText = (lang.steps && lang.steps[3]) ? lang.steps[3] : "04 Role";
+        const roles = lang.roles || (i18n.EN && i18n.EN.roles) || ["Receptionist","Sales Agent","Support Agent"];
+        roles.forEach(r => c.appendChild(createBtn(r, () => finish(4, r))));
+      } else if (step === 5) {
+        tEl.innerText = (lang.steps && lang.steps[4]) ? lang.steps[4] : "05 Demo";
+        c.appendChild(createBtn(lang.demoBtn || "START DEMO CALL", runVoice));
+      } else if (step === 6) {
+        // ✅ VERSION 1: TWO OPTIONS (Quick Activate + Connect Stripe)
+        tEl.innerText = (lang.steps && lang.steps[5]) ? lang.steps[5] : "06 Deploy";
 
         c.innerHTML = `
-          <div class="pill mb-4">ROLE • TEMPLATES (CATEGORIZED + SEARCH) • VOICE</div>
-
-          <div class="grid lg:grid-cols-3 gap-4 text-left">
-            <div class="card-theme">
-              <div class="muted-hint mb-3">Agent Role</div>
-              <div id="roleList" class="grid gap-2"></div>
-              <div class="mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
-                Current Industry: <span class="text-orange-500">${currentIndustryKey}</span><br>
-                Template pack uses industry-specific templates when available, otherwise GLOBAL fallback.
-              </div>
-            </div>
-
-            <div class="card-theme">
-              <div class="muted-hint mb-3">Templates</div>
-
-              <div class="grid grid-cols-2 gap-2 mb-2">
-                <select id="templateCategory" class="select-theme" onchange="onTemplateCategoryChange(this.value)"></select>
-                <input id="templateSearch" class="search-box" style="margin:0" placeholder="SEARCH TEMPLATES..." oninput="onTemplateSearchChange(this.value)" />
-              </div>
-
-              <select id="templateSelect" class="select-theme" onchange="onTemplateChange(this.value)"></select>
-
-              <div class="mt-3 muted-hint">Editable Script</div>
-              <textarea id="scriptBox" class="textarea-theme mt-2" oninput="onScriptEdit()"></textarea>
-
-              <div class="grid grid-cols-2 gap-2 mt-3">
-                <button class="modal-btn justify-center text-center" onclick="resetTemplate()">RESET TEMPLATE</button>
-                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="saveScriptOnly()">SAVE SCRIPT</button>
-              </div>
-            </div>
-
-            <div class="card-theme">
-              <div class="muted-hint mb-3">Voice (ElevenLabs)</div>
-              <select id="voiceSelect" class="select-theme" onchange="onVoiceChange(this.value)"></select>
-
-              <div class="grid grid-cols-2 gap-2 mt-3">
-                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="previewVoice()">PREVIEW VOICE</button>
-                <button class="modal-btn justify-center text-center" onclick="saveVoiceOnly()">SAVE VOICE</button>
-              </div>
-
-              <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mt-4">
-                <div class="muted-hint mb-2">Voice Tuning</div>
-                <div class="grid grid-cols-2 gap-2">
-                  <label class="text-[9px] font-black uppercase text-slate-400">Stability
-                    <input id="stabilityRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.stability}" oninput="onVoiceTuningChange()" class="w-full">
-                  </label>
-                  <label class="text-[9px] font-black uppercase text-slate-400">Similarity
-                    <input id="simRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.similarityBoost}" oninput="onVoiceTuningChange()" class="w-full">
-                  </label>
-                  <label class="text-[9px] font-black uppercase text-slate-400">Style
-                    <input id="styleRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.style}" oninput="onVoiceTuningChange()" class="w-full">
-                  </label>
-                  <label class="text-[9px] font-black uppercase text-slate-400">Speaker Boost
-                    <select id="boostSelect" class="select-theme" onchange="onVoiceTuningChange()">
-                      <option value="true">ON</option>
-                      <option value="false">OFF</option>
-                    </select>
-                  </label>
-                </div>
-              </div>
-            </div>
+          <div class="text-left bg-black/30 border border-orange-500/20 rounded-2xl p-4">
+            <p class="text-[10px] font-black uppercase tracking-widest text-orange-400 mb-2">DEPLOY OPTIONS</p>
+            <p class="text-[11px] font-bold text-slate-300 leading-relaxed">
+              Choose how you want to activate billing and go live.
+              Recommended: <span class="text-orange-400">Quick Activate</span>.
+            </p>
           </div>
 
-          <div class="grid sm:grid-cols-2 gap-2 mt-4">
-            <button class="modal-btn justify-center text-center" onclick="closeModal()">CLOSE</button>
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="confirmRoleStep()">
-              CONFIRM ROLE + TEMPLATE + VOICE
+          <div class="mt-3 space-y-2">
+            <button class="modal-btn orange-btn" onclick="quickActivate()">
+              🚀 QUICK ACTIVATE <span class="ml-auto text-[9px] font-black uppercase tracking-widest">RECOMMENDED</span>
             </button>
+            <div class="text-left px-1">
+              <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Fastest path</div>
+              <div class="text-[11px] font-bold text-slate-300">
+                Pay monthly via our checkout. After payment you get a dashboard, can edit everything, and can connect your own Stripe later.
+              </div>
+            </div>
+
+            <button class="modal-btn" onclick="triggerModal('stripeConnectInfo')">
+              ⚙ CONNECT MY STRIPE <span class="ml-auto text-[9px] font-black uppercase tracking-widest text-orange-400">ADVANCED</span>
+            </button>
+            <div class="text-left px-1">
+              <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">For power users</div>
+              <div class="text-[11px] font-bold text-slate-300">
+                Receive payments directly to your Stripe. Available from dashboard after activation.
+              </div>
+            </div>
           </div>
         `;
-
-        const roleList = document.getElementById('roleList');
-        roleList.innerHTML = "";
-        (i18n.EN.roles).forEach(r => {
-          const b = createBtn(r, () => setRole(r));
-          b.style.fontSize = "10px";
-          b.style.padding = "12px";
-          b.innerHTML = `${r}${selectedRole === r ? " ✓" : ""}`;
-          roleList.appendChild(b);
-        });
-
-        initTemplateCategoryDropdown();
-        initTemplateDropdown();
-        initVoiceDropdown();
-      }
-
-      else if (step === 5) {
-        tEl.innerText = i18n.EN.steps[4];
-        c.className = "modal-scroll";
-        c.appendChild(createBtn(i18n.EN.demoBtn, runVoice));
-        const note = document.createElement('div');
-        note.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2 text-center";
-        note.innerText = "Demo uses your chosen role, script, and ElevenLabs voice.";
-        c.appendChild(note);
-
-      } else if (step === 6) {
-        tEl.innerText = i18n.EN.steps[5];
-        c.className = "modal-scroll";
-        c.appendChild(createBtn(i18n.EN.deployBtn, () => {
-          confetti();
-          finish(6, "READY");
-          setTimeout(() => { triggerModal("dashboard"); }, 900);
-          setTimeout(() => window.open("https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"), 1400);
-        }));
       }
     }
 
-    // ========= STEP 2: categorized industry rendering + search =========
-    function renderIndustryCategoryList(searchQuery) {
-      const c = document.getElementById('mContent');
-      c.innerHTML = "";
-      const q = (searchQuery || "").trim().toUpperCase();
-
-      const groups = buildCategorizedIndustryList();
-      groups.forEach(g => {
-        const filtered = g.items.filter(name => name.toUpperCase().includes(q));
-        if (!filtered.length) return;
-
-        const div = document.createElement('div');
-        div.className = "divider";
-        div.innerText = g.cat;
-        c.appendChild(div);
-
-        filtered.forEach(name => {
-          const idx = industryKeys.indexOf(name);
-          const btn = createBtn(name, () => {
-            currentIndustryIdx = idx >= 0 ? idx : currentIndustryIdx;
-            finish(2, name);
-            refreshTemplatesForCurrentSelection(true);
-          });
-          btn.setAttribute('data-n', name);
-          c.appendChild(btn);
-        });
-      });
-
-      if (!c.children.length) {
-        const hint = document.createElement('div');
-        hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
-        hint.innerText = "NO MATCHING INDUSTRIES";
-        c.appendChild(hint);
-      }
-    }
-    function filterIndustryCategories(query) { renderIndustryCategoryList(query); }
-
-    // ========= ROLE / TEMPLATE / SCRIPT =========
-    function setRole(roleName) {
-      selectedRole = roleName;
-      templateCategoryFilter = "ALL";
-      templateSearchQuery = "";
-      refreshTemplatesForCurrentSelection(true);
-      triggerModal(4);
+    function quickActivate() {
+      confetti();
+      finish(6, "READY");
+      setTimeout(() => window.open(STRIPE_CHECKOUT_URL, "_blank"), 900);
     }
 
-    function refreshTemplatesForCurrentSelection(forceResetScript) {
-      const { templates } = getTemplatesFor(selectedRole);
-      if (!templates.length) {
-        selectedTemplateKey = null;
-        if (forceResetScript) agentScript = "";
-        return;
-      }
-      if (!selectedTemplateKey || !templates.find(t => t.key === selectedTemplateKey)) {
-        selectedTemplateKey = templates[0].key;
-      }
-      if (forceResetScript) {
-        const chosen = templates.find(t => t.key === selectedTemplateKey) || templates[0];
-        agentScript = applyVars(chosen.script);
-      } else {
-        agentScript = applyVars(agentScript);
-      }
-    }
-
-    function initTemplateCategoryDropdown() {
-      const dd = document.getElementById('templateCategory');
-      dd.innerHTML = "";
-      templateCategories.forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat;
-        opt.textContent = cat.toUpperCase();
-        dd.appendChild(opt);
-      });
-      dd.value = templateCategoryFilter || "ALL";
-
-      const search = document.getElementById('templateSearch');
-      search.value = templateSearchQuery || "";
-    }
-
-    function getFilteredTemplates() {
-      const { templates } = getTemplatesFor(selectedRole);
-      const cat = templateCategoryFilter || "ALL";
-      const q = (templateSearchQuery || "").trim().toUpperCase();
-
-      return templates.filter(t => {
-        const catOk = (cat === "ALL") ? true : (String(t.category || "").toUpperCase() === cat);
-        const text = `${t.title} ${t.category}`.toUpperCase();
-        const qOk = q ? text.includes(q) : true;
-        return catOk && qOk;
-      });
-    }
-
-    function initTemplateDropdown() {
-      const templateSelect = document.getElementById('templateSelect');
-      const scriptBox = document.getElementById('scriptBox');
-      templateSelect.innerHTML = "";
-
-      const { packName } = getTemplatesFor(selectedRole);
-      const filtered = getFilteredTemplates();
-
-      if (!filtered.length) {
-        const opt = document.createElement('option');
-        opt.value = "";
-        opt.textContent = "NO MATCHING TEMPLATES";
-        templateSelect.appendChild(opt);
-        scriptBox.value = agentScript || "";
-        return;
-      }
-
-      if (!selectedTemplateKey || !filtered.find(x => x.key === selectedTemplateKey)) {
-        selectedTemplateKey = filtered[0].key;
-        agentScript = applyVars(filtered[0].script);
-      }
-
-      filtered.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.key;
-        opt.textContent = `${t.title} — ${t.category} — ${packName}`.toUpperCase();
-        templateSelect.appendChild(opt);
-      });
-
-      templateSelect.value = selectedTemplateKey;
-
-      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
-      if (!agentScript || agentScript.trim().length < 10) agentScript = applyVars(chosen.script);
-      scriptBox.value = agentScript;
-    }
-
-    function onTemplateCategoryChange(cat) { templateCategoryFilter = cat; initTemplateDropdown(); }
-    function onTemplateSearchChange(q) { templateSearchQuery = q || ""; initTemplateDropdown(); }
-
-    function onTemplateChange(key) {
-      const filtered = getFilteredTemplates();
-      const chosen = filtered.find(x => x.key === key);
-      if (!chosen) return;
-      selectedTemplateKey = key;
-      agentScript = applyVars(chosen.script);
-      document.getElementById('scriptBox').value = agentScript;
-    }
-
-    function onScriptEdit() { agentScript = document.getElementById('scriptBox').value; }
-    function resetTemplate() {
-      const filtered = getFilteredTemplates();
-      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
-      if (!chosen) return;
-      agentScript = applyVars(chosen.script);
-      document.getElementById('scriptBox').value = agentScript;
-    }
-    function saveScriptOnly() { onScriptEdit(); closeModal(); triggerModal(4); }
-
-    function confirmRoleStep() {
-      if (!selectedRole) selectedRole = "Receptionist";
-      if (!agentScript || agentScript.trim().length < 10) refreshTemplatesForCurrentSelection(true);
-      finish(4, selectedRole);
-    }
-
-    function applyVars(text) {
-      const businessName = (document.getElementById('v3')?.innerText && document.getElementById('v3').innerText !== "Sync")
-        ? document.getElementById('v3').innerText
-        : "YOUR BUSINESS";
-      return (text || "")
-        .replaceAll("{{BUSINESS_NAME}}", businessName)
-        .replaceAll("{{MARKET}}", selectedMarket || "YOUR MARKET");
-    }
-
-    // ========= VOICE UI =========
-    function initVoiceDropdown() {
-      const voiceSelect = document.getElementById('voiceSelect');
-      voiceSelect.innerHTML = "";
-      elevenVoices.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v.id;
-        opt.textContent = v.label.toUpperCase();
-        voiceSelect.appendChild(opt);
-      });
-      voiceSelect.value = selectedVoiceId;
-
-      const boostSelect = document.getElementById('boostSelect');
-      if (boostSelect) boostSelect.value = String(!!selectedVoiceSettings.useSpeakerBoost);
-    }
-    function onVoiceChange(id) { selectedVoiceId = id; }
-    function onVoiceTuningChange() {
-      const st = document.getElementById('stabilityRange');
-      const sim = document.getElementById('simRange');
-      const style = document.getElementById('styleRange');
-      const boost = document.getElementById('boostSelect');
-      if (!st || !sim || !style || !boost) return;
-
-      selectedVoiceSettings.stability = Number(st.value);
-      selectedVoiceSettings.similarityBoost = Number(sim.value);
-      selectedVoiceSettings.style = Number(style.value);
-      selectedVoiceSettings.useSpeakerBoost = (boost.value === "true");
-    }
-    function saveVoiceOnly() { closeModal(); triggerModal(4); }
-
-    async function previewVoice() {
-      try {
-        const apiKey = await loadVapiKey();
-        const industry = getCurrentIndustryKey();
-        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
-
-        if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
-          window.vapiSDK.run({
-            apiKey,
-            assistant: assistantId,
-            assistantOverrides: {
-              voice: getSelectedVapiVoice(),
-              firstMessage: "Hi! This is a quick voice preview. How does this voice sound to you?"
-            }
-          });
-          closeModal();
-          return;
-        }
-        alert("Voice SDK still loading. Please try again in 2 seconds.");
-      } catch (e) {
-        console.error(e);
-        alert("Preview failed. Check console + /api/config.");
-      }
-    }
-
-    // ========= DASHBOARD (SAMPLE) =========
-    function renderDashboard() {
-      const c = document.getElementById('mContent');
-      const market = selectedMarket || "—";
-      const industry = document.getElementById('v2')?.innerText || "—";
-      const biz = document.getElementById('v3')?.innerText || "—";
-      const role = selectedRole || document.getElementById('v4')?.innerText || "—";
-      const voice = selectedVoiceId || "—";
-      const pack = getTemplatesFor(selectedRole).packName || "GLOBAL";
-
-      c.innerHTML = `
-        <div class="pill mb-4">CUSTOMER DASHBOARD (SAMPLE)</div>
-
-        <div class="grid lg:grid-cols-3 gap-4 text-left">
-          <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">Account</div>
-            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
-              <div><span class="mini">Market:</span> ${market}</div>
-              <div class="mt-1"><span class="mini">Industry:</span> ${industry}</div>
-              <div class="mt-1"><span class="mini">Business:</span> ${biz}</div>
-            </div>
-          </div>
-
-          <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">Agent</div>
-            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
-              <div><span class="mini">Role:</span> ${role}</div>
-              <div class="mt-1"><span class="mini">Voice:</span> ${voice}</div>
-              <div class="mt-1"><span class="mini">Template Pack:</span> ${pack}</div>
-              <div class="mt-1"><span class="mini">Template:</span> ${selectedTemplateKey || "custom"}</div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-2 mt-4">
-              <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">EDIT ROLE</button>
-              <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">EDIT SCRIPT</button>
-              <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">EDIT VOICE</button>
-            </div>
-          </div>
-
-          <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">Deployment</div>
-            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
-              After activation, customer can:
-              <ul class="mt-2 list-disc pl-5 text-slate-400">
-                <li>Change role completely</li>
-                <li>Swap template packs (industry-specific when available)</li>
-                <li>Edit script anytime</li>
-                <li>Change voice anytime</li>
-                <li>Routing / forwarding settings</li>
-                <li>Business hours + after-hours behavior</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-theme mt-4 text-left">
-          <div class="mini text-orange-500 mb-2">Current Script</div>
-          <pre class="whitespace-pre-wrap text-[11px] text-slate-300 font-semibold leading-relaxed bg-white/5 border border-white/10 rounded-2xl p-3 max-h-[240px] overflow-auto">${escapeHtml(agentScript || "—")}</pre>
-        </div>
-
-        <div class="grid sm:grid-cols-2 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" onclick="closeModal()">CLOSE</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" onclick="handleStep(1)">
-            START NEW ACTIVATION
-          </button>
-        </div>
-      `;
-    }
-
-    function escapeHtml(str) {
-      return String(str || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;");
-    }
-
-    // ========= WAITLIST =========
-    function submitLead(country) {
-      const email = document.getElementById('waitEmail').value;
-      if (email && email.includes('@')) {
-        console.log(`Lead Captured: ${email} for ${country}`);
-        const c = document.getElementById('mContent');
-        c.innerHTML = `<div class="py-10"><p class="text-orange-500 font-black italic text-xs uppercase">PROTOCOL INITIATED</p><p class="text-[9px] text-slate-400 mt-2">WE WILL NOTIFY YOU VIA ${email}</p></div>`;
-        setTimeout(closeModal, 2000);
-      } else {
-        document.getElementById('waitEmail').style.borderColor = 'red';
-      }
-    }
-
-    // ========= GENERIC HELPERS =========
     function filterList(containerId, query) {
       const q = (query || "").toUpperCase();
       document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
         const name = b.getAttribute('data-n') || b.innerText;
         b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
       });
+
+      // Also hide empty continent headers during filtering
+      document.querySelectorAll(`#${containerId} .section-label`).forEach(h => {
+        // show header if any visible button after it until next header
+        let show = false;
+        let el = h.nextElementSibling;
+        while (el && !el.classList.contains('section-label')) {
+          if (el.classList.contains('modal-btn') && el.style.display !== 'none') { show = true; break; }
+          el = el.nextElementSibling;
+        }
+        h.style.display = show ? 'block' : 'none';
+      });
     }
+
     function createBtn(txt, fn) {
       const b = document.createElement('button');
       b.className = "modal-btn";
@@ -1398,6 +691,7 @@ Ask: budget, pre-approved, must-haves, timeline. Collect contact and book call.`
       b.onclick = fn;
       return b;
     }
+
     function handleStep(s) { if (s === 1 || completedSteps >= s - 1) triggerModal(s); }
     function finish(s, v) {
       completedSteps = s;
@@ -1406,34 +700,25 @@ Ask: budget, pre-approved, must-haves, timeline. Collect contact and book call.`
       closeModal();
       if (s < 6) document.getElementById(`s${s + 1}`).classList.add('next-focus');
     }
-    function saveB() {
-      const v = document.getElementById('bn').value;
-      if (v) {
-        finish(3, v);
-        agentScript = applyVars(agentScript);
-      }
-    }
+    function saveB() { const v = document.getElementById('bn').value; if (v) finish(3, v); }
     function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
+
     function toggleLangMenu(force) {
       const d = document.getElementById('langMenu');
       if (force === true) d.style.display = 'flex';
       else if (force === false) d.style.display = 'none';
       else d.style.display = (d.style.display === 'flex') ? 'none' : 'flex';
     }
-    function setLang(cc, langCode) {
-      currentLang = langCode;
-      document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
-      document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${currentLang}`;
-      toggleLangMenu(false);
-    }
+
     function updateCurrencyUI(m) {
       selectedMarket = m;
-      const data = marketCurrency[m];
+      const data = getMarketData(m);
+      const t = i18n[currentLang] || i18n.EN;
       document.getElementById('main-currency').innerText = data.cur;
       document.getElementById('main-price').innerText = data.price;
-      document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} Regular`;
-      agentScript = applyVars(agentScript);
+      document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} ${t.reg || (i18n.EN && i18n.EN.reg) || "Regular"}`;
     }
+
     function initLangList() {
       const list = document.getElementById('langList');
       list.innerHTML = "";
@@ -1444,6 +729,8 @@ Ask: budget, pre-approved, must-haves, timeline. Collect contact and book call.`
         list.appendChild(b);
       });
     }
+
+    // ✅ FIXED: e.clientY (not e.innerHeight)
     function updateParallax(e) {
       document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
       document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
@@ -1452,23 +739,12 @@ Ask: budget, pre-approved, must-haves, timeline. Collect contact and book call.`
     // ========= VAPI DEMO CALL =========
     async function runVoice() {
       try {
+        const key = industryKeys[currentIndustryIdx];
+        const assistantId = assistants[key] || assistants["Electrical"];
         const apiKey = await loadVapiKey();
-        const industry = getCurrentIndustryKey();
-        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
-
-        const businessName = document.getElementById('v3')?.innerText || "YOUR BUSINESS";
-        const finalScript = applyVars(agentScript || "");
 
         if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
-          window.vapiSDK.run({
-            apiKey,
-            assistant: assistantId,
-            assistantOverrides: {
-              voice: getSelectedVapiVoice(),
-              systemPrompt: finalScript,
-              firstMessage: `Hi! Thank you for calling ${businessName}. How can I help you today?`
-            }
-          });
+          window.vapiSDK.run({ apiKey, assistant: assistantId });
           closeModal();
           finish(5, "ACTIVE");
           return;
@@ -1497,17 +773,6 @@ Ask: budget, pre-approved, must-haves, timeline. Collect contact and book call.`
 
     // ========= INIT =========
     initLangList();
-
-    // set a safe default industry index
-    const defaultIndustry = "Electrical";
-    currentIndustryIdx = Math.max(0, industryKeys.indexOf(defaultIndustry));
-
-    // initial template state
-    (function initTemplates() {
-      refreshTemplatesForCurrentSelection(true);
-      const initTemplates = getTemplatesFor(selectedRole).templates;
-      if (initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
-    })();
 
     // Vapi html-script-tag (provides window.vapiSDK.run)
     (function(d, t) {
