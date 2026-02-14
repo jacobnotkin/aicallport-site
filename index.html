@@ -79,7 +79,6 @@
       opacity: 1 !important;
     }
     .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
-
     @keyframes border-glow {
       0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
       50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
@@ -123,8 +122,7 @@
       width: 100%;
       margin-bottom: 8px;
     }
-
-    .modal-scroll { max-height: 440px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .modal-scroll { max-height: 520px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
 
     #setupModal {
       position: fixed;
@@ -137,7 +135,6 @@
       padding: 20px;
     }
 
-    /* modal = same theme */
     .modal-shell {
       background: rgba(15, 23, 42, 0.92);
       border: 1px solid rgba(255, 255, 255, 0.10);
@@ -148,9 +145,7 @@
       padding: 18px;
       text-align: center;
     }
-    @media (min-width: 1024px) {
-      .modal-shell { max-width: 760px; }
-    }
+    @media (min-width: 1024px) { .modal-shell { max-width: 880px; } }
 
     .modal-hdr {
       display: flex;
@@ -192,6 +187,24 @@
       padding-bottom: 6px;
     }
 
+    .chip-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom: 8px; }
+    .chip {
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: rgba(226,232,240,0.9);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      padding: 8px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: .15s;
+      user-select: none;
+    }
+    .chip:hover { border-color: rgba(249,115,22,0.6); background: rgba(249,115,22,0.08); }
+    .chip.active { border-color: rgba(249,115,22,0.95); background: rgba(249,115,22,0.12); color: #fff; }
+
     .modal-btn {
       width: 100%;
       padding: 12px;
@@ -221,39 +234,14 @@
       transition: .15s;
       text-align: left;
     }
-    .tpl-card:hover {
-      border-color: rgba(249,115,22,0.65);
-      box-shadow: 0 0 24px rgba(249,115,22,0.10);
-    }
-    .tpl-card.active {
-      border-color: rgba(249,115,22,0.95);
-      background: rgba(249,115,22,0.08);
-    }
-    .tpl-title {
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: #fff;
-    }
-    .tpl-sub {
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      color: rgba(249,115,22,0.8);
-      margin-top: 3px;
-    }
+    .tpl-card:hover { border-color: rgba(249,115,22,0.65); box-shadow: 0 0 24px rgba(249,115,22,0.10); }
+    .tpl-card.active { border-color: rgba(249,115,22,0.95); background: rgba(249,115,22,0.08); }
+    .tpl-title { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: #fff; }
+    .tpl-sub { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; color: rgba(249,115,22,0.8); margin-top: 3px; }
     .tpl-preview {
-      font-size: 11px;
-      font-weight: 700;
-      color: rgba(226,232,240,0.75);
-      margin-top: 8px;
-      line-height: 1.45;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-size: 11px; font-weight: 700; color: rgba(226,232,240,0.75);
+      margin-top: 8px; line-height: 1.45; display: -webkit-box;
+      -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
     }
     .editor {
       width: 100%;
@@ -399,7 +387,6 @@
 
     // ========= VAPI KEY (NO HARDCODE) =========
     let vapiApiKey = null;
-
     async function loadVapiKey() {
       if (vapiApiKey) return vapiApiKey;
       const res = await fetch("/api/config", { cache: "no-store" });
@@ -419,19 +406,22 @@
     };
 
     let completedSteps = 0;
-    let currentIndustryIdx = 8;
     let currentLang = "EN";
     let selectedMarket = "United States";
 
-    // ✅ NEW (Templates)
+    // ✅ Selected Industry (now string-based, not index-based)
+    let selectedIndustry = null;
+
+    // ✅ Templates state
     let selectedRole = null;
     let selectedTemplateId = null;
 
     const LS_SCRIPT = "aicallport_script";
     const LS_ROLE = "aicallport_role";
     const LS_TEMPLATE = "aicallport_template";
+    const LS_INDUSTRY = "aicallport_industry";
 
-    // ========= PRICING TABLE =========
+    // ========= PRICING TABLE (same as before) =========
     const marketCurrency = {
       "United States": { cur: "$", price: "199", reg: "399", prefix: "+1", active: true },
       "United Kingdom": { cur: "£", price: "155", reg: "310", prefix: "+44", active: true },
@@ -456,7 +446,6 @@
       "Turkey": { cur: "₺", price: "6500", reg: "13000", prefix: "+90", active: true },
       "Thailand": { cur: "฿", price: "6800", reg: "13600", prefix: "+66", active: true },
 
-      // active fallback
       "Mexico": { cur: "$", price: "199", reg: "399", prefix: "+52", active: true },
       "Spain": { cur: "€", price: "185", reg: "370", prefix: "+34", active: true },
       "Vietnam": { cur: "₫", price: "199", reg: "399", prefix: "+84", active: true },
@@ -483,7 +472,7 @@
       return marketCurrency[country] || { cur: "$", price: "199", reg: "399", prefix: "", active: true };
     }
 
-    // ========= COUNTRIES (condensed here to keep file size reasonable; keep your existing expanded list if needed) =========
+    // ========= COUNTRIES (kept compact) =========
     const countriesByContinent = {
       "Europe": ["Albania","Andorra","Austria","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Malta","Moldova","Monaco","Montenegro","Netherlands","North Macedonia","Norway","Poland","Portugal","Romania","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom","Belarus","Armenia","Azerbaijan","Georgia"].sort(),
       "Asia & Oceania": ["Australia","Bahrain","Bangladesh","Cambodia","China","Fiji","Hong Kong","India","Indonesia","Iraq","Israel","Japan","Jordan","Kazakhstan","Kuwait","Kyrgyzstan","Laos","Lebanon","Macao","Malaysia","Maldives","Mongolia","New Zealand","Oman","Pakistan","Papua New Guinea","Philippines","Qatar","Saudi Arabia","Singapore","South Korea","Sri Lanka","Taiwan","Thailand","Turkey","United Arab Emirates","Uzbekistan","Vietnam"].sort(),
@@ -492,6 +481,7 @@
       "Africa": ["Angola","Benin","Botswana","Burkina Faso","Cameroon","Egypt","Ethiopia","Gabon","Ghana","Ivory Coast","Kenya","Madagascar","Malawi","Mali","Mauritius","Morocco","Namibia","Nigeria","Rwanda","Senegal","Seychelles","South Africa","Tanzania","Togo","Tunisia","Uganda","Zambia","Zimbabwe"].sort()
     };
 
+    // ========= LANG MENU =========
     const languages = [
       { id: 'EN', n: 'English', f: 'us' },
       { id: 'ES', n: 'Spanish', f: 'mx' },
@@ -515,9 +505,70 @@
       { id: 'TH', n: 'Thai', f: 'th' }
     ];
 
-    const industryKeys = ["Accounting","After Hours","Auto Repair","Bakery","Boutique","Car Detailing","Car Rental","Dental","Electrical","Electronics","Flower Shop","Furniture","HVAC","Hair Salon","Handyman","Home Cleaning","Insurance","Jewelry","Landscaping","Legal","Locksmith","Massage","Med Spa","Nail Salon","Pest Control","Plumbing","Real Estate","Restaurant","Roofing","Towing","Urgent Care","Veterinary","Windows"];
+    // ========= INDUSTRIES (CATEGORIZED + SEARCHABLE) =========
+    const industriesByCategory = {
+      "Home Services": [
+        "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door Repair","Appliance Repair","Handyman",
+        "Home Cleaning","Carpet Cleaning","Window Cleaning","Pressure Washing","Junk Removal","Moving Company",
+        "Pest Control","Landscaping","Tree Service","Pool Service","Septic Service","Water Damage Restoration",
+        "Mold Remediation","Fire Restoration","Locksmith","Security Systems","Smart Home Installer","Solar Installer",
+        "Painting","Drywall","Flooring","Tile & Grout","Concrete Contractor","Foundation Repair","Fencing","Gutters",
+        "Insulation","Kitchen Remodel","Bathroom Remodel","General Contractor","Glass Repair","Chimney Service",
+        "Paving/Asphalt","Plaster & Stucco","Irrigation","Snow Removal"
+      ],
+      "Health & Wellness": [
+        "Dental","Orthodontics","Chiropractor","Physical Therapy","Massage Therapy","Med Spa","Dermatology",
+        "Primary Care Clinic","Urgent Care","Pediatrics","Optometry","Ophthalmology","Mental Health Therapy",
+        "Psychiatry","Nutritionist/Dietitian","Wellness Clinic","IV Therapy","Acupuncture","Gym/Fitness Studio",
+        "Yoga Studio","Pilates Studio","Personal Trainer","Home Care Agency","Senior Care","Pharmacy","Veterinary",
+        "Animal Hospital","Grooming Salon"
+      ],
+      "Beauty & Personal Care": [
+        "Hair Salon","Barbershop","Nail Salon","Spa","Waxing Studio","Makeup Artist","Cosmetic Clinic",
+        "Tanning Salon","Tattoo Studio","Piercing Studio","Skincare Studio","Lash/Brow Studio"
+      ],
+      "Auto & Transport": [
+        "Auto Repair","Tire Shop","Auto Body Shop","Car Detailing","Car Wash","Oil Change","Brake Shop",
+        "Towing","Roadside Assistance","Car Rental","Limousine Service","Taxi Service","Moving Truck Rental",
+        "Motorcycle Repair","Boat Repair","RV Repair"
+      ],
+      "Food & Hospitality": [
+        "Restaurant","Cafe","Coffee Shop","Bakery","Catering","Food Truck","Bar/Pub","Hotel","Motel",
+        "Airbnb/Short-Term Rental","Event Venue","Wedding Venue","Banquet Hall","Nightclub"
+      ],
+      "Professional Services": [
+        "Legal","Accounting","Tax Preparation","Insurance Agency","Real Estate","Mortgage Broker",
+        "Financial Advisor","Wealth Management","Business Consulting","Marketing Agency","Web Design Agency",
+        "IT Services","Managed IT","Cybersecurity Services","Recruiting/Staffing","Notary Services",
+        "Translation Services","Architect","Engineering Firm"
+      ],
+      "Retail & Local Shops": [
+        "Boutique","Jewelry Store","Flower Shop","Furniture Store","Electronics Store","Phone Repair",
+        "Computer Repair","Pet Store","Liquor Store","Grocery Store","Convenience Store","Sporting Goods",
+        "Bike Shop","Bookstore","Pharmacy Retail","Hardware Store","Auto Parts Store","Thrift Store","Gift Shop"
+      ],
+      "Education & Training": [
+        "Tutoring","Driving School","Music School","Dance Studio","Martial Arts School","Childcare/Daycare",
+        "Private School","Test Prep","Language School","Vocational Training","Online Course Provider"
+      ],
+      "Construction & Trades": [
+        "Construction Company","Electric Contractor","Plumbing Contractor","HVAC Contractor","Roofing Contractor",
+        "Concrete Contractor","Excavation","Demolition","Land Surveyor","Steel Fabrication","Welding Shop",
+        "Custom Cabinets","Carpentry","Masonry","Painter Contractor"
+      ],
+      "Other SMB": [
+        "After Hours Answering","Call Center","Security Guard Company","Private Investigation","Courier Service",
+        "Shipping & Logistics","Storage Facility","Printing Shop","Laundry / Dry Cleaning","Repair Shop",
+        "Event Planner","Photography Studio","Videography","DJ Services","Funeral Home"
+      ]
+    };
 
-    // ========= i18n (kept minimal for this response - your prior full object also works) =========
+    // Flatten + dedupe + alpha for search
+    const ALL_INDUSTRIES = Array.from(new Set(
+      Object.values(industriesByCategory).flat()
+    )).sort((a,b)=>a.localeCompare(b));
+
+    // ========= i18n (kept EN only for now) =========
     const i18n = {
       EN: {
         h1:"GLOBAL ZERO-HUMAN<br> AI RECEPTIONIST",
@@ -529,16 +580,21 @@
         live:"Global Live",
         priceFeats:["Unlimited Calling","Pay Monthly","No Contract"],
         steps:["01 Market","02 Industry","03 Business","04 Role","05 Demo","06 Deploy"],
-        roles:["Receptionist","Sales Agent","Support Agent"],
-        demoBtn:"START DEMO CALL",
-        deployBtn:"GET MY NUMBER",
-        industries:industryKeys
+        roles:["Receptionist","Sales Agent","Support Agent"]
       }
     };
 
-    // ========= TEMPLATES (Industry Packs) =========
+    // ========= Templates (Industry Packs) =========
+    function getBusinessNameSafe() {
+      const v = document.getElementById('v3')?.innerText || "";
+      if (!v || v.toUpperCase() === "SYNC") return "Your Business";
+      return v;
+    }
+    function getSelectedIndustrySafe() {
+      return selectedIndustry || localStorage.getItem(LS_INDUSTRY) || "General";
+    }
+
     function buildTemplatePacks() {
-      // Standard role skeletons (reused)
       const base = {
         Receptionist: (biz, industry) => `You are the AI Receptionist for ${biz} (${industry}).
 Your goals:
@@ -548,10 +604,9 @@ Your goals:
 4) Offer scheduling if needed.
 Rules:
 - Be concise, confident, and helpful.
-- If urgent: ask “Is anyone in danger right now?” and provide emergency guidance to call local emergency services.
+- If urgent: ask “Is anyone in danger right now?” and advise calling local emergency services.
 Opening:
 “Thank you for calling ${biz}. This is the automated receptionist. How can I help you today?”`,
-
         Sales: (biz, industry) => `You are the AI Sales Agent for ${biz} (${industry}).
 Your goals:
 1) Understand what the customer wants (service/product + timeframe).
@@ -560,8 +615,7 @@ Your goals:
 4) Capture name + callback number + email (optional).
 Tone: friendly, confident, not pushy.
 Opening:
-“Hi—thanks for calling ${biz}. I can help with pricing and booking. What service are you looking for today?”`,
-
+“Hi—thanks for calling ${biz}. I can help with pricing and booking. What are you looking for today?”`,
         Support: (biz, industry) => `You are the AI Support Agent for ${biz} (${industry}).
 Your goals:
 1) Quickly diagnose the issue.
@@ -569,97 +623,36 @@ Your goals:
 3) Escalate to a human only when needed.
 4) Capture name + callback number and confirm best time to reach them.
 Opening:
-“Thanks for calling ${biz} support. Tell me what’s going on and I’ll help you fix it.”`
+“Thanks for calling ${biz} support. Tell me what’s going on and I’ll help.”`
       };
 
-      // Industry-specific adds
-      const industryAddOns = {
-        Electrical: {
-          Receptionist: `Key questions: address, issue type (outlet, panel, lighting), urgency, breaker tripping, burning smell.`,
-          Sales: `Qualifiers: property type, scope, timeline, photos available, permit needed, budget range.`,
-          Support: `Safety: if sparks/smell of burning/heat → advise shut off breaker and call emergency services if needed.`
-        },
-        Plumbing: {
-          Receptionist: `Key questions: leak/clog/water heater, is water shut off, location of issue, urgency.`,
-          Sales: `Qualifiers: fixture type, age, symptoms, access, timeline.`,
-          Support: `If active leak: advise shutoff valve/main water; minimize damage.`
-        },
-        Dental: {
-          Receptionist: `Key questions: new patient?, emergency pain?, insurance?, preferred times.`,
-          Sales: `Qualifiers: service needed (cleaning, whitening, implant consult), insurance details.`,
-          Support: `If severe pain/bleeding: recommend urgent care or emergency services as appropriate.`
-        },
-        Restaurant: {
-          Receptionist: `Key questions: reservation size/time, takeout/delivery, dietary needs, hours/location.`,
-          Sales: `Qualifiers: catering size/date/budget, menu preferences.`,
-          Support: `Order issue workflow: confirm order name, time, resolution option (remake/refund callback).`
-        },
-        AutoRepair: {
-          Receptionist: `Key questions: make/model/year, symptoms, check engine light?, urgency, location.`,
-          Sales: `Qualifiers: service type (brakes, oil, diagnostics), timeline, warranty.`,
-          Support: `If vehicle unsafe: advise towing.`
-        }
-      };
-
-      // Build template list
-      const allIndustries = industryKeys.slice();
       const templates = [];
-
-      function addTemplate(industryKey, role, title, body) {
-        templates.push({
-          id: `${industryKey}__${role}__${title}`.replace(/\s+/g,'_'),
-          industry: industryKey,
-          role,
-          title,
-          body
-        });
+      function addTemplate(industry, role, title, body) {
+        templates.push({ id: `${industry}__${role}__${title}`.replace(/\s+/g,'_'), industry, role, title, body });
       }
 
-      allIndustries.forEach(ind => {
-        const nice = ind.replace("Auto Repair","Auto Repair").replace("After Hours","After Hours");
-        // map some keys to addon names
-        const addonKey =
-          ind === "Auto Repair" ? "AutoRepair" :
-          ind === "Restaurant" ? "Restaurant" :
-          ind === "Dental" ? "Dental" :
-          ind === "Electrical" ? "Electrical" :
-          ind === "Plumbing" ? "Plumbing" : null;
+      const seedIndustries = ["Plumbing","Electrical","HVAC","Dental","Restaurant","Auto Repair","Legal","Real Estate","Hair Salon","Home Cleaning"];
+      const all = Array.from(new Set([...ALL_INDUSTRIES, ...seedIndustries]));
 
+      all.forEach(ind => {
         ["Receptionist","Sales","Support"].forEach(role => {
           const biz = getBusinessNameSafe();
-          let script = base[role](biz, nice);
-          if (addonKey && industryAddOns[addonKey] && industryAddOns[addonKey][role]) {
-            script += `\n\nIndustry Notes:\n- ${industryAddOns[addonKey][role]}`;
-          }
-
-          addTemplate(ind, role, "CORE FLOW", script);
-
-          // A second template variant per role for variety
-          addTemplate(ind, role, "FAST QUALIFIER", `${script}\n\nFast Qualifier Mode:\nAsk only 3 questions before offering the next step:\n1) What exactly do you need?\n2) When do you need it?\n3) What is the best callback number?`);
-
-          // A third template: booking oriented
-          addTemplate(ind, role, "BOOKING FIRST", `${script}\n\nBooking First Mode:\nAfter understanding the need, offer:\n“I can book your appointment now. What day works best—today, tomorrow, or later this week?”`);
+          addTemplate(ind, role, "CORE FLOW", base[role](biz, ind));
+          addTemplate(ind, role, "FAST QUALIFIER", `${base[role](biz, ind)}\n\nFast Qualifier Mode:\n1) What do you need?\n2) When do you need it?\n3) Best callback number?`);
+          addTemplate(ind, role, "BOOKING FIRST", `${base[role](biz, ind)}\n\nBooking First Mode:\nOffer booking right after understanding the need.`);
         });
       });
 
-      // General pack (works for any)
-      ["Receptionist","Sales","Support"].forEach(role => {
-        addTemplate("General", role, "UNIVERSAL", base[role](getBusinessNameSafe(), "Any Industry"));
-      });
-
+      ["Receptionist","Sales","Support"].forEach(role => addTemplate("General", role, "UNIVERSAL", base[role](getBusinessNameSafe(), "Any Industry")));
       return templates;
     }
-
     const TEMPLATE_DB = buildTemplatePacks();
 
-    function getCurrentIndustryKey() {
-      return industryKeys[currentIndustryIdx] || "General";
-    }
-
-    function getBusinessNameSafe() {
-      const v = document.getElementById('v3')?.innerText || "";
-      if (!v || v.toUpperCase() === "SYNC") return "Your Business";
-      return v;
+    function mapRoleToTemplateRole(roleLabel) {
+      if (!roleLabel) return "Receptionist";
+      if (roleLabel.toLowerCase().includes("sales")) return "Sales";
+      if (roleLabel.toLowerCase().includes("support")) return "Support";
+      return "Receptionist";
     }
 
     // ========= LANGUAGE SWITCH =========
@@ -726,15 +719,39 @@ Opening:
         });
 
       } else if (step === 2) {
+        // ✅ Categorized + searchable industries restored
         tEl.innerText = lang.steps[1];
-        s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH INDUSTRIES..." onkeyup="filterList('mContent', this.value)">`;
 
-        const industryList = (lang.industries || i18n.EN.industries);
-        industryList.forEach((name, idx) => {
-          const btn = createBtn(name, () => { currentIndustryIdx = idx; finish(2, name); });
-          btn.setAttribute('data-n', name);
-          c.appendChild(btn);
-        });
+        const cats = Object.keys(industriesByCategory);
+
+        s.innerHTML = `
+          <input id="industrySearch" type="text" class="search-box" placeholder="SEARCH INDUSTRIES..." onkeyup="renderIndustryList()">
+          <div class="chip-row" id="catChips"></div>
+        `;
+
+        const chipRow = () => {
+          const row = document.getElementById("catChips");
+          row.innerHTML = "";
+          const allChip = document.createElement("div");
+          allChip.className = "chip active";
+          allChip.innerText = "ALL";
+          allChip.onclick = () => { window.__catFilter = "ALL"; updateChipActive("ALL"); renderIndustryList(); };
+          row.appendChild(allChip);
+
+          cats.forEach(cat => {
+            const ch = document.createElement("div");
+            ch.className = "chip";
+            ch.innerText = cat;
+            ch.onclick = () => { window.__catFilter = cat; updateChipActive(cat); renderIndustryList(); };
+            row.appendChild(ch);
+          });
+        };
+
+        window.__catFilter = "ALL";
+        chipRow();
+
+        c.innerHTML = `<div id="industryList"></div>`;
+        renderIndustryList();
 
       } else if (step === 3) {
         tEl.innerText = lang.steps[2];
@@ -744,14 +761,13 @@ Opening:
         `;
 
       } else if (step === 4) {
-        // ✅ NEW: Larger role menu + then templates
         tEl.innerText = "CHOOSE ROLE";
         c.innerHTML = `
           <div class="text-left bg-black/30 border border-orange-500/20 rounded-2xl p-4 mb-2">
             <div class="text-[10px] font-black uppercase tracking-widest text-orange-400">STEP 4</div>
             <div class="text-[12px] font-black uppercase text-white mt-1">Choose Agent Role → Pick Template Pack</div>
             <div class="text-[11px] font-bold text-slate-300 mt-2">
-              Your customer selects a role, then gets industry-specific templates they can edit.
+              You selected industry: <span class="text-orange-400">${getSelectedIndustrySafe()}</span>
             </div>
           </div>
 
@@ -760,15 +776,10 @@ Opening:
             <button class="modal-btn orange-btn" style="justify-content:center" onclick="selectRoleThenTemplates('Sales Agent')">SALES AGENT</button>
             <button class="modal-btn orange-btn" style="justify-content:center" onclick="selectRoleThenTemplates('Support Agent')">SUPPORT AGENT</button>
           </div>
-
-          <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-400">
-            No scrolling needed — templates open next.
-          </div>
         `;
 
       } else if (step === 'templates') {
-        // ✅ Templates UI
-        const industryKey = getCurrentIndustryKey();
+        const industryKey = getSelectedIndustrySafe();
         const biz = getBusinessNameSafe();
         tEl.innerText = "TEMPLATE PACKS";
 
@@ -776,7 +787,6 @@ Opening:
         const currentTemplate = localStorage.getItem(LS_TEMPLATE) || "";
         const savedScript = localStorage.getItem(LS_SCRIPT) || "";
 
-        // Pre-filter templates for this industry + role (+ add General)
         const list = TEMPLATE_DB.filter(t =>
           (t.role === mapRoleToTemplateRole(pickedRole)) &&
           (t.industry === industryKey || t.industry === "General")
@@ -795,11 +805,8 @@ Opening:
               <div class="text-left bg-black/30 border border-white/10 rounded-2xl p-4 mb-2">
                 <div class="text-[10px] font-black uppercase tracking-widest text-orange-400">ACTIVE PACK</div>
                 <div class="text-[12px] font-black uppercase text-white mt-1">${industryKey} • ${pickedRole}</div>
-                <div class="text-[11px] font-bold text-slate-300 mt-2">
-                  Click a template to load it into the editor.
-                </div>
+                <div class="text-[11px] font-bold text-slate-300 mt-2">Click a template to load it into the editor.</div>
               </div>
-
               <div id="tplList" class="modal-scroll" style="max-height: 420px;"></div>
             </div>
 
@@ -807,9 +814,7 @@ Opening:
               <div class="text-left bg-black/30 border border-white/10 rounded-2xl p-4 mb-2">
                 <div class="text-[10px] font-black uppercase tracking-widest text-orange-400">SCRIPT EDITOR</div>
                 <div class="text-[12px] font-black uppercase text-white mt-1">Business: ${biz}</div>
-                <div class="text-[11px] font-bold text-slate-300 mt-2">
-                  Edit the script. Save it. Then apply to finish Step 4.
-                </div>
+                <div class="text-[11px] font-bold text-slate-300 mt-2">Edit the script. Save it. Then apply to finish Step 4.</div>
               </div>
 
               <textarea id="tplEditor" class="editor" placeholder="Select a template on the left...">${savedScript || ""}</textarea>
@@ -827,13 +832,12 @@ Opening:
           </div>
         `;
 
-        // render list now
         window.__tplCache = list;
         renderTemplateList();
 
       } else if (step === 5) {
         tEl.innerText = lang.steps[4];
-        c.appendChild(createBtn(lang.demoBtn || i18n.EN.demoBtn, runVoice));
+        c.appendChild(createBtn("START DEMO CALL", runVoice));
 
       } else if (step === 6) {
         tEl.innerText = lang.steps[5];
@@ -847,7 +851,7 @@ Opening:
             <p class="text-[10px] font-black uppercase tracking-widest text-orange-400 mb-2">DEPLOY SUMMARY</p>
             <div class="text-[11px] font-bold text-slate-300 leading-relaxed">
               <div><span class="text-orange-400">Market:</span> ${selectedMarket}</div>
-              <div><span class="text-orange-400">Industry:</span> ${getCurrentIndustryKey()}</div>
+              <div><span class="text-orange-400">Industry:</span> ${getSelectedIndustrySafe()}</div>
               <div><span class="text-orange-400">Role:</span> ${role}</div>
               <div><span class="text-orange-400">Template:</span> ${template}</div>
             </div>
@@ -871,19 +875,80 @@ Opening:
       }
     }
 
-    // ========= Templates Helpers =========
-    function mapRoleToTemplateRole(roleLabel) {
-      // role menu labels (Sales Agent / Support Agent) -> templates role keys
-      if (!roleLabel) return "Receptionist";
-      if (roleLabel.toLowerCase().includes("sales")) return "Sales";
-      if (roleLabel.toLowerCase().includes("support")) return "Support";
-      return "Receptionist";
+    // ========= Industry rendering =========
+    function updateChipActive(cat) {
+      document.querySelectorAll(".chip").forEach(ch => ch.classList.remove("active"));
+      document.querySelectorAll(".chip").forEach(ch => {
+        if (ch.innerText === cat.toUpperCase()) ch.classList.add("active");
+      });
+      if (cat === "ALL") document.querySelectorAll(".chip")[0]?.classList.add("active");
     }
 
+    function renderIndustryList() {
+      const holder = document.getElementById("industryList");
+      if (!holder) return;
+
+      const q = (document.getElementById("industrySearch")?.value || "").trim().toLowerCase();
+      const cat = window.__catFilter || "ALL";
+
+      holder.innerHTML = "";
+
+      const cats = Object.keys(industriesByCategory);
+
+      cats.forEach(category => {
+        if (cat !== "ALL" && category !== cat) return;
+
+        const items = industriesByCategory[category].filter(name => {
+          if (!q) return true;
+          return name.toLowerCase().includes(q);
+        });
+
+        if (items.length === 0) return;
+
+        const header = document.createElement("div");
+        header.className = "section-label";
+        header.innerText = category.toUpperCase();
+        holder.appendChild(header);
+
+        items.sort((a,b)=>a.localeCompare(b)).forEach(name => {
+          const btn = createBtn(name, () => selectIndustry(name));
+          btn.setAttribute("data-n", name);
+          holder.appendChild(btn);
+        });
+      });
+
+      // If search yields nothing in category mode, try global fallback
+      if (holder.innerHTML.trim() === "") {
+        const any = ALL_INDUSTRIES.filter(i => i.toLowerCase().includes(q));
+        if (any.length) {
+          const header = document.createElement("div");
+          header.className = "section-label";
+          header.innerText = "SEARCH RESULTS";
+          holder.appendChild(header);
+          any.slice(0, 80).forEach(name => {
+            const btn = createBtn(name, () => selectIndustry(name));
+            btn.setAttribute("data-n", name);
+            holder.appendChild(btn);
+          });
+        } else {
+          const empty = document.createElement("div");
+          empty.className = "text-[11px] font-bold text-white/40 py-6 text-center";
+          empty.innerText = "No industries match your search.";
+          holder.appendChild(empty);
+        }
+      }
+    }
+
+    function selectIndustry(name) {
+      selectedIndustry = name;
+      localStorage.setItem(LS_INDUSTRY, name);
+      finish(2, name);
+    }
+
+    // ========= Templates =========
     function selectRoleThenTemplates(roleLabel) {
       selectedRole = roleLabel;
       localStorage.setItem(LS_ROLE, roleLabel);
-      // open templates picker
       triggerModal('templates');
     }
 
@@ -932,13 +997,12 @@ Opening:
       const lab = document.getElementById("tplChosenLabel");
       if (lab) lab.innerText = `${t.industry} • ${t.title}`;
 
-      // re-render for highlighting
       renderTemplateList();
     }
 
     function personalizeTemplate(text) {
       const biz = getBusinessNameSafe();
-      const industry = getCurrentIndustryKey();
+      const industry = getSelectedIndustrySafe();
       return (text || "")
         .replaceAll("${biz}", biz)
         .replaceAll("${industry}", industry)
@@ -947,9 +1011,8 @@ Opening:
     }
 
     function loadDefaultTemplate() {
-      // choose the first matching template automatically
       const role = mapRoleToTemplateRole(localStorage.getItem(LS_ROLE) || selectedRole || "Receptionist");
-      const industry = getCurrentIndustryKey();
+      const industry = getSelectedIndustrySafe();
       const t = TEMPLATE_DB.find(x => x.role === role && x.industry === industry && x.title === "CORE FLOW")
         || TEMPLATE_DB.find(x => x.role === role && x.industry === industry)
         || TEMPLATE_DB.find(x => x.role === role && x.industry === "General");
@@ -962,7 +1025,6 @@ Opening:
       const v = (ed.value || "").trim();
       localStorage.setItem(LS_SCRIPT, v);
 
-      // small visual confirm
       const c = document.getElementById('mContent');
       const toast = document.createElement("div");
       toast.className = "text-[10px] font-black uppercase tracking-widest text-orange-400 text-center py-2";
@@ -975,40 +1037,14 @@ Opening:
       const roleLabel = localStorage.getItem(LS_ROLE) || selectedRole;
       const script = (document.getElementById("tplEditor")?.value || "").trim();
 
-      if (!roleLabel) {
-        alert("Select a role first.");
-        return;
-      }
-      if (!script) {
-        alert("Please load a template (or write a script) before applying.");
-        return;
-      }
+      if (!roleLabel) { alert("Select a role first."); return; }
+      if (!script) { alert("Please load a template (or write a script) before applying."); return; }
 
       localStorage.setItem(LS_SCRIPT, script);
-
-      // Finish step 4 properly
       finish(4, roleLabel.toUpperCase());
     }
 
-    // ========= GENERAL HELPERS =========
-    function filterList(containerId, query) {
-      const q = (query || "").toUpperCase();
-      document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
-        const name = b.getAttribute('data-n') || b.innerText;
-        b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
-      });
-
-      document.querySelectorAll(`#${containerId} .section-label`).forEach(h => {
-        let show = false;
-        let el = h.nextElementSibling;
-        while (el && !el.classList.contains('section-label')) {
-          if (el.classList.contains('modal-btn') && el.style.display !== 'none') { show = true; break; }
-          el = el.nextElementSibling;
-        }
-        h.style.display = show ? 'block' : 'none';
-      });
-    }
-
+    // ========= GENERAL UI HELPERS =========
     function createBtn(txt, fn) {
       const b = document.createElement('button');
       b.className = "modal-btn";
@@ -1017,9 +1053,15 @@ Opening:
       return b;
     }
 
-    function handleStep(s) {
-      if (s === 1 || completedSteps >= s - 1) triggerModal(s);
+    function filterList(containerId, query) {
+      const q = (query || "").toUpperCase();
+      document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
+        const name = b.getAttribute('data-n') || b.innerText;
+        b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
+      });
     }
+
+    function handleStep(s) { if (s === 1 || completedSteps >= s - 1) triggerModal(s); }
 
     function finish(s, v) {
       completedSteps = s;
@@ -1029,14 +1071,8 @@ Opening:
       if (s < 6) document.getElementById(`s${s + 1}`).classList.add('next-focus');
     }
 
-    function saveB() {
-      const v = document.getElementById('bn').value;
-      if (v) finish(3, v);
-    }
-
-    function closeModal() {
-      document.getElementById('setupModal').style.display = 'none';
-    }
+    function saveB() { const v = document.getElementById('bn').value; if (v) finish(3, v); }
+    function closeModal() { document.getElementById('setupModal').style.display = 'none'; }
 
     function toggleLangMenu(force) {
       const d = document.getElementById('langMenu');
@@ -1080,8 +1116,13 @@ Opening:
     // ========= VAPI DEMO CALL =========
     async function runVoice() {
       try {
-        const key = industryKeys[currentIndustryIdx];
-        const assistantId = assistants[key] || assistants["Electrical"];
+        // pick assistant by matching some common industries; fallback to Electrical
+        const ind = getSelectedIndustrySafe();
+        let assistantId = assistants["Electrical"];
+        if (ind.toLowerCase().includes("plumb")) assistantId = assistants["Plumbing"];
+        else if (ind.toLowerCase().includes("legal")) assistantId = assistants["Legal"];
+        else if (ind.toLowerCase().includes("dental") || ind.toLowerCase().includes("massage") || ind.toLowerCase().includes("spa")) assistantId = assistants["Wellness"];
+
         const apiKey = await loadVapiKey();
 
         if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
@@ -1090,6 +1131,7 @@ Opening:
           finish(5, "ACTIVE");
           return;
         }
+
         alert("Voice SDK still loading. Please try again in 2 seconds.");
       } catch (err) {
         console.error(err);
@@ -1121,6 +1163,14 @@ Opening:
     // ========= INIT =========
     initLangList();
 
+    // restore saved industry
+    (function restoreSaved() {
+      const ind = localStorage.getItem(LS_INDUSTRY);
+      if (ind) { selectedIndustry = ind; document.getElementById("v2").innerText = ind; }
+      const role = localStorage.getItem(LS_ROLE);
+      if (role) document.getElementById("v4").innerText = role.toUpperCase();
+    })();
+
     // Vapi html-script-tag
     (function(d, t) {
       var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
@@ -1129,12 +1179,6 @@ Opening:
       g.async = true;
       s.parentNode.insertBefore(g, s);
     })(document, "script");
-
-    // Restore role/template/script if exists (optional)
-    (function restoreSaved() {
-      const role = localStorage.getItem(LS_ROLE);
-      if (role) document.getElementById("v4").innerText = role.toUpperCase();
-    })();
   </script>
 </body>
 </html>
