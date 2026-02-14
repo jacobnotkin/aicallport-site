@@ -37,6 +37,7 @@
       background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%);
       pointer-events: none;
     }
+
     .console-container {
       width: 100%;
       max-width: 1100px;
@@ -55,6 +56,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
     .orange-btn {
       background: linear-gradient(90deg, #f97316, #ea580c);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -79,7 +81,6 @@
       opacity: 1 !important;
     }
     .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
-
     @keyframes border-glow {
       0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
       50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
@@ -123,8 +124,10 @@
       width: 100%;
       margin-bottom: 8px;
     }
+
     .modal-scroll { max-height: 460px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
 
+    /* MODAL THEME (must match landing page colors) */
     #setupModal {
       position: fixed;
       inset: 0;
@@ -147,10 +150,11 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       backdrop-filter: blur(10px);
     }
-    .modal-shell.role-wide { max-width: 1080px; }
+    .modal-shell.role-wide { max-width: 1120px; }
     .modal-shell.info-wide { max-width: 860px; }
-    .modal-shell.dashboard-wide { max-width: 1080px; }
+    .modal-shell.dashboard-wide { max-width: 1120px; }
     .modal-shell.community-wide { max-width: 1100px; }
+    .modal-shell.market-wide { max-width: 980px; }
 
     .modal-btn {
       width: 100%;
@@ -261,12 +265,7 @@
     }
 
     /* community tabs */
-    .tabbar {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 10px 0 14px 0;
-    }
+    .tabbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px 0; }
     .tab {
       padding: 10px 12px;
       border-radius: 999px;
@@ -278,10 +277,39 @@
       letter-spacing: 0.18em;
       cursor: pointer;
     }
-    .tab.active {
-      border-color: rgba(249,115,22,0.45);
-      background: rgba(249,115,22,0.12);
+    .tab.active { border-color: rgba(249,115,22,0.45); background: rgba(249,115,22,0.12); }
+
+    /* market tabs */
+    .market-tabs { display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0 14px 0; }
+    .market-tab {
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      font-weight: 900;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      cursor: pointer;
+      user-select: none;
     }
+    .market-tab.active { border-color: rgba(249,115,22,0.45); background: rgba(249,115,22,0.12); }
+
+    /* role list should be bigger / not cluttered */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (max-width: 980px) { .role-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { .role-grid { grid-template-columns: repeat(1, minmax(0, 1fr)); } }
+    .role-grid .modal-btn { padding: 14px 14px; font-size: 10px; border-radius: 16px; justify-content: center; text-align: center; }
+
+    /* market grid */
+    .grid-btns { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+    @media (min-width: 720px) { .grid-btns { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+    @media (min-width: 980px) { .grid-btns { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+    .grid-btns .modal-btn { font-size: 9px; padding: 12px; border-radius: 16px; justify-content: flex-start; }
   </style>
 </head>
 
@@ -441,15 +469,18 @@
     let templateCategoryFilter = "ALL";
     let templateSearchQuery = "";
 
+    // market UI state
+    let marketTab = "All";
+    let marketSearch = "";
+
     // deployment tracking
-    // deployed means: user pressed deploy step CTA (and we show dashboard)
-    // paid/active should be verified server-side in real production (Stripe webhook). Here it's just UX state.
     const LS_DEPLOYED = "aicallport_deployed";
     function setDeployed(v) { localStorage.setItem(LS_DEPLOYED, v ? "1" : "0"); }
     function isDeployed() { return localStorage.getItem(LS_DEPLOYED) === "1"; }
 
     // ========= ELEVENLABS VOICE =========
-    const elevenVoices = [
+    // Fallback list; can be replaced by real IDs if you create /api/elevenlabs/voices
+    let elevenVoices = [
       { id: "sarah",    label: "Sarah (Warm / Natural)" },
       { id: "andrea",   label: "Andrea (Confident)" },
       { id: "phillip",  label: "Phillip (Deep / Calm)" },
@@ -473,8 +504,29 @@
       return { provider: "11labs", voiceId: selectedVoiceId, model: "eleven_turbo_v2", ...selectedVoiceSettings };
     }
 
-    // ========= MARKET (ALL ACTIVE — NO COMING SOON) =========
-    // If any market had price/reg as "---", we auto-fill using defaults to keep UX clean.
+    async function tryLoadElevenlabsVoices() {
+      try {
+        const res = await fetch("/api/elevenlabs/voices", { cache: "no-store" });
+        if (!res.ok) return false;
+        const data = await res.json();
+        const list = data?.voices || data?.data || data;
+        if (!Array.isArray(list) || !list.length) return false;
+
+        const mapped = list.map(v => ({
+          id: v.voice_id || v.id || v.voiceId,
+          label: v.name ? `${v.name}` : (v.label || "Voice")
+        })).filter(x => x.id);
+
+        if (mapped.length) {
+          elevenVoices = mapped;
+          if (!mapped.find(x => x.id === selectedVoiceId)) selectedVoiceId = mapped[0].id;
+          return true;
+        }
+      } catch {}
+      return false;
+    }
+
+    // ========= MARKET (ALL ACTIVE) =========
     const DEFAULT_PRICE = "199";
     const DEFAULT_REG = "399";
 
@@ -500,8 +552,6 @@
       "Israel": { cur: "₪", price: "720", reg: "1440", prefix: "+972", active: true },
       "Turkey": { cur: "₺", price: "6500", reg: "13000", prefix: "+90", active: true },
       "Thailand": { cur: "฿", price: "6800", reg: "13600", prefix: "+66", active: true },
-
-      // previously "coming soon" — now ACTIVE
       "Mexico": { cur: "$", price: "199", reg: "399", prefix: "+52", active: true },
       "Spain": { cur: "€", price: "185", reg: "370", prefix: "+34", active: true },
       "Vietnam": { cur: "₫", price: "199", reg: "399", prefix: "+84", active: true },
@@ -531,6 +581,26 @@
       if (!out.price || out.price === "---") out.price = DEFAULT_PRICE;
       if (!out.reg || out.reg === "---") out.reg = DEFAULT_REG;
       return out;
+    }
+
+    const marketContinents = {
+      "All": [],
+      "North America & Caribbean": ["Canada","Mexico","United States"],
+      "South America": ["Argentina","Brazil","Chile","Colombia"],
+      "Europe": ["Austria","Belgium","Denmark","Finland","France","Germany","Greece","Ireland","Italy","Netherlands","Norway","Poland","Portugal","Spain","Sweden","Switzerland","United Kingdom"],
+      "Asia & Oceania": ["Australia","China","Hong Kong","India","Japan","Korea","Malaysia","New Zealand","Philippines","Singapore","Taiwan","Thailand","United Arab Emirates","Vietnam"],
+      "Africa": ["South Africa"]
+    };
+    function computeAllMarketList(){
+      marketContinents["All"] = Object.keys(marketCurrency).sort((a,b)=>a.localeCompare(b));
+    }
+    function getMarketsForTab(tab){
+      computeAllMarketList();
+      const list = marketContinents[tab] || marketContinents["All"];
+      const q = (marketSearch || "").trim().toUpperCase();
+      return list
+        .filter(x => x.toUpperCase().includes(q))
+        .sort((a,b)=>a.localeCompare(b));
     }
 
     // ========= LANG MENU =========
@@ -593,32 +663,41 @@
     function infoPrev(){ if(infoIdx>0){ infoIdx--; renderInfoSlide(); } }
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
-    // ========= INDUSTRIES (same as before, shortened here for space) =========
+    // ========= INDUSTRIES (Categorized + searchable) =========
     const industryKeys = [
-      "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Locksmith","Home Cleaning","Commercial Cleaning","Pest Control","Landscaping","Pool Service",
-      "Auto Repair","Car Detailing","Car Rental","Towing",
-      "Dental","Chiropractic","Urgent Care","Med Spa","Massage Therapy",
-      "Hair Salon","Barbershop","Nail Salon",
-      "Veterinary","Pet Grooming","Pet Boarding",
-      "Law Firm","Accounting","Insurance Agency","Financial Advisor","Real Estate","Property Management",
-      "IT Services","Marketing Agency","Web Design","Photography Studio","Event Planning",
-      "Daycare","Tutoring Center","Driving School",
-      "Boutique","Jewelry Store","Flower Shop","Bakery","Cafe","Coffee Shop","Restaurant","Catering",
-      "Hotel","Travel Agency","Nonprofit","After Hours"
+      "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door Repair","Appliance Repair","Handyman","Locksmith",
+      "Home Cleaning","Commercial Cleaning","Carpet Cleaning","Pest Control","Landscaping","Tree Service","Pool Service","Pressure Washing","Painting","Flooring",
+      "General Contractor","Remodeling","Kitchen & Bath","Concrete","Masonry","Fencing","Solar","Insulation",
+      "Auto Repair","Tire Shop","Body Shop","Auto Glass","Car Detailing","Car Rental","Towing",
+      "Dental","Orthodontics","Chiropractic","Physical Therapy","Urgent Care","Primary Care","Optometry","Dermatology","Med Spa","Massage Therapy","Mental Health Clinic",
+      "Hair Salon","Barbershop","Nail Salon","Spa",
+      "Veterinary","Pet Grooming","Pet Boarding","Dog Training",
+      "Law Firm","Immigration Law","Personal Injury Law","Accounting","Bookkeeping","Insurance Agency","Financial Advisor",
+      "Real Estate","Mortgage Broker","Property Management",
+      "IT Services","Managed Services","Marketing Agency","Web Design","Photography Studio","Event Planning","Staffing Agency","Consulting",
+      "Daycare","Tutoring Center","Driving School","Music School",
+      "Boutique","Jewelry Store","Flower Shop","Bakery","Cafe","Coffee Shop","Restaurant","Catering","Food Truck",
+      "Hotel","Vacation Rental","Travel Agency",
+      "Gym","Yoga Studio","Martial Arts School",
+      "Nonprofit","After Hours","Security Services"
     ];
+
     const industryCategories = {
-      "Home Services": ["Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Locksmith","Home Cleaning","Commercial Cleaning","Pest Control","Landscaping","Pool Service"],
-      "Automotive": ["Auto Repair","Car Detailing","Car Rental","Towing"],
-      "Healthcare": ["Dental","Chiropractic","Urgent Care","Med Spa","Massage Therapy"],
-      "Beauty": ["Hair Salon","Barbershop","Nail Salon"],
-      "Pets": ["Veterinary","Pet Grooming","Pet Boarding"],
-      "Legal & Finance": ["Law Firm","Accounting","Insurance Agency","Financial Advisor","Real Estate","Property Management"],
-      "Professional Services": ["IT Services","Marketing Agency","Web Design","Photography Studio","Event Planning"],
-      "Education": ["Daycare","Tutoring Center","Driving School"],
-      "Retail & Food": ["Boutique","Jewelry Store","Flower Shop","Bakery","Cafe","Coffee Shop","Restaurant","Catering"],
-      "Hospitality": ["Hotel","Travel Agency"],
-      "Community": ["Nonprofit","After Hours"]
+      "Home Services": ["Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door Repair","Appliance Repair","Handyman","Locksmith","Home Cleaning","Commercial Cleaning","Carpet Cleaning","Pest Control","Landscaping","Tree Service","Pool Service","Pressure Washing","Painting","Flooring"],
+      "Construction & Trades": ["General Contractor","Remodeling","Kitchen & Bath","Concrete","Masonry","Fencing","Solar","Insulation"],
+      "Automotive": ["Auto Repair","Tire Shop","Body Shop","Auto Glass","Car Detailing","Car Rental","Towing"],
+      "Healthcare": ["Dental","Orthodontics","Chiropractic","Physical Therapy","Urgent Care","Primary Care","Optometry","Dermatology","Med Spa","Massage Therapy","Mental Health Clinic"],
+      "Beauty": ["Hair Salon","Barbershop","Nail Salon","Spa"],
+      "Pets": ["Veterinary","Pet Grooming","Pet Boarding","Dog Training"],
+      "Legal, Finance & Real Estate": ["Law Firm","Immigration Law","Personal Injury Law","Accounting","Bookkeeping","Insurance Agency","Financial Advisor","Real Estate","Mortgage Broker","Property Management"],
+      "Professional Services": ["IT Services","Managed Services","Marketing Agency","Web Design","Photography Studio","Event Planning","Staffing Agency","Consulting"],
+      "Education": ["Daycare","Tutoring Center","Driving School","Music School"],
+      "Retail & Food": ["Boutique","Jewelry Store","Flower Shop","Bakery","Cafe","Coffee Shop","Restaurant","Catering","Food Truck"],
+      "Hospitality & Travel": ["Hotel","Vacation Rental","Travel Agency"],
+      "Wellness & Fitness": ["Gym","Yoga Studio","Martial Arts School"],
+      "Community & Other": ["Nonprofit","After Hours","Security Services"]
     };
+
     function buildCategorizedIndustryList(){
       const all = new Set(industryKeys);
       const out = [];
@@ -632,50 +711,201 @@
       return out;
     }
 
-    // ========= TEMPLATE CATEGORIES + PACKS (kept minimal here; expand freely) =========
-    const templateCategories = ["ALL","Appointments","Emergency","After Hours","Sales","Support","Intake","Info"];
+    // ========= TEMPLATE PACKS (Industry-specific + searchable) =========
+    const templateCategories = ["ALL","Appointments","Emergency","After Hours","Sales","Support","Intake","Info","Dispatch","Pricing"];
+
+    function scriptBase(lines){ return lines.join("\n").trim(); }
+    function sReceptionistBase(){
+      return scriptBase([
+        "You are the AI receptionist for {{BUSINESS_NAME}} in {{MARKET}}.",
+        "Goals:",
+        "- Answer inbound calls, greet politely, and help the caller.",
+        "- Provide basic information and next steps.",
+        "- If appointment-based, offer to schedule or collect preferred times.",
+        "- If urgent, capture details and mark as URGENT.",
+        "",
+        "Collect when relevant:",
+        "- Caller name",
+        "- Callback number",
+        "- Email (optional)",
+        "- Reason for calling",
+        "- Location/address (if service-based)",
+        "- Preferred date/time",
+        "",
+        "If you cannot solve the request, take a clear message and confirm what will happen next.",
+        "Always end with a polite closing."
+      ]);
+    }
+    function sSalesBase(){
+      return scriptBase([
+        "You are the AI sales agent for {{BUSINESS_NAME}} in {{MARKET}}.",
+        "Goal: qualify the lead and book next steps.",
+        "Ask:",
+        "- What service/product is needed?",
+        "- Location (if relevant)",
+        "- Timeline/urgency",
+        "- Budget range (optional, only if natural)",
+        "Collect contact details and propose an appointment time.",
+        "Be concise, confident, and helpful."
+      ]);
+    }
+    function sSupportBase(){
+      return scriptBase([
+        "You are the AI support agent for {{BUSINESS_NAME}}.",
+        "Goal: triage the issue and capture a complete ticket.",
+        "Collect:",
+        "- Name + best callback number",
+        "- Account/order info (if applicable)",
+        "- Summary of issue",
+        "- Any error messages",
+        "- Best time to call back",
+        "If urgent or safety-related, advise the caller to contact emergency services where appropriate."
+      ]);
+    }
+
     const industryPacks = {
       GLOBAL: {
         Receptionist: [
-          { key:"g_rec_appt", title:"Appointment + Info Receptionist", category:"Appointments",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} in {{MARKET}}.
-Goal: Answer calls, provide basic info, schedule appointments, or take messages.
-
-Collect: name, phone, email (optional), reason, preferred date/time.
-
-Close politely.`},
+          { key:"g_rec_appt", title:"Appointment + Info Receptionist", category:"Appointments", script: sReceptionistBase() },
           { key:"g_rec_afterhours", title:"After-Hours Message Capture", category:"After Hours",
-            script:`You are the after-hours AI receptionist for {{BUSINESS_NAME}}.
-Collect: name, callback number, reason, best time to call back, email (optional). Confirm details.`}
+            script: scriptBase([
+              "You are the after-hours AI receptionist for {{BUSINESS_NAME}} in {{MARKET}}.",
+              "Collect: name, callback number, reason, best time to call back, email (optional).",
+              "Confirm details and say the team will respond during business hours."
+            ])
+          },
+          { key:"g_rec_pricing", title:"Basic Pricing + Scheduling", category:"Pricing",
+            script: scriptBase([ sReceptionistBase(), "", "If asked about pricing: provide general starting ranges and suggest scheduling for an accurate quote." ])
+          }
         ],
         "Sales Agent": [
-          { key:"g_sales_qual", title:"Lead Qualifier + Booking", category:"Sales",
-            script:`You are the AI sales agent for {{BUSINESS_NAME}}.
-Qualify and book. Ask: service needed, location, timeline. Collect contact and schedule.`}
+          { key:"g_sales_qual", title:"Lead Qualifier + Booking", category:"Sales", script: sSalesBase() },
+          { key:"g_sales_followup", title:"Lead Follow-up + Rebook", category:"Sales",
+            script: scriptBase([ sSalesBase(), "", "If caller previously spoke with the business, capture details and rebook." ])
+          }
         ],
         "Support Agent": [
-          { key:"g_support_triage", title:"Support Triage + Ticket", category:"Support",
-            script:`You are the AI support agent for {{BUSINESS_NAME}}.
-Collect issue summary + callback number. Escalate urgent issues.`}
+          { key:"g_support_triage", title:"Support Triage + Ticket", category:"Support", script: sSupportBase() },
+          { key:"g_support_hours", title:"Hours + Status + Callback", category:"Info",
+            script: scriptBase([ sSupportBase(), "", "Share business hours if asked. Offer a callback window." ])
+          }
         ]
       },
+
       "Plumbing": {
         Receptionist: [
-          { key:"pl_rec_dispatch", title:"Plumbing Dispatcher (Urgent + Standard)", category:"Emergency",
-            script:`You are the AI receptionist/dispatcher for {{BUSINESS_NAME}} (Plumbing).
-Ask: leak/flooding, shutoff status, address, access notes, name + phone. If active leak: mark URGENT.`}
+          { key:"pl_rec_dispatch", title:"Plumbing Dispatcher (Urgent + Standard)", category:"Dispatch",
+            script: scriptBase([
+              "You are the AI receptionist/dispatcher for {{BUSINESS_NAME}} (Plumbing) in {{MARKET}}.",
+              "Ask:",
+              "- Is there an active leak or flooding? (If yes = URGENT)",
+              "- Has the water shutoff been turned off? (If safe)",
+              "- Address and access instructions",
+              "- Type of issue (clog, water heater, leak, etc.)",
+              "- Name + callback number",
+              "Confirm priority level and next steps."
+            ])
+          },
+          { key:"pl_rec_appt", title:"Plumbing Appointment Scheduler", category:"Appointments",
+            script: scriptBase([ sReceptionistBase(), "", "Collect address + issue type; propose service windows." ])
+          }
+        ],
+        "Sales Agent": [
+          { key:"pl_sales_quote", title:"Quote + Availability (Plumbing)", category:"Sales",
+            script: scriptBase([ sSalesBase(), "", "Collect issue type and address. Offer estimate scheduling." ])
+          }
+        ],
+        "Support Agent": [
+          { key:"pl_support_warranty", title:"Warranty / Past Work Support", category:"Support",
+            script: scriptBase([ sSupportBase(), "", "Ask for prior invoice/date, address, and what changed." ])
+          }
         ]
       },
+
       "Electrical": {
         Receptionist: [
           { key:"el_rec_safety", title:"Electrical Dispatcher (Safety First)", category:"Emergency",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electrical).
-Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency services), then address and contact.`}
+            script: scriptBase([
+              "You are the AI receptionist for {{BUSINESS_NAME}} (Electrical) in {{MARKET}}.",
+              "Safety screening:",
+              "- Any smoke, burning smell, sparks, or visible fire? If yes: advise turning off breaker if safe and contacting emergency services.",
+              "Then collect:",
+              "- Address",
+              "- Issue type (outlet, panel, lights, etc.)",
+              "- Name + callback number",
+              "- Access notes",
+              "Confirm next steps and scheduling."
+            ])
+          },
+          { key:"el_rec_booking", title:"Electrical Booking + Basic Info", category:"Appointments",
+            script: scriptBase([ sReceptionistBase(), "", "Collect service location and issue details; schedule appointment windows." ])
+          }
+        ],
+        "Sales Agent": [
+          { key:"el_sales_panel", title:"Panel Upgrade Lead Qualifier", category:"Sales",
+            script: scriptBase([ sSalesBase(), "", "Ask home/business type, panel age, goals. Offer inspection scheduling." ])
+          }
+        ],
+        "Support Agent": [
+          { key:"el_support_service", title:"Service Follow-Up Support", category:"Support",
+            script: scriptBase([ sSupportBase(), "", "Ask for address + date of service. Capture symptoms and urgency." ])
+          }
+        ]
+      },
+
+      "Dental": {
+        Receptionist: [
+          { key:"de_rec_newpatient", title:"New Patient Intake + Booking", category:"Intake",
+            script: scriptBase([
+              "You are the AI receptionist for {{BUSINESS_NAME}} (Dental).",
+              "Ask if caller is a new or existing patient.",
+              "For new patients: collect name, phone, insurance (optional), reason, preferred times.",
+              "For emergencies: collect symptoms and urgency; offer earliest appointment."
+            ])
+          },
+          { key:"de_rec_reschedule", title:"Reschedule / Cancel Appointment", category:"Appointments",
+            script: scriptBase([ sReceptionistBase(), "", "Handle rescheduling and cancellations politely. Confirm changes." ])
+          }
+        ],
+        "Sales Agent": [
+          { key:"de_sales_cosmetic", title:"Cosmetic Dentistry Lead Qualifier", category:"Sales",
+            script: scriptBase([ sSalesBase(), "", "Ask goals (whitening, veneers), timeline, offer consult booking." ])
+          }
+        ],
+        "Support Agent": [
+          { key:"de_support_billing", title:"Billing / Insurance Support", category:"Support",
+            script: scriptBase([ sSupportBase(), "", "Collect patient name, appointment date, question type." ])
+          }
+        ]
+      },
+
+      "Restaurant": {
+        Receptionist: [
+          { key:"rs_rec_reservations", title:"Reservations + Hours + Directions", category:"Appointments",
+            script: scriptBase([
+              "You are the AI receptionist for {{BUSINESS_NAME}} (Restaurant).",
+              "Handle: reservations, hours, directions, menu questions.",
+              "Collect reservation details: name, phone, party size, date/time, seating notes.",
+              "If catering inquiry: capture details and offer callback."
+            ])
+          }
+        ],
+        "Sales Agent": [
+          { key:"rs_sales_catering", title:"Catering Lead Capture", category:"Sales",
+            script: scriptBase([ sSalesBase(), "", "Ask event date, headcount, location, dietary needs. Offer follow-up booking." ])
+          }
+        ],
+        "Support Agent": [
+          { key:"rs_support_order", title:"Order Issue / Feedback", category:"Support",
+            script: scriptBase([ sSupportBase(), "", "Collect order time, name, what went wrong. Be empathetic and route to manager." ])
+          }
         ]
       }
     };
+
     function getCurrentIndustryKey(){ return industryKeys[currentIndustryIdx] || "GLOBAL"; }
     function getPackFor(industryKey){ return industryPacks[industryKey] || industryPacks.GLOBAL; }
+
     function getTemplatesFor(roleName){
       const industryKey = getCurrentIndustryKey();
       const pack = getPackFor(industryKey);
@@ -690,69 +920,33 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
     // ========= COMMUNITY (NEWSLETTER + FORUM + AI Q&A) =========
     let communityTab = "NEWSLETTER";
 
-    function openCommunity(){
-      communityTab = "NEWSLETTER";
-      triggerModal("community");
-    }
-    function openNewsletterPortal(){
-      communityTab = "NEWSLETTER";
-      triggerModal("community");
-    }
+    function openCommunity(){ communityTab = "NEWSLETTER"; triggerModal("community"); }
+    function openNewsletterPortal(){ communityTab = "NEWSLETTER"; triggerModal("community"); }
+    function setCommunityTab(tab){ communityTab = tab; renderCommunity(); }
 
-    function setCommunityTab(tab){
-      communityTab = tab;
-      renderCommunity();
-    }
-
-    // Forum storage
     const LS_FORUM = "aicallport_forum_posts";
-    function loadForumPosts(){
-      try { return JSON.parse(localStorage.getItem(LS_FORUM) || "[]"); } catch { return []; }
-    }
-    function saveForumPosts(posts){
-      localStorage.setItem(LS_FORUM, JSON.stringify(posts || []));
-    }
+    function loadForumPosts(){ try { return JSON.parse(localStorage.getItem(LS_FORUM) || "[]"); } catch { return []; } }
+    function saveForumPosts(posts){ localStorage.setItem(LS_FORUM, JSON.stringify(posts || [])); }
 
-    // Newsletter storage
     const LS_NEWSLETTER = "aicallport_newsletter_signups";
-    function loadNewsletter(){
-      try { return JSON.parse(localStorage.getItem(LS_NEWSLETTER) || "[]"); } catch { return []; }
-    }
-    function saveNewsletter(list){
-      localStorage.setItem(LS_NEWSLETTER, JSON.stringify(list || []));
-    }
+    function loadNewsletter(){ try { return JSON.parse(localStorage.getItem(LS_NEWSLETTER) || "[]"); } catch { return []; } }
+    function saveNewsletter(list){ localStorage.setItem(LS_NEWSLETTER, JSON.stringify(list || [])); }
 
     async function submitNewsletter(){
       const email = document.getElementById("nlEmail")?.value || "";
       const name = document.getElementById("nlName")?.value || "";
       const note = document.getElementById("nlNote")?.value || "";
-      if(!email.includes("@")){
-        document.getElementById("nlEmail").style.borderColor = "red";
-        return;
-      }
+      if(!email.includes("@")){ document.getElementById("nlEmail").style.borderColor = "red"; return; }
 
-      const payload = {
-        email, name, note,
-        market: selectedMarket,
-        industry: document.getElementById("v2")?.innerText || "",
-        deployed: isDeployed()
-      };
+      const payload = { email, name, note, market: selectedMarket, industry: document.getElementById("v2")?.innerText || "", deployed: isDeployed() };
 
       const list = loadNewsletter();
       list.unshift({ ...payload, ts: Date.now() });
       saveNewsletter(list);
 
-      // optional backend endpoint
       try {
-        await fetch("/api/newsletter", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      } catch (e) {
-        // If no backend, we still keep it in localStorage
-        console.warn("Newsletter endpoint not available:", e);
-      }
+        await fetch("/api/newsletter", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
+      } catch (e) { console.warn("Newsletter endpoint not available:", e); }
 
       const msg = document.getElementById("nlMsg");
       if(msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">Subscribed</div>
@@ -763,18 +957,9 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
     function addForumPost(){
       const title = (document.getElementById("fpTitle")?.value || "").trim();
       const body = (document.getElementById("fpBody")?.value || "").trim();
-      if(title.length < 3 || body.length < 10){
-        alert("Please add a longer title and message.");
-        return;
-      }
+      if(title.length < 3 || body.length < 10){ alert("Please add a longer title and message."); return; }
       const posts = loadForumPosts();
-      posts.unshift({
-        id: cryptoRandomId(),
-        title,
-        body,
-        replies: [],
-        ts: Date.now()
-      });
+      posts.unshift({ id: cryptoRandomId(), title, body, replies: [], ts: Date.now() });
       saveForumPosts(posts);
       renderCommunity();
     }
@@ -783,7 +968,6 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
       const input = document.getElementById("reply_" + postId);
       const text = (input?.value || "").trim();
       if(text.length < 3) return;
-
       const posts = loadForumPosts();
       const p = posts.find(x => x.id === postId);
       if(!p) return;
@@ -799,21 +983,11 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
       const out = document.getElementById("qaAnswer");
       out.innerHTML = `<div class="text-slate-500 font-black uppercase text-[10px] tracking-widest">Thinking...</div>`;
 
-      // AI-powered Q&A requires a backend.
-      // This frontend calls /api/ai-qa (you implement server-side with your preferred model).
       try{
         const res = await fetch("/api/ai-qa", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            question: q,
-            context: {
-              market: selectedMarket,
-              industry: document.getElementById("v2")?.innerText || "",
-              role: selectedRole,
-              deployed: isDeployed()
-            }
-          })
+          body: JSON.stringify({ question: q, context: { market: selectedMarket, industry: document.getElementById("v2")?.innerText || "", role: selectedRole, deployed: isDeployed() } })
         });
         if(!res.ok) throw new Error("Bad response");
         const data = await res.json();
@@ -825,7 +999,7 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
         out.innerHTML = `
           <div class="mini text-orange-500 mb-2">AI Q&A Needs Backend</div>
           <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-            This UI is ready. To power it with AI, add a server endpoint:
+            Add server endpoint:
             <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 text-[11px] text-slate-300 font-semibold">
               POST <span class="text-orange-500">/api/ai-qa</span> → { answer: "..." }
             </div>
@@ -880,9 +1054,6 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
             </button>
 
             <div class="divider mt-4">Recent Signups (Local)</div>
-            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
-              Stored locally for now. If you enable <span class="text-orange-500">/api/newsletter</span>, signups will also post to your server.
-            </div>
             <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 max-h-[160px] overflow-auto">
               ${renderNewsletterListHtml()}
             </div>
@@ -901,7 +1072,7 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
                 Post
               </button>
               <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed mt-3">
-                Forum is stored in <span class="text-orange-500">localStorage</span>. Add a backend later if you want multi-user.
+                Forum stored in <span class="text-orange-500">localStorage</span>. Add backend for multi-user.
               </div>
             </div>
 
@@ -919,18 +1090,14 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
         body.innerHTML = `
           <div class="card-theme text-left">
             <div class="mini text-orange-500 mb-2">AI Questions & Answers</div>
-            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
-              Ask anything about activation, deployment, roles, scripts, or best practices.
-            </div>
             <textarea id="qaQuestion" class="textarea-theme mt-2" style="min-height:110px" placeholder="Ask a question..."></textarea>
             <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" onclick="askAiQuestion()">
               Ask AI
             </button>
             <div id="qaAnswer" class="mt-4"></div>
-
             <div class="divider mt-4">Server Endpoint</div>
             <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
-              This UI calls <span class="text-orange-500">POST /api/ai-qa</span>. If it does not exist, you will see the setup message.
+              UI calls <span class="text-orange-500">POST /api/ai-qa</span>.
             </div>
           </div>
         `;
@@ -992,6 +1159,7 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
         .replaceAll("{{BUSINESS_NAME}}", businessName)
         .replaceAll("{{MARKET}}", selectedMarket || "YOUR MARKET");
     }
+
     function refreshTemplatesForCurrentSelection(forceResetScript){
       const { templates } = getTemplatesFor(selectedRole);
       if(!templates.length){
@@ -1094,11 +1262,12 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
     // ========= VOICE UI =========
     function initVoiceDropdown(){
       const voiceSelect = document.getElementById('voiceSelect');
+      if(!voiceSelect) return;
       voiceSelect.innerHTML = "";
       elevenVoices.forEach(v => {
         const opt = document.createElement('option');
         opt.value = v.id;
-        opt.textContent = v.label.toUpperCase();
+        opt.textContent = String(v.label || v.id).toUpperCase();
         voiceSelect.appendChild(opt);
       });
       voiceSelect.value = selectedVoiceId;
@@ -1181,12 +1350,16 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
               <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">EDIT SCRIPT</button>
               <button class="modal-btn justify-center text-center" onclick="triggerModal(4)">EDIT VOICE</button>
             </div>
+
+            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed mt-3">
+              After activation, customers can edit role, templates, script, and voice anytime.
+            </div>
           </div>
 
           <div class="card-theme">
             <div class="mini text-orange-500 mb-2">Community</div>
             <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
-              If you did not deploy yet, you can still join:
+              People who did not deploy yet can still join:
               <ul class="mt-2 list-disc pl-5 text-slate-400">
                 <li>Newsletter updates</li>
                 <li>Forum discussions</li>
@@ -1221,6 +1394,45 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
         .replaceAll(">","&gt;");
     }
 
+    // ========= MARKET MODAL UI =========
+    function setMarketTab(tab){
+      marketTab = tab;
+      renderMarketModal();
+    }
+    function setMarketSearch(q){
+      marketSearch = q || "";
+      renderMarketModal();
+    }
+    function renderMarketModal(){
+      const c = document.getElementById("mContent");
+      const tabs = Object.keys(marketContinents);
+
+      c.innerHTML = `
+        <div class="pill mb-3">SELECT MARKET</div>
+        <div class="market-tabs">
+          ${tabs.map(t => `<div class="market-tab ${marketTab===t?'active':''}" onclick="setMarketTab('${escapeHtml(t)}')">${escapeHtml(t)}</div>`).join("")}
+        </div>
+        <input class="search-box" style="margin-bottom:10px" placeholder="SEARCH COUNTRIES..." value="${escapeHtml(marketSearch)}" oninput="setMarketSearch(this.value)" />
+        <div class="grid-btns" id="marketGrid"></div>
+      `;
+
+      const grid = document.getElementById("marketGrid");
+      const list = getMarketsForTab(marketTab);
+
+      if(!list.length){
+        grid.innerHTML = `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10 col-span-full">NO MATCHES</div>`;
+        return;
+      }
+
+      list.forEach(name => {
+        const btn = document.createElement("button");
+        btn.className = "modal-btn";
+        btn.onclick = () => { updateCurrencyUI(name); finish(1, name); };
+        btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${escapeHtml(name)}`;
+        grid.appendChild(btn);
+      });
+    }
+
     // ========= MODAL FLOW =========
     function triggerModal(step){
       const m = document.getElementById('setupModal');
@@ -1229,43 +1441,21 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
       const tEl = document.getElementById('mTitle');
       const shell = document.getElementById('modalShell');
 
-      shell.classList.remove('role-wide','info-wide','dashboard-wide','community-wide');
+      shell.classList.remove('role-wide','info-wide','dashboard-wide','community-wide','market-wide');
       m.style.display = 'flex';
       c.innerHTML = "";
       s.innerHTML = "";
       c.className = "";
 
-      if(step === "info"){
-        shell.classList.add('info-wide');
-        tEl.innerText = "Info";
-        renderInfoSlide();
-        return;
-      }
-      if(step === "dashboard"){
-        shell.classList.add('dashboard-wide');
-        tEl.innerText = "Dashboard";
-        renderDashboard();
-        return;
-      }
-      if(step === "community"){
-        shell.classList.add('community-wide');
-        tEl.innerText = "Community";
-        renderCommunity();
-        return;
-      }
+      if(step === "info"){ shell.classList.add('info-wide'); tEl.innerText = "Info"; renderInfoSlide(); return; }
+      if(step === "dashboard"){ shell.classList.add('dashboard-wide'); tEl.innerText = "Dashboard"; renderDashboard(); return; }
+      if(step === "community"){ shell.classList.add('community-wide'); tEl.innerText = "Community"; renderCommunity(); return; }
 
       if(step === 1){
+        shell.classList.add('market-wide');
         tEl.innerText = i18n.EN.steps[0];
-        s.innerHTML = `<input type="text" class="search-box" placeholder="SEARCH COUNTRIES..." onkeyup="filterList('mContent', this.value)">`;
-        c.className = "modal-scroll";
-
-        const countries = Object.keys(marketCurrency).sort();
-        countries.forEach(name => {
-          const btn = createBtn(name, () => { updateCurrencyUI(name); finish(1, name); });
-          btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${name}`;
-          btn.setAttribute('data-n', name);
-          c.appendChild(btn);
-        });
+        marketTab = marketTab || "All";
+        renderMarketModal();
         return;
       }
 
@@ -1281,7 +1471,7 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
         tEl.innerText = i18n.EN.steps[2];
         c.innerHTML = `
           <input id="bn" placeholder="BUSINESS NAME" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
-          <button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">SAVE</button>
+          <button onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic">SAVE</button>
         `;
         return;
       }
@@ -1295,15 +1485,18 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
 
           <div class="grid lg:grid-cols-3 gap-4 text-left">
             <div class="card-theme">
-              <div class="muted-hint mb-3">Agent Role</div>
-              <div id="roleList" class="grid gap-2"></div>
+              <div class="muted-hint mb-3">Agent Role (Large)</div>
+              <div id="roleList" class="role-grid"></div>
               <div class="mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
                 Current Industry: <span class="text-orange-500">${escapeHtml(getCurrentIndustryKey())}</span>
+              </div>
+              <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-relaxed mt-2">
+                Customer can change role later from dashboard.
               </div>
             </div>
 
             <div class="card-theme">
-              <div class="muted-hint mb-3">Templates</div>
+              <div class="muted-hint mb-3">Templates (Search + Category)</div>
 
               <div class="grid grid-cols-2 gap-2 mb-2">
                 <select id="templateCategory" class="select-theme" onchange="onTemplateCategoryChange(this.value)"></select>
@@ -1349,6 +1542,9 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
                     </select>
                   </label>
                 </div>
+                <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-relaxed mt-3">
+                  If voice sounds robotic, connect real ElevenLabs voices via <span class="text-orange-500">/api/elevenlabs/voices</span>.
+                </div>
               </div>
             </div>
           </div>
@@ -1361,6 +1557,7 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
           </div>
         `;
 
+        // render roles (big buttons)
         const roleList = document.getElementById('roleList');
         roleList.innerHTML = "";
         (i18n.EN.roles).forEach(r => {
@@ -1371,11 +1568,12 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
             refreshTemplatesForCurrentSelection(true);
             triggerModal(4);
           });
-          b.style.fontSize = "10px";
-          b.style.padding = "12px";
-          b.innerHTML = `${r}${selectedRole === r ? " ✓" : ""}`;
+          b.innerHTML = `${escapeHtml(r)}${selectedRole === r ? " ✓" : ""}`;
           roleList.appendChild(b);
         });
+
+        // optional: load real ElevenLabs voices from API if present, then populate dropdown
+        await tryLoadElevenlabsVoices();
 
         initTemplateCategoryDropdown();
         initTemplateDropdown();
@@ -1571,7 +1769,7 @@ Ask: sparking/burning smell/smoke (if yes advise breaker off if safe + emergency
     const initTemplates = getTemplatesFor(selectedRole).templates;
     if(initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
 
-    // if user deployed previously, show community badge state via localStorage (no auto modal)
+    // if user deployed previously
     if(isDeployed()){
       document.getElementById('v6').innerText = "READY";
       document.getElementById('s6').classList.add('active');
