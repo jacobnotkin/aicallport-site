@@ -19,8 +19,10 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- ✅ FIX: Use the browser-ready Vapi script-tag SDK (prevents "exports is not defined") -->
-  <script defer src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+  <!-- ✅ IMPORTANT:
+       Removed @vapi-ai/web CDN script because it can throw:
+       "Uncaught ReferenceError: exports is not defined"
+       We use the browser-safe html-script-tag SDK dynamically in JS instead. -->
 
   <style>
     * { box-sizing: border-box; }
@@ -727,6 +729,7 @@
 
         business_name: "اسم النشاط",
 
+        /* ✅ FIX: role labels */
         receptionist: "موظف استقبال",
         sales_agent: "مندوب مبيعات",
         support_agent: "دعم"
@@ -791,6 +794,7 @@
 
         business_name: "שם העסק",
 
+        /* ✅ FIX: role labels */
         receptionist: "פקיד קבלה",
         sales_agent: "איש מכירות",
         support_agent: "תמיכה"
@@ -1046,12 +1050,11 @@
   <script>
     // ============================
     // VAPI KEY (NO HARDCODE)
-    // ✅ FIX: add cache-busting query param to avoid stale edge cache
     // ============================
     let vapiApiKey = null;
     async function loadVapiKey() {
       if (vapiApiKey) return vapiApiKey;
-      const res = await fetch(`/api/config?ts=${Date.now()}`, { cache: "no-store" });
+      const res = await fetch("/api/config", { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to load /api/config");
       const data = await res.json();
       if (!data || !data.vapiPublicKey) throw new Error("Missing vapiPublicKey in /api/config response");
@@ -1060,26 +1063,40 @@
     }
 
     // ============================
-    // ✅ VAPI LOADER (SIMPLIFIED + BROWSER SAFE)
-    // We always use the script-tag SDK: window.vapiSDK.run(...)
+    // ✅ VAPI LOADER (BROWSER-SAFE)
+    // Always use html-script-tag SDK (avoids "exports is not defined").
     // ============================
     let vapiFallbackInstance = null;
 
-    function waitForVapiSDK(timeoutMs = 8000) {
+    function loadScriptOnce(src) {
       return new Promise((resolve, reject) => {
-        const start = Date.now();
-        const tick = () => {
-          if (window.vapiSDK && typeof window.vapiSDK.run === "function") return resolve();
-          if (Date.now() - start > timeoutMs) return reject(new Error("vapiSDK not available"));
-          requestAnimationFrame(tick);
-        };
-        tick();
+        const existing = [...document.scripts].find(s => s.src === src);
+        if (existing) return resolve();
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.defer = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("Failed to load: " + src));
+        document.head.appendChild(s);
       });
     }
 
-    async function vapiStartCall(assistantId, assistantOverrides) {
+    async function getVapiClientOrFallback() {
       const apiKey = await loadVapiKey();
-      await waitForVapiSDK();
+
+      // Always use the browser-safe html-script-tag SDK
+      await loadScriptOnce("https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js");
+
+      if (!window.vapiSDK || typeof window.vapiSDK.run !== "function") {
+        throw new Error("Vapi SDK (html-script-tag) did not initialize");
+      }
+
+      return { mode: "script", apiKey, client: null };
+    }
+
+    async function vapiStartCall(assistantId, assistantOverrides) {
+      const { apiKey } = await getVapiClientOrFallback();
 
       // Keep a single instance to avoid multiple overlays
       if (vapiFallbackInstance && vapiFallbackInstance.stop) {
