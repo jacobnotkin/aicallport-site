@@ -1,11 +1,14 @@
 export default function handler(req, res) {
-  res.setHeader("Content-Type", "application/json");
+  const key = process.env.VAPI_PUBLIC_KEY;
 
-  const vapiPublicKey = process.env.VAPI_PUBLIC_KEY || "";
-  const assistantId = process.env.VAPI_ASSISTANT_ID || "";
+  if (!key) {
+    return res.status(500).json({
+      error: "VAPI_PUBLIC_KEY is not set"
+    });
+  }
 
-  res.status(200).json({
-    vapiPublicKey,
-    assistantId
+  res.setHeader("Cache-Control", "no-store");
+  return res.status(200).json({
+    vapiPublicKey: key
   });
 }
