@@ -19,8 +19,8 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- Vapi Web SDK (preferred). If it doesn't expose window.Vapi, we fallback to script-tag SDK dynamically. -->
-  <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest"></script>
+  <!-- ✅ FIX: Use the browser-ready Vapi script-tag SDK (prevents "exports is not defined") -->
+  <script defer src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -727,7 +727,6 @@
 
         business_name: "اسم النشاط",
 
-        /* ✅ FIX: role labels */
         receptionist: "موظف استقبال",
         sales_agent: "مندوب مبيعات",
         support_agent: "دعم"
@@ -792,7 +791,6 @@
 
         business_name: "שם העסק",
 
-        /* ✅ FIX: role labels */
         receptionist: "פקיד קבלה",
         sales_agent: "איש מכירות",
         support_agent: "תמיכה"
@@ -1048,11 +1046,12 @@
   <script>
     // ============================
     // VAPI KEY (NO HARDCODE)
+    // ✅ FIX: add cache-busting query param to avoid stale edge cache
     // ============================
     let vapiApiKey = null;
     async function loadVapiKey() {
       if (vapiApiKey) return vapiApiKey;
-      const res = await fetch("/api/config", { cache: "no-store" });
+      const res = await fetch(`/api/config?ts=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to load /api/config");
       const data = await res.json();
       if (!data || !data.vapiPublicKey) throw new Error("Missing vapiPublicKey in /api/config response");
@@ -1061,63 +1060,38 @@
     }
 
     // ============================
-    // ✅ VAPI LOADER (ROBUST)
-    // Prefer window.Vapi (web SDK). If missing, fallback to html-script-tag SDK and window.vapiSDK.run.
-    // - Web SDK usage: new Vapi('publicKey'); vapi.start('assistantId', overrides) :contentReference[oaicite:2]{index=2}
-    // - Script-tag usage: window.vapiSDK.run({ apiKey, assistant, assistantOverrides }) :contentReference[oaicite:3]{index=3}
+    // ✅ VAPI LOADER (SIMPLIFIED + BROWSER SAFE)
+    // We always use the script-tag SDK: window.vapiSDK.run(...)
     // ============================
-    let vapiClient = null;
     let vapiFallbackInstance = null;
 
-    function loadScriptOnce(src) {
+    function waitForVapiSDK(timeoutMs = 8000) {
       return new Promise((resolve, reject) => {
-        const existing = [...document.scripts].find(s => s.src === src);
-        if (existing) return resolve();
-        const s = document.createElement("script");
-        s.src = src;
-        s.async = true;
-        s.defer = true;
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error("Failed to load: " + src));
-        document.head.appendChild(s);
+        const start = Date.now();
+        const tick = () => {
+          if (window.vapiSDK && typeof window.vapiSDK.run === "function") return resolve();
+          if (Date.now() - start > timeoutMs) return reject(new Error("vapiSDK not available"));
+          requestAnimationFrame(tick);
+        };
+        tick();
       });
     }
 
-    async function getVapiClientOrFallback() {
-      const apiKey = await loadVapiKey();
-
-      // Preferred: window.Vapi class
-      if (window.Vapi) {
-        if (!vapiClient) vapiClient = new window.Vapi(apiKey);
-        return { mode: "class", apiKey, client: vapiClient };
-      }
-
-      // Fallback: load html-script-tag SDK
-      await loadScriptOnce("https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js");
-      if (!window.vapiSDK || typeof window.vapiSDK.run !== "function") {
-        throw new Error("Vapi fallback SDK did not initialize");
-      }
-      return { mode: "script", apiKey, client: null };
-    }
-
     async function vapiStartCall(assistantId, assistantOverrides) {
-      const { mode, apiKey, client } = await getVapiClientOrFallback();
+      const apiKey = await loadVapiKey();
+      await waitForVapiSDK();
 
-      if (mode === "class") {
-        // According to the SDK docs/repo: start('assistantId', assistantOverrides) :contentReference[oaicite:4]{index=4}
-        return client.start(assistantId, assistantOverrides || {});
-      }
-
-      // script-tag instance: run() creates/controls a widget/call session
       // Keep a single instance to avoid multiple overlays
       if (vapiFallbackInstance && vapiFallbackInstance.stop) {
         try { vapiFallbackInstance.stop(); } catch {}
       }
+
       vapiFallbackInstance = window.vapiSDK.run({
         apiKey,
         assistant: assistantId,
         assistantOverrides: assistantOverrides || {}
       });
+
       return vapiFallbackInstance;
     }
 
