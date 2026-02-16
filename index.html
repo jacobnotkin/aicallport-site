@@ -2308,9 +2308,17 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
         const finalScript = applyVars(agentScript || "");
 
         await vapiStartCall(assistantId, {
-          voice: getSelectedVapiVoice(),
-          firstMessage: `Hi! Thank you for calling ${businessName}. How can I help you today?`
-        });
+  voice: getSelectedVapiVoice(),
+  firstMessage: `Hi! Thank you for calling ${businessName}. How can I help you today?`,
+  model: {
+    provider: "openai",
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: finalScript }
+    ]
+  }
+});
+
 
         closeModal();
         finish(5, "ACTIVE");
