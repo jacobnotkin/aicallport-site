@@ -17,10 +17,7 @@ async function getConfig() {
   if (!data.vapiPublicKey) {
     throw new Error("Missing vapiPublicKey in /api/config response");
   }
-  if (!data.assistantId) {
-    throw new Error("Missing assistantId in /api/config response");
-  }
-
+  
   configCache = data;
   return data;
 }
