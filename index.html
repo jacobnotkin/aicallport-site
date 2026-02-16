@@ -1144,32 +1144,29 @@
     function setDeployed(v) { localStorage.setItem(LS_DEPLOYED, v ? "1" : "0"); }
     function isDeployed() { return localStorage.getItem(LS_DEPLOYED) === "1"; }
 
-    // ============================
-    // ELEVENLABS VOICE
-    // ============================
-    const elevenVoices = [
-      { id: "sarah",    label: "Sarah (Warm / Natural)" },
-      { id: "andrea",   label: "Andrea (Confident)" },
-      { id: "phillip",  label: "Phillip (Deep / Calm)" },
-      { id: "ryan",     label: "Ryan (Friendly)" },
-      { id: "joseph",   label: "Joseph (Neutral)" },
-      { id: "myra",     label: "Myra (Bright)" },
-      { id: "paula",    label: "Paula (Soft)" },
-      { id: "steve",    label: "Steve (Direct)" },
-      { id: "mark",     label: "Mark (Professional)" },
-      { id: "matilda",  label: "Matilda (Energetic)" }
-    ];
-    let selectedVoiceId = "sarah";
-    let selectedVoiceSettings = {
-      stability: 0.45,
-      similarityBoost: 0.80,
-      style: 0.15,
-      useSpeakerBoost: true,
-      optimizeStreamingLatency: 4
-    };
-    function getSelectedVapiVoice() {
-      return { provider: "11labs", voiceId: selectedVoiceId, model: "eleven_turbo_v2", ...selectedVoiceSettings };
-    }
+// ============================
+// VAPI VOICES (matches your dashboard)
+// ============================
+const vapiVoices = [
+  { id: "Mia", label: "Mia (Professional / Articulate)" },
+  { id: "Leah", label: "Leah (Warm / Gentle)" },
+  { id: "Dan", label: "Dan (Friendly / Casual)" },
+  { id: "Zac", label: "Zac (Enthusiastic / Dynamic)" },
+  { id: "Jess", label: "Jess (Energetic / Youthful)" },
+  { id: "Zoe", label: "Zoe (Calm / Soothing)" },
+  { id: "Leo", label: "Leo (Authoritative / Deep)" },
+  { id: "Savannah", label: "Savannah (American / Southern)" },
+  { id: "Rohan", label: "Rohan (Bright / Energetic)" },
+  { id: "Elliot", label: "Elliot (Canadian / Soothing)" }
+];
+
+let selectedVoiceId = "Mia";
+
+// For Vapi provider voices:
+function getSelectedVapiVoice() {
+  return { provider: "vapi", voiceId: selectedVoiceId };
+}
+
 
     // ============================
     // MARKETS (continent list)
@@ -1619,19 +1616,21 @@ Offer to schedule a call or showing. Collect name, phone, and availability.`}
     // VOICE UI
     // ============================
     function initVoiceDropdown(){
-      const voiceSelect = document.getElementById('voiceSelect');
-      voiceSelect.innerHTML = "";
-      elevenVoices.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v.id;
-        opt.textContent = v.label.toUpperCase();
-        voiceSelect.appendChild(opt);
-      });
-      voiceSelect.value = selectedVoiceId;
+  const voiceSelect = document.getElementById('voiceSelect');
+  if(!voiceSelect) return;
 
-      const boostSelect = document.getElementById('boostSelect');
-      if(boostSelect) boostSelect.value = String(!!selectedVoiceSettings.useSpeakerBoost);
-    }
+  voiceSelect.innerHTML = "";
+
+  vapiVoices.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v.id;
+    opt.textContent = v.label.toUpperCase();
+    voiceSelect.appendChild(opt);
+  });
+
+  voiceSelect.value = selectedVoiceId;
+}
+
     function onVoiceChange(id){ selectedVoiceId = id; }
     function onVoiceTuningChange(){
       const st = document.getElementById('stabilityRange');
