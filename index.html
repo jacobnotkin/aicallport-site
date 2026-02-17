@@ -161,6 +161,7 @@
       pointer-events: auto;
     }
 
+    /* ✅ Make modal slightly taller by default so footer buttons rarely require scrolling */
     .modal-shell {
       background: rgba(10, 12, 18, 0.92);
       border: 1px solid rgba(255,255,255,0.10);
@@ -172,7 +173,7 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       backdrop-filter: blur(10px);
       pointer-events: auto;
-      max-height: 90vh;
+      max-height: 94vh; /* was 90vh */
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -181,6 +182,7 @@
     .modal-shell.info-wide { max-width: 900px; }
     .modal-shell.community-wide { max-width: 1120px; }
     .modal-shell.script-wide { max-width: 1120px; }
+    .modal-shell.dashboard-wide { max-width: 1120px; }
 
     .modal-content-wrap {
       overflow: hidden;
@@ -387,9 +389,30 @@
       line-height: 1.55;
       overflow: auto;
     }
+
+    /* Dashboard */
+    .dash-grid { display:grid; gap:14px; }
+    @media (min-width: 1024px){ .dash-grid { grid-template-columns: 1.15fr 0.85fr; } }
+    .dash-subgrid { display:grid; gap:12px; }
+    @media (min-width: 1024px){ .dash-subgrid { grid-template-columns: 1fr 1fr; } }
+    .small-btn {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.05);
+      color: white;
+      cursor: pointer;
+    }
+    .small-btn:hover { border-color: rgba(249,115,22,0.45); background: rgba(249,115,22,0.10); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
   </style>
 
-  <!-- ✅ Language Engine (kept from your original, with added keys + improved coverage) -->
+  <!-- ✅ Language Engine (expanded key coverage + safer fallback) -->
   <script>
     const LANG_STORAGE_KEY = "aicallport_lang";
     const I18N_CACHE_KEY = "aicallport_i18n_cache_v1";
@@ -444,15 +467,17 @@
         activate_now: "Activate Now",
         save: "Save",
         confirm: "Confirm",
+        dashboard: "Dashboard",
 
+        // Search / lists
         search_languages: "SEARCH LANGUAGES...",
         search_countries: "SEARCH COUNTRIES...",
         search_industries: "SEARCH INDUSTRIES...",
         search_templates: "SEARCH TEMPLATES...",
         no_matching: "NO MATCHING RESULTS",
 
+        // Generic UI
         setup: "Setup",
-        dashboard: "Dashboard",
         post: "Post",
         reply: "Reply",
         title: "Title",
@@ -465,6 +490,7 @@
         thinking: "Thinking...",
         needs_backend: "This feature needs a backend endpoint.",
 
+        // Hero
         hero_h1: "GLOBAL ZERO-HUMAN<br>AI RECEPTIONIST",
         hero_p:
           "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. " +
@@ -480,6 +506,7 @@
         feat_2: "Pay Monthly",
         feat_3: "No Contract",
 
+        // Steps
         step_01: "01 Market",
         step_02: "02 Industry",
         step_03: "03 Business",
@@ -493,6 +520,7 @@
         sandbox: "Sandbox",
         instant: "Instant",
 
+        // Role modal
         role_templates_voice: "ROLE • TEMPLATES • VOICE",
         agent_role: "Agent Role",
         templates: "Templates",
@@ -523,37 +551,97 @@
         role_help_sales: "Qualifies leads fast, captures contact details, and books consultations.",
         role_help_support: "Collects issue details, prioritizes urgency, and escalates when needed.",
 
+        // Demo / deploy
         demo_call: "START DEMO CALL",
         deploy_get_number: "GET MY NUMBER",
+        deploy_pay_now: "PAY NOW",
+        deploy_open_dashboard: "OPEN DASHBOARD",
+        deploy_i_paid: "I PAID — ACTIVATE",
+        deploy_note: "Stripe checkout opens in a new tab. After payment, return here and click “I PAID — ACTIVATE”.",
 
+        // Community
         community_portal: "Community Portal",
         join_list: "Join List",
         ask_ai: "Ask AI",
+        recent_signups_local: "Recent Signups (Local)",
+        replies: "Replies",
+        no_replies_yet: "No replies yet",
+        deployed_tag: "DEPLOYED",
+        no_deploy_tag: "NO DEPLOY",
+        no_posts: "No posts yet",
+        no_signups: "No signups yet",
+        forum_threads: "Forum Threads",
+        deployed_yes: "Deployed: YES",
+        deployed_no: "Deployed: NO",
 
+        // Footer
         privacy: "Privacy",
         terms: "Terms",
         support: "Support",
         active_agents: "ACTIVE AGENTS",
 
+        // Business
         business_name: "Business Name",
 
+        // Top buttons
         open_ai_qa: "AI Q&A",
         open_forum: "Forum",
         open_newsletter: "Newsletter",
-        subscribed: "Subscribed",
-        no_signups: "No signups yet",
-        no_posts: "No posts yet",
-        forum_threads: "Forum Threads",
-        deployed_yes: "Deployed: YES",
-        deployed_no: "Deployed: NO"
+
+        // Script editor extra labels
+        role_behavior: "Role Behavior",
+        variables: "Variables",
+
+        // Dashboard labels
+        dash_title: "Client Dashboard",
+        dash_subtitle: "Manage your AI agent after activation: role, voice, templates, script, hours, and call records.",
+        dash_agent_settings: "Agent Settings",
+        dash_business_settings: "Business Settings",
+        dash_hours: "Open / Close Hours",
+        dash_calls: "Calls & Transcripts",
+        dash_sync_calls: "Sync Calls",
+        dash_clear_calls: "Clear Local Cache",
+        dash_export_calls: "Export JSON",
+        dash_import_calls: "Import JSON",
+        dash_status_active: "Status: Active",
+        dash_status_inactive: "Status: Not Activated",
+        dash_open_role_modal: "Edit Role / Template / Voice",
+        dash_open_script: "Edit Script",
+        dash_open_community: "Open Community",
+        dash_open_steps: "Open Activation Steps",
+        dash_save: "Save Changes",
+        dash_saved: "Saved",
+        dash_hours_note: "These hours affect your agent behavior (open/closed handling).",
+        dash_calls_note: "Transcripts and caller info require a backend to store reliably. Local cache works for testing.",
+
+        // Days
+        day_mon: "Mon",
+        day_tue: "Tue",
+        day_wed: "Wed",
+        day_thu: "Thu",
+        day_fri: "Fri",
+        day_sat: "Sat",
+        day_sun: "Sun",
+        closed: "Closed",
+        open_time: "Open",
+        close_time: "Close",
+
+        // Calls table
+        call_id: "Call ID",
+        caller: "Caller",
+        phone: "Phone",
+        time: "Time",
+        duration: "Duration",
+        transcript: "Transcript",
+        view: "View",
+        no_calls: "No calls yet"
       },
 
-      // Keep your ES/FR/AR/HE blocks (shortened here for size).
-      // Missing keys will safely fall back to EN.
-      ES: { community:"Comunidad", newsletter:"Boletín", forum:"Foro", ai_qa:"Preguntas IA", close:"Cerrar", start_activation:"Iniciar Activación", confirm:"Confirmar" },
-      FR: { community:"Communauté", newsletter:"Newsletter", forum:"Forum", ai_qa:"Q&R IA", close:"Fermer", start_activation:"Démarrer", confirm:"Confirmer" },
-      AR: { community:"المجتمع", newsletter:"النشرة", forum:"المنتدى", ai_qa:"سؤال وجواب", close:"إغلاق", start_activation:"بدء التفعيل", confirm:"تأكيد" },
-      HE: { community:"קהילה", newsletter:"ניוזלטר", forum:"פורום", ai_qa:"שאלות ותשובות", close:"סגור", start_activation:"התחל הפעלה", confirm:"אישור" }
+      // Minimal short blocks. Missing keys fall back to EN.
+      ES: { community:"Comunidad", newsletter:"Boletín", forum:"Foro", ai_qa:"Preguntas IA", close:"Cerrar", start_activation:"Iniciar Activación", confirm:"Confirmar", dashboard:"Panel" },
+      FR: { community:"Communauté", newsletter:"Newsletter", forum:"Forum", ai_qa:"Q&R IA", close:"Fermer", start_activation:"Démarrer", confirm:"Confirmer", dashboard:"Tableau de bord" },
+      AR: { community:"المجتمع", newsletter:"النشرة", forum:"المنتدى", ai_qa:"سؤال وجواب", close:"إغلاق", start_activation:"بدء التفعيل", confirm:"تأكيد", dashboard:"لوحة التحكم" },
+      HE: { community:"קהילה", newsletter:"ניוזלטר", forum:"פורום", ai_qa:"שאלות ותשובות", close:"סגור", start_activation:"התחל הפעלה", confirm:"אישור", dashboard:"לוח בקרה" }
     };
 
     SUPPORTED_LANGS.forEach(code => { if (!translations[code]) translations[code] = {}; });
@@ -671,6 +759,12 @@
         <button id="qaBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="open_ai_qa" type="button">AI Q&A</button>
         <button id="forumBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="open_forum" type="button">Forum</button>
         <button id="newsletterTopBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="open_newsletter" type="button">Newsletter</button>
+
+        <!-- ✅ Dashboard button (enabled only after activation) -->
+        <button id="dashTopBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/10 bg-white/5 hover:bg-white/10 transition"
+          data-i18n="dashboard" type="button" data-i18n-title="dash_status_inactive" title="Status: Not Activated">
+          Dashboard
+        </button>
 
         <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
           <div class="dot-blink"></div>
@@ -819,6 +913,37 @@
   </footer>
 
   <script>
+    // ============================================================
+    // GLOBAL ARCHITECTURE MAP (IMPLEMENTATION GUIDE)
+    // ============================================================
+    /*
+      [Client Browser]
+        ├─ Landing / Activation Wizard (this page)
+        │   ├─ Step 1: Market (FX estimate)        → Local state + optional /api/fx
+        │   ├─ Step 2: Industry (packs)            → Local + optional /api/i18n-batch
+        │   ├─ Step 3: Business name               → Local
+        │   ├─ Step 4: Role/Template/Voice/Script  → Local + optional /api/i18n-batch
+        │   ├─ Step 5: Demo Call (Vapi)            → Vapi SDK + optional /api/calls (store)
+        │   └─ Step 6: Deploy (Stripe)             → Stripe Checkout → Backend webhook → Mark active
+        │
+        └─ Client Dashboard (after activation)
+            ├─ Agent Settings (role/voice/template/script)
+            │     → /api/agent/get, /api/agent/update
+            ├─ Business Settings (name/market/industry)
+            │     → /api/business/update
+            ├─ Open/Close Hours
+            │     → /api/hours/update
+            └─ Calls & Transcripts (caller info)
+                  → /api/calls/list, /api/calls/get, /api/calls/webhook (Vapi)
+
+      [Backend]
+        ├─ Stripe Webhook: payment_succeeded → provision tenant + agent config
+        ├─ Vapi Webhooks: call_end/transcript → persist calls, transcripts, caller metadata
+        ├─ i18n Batch Translator: /api/i18n-batch (optional)
+        └─ Multi-tenant DB:
+             tenants, agents, hours, calls, transcripts, users
+    */
+
     // ============================
     // CONFIG (Vapi key)
     // ============================
@@ -870,6 +995,18 @@
         assistantOverrides: assistantOverrides || {}
       });
 
+      // OPTIONAL: attach events (depends on SDK build). If present, store calls locally.
+      try {
+        if (vapiFallbackInstance && typeof vapiFallbackInstance.on === "function") {
+          vapiFallbackInstance.on("call-end", (payload) => {
+            try { upsertLocalCallFromVapi(payload); } catch {}
+          });
+          vapiFallbackInstance.on("transcript", (payload) => {
+            try { upsertLocalTranscriptFromVapi(payload); } catch {}
+          });
+        }
+      } catch {}
+
       return vapiFallbackInstance;
     }
 
@@ -898,9 +1035,7 @@
     const FX_CACHE_KEY = "aicallport_fx_cache_v1";
 
     function roundNice(amount, code){
-      // simple "pricing" rounding
       if (code === "JPY" || code === "KRW") return Math.round(amount);
-      // most currencies: show no decimals for simplicity in UI
       return Math.round(amount);
     }
 
@@ -912,10 +1047,8 @@
       const key = `USD_${toCode}`;
       const now = Date.now();
 
-      // 24h cache
       if (cache[key] && (now - cache[key].ts) < 24*60*60*1000) return cache[key].rate;
 
-      // backend endpoint expected: /api/fx?base=USD&to=EUR
       try{
         const res = await fetch(`/api/fx?base=USD&to=${encodeURIComponent(toCode)}`, { cache: "no-store" });
         if (!res.ok) throw new Error("fx backend missing");
@@ -926,7 +1059,6 @@
         setFxCache(cache);
         return rate;
       } catch(e){
-        // fallback: no backend => approximate "1:1" (still show USD line correctly)
         return null;
       }
     }
@@ -935,12 +1067,10 @@
       const code = marketCurrencyCode[countryName] || "USD";
       const sym = currencySymbolMap[code] || "$";
 
-      // USD line
       document.getElementById("usd-symbol").textContent = "$";
       document.getElementById("usd-price").textContent = String(BASE_USD_PRICE);
       document.getElementById("reg-usd").textContent = `$${BASE_USD_REG}`;
 
-      // Local estimate
       if (code === "USD"){
         document.getElementById("local-line").textContent = `$${BASE_USD_PRICE}`;
         document.getElementById("reg-local").textContent = `$${BASE_USD_REG}`;
@@ -989,6 +1119,85 @@
     function setDeployed(v) { localStorage.setItem(LS_DEPLOYED, v ? "1" : "0"); }
     function isDeployed() { return localStorage.getItem(LS_DEPLOYED) === "1"; }
 
+    // Dashboard + settings storage
+    const LS_AGENT_SETTINGS = "aicallport_agent_settings_v1";
+    const LS_HOURS = "aicallport_hours_v1";
+    const LS_CALLS = "aicallport_calls_v1";
+
+    function getAgentSettings(){
+      try { return JSON.parse(localStorage.getItem(LS_AGENT_SETTINGS) || "{}"); } catch { return {}; }
+    }
+    function saveAgentSettings(patch){
+      const cur = getAgentSettings();
+      const next = { ...cur, ...(patch || {}), updatedAt: Date.now() };
+      localStorage.setItem(LS_AGENT_SETTINGS, JSON.stringify(next));
+      return next;
+    }
+
+    function getDefaultHours(){
+      // default: Mon-Fri 09:00-17:00, Sat/Sun closed
+      return {
+        mon: { open: true,  start: "09:00", end: "17:00" },
+        tue: { open: true,  start: "09:00", end: "17:00" },
+        wed: { open: true,  start: "09:00", end: "17:00" },
+        thu: { open: true,  start: "09:00", end: "17:00" },
+        fri: { open: true,  start: "09:00", end: "17:00" },
+        sat: { open: false, start: "09:00", end: "17:00" },
+        sun: { open: false, start: "09:00", end: "17:00" }
+      };
+    }
+    function loadHours(){
+      try {
+        const v = JSON.parse(localStorage.getItem(LS_HOURS) || "null");
+        return v && typeof v === "object" ? v : getDefaultHours();
+      } catch {
+        return getDefaultHours();
+      }
+    }
+    function saveHours(h){
+      localStorage.setItem(LS_HOURS, JSON.stringify(h || getDefaultHours()));
+    }
+
+    function loadCalls(){ try { return JSON.parse(localStorage.getItem(LS_CALLS) || "[]"); } catch { return []; } }
+    function saveCalls(calls){ localStorage.setItem(LS_CALLS, JSON.stringify(calls || [])); }
+
+    function upsertLocalCallFromVapi(payload){
+      // payload schema varies. Keep it defensive.
+      const id = payload?.id || payload?.callId || payload?.call?.id || ("call_" + Date.now());
+      const calls = loadCalls();
+      const idx = calls.findIndex(x => x.id === id);
+      const item = {
+        id,
+        callerName: payload?.customer?.name || payload?.caller?.name || "",
+        phone: payload?.customer?.phone || payload?.caller?.phone || payload?.phone || "",
+        startedAt: payload?.startedAt || payload?.call?.startedAt || Date.now(),
+        endedAt: payload?.endedAt || payload?.call?.endedAt || null,
+        durationSec: payload?.duration || payload?.call?.duration || null,
+        transcript: payload?.transcript || payload?.call?.transcript || "",
+        meta: payload || {}
+      };
+      if (idx >= 0) calls[idx] = { ...calls[idx], ...item };
+      else calls.unshift(item);
+      saveCalls(calls.slice(0, 200));
+    }
+
+    function upsertLocalTranscriptFromVapi(payload){
+      const callId = payload?.callId || payload?.id || payload?.call?.id;
+      if (!callId) return;
+      const calls = loadCalls();
+      const idx = calls.findIndex(x => x.id === callId);
+      if (idx < 0) {
+        calls.unshift({ id: callId, callerName:"", phone:"", startedAt: Date.now(), endedAt:null, durationSec:null, transcript: payload?.text || "", meta: { transcriptEvents: [payload] } });
+        saveCalls(calls.slice(0, 200));
+        return;
+      }
+      const cur = calls[idx];
+      const existing = String(cur.transcript || "");
+      const nextText = payload?.text ? (existing ? (existing + "\n" + payload.text) : payload.text) : existing;
+      calls[idx] = { ...cur, transcript: nextText, meta: { ...(cur.meta||{}), lastTranscriptEvent: payload } };
+      saveCalls(calls.slice(0, 200));
+    }
+
     // Vapi Voices
     const vapiVoices = [
       { id: "Mia", label: "Mia (Professional / Articulate)" },
@@ -1007,7 +1216,7 @@
     function getSelectedVapiVoice() { return { provider: "vapi", voiceId: selectedVoiceId }; }
 
     // ============================
-    // MARKETS (your original lists)
+    // MARKETS
     // ============================
     const marketsByContinent = {
       "Europe": ["France","Germany","United Kingdom","Spain","Italy"],
@@ -1018,7 +1227,7 @@
     };
 
     // ============================
-    // LANG MENU (kept minimal here; you can paste your full list back if needed)
+    // LANG MENU
     // ============================
     const languageList = [
       { id:"EN", n:"English", f:"us" },
@@ -1040,7 +1249,7 @@
     };
 
     // ============================
-    // ACTIVATION INFO (kept)
+    // ACTIVATION INFO
     // ============================
     const activationInfoSlides = [
       { keyTitle:"STEP 1 — MARKET", keyText:"Choose the country/market. Pricing and deployment routing adjust automatically based on your selection." },
@@ -1048,7 +1257,7 @@
       { keyTitle:"STEP 3 — BUSINESS", keyText:"Enter your business name. Used in greetings and scripts." },
       { keyTitle:"STEP 4 — ROLE + TEMPLATES + VOICE", keyText:"Pick the role. Choose an industry template pack, edit script, choose a voice, preview it." },
       { keyTitle:"STEP 5 — DEMO", keyText:"Run a test call using your selected role + script + voice." },
-      { keyTitle:"STEP 6 — DEPLOY + DASHBOARD", keyText:"After payment, your agent deploys. Customer gets a dashboard to edit role, script, voice, routing, and business info anytime." }
+      { keyTitle:"STEP 6 — DEPLOY + DASHBOARD", keyText:"After payment, your agent deploys. Customer gets a dashboard to edit role, script, voice, hours, and view call transcripts anytime." }
     ];
     let infoIdx = 0;
 
@@ -1084,7 +1293,7 @@
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
     // ============================
-    // INDUSTRIES (short list for demo; paste your full list if desired)
+    // INDUSTRIES
     // ============================
     const industryKeys = ["Plumbing","Electrical","HVAC","Roofing","Real Estate","After Hours"];
     const industryCategories = { "Home Services":["Plumbing","Electrical","HVAC","Roofing"], "Business":["Real Estate","After Hours"] };
@@ -1102,7 +1311,7 @@
     }
 
     // ============================
-    // TEMPLATES (kept minimal; your full packs can be reinserted)
+    // TEMPLATES
     // ============================
     const templateCategories = ["ALL","Popular","Recommended","Appointments","After Hours","Sales","Support"];
     const industryPacks = {
@@ -1110,23 +1319,30 @@
         Receptionist: [
           { key:"pop_rec_standard", title:"Popular: Standard Receptionist + Booking", category:"Popular",
             script:`You are the AI receptionist for {{BUSINESS_NAME}} in {{MARKET}}.
+
 Primary goals:
 - Answer calls politely
 - Provide basic info
 - Book appointments or take messages
+
 Collect: name, phone, reason, preferred date/time, email (optional)
+
 Always confirm details before ending the call.`}
         ],
         "Sales Agent": [
           { key:"pop_sales_qual", title:"Popular: Sales Lead Qualifier + Booking", category:"Popular",
             script:`You are the AI sales agent for {{BUSINESS_NAME}}.
+
 Qualify leads quickly and book appointments.
+
 Ask: service needed, location, timeline, budget range (optional), contact info.`}
         ],
         "Support Agent": [
           { key:"rec_support_helpdesk", title:"Recommended: Helpdesk + Escalation", category:"Recommended",
             script:`You are the AI support agent for {{BUSINESS_NAME}}.
+
 Collect: name, phone, account/order (if applicable), issue description, urgency.
+
 Provide a short helpful step, then create a ticket and confirm callback.`}
         ]
       },
@@ -1134,7 +1350,9 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
         Receptionist: [
           { key:"el_rec_safety", title:"Recommended: Electrical Safety First", category:"Recommended",
             script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electrical).
+
 Ask: sparking/burning smell/smoke? If yes, advise to turn off breaker if safe and call emergency services if needed.
+
 Collect: address, issue description, contact info, urgency.`}
         ]
       }
@@ -1276,7 +1494,7 @@ Collect: address, issue description, contact info, urgency.`}
     function onVoiceChange(id){ selectedVoiceId = id; }
 
     // ============================
-    // Community (working w/ backend if present; local fallback)
+    // Community
     // ============================
     let communityTab = "NEWSLETTER";
 
@@ -1310,12 +1528,10 @@ Collect: address, issue description, contact info, urgency.`}
       }
       const payload = { email, name, note, market: selectedMarket, industryKey: selectedIndustryKey, deployed: isDeployed() };
 
-      // local storage masked
       const list = loadNewsletter();
       list.unshift({ ...payload, email: maskEmail(email), ts: Date.now() });
       saveNewsletter(list);
 
-      // backend (optional)
       try {
         await fetch("/api/newsletter", {
           method: "POST",
@@ -1325,7 +1541,7 @@ Collect: address, issue description, contact info, urgency.`}
       } catch (e) {}
 
       const msg = document.getElementById("nlMsg");
-      if(msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("subscribed"))}</div>`;
+      if(msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("dash_saved"))}</div>`;
       setTimeout(() => { renderCommunity(); }, 700);
     }
 
@@ -1396,7 +1612,7 @@ Collect: address, issue description, contact info, urgency.`}
             <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">${escapeHtml(x.name || "—")} • ${escapeHtml(x.market || "—")} • ${escapeHtml(x.industryKey || "—")}</div>
           </div>
           <div class="text-[9px] font-black uppercase tracking-widest ${x.deployed ? "text-green-400" : "text-slate-400"}">
-            ${x.deployed ? "DEPLOYED" : "NO DEPLOY"}
+            ${escapeHtml(x.deployed ? i18n.t("deployed_tag") : i18n.t("no_deploy_tag"))}
           </div>
         </div>
       `).join("");
@@ -1409,11 +1625,11 @@ Collect: address, issue description, contact info, urgency.`}
         <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mb-3">
           <div class="text-[10px] font-black uppercase tracking-wider text-orange-500">${escapeHtml(p.title)}</div>
           <div class="text-[11px] text-slate-300 font-semibold leading-relaxed mt-1 whitespace-pre-wrap">${escapeHtml(p.body)}</div>
-          <div class="divider mt-3">Replies</div>
+          <div class="divider mt-3">${escapeHtml(i18n.t("replies"))}</div>
           <div class="space-y-2">
             ${(p.replies||[]).slice(-3).map(r => `
               <div class="text-[11px] text-slate-300 font-semibold leading-relaxed bg-black/20 border border-white/5 rounded-xl p-2 whitespace-pre-wrap">${escapeHtml(r.text)}</div>
-            `).join("") || `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-2">No replies yet</div>`}
+            `).join("") || `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-2">${escapeHtml(i18n.t("no_replies_yet"))}</div>`}
           </div>
           <div class="grid grid-cols-4 gap-2 mt-3">
             <input id="reply_${p.id}" class="select-theme col-span-3" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="write_reply" />
@@ -1463,7 +1679,7 @@ Collect: address, issue description, contact info, urgency.`}
               ${escapeHtml(i18n.t("join_list"))}
             </button>
 
-            <div class="divider mt-4">Recent Signups (Local)</div>
+            <div class="divider mt-4">${escapeHtml(i18n.t("recent_signups_local"))}</div>
             <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 max-h-[160px] overflow-auto">
               ${renderNewsletterListHtml()}
             </div>
@@ -1538,7 +1754,7 @@ Collect: address, issue description, contact info, urgency.`}
       const tEl = document.getElementById("mTitle");
       const shell = document.getElementById("modalShell");
 
-      shell.classList.remove("role-wide","info-wide","community-wide");
+      shell.classList.remove("role-wide","info-wide","community-wide","dashboard-wide");
       shell.classList.add("script-wide");
 
       m.style.display = "flex";
@@ -1566,10 +1782,10 @@ Collect: address, issue description, contact info, urgency.`}
           </div>
 
           <div class="card-theme text-left">
-            <div class="mini text-orange-500 mb-2">Role Behavior</div>
+            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("role_behavior"))}</div>
             <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(roleHelp)}</div>
             <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">
-              Variables: <span class="text-orange-500">{{BUSINESS_NAME}}</span>, <span class="text-orange-500">{{MARKET}}</span>
+              ${escapeHtml(i18n.t("variables"))}: <span class="text-orange-500">{{BUSINESS_NAME}}</span>, <span class="text-orange-500">{{MARKET}}</span>
             </div>
           </div>
 
@@ -1602,12 +1818,397 @@ Collect: address, issue description, contact info, urgency.`}
 
     function scriptEditorSave(){
       agentScript = applyVars(String(scriptEditorDraft || ""));
+      // persist
+      saveAgentSettings({
+        market: selectedMarket,
+        industryKey: selectedIndustryKey,
+        role: selectedRole,
+        templateKey: selectedTemplateKey,
+        voiceId: selectedVoiceId,
+        script: agentScript
+      });
       scriptEditorBackToRoleModal();
     }
 
     function scriptEditorBackToRoleModal(){
       document.getElementById("modalShell").classList.remove("script-wide");
       triggerModal(4);
+    }
+
+    // ============================
+    // DASHBOARD (after activation)
+    // ============================
+    function openDashboard(){
+      triggerModal("dashboard");
+    }
+
+    function formatTime(ts){
+      try {
+        const d = new Date(ts);
+        return d.toLocaleString();
+      } catch {
+        return String(ts || "");
+      }
+    }
+
+    function secondsToMmSs(sec){
+      const s = Number(sec);
+      if (!isFinite(s) || s < 0) return "—";
+      const m = Math.floor(s / 60);
+      const r = Math.floor(s % 60);
+      return `${String(m).padStart(2,"0")}:${String(r).padStart(2,"0")}`;
+    }
+
+    function renderHoursEditor(hours){
+      const dayRows = [
+        { k:"mon", label:i18n.t("day_mon") },
+        { k:"tue", label:i18n.t("day_tue") },
+        { k:"wed", label:i18n.t("day_wed") },
+        { k:"thu", label:i18n.t("day_thu") },
+        { k:"fri", label:i18n.t("day_fri") },
+        { k:"sat", label:i18n.t("day_sat") },
+        { k:"sun", label:i18n.t("day_sun") },
+      ];
+
+      return `
+        <div class="text-[12px] text-slate-300 font-semibold leading-relaxed mb-3">${escapeHtml(i18n.t("dash_hours_note"))}</div>
+        <div class="grid gap-2">
+          ${dayRows.map(d => {
+            const v = hours[d.k] || { open:false, start:"09:00", end:"17:00" };
+            return `
+              <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="text-[10px] font-black uppercase tracking-widest text-white">${escapeHtml(d.label)}</div>
+                  <label class="text-[9px] font-black uppercase tracking-widest text-slate-300 flex items-center gap-2">
+                    <input type="checkbox" ${v.open ? "checked" : ""} onchange="dashToggleDay('${d.k}', this.checked)" />
+                    ${escapeHtml(v.open ? i18n.t("open_time") : i18n.t("closed"))}
+                  </label>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div>
+                    <div class="mini mb-1">${escapeHtml(i18n.t("open_time"))}</div>
+                    <input class="select-theme mono" value="${escapeHtml(v.start)}" type="time" ${v.open ? "" : "disabled"} onchange="dashSetTime('${d.k}','start',this.value)" />
+                  </div>
+                  <div>
+                    <div class="mini mb-1">${escapeHtml(i18n.t("close_time"))}</div>
+                    <input class="select-theme mono" value="${escapeHtml(v.end)}" type="time" ${v.open ? "" : "disabled"} onchange="dashSetTime('${d.k}','end',this.value)" />
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderCallsTable(calls){
+      if (!calls.length){
+        return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10">${escapeHtml(i18n.t("no_calls"))}</div>`;
+      }
+      const rows = calls.slice(0, 30).map(c => {
+        const name = c.callerName || "—";
+        const phone = c.phone || "—";
+        const dur = secondsToMmSs(c.durationSec);
+        const ts = formatTime(c.startedAt || Date.now());
+        return `
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="text-[10px] font-black uppercase tracking-widest text-orange-500">${escapeHtml(i18n.t("call_id"))}: <span class="text-white">${escapeHtml(c.id)}</span></div>
+                <div class="text-[11px] text-slate-200 font-semibold mt-1">
+                  ${escapeHtml(i18n.t("caller"))}: <span class="text-white">${escapeHtml(name)}</span> •
+                  ${escapeHtml(i18n.t("phone"))}: <span class="text-white">${escapeHtml(phone)}</span>
+                </div>
+                <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">
+                  ${escapeHtml(i18n.t("time"))}: ${escapeHtml(ts)} • ${escapeHtml(i18n.t("duration"))}: ${escapeHtml(dur)}
+                </div>
+              </div>
+              <button class="small-btn" type="button" onclick="dashViewTranscript('${escapeHtml(c.id)}')">${escapeHtml(i18n.t("view"))}</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+      return `<div class="grid gap-2">${rows}</div>`;
+    }
+
+    function renderDashboard(){
+      const c = document.getElementById("mContent");
+
+      // pull latest settings from storage as the source of truth
+      const stored = getAgentSettings();
+      if (stored.market) selectedMarket = stored.market;
+      if (stored.industryKey) selectedIndustryKey = stored.industryKey;
+      if (stored.role) selectedRole = stored.role;
+      if (stored.templateKey) selectedTemplateKey = stored.templateKey;
+      if (stored.voiceId) selectedVoiceId = stored.voiceId;
+      if (stored.script) agentScript = stored.script;
+
+      const hours = loadHours();
+      const calls = loadCalls();
+
+      const businessName = (document.getElementById("v3")?.innerText || "").trim();
+      const shownBiz = businessName && businessName !== i18n.t("sync") ? businessName : (stored.businessName || "");
+
+      const statusLine = isDeployed()
+        ? `<div class="text-[10px] font-black uppercase tracking-widest text-green-400">${escapeHtml(i18n.t("dash_status_active"))}</div>`
+        : `<div class="text-[10px] font-black uppercase tracking-widest text-slate-400">${escapeHtml(i18n.t("dash_status_inactive"))}</div>`;
+
+      c.innerHTML = `
+        <div class="pill mb-3">${escapeHtml(i18n.t("dash_title"))}</div>
+        ${statusLine}
+        <div class="text-[12px] text-slate-300 font-semibold leading-relaxed mt-2">${escapeHtml(i18n.t("dash_subtitle"))}</div>
+
+        <div class="dash-grid mt-4 text-left">
+          <div class="dash-subgrid">
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("dash_agent_settings"))}</div>
+
+              <div class="grid gap-2">
+                <div class="text-[10px] font-black uppercase tracking-widest text-slate-500">Market</div>
+                <div class="text-[12px] font-semibold text-white">${escapeHtml(selectedMarket)}</div>
+
+                <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">Industry</div>
+                <div class="text-[12px] font-semibold text-white">${escapeHtml(selectedIndustryKey)}</div>
+
+                <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">Role</div>
+                <div class="text-[12px] font-semibold text-white">${escapeHtml(selectedRole)}</div>
+
+                <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">Voice</div>
+                <div class="text-[12px] font-semibold text-white">${escapeHtml(selectedVoiceId)}</div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-2 mt-4">
+                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="triggerModal(4)">${escapeHtml(i18n.t("dash_open_role_modal"))}</button>
+                <button class="small-btn" type="button" onclick="openScriptEditor()">${escapeHtml(i18n.t("dash_open_script"))}</button>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-2 mt-2">
+                <button class="small-btn" type="button" onclick="openCommunity('NEWSLETTER')">${escapeHtml(i18n.t("dash_open_community"))}</button>
+                <button class="small-btn" type="button" onclick="openActivationInfo()">${escapeHtml(i18n.t("dash_open_steps"))}</button>
+              </div>
+            </div>
+
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("dash_business_settings"))}</div>
+
+              <div class="grid gap-2">
+                <div class="text-[10px] font-black uppercase tracking-widest text-slate-500">${escapeHtml(i18n.t("business_name"))}</div>
+                <input id="dashBizName" class="select-theme" style="text-transform:none;letter-spacing:.06em" value="${escapeHtml(shownBiz)}" />
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-2 mt-3">
+                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="dashSaveBusiness()">${escapeHtml(i18n.t("dash_save"))}</button>
+                <button class="small-btn" type="button" onclick="dashRefreshFromSteps()">${escapeHtml(i18n.t("sync"))}</button>
+              </div>
+
+              <div id="dashBizMsg" class="mt-3"></div>
+            </div>
+          </div>
+
+          <div class="card-theme">
+            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("dash_hours"))}</div>
+            <div id="dashHoursWrap">${renderHoursEditor(hours)}</div>
+            <div class="grid sm:grid-cols-2 gap-2 mt-3">
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="dashSaveHours()">${escapeHtml(i18n.t("dash_save"))}</button>
+              <button class="small-btn" type="button" onclick="dashResetHours()">${escapeHtml(i18n.t("reset_template"))}</button>
+            </div>
+            <div id="dashHoursMsg" class="mt-3"></div>
+          </div>
+        </div>
+
+        <div class="card-theme mt-4 text-left">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <div class="mini text-orange-500 mb-1">${escapeHtml(i18n.t("dash_calls"))}</div>
+              <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(i18n.t("dash_calls_note"))}</div>
+            </div>
+
+            <div class="grid gap-2" style="min-width:220px">
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="dashSyncCalls()">${escapeHtml(i18n.t("dash_sync_calls"))}</button>
+              <button class="small-btn" type="button" onclick="dashExportCalls()">${escapeHtml(i18n.t("dash_export_calls"))}</button>
+              <button class="small-btn" type="button" onclick="dashImportCalls()">${escapeHtml(i18n.t("dash_import_calls"))}</button>
+              <button class="small-btn" type="button" onclick="dashClearCalls()">${escapeHtml(i18n.t("dash_clear_calls"))}</button>
+            </div>
+          </div>
+
+          <div id="dashCallsWrap" class="mt-3">
+            ${renderCallsTable(calls)}
+          </div>
+
+          <div id="dashCallsMsg" class="mt-3"></div>
+        </div>
+      `;
+
+      i18n.applyTranslations(document.getElementById("setupModal"));
+    }
+
+    function dashRefreshFromSteps(){
+      // sync from step labels if they exist
+      const bn = (document.getElementById("v3")?.innerText || "").trim();
+      if (bn && bn !== i18n.t("sync")) saveAgentSettings({ businessName: bn });
+      saveAgentSettings({
+        market: selectedMarket,
+        industryKey: selectedIndustryKey,
+        role: selectedRole,
+        templateKey: selectedTemplateKey,
+        voiceId: selectedVoiceId,
+        script: agentScript
+      });
+      const msg = document.getElementById("dashBizMsg");
+      if (msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("dash_saved"))}</div>`;
+      setTimeout(() => { try { renderDashboard(); } catch {} }, 500);
+    }
+
+    function dashSaveBusiness(){
+      const v = (document.getElementById("dashBizName")?.value || "").trim().slice(0, 80);
+      if (v.length < 2) return;
+      // update step UI too for consistency
+      const v3 = document.getElementById("v3");
+      if (v3) v3.innerText = v;
+
+      saveAgentSettings({ businessName: v });
+
+      const msg = document.getElementById("dashBizMsg");
+      if (msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("dash_saved"))}</div>`;
+
+      // re-apply vars
+      agentScript = applyVars(agentScript);
+
+      setTimeout(() => { if (msg) msg.innerHTML = ""; }, 1200);
+    }
+
+    function dashToggleDay(dayKey, open){
+      const h = loadHours();
+      h[dayKey] ||= { open:false, start:"09:00", end:"17:00" };
+      h[dayKey].open = !!open;
+      saveHours(h);
+      // re-render editor to enable/disable time inputs
+      const wrap = document.getElementById("dashHoursWrap");
+      if (wrap) wrap.innerHTML = renderHoursEditor(h);
+      i18n.applyTranslations(document.getElementById("setupModal"));
+    }
+
+    function dashSetTime(dayKey, field, value){
+      const h = loadHours();
+      h[dayKey] ||= { open:false, start:"09:00", end:"17:00" };
+      if (field === "start") h[dayKey].start = value;
+      if (field === "end") h[dayKey].end = value;
+      saveHours(h);
+    }
+
+    function dashSaveHours(){
+      const msg = document.getElementById("dashHoursMsg");
+      if (msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("dash_saved"))}</div>`;
+      // Optional backend sync:
+      // POST /api/hours/update { hours: loadHours() }
+      setTimeout(() => { if (msg) msg.innerHTML = ""; }, 1200);
+    }
+
+    function dashResetHours(){
+      saveHours(getDefaultHours());
+      const wrap = document.getElementById("dashHoursWrap");
+      if (wrap) wrap.innerHTML = renderHoursEditor(loadHours());
+      i18n.applyTranslations(document.getElementById("setupModal"));
+    }
+
+    function dashViewTranscript(callId){
+      const calls = loadCalls();
+      const c = calls.find(x => x.id === callId);
+      const txt = c?.transcript ? String(c.transcript) : "—";
+      const shell = document.getElementById("modalShell");
+      shell.classList.remove("role-wide","info-wide","community-wide","script-wide");
+      shell.classList.add("info-wide");
+
+      const tEl = document.getElementById("mTitle");
+      tEl.innerText = i18n.t("transcript");
+
+      const body = document.getElementById("mContent");
+      body.innerHTML = `
+        <div class="pill mb-3">${escapeHtml(i18n.t("transcript"))}</div>
+        <div class="card-theme text-left">
+          <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("call_id"))}: ${escapeHtml(callId)}</div>
+          <div class="text-[11px] text-slate-200 font-semibold leading-relaxed whitespace-pre-wrap">${escapeHtml(txt)}</div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn justify-center text-center" type="button" onclick="triggerModal('dashboard')">${escapeHtml(i18n.t("dashboard"))}</button>
+        </div>
+      `;
+      i18n.applyTranslations(document.getElementById("setupModal"));
+    }
+
+    async function dashSyncCalls(){
+      const msg = document.getElementById("dashCallsMsg");
+      if (msg) msg.innerHTML = `<div class="text-slate-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("thinking"))}</div>`;
+
+      // Optional backend:
+      // GET /api/calls/list → [{id, callerName, phone, startedAt, durationSec, transcript}]
+      try{
+        const res = await fetch("/api/calls/list", { cache: "no-store" });
+        if (!res.ok) throw new Error("no backend");
+        const data = await res.json();
+        if (Array.isArray(data?.calls)) {
+          saveCalls(data.calls);
+          if (msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("dash_saved"))}</div>`;
+        } else {
+          throw new Error("bad payload");
+        }
+      } catch(e){
+        if (msg) msg.innerHTML = `
+          <div class="text-slate-300 font-semibold text-[12px] leading-relaxed">
+            ${escapeHtml(i18n.t("needs_backend"))}
+            <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 text-[11px] text-slate-300 font-semibold">
+              GET <span class="text-orange-500">/api/calls/list</span> → { calls: [...] }
+            </div>
+          </div>
+        `;
+      }
+
+      const wrap = document.getElementById("dashCallsWrap");
+      if (wrap) wrap.innerHTML = renderCallsTable(loadCalls());
+      i18n.applyTranslations(document.getElementById("setupModal"));
+    }
+
+    function dashClearCalls(){
+      saveCalls([]);
+      const wrap = document.getElementById("dashCallsWrap");
+      if (wrap) wrap.innerHTML = renderCallsTable([]);
+      const msg = document.getElementById("dashCallsMsg");
+      if (msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("dash_saved"))}</div>`;
+      setTimeout(() => { if (msg) msg.innerHTML = ""; }, 1000);
+    }
+
+    function dashExportCalls(){
+      const calls = loadCalls();
+      const blob = new Blob([JSON.stringify({ calls }, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "aicallport_calls_export.json";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1200);
+    }
+
+    function dashImportCalls(){
+      const inp = document.createElement("input");
+      inp.type = "file";
+      inp.accept = "application/json";
+      inp.onchange = async () => {
+        const f = inp.files && inp.files[0];
+        if (!f) return;
+        const txt = await f.text();
+        try{
+          const parsed = JSON.parse(txt);
+          if (Array.isArray(parsed?.calls)) {
+            saveCalls(parsed.calls);
+            const wrap = document.getElementById("dashCallsWrap");
+            if (wrap) wrap.innerHTML = renderCallsTable(loadCalls());
+            const msg = document.getElementById("dashCallsMsg");
+            if (msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("dash_saved"))}</div>`;
+            setTimeout(() => { if (msg) msg.innerHTML = ""; }, 1000);
+          }
+        } catch {}
+      };
+      inp.click();
     }
 
     // ============================
@@ -1624,7 +2225,9 @@ Collect: address, issue description, contact info, urgency.`}
       return b;
     }
 
-    function closeModal(){ document.getElementById('setupModal').style.display = 'none'; }
+    function closeModal(){
+      document.getElementById('setupModal').style.display = 'none';
+    }
 
     async function triggerModal(step){
       lastModalStep = step;
@@ -1635,7 +2238,7 @@ Collect: address, issue description, contact info, urgency.`}
       const tEl = document.getElementById('mTitle');
       const shell = document.getElementById('modalShell');
 
-      shell.classList.remove('role-wide','info-wide','community-wide','script-wide');
+      shell.classList.remove('role-wide','info-wide','community-wide','script-wide','dashboard-wide');
       m.style.display = 'flex';
       c.innerHTML = "";
       s.innerHTML = "";
@@ -1651,6 +2254,13 @@ Collect: address, issue description, contact info, urgency.`}
         shell.classList.add('community-wide');
         tEl.innerText = i18n.t("community");
         renderCommunity();
+        return;
+      }
+
+      if(step === "dashboard"){
+        shell.classList.add('dashboard-wide');
+        tEl.innerText = i18n.t("dashboard");
+        renderDashboard();
         return;
       }
 
@@ -1693,7 +2303,6 @@ Collect: address, issue description, contact info, urgency.`}
               <div class="muted-hint mb-3">${escapeHtml(i18n.t("agent_role"))}</div>
               <div id="roleList" class="grid gap-2"></div>
 
-              <!-- ✅ Role description paragraphs under role selection -->
               <div class="divider mt-4">Role Description</div>
               <div id="roleDesc" class="text-[12px] text-slate-300 font-semibold leading-relaxed"></div>
 
@@ -1712,7 +2321,6 @@ Collect: address, issue description, contact info, urgency.`}
 
               <select id="templateSelect" class="select-theme" onchange="onTemplateChange(this.value)"></select>
 
-              <!-- ✅ Big "Editable Script" button opens full popup editor -->
               <div class="mt-3 muted-hint" data-i18n="editable_script">${escapeHtml(i18n.t("editable_script"))}</div>
               <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-2"
                 type="button" onclick="openScriptEditor()" data-i18n="editable_script_btn">
@@ -1721,7 +2329,7 @@ Collect: address, issue description, contact info, urgency.`}
 
               <div class="grid grid-cols-2 gap-2 mt-3">
                 <button class="modal-btn justify-center text-center" type="button" onclick="resetTemplate()">${escapeHtml(i18n.t("reset_template"))}</button>
-                <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("save"))}</button>
+                <button class="modal-btn justify-center text-center" type="button" onclick="persistRoleModalSelections()">${escapeHtml(i18n.t("save"))}</button>
               </div>
             </div>
 
@@ -1730,23 +2338,21 @@ Collect: address, issue description, contact info, urgency.`}
               <select id="voiceSelect" class="select-theme" onchange="onVoiceChange(this.value)"></select>
               <div class="grid grid-cols-2 gap-2 mt-3">
                 <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="previewVoice()">${escapeHtml(i18n.t("preview_voice"))}</button>
-                <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("save"))}</button>
+                <button class="modal-btn justify-center text-center" type="button" onclick="persistRoleModalSelections()">${escapeHtml(i18n.t("save"))}</button>
               </div>
             </div>
           </div>
 
-          <!-- ✅ Sticky footer ensures confirm is never hidden -->
           <div class="modal-footer">
             <div class="grid sm:grid-cols-2 gap-2">
               <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="finish(4, selectedRole)">
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="finishRoleStepAndPersist()">
                 ${escapeHtml(i18n.t("confirm_role_template_voice"))}
               </button>
             </div>
           </div>
         `;
 
-        // role buttons
         const roleList = document.getElementById('roleList');
         roleList.innerHTML = "";
         const roles = [
@@ -1770,7 +2376,6 @@ Collect: address, issue description, contact info, urgency.`}
           roleList.appendChild(b);
         });
 
-        // role description paragraph
         const roleDesc = document.getElementById("roleDesc");
         roleDesc.textContent = i18n.t(getRoleHelpKey(selectedRole));
 
@@ -1785,23 +2390,69 @@ Collect: address, issue description, contact info, urgency.`}
         tEl.innerText = i18n.t("step_05");
         c.innerHTML = "";
         c.appendChild(createBtn(i18n.t("demo_call"), runVoice));
+        i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
 
       if(step === 6){
         tEl.innerText = i18n.t("step_06");
-        c.innerHTML = "";
-        c.appendChild(createBtn(i18n.t("deploy_get_number"), () => {
-          confetti();
-          setDeployed(true);
-          finish(6, "READY");
 
-          setTimeout(() => {
-            window.location.href = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
-          }, 900);
-        }));
+        const stripeLink = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
+
+        c.innerHTML = `
+          <div class="pill mb-3">${escapeHtml(i18n.t("step_06"))}</div>
+
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("deploy_pay_now"))}</div>
+            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+              ${escapeHtml(i18n.t("deploy_note"))}
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-2 mt-4">
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="openStripeCheckout('${stripeLink}')">
+                ${escapeHtml(i18n.t("deploy_pay_now"))}
+              </button>
+
+              <button class="modal-btn justify-center text-center" type="button" onclick="manualActivateAfterPayment()">
+                ${escapeHtml(i18n.t("deploy_i_paid"))}
+              </button>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-2 mt-2">
+              <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+              <button class="modal-btn justify-center text-center" type="button" onclick="triggerModal('dashboard')">${escapeHtml(i18n.t("deploy_open_dashboard"))}</button>
+            </div>
+          </div>
+        `;
+        i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
+    }
+
+    function persistRoleModalSelections(){
+      refreshTemplatesForCurrentSelection(false);
+      saveAgentSettings({
+        market: selectedMarket,
+        industryKey: selectedIndustryKey,
+        role: selectedRole,
+        templateKey: selectedTemplateKey,
+        voiceId: selectedVoiceId,
+        script: agentScript
+      });
+      closeModal();
+    }
+
+    function finishRoleStepAndPersist(){
+      refreshTemplatesForCurrentSelection(false);
+      saveAgentSettings({
+        market: selectedMarket,
+        industryKey: selectedIndustryKey,
+        role: selectedRole,
+        templateKey: selectedTemplateKey,
+        voiceId: selectedVoiceId,
+        script: agentScript
+      });
+      finish(4, selectedRole);
     }
 
     // ============================
@@ -1826,6 +2477,7 @@ Collect: address, issue description, contact info, urgency.`}
           const btn = createBtn(name, async () => {
             selectedMarket = name;
             await updatePricingUIForMarket(name);
+            saveAgentSettings({ market: selectedMarket });
             finish(1, name);
           });
           btn.setAttribute('data-n', name);
@@ -1866,6 +2518,7 @@ Collect: address, issue description, contact info, urgency.`}
           const shown = dt("industries", name, name);
           const btn = createBtn(shown, () => {
             selectedIndustryKey = name;
+            saveAgentSettings({ industryKey: selectedIndustryKey });
             finish(2, shown);
             refreshTemplatesForCurrentSelection(true);
           });
@@ -1913,12 +2566,14 @@ Collect: address, issue description, contact info, urgency.`}
       if(s < 6) document.getElementById(`s${s + 1}`)?.classList.add('next-focus');
 
       refreshStepLocks();
+      refreshDashboardButtonState();
     }
 
     function saveB(){
       const raw = (document.getElementById('bn').value || "");
       const v = raw.trim().slice(0, 60);
       if(v.length >= 2){
+        saveAgentSettings({ businessName: v });
         finish(3, v);
         agentScript = applyVars(agentScript);
       }
@@ -2003,9 +2658,52 @@ Collect: address, issue description, contact info, urgency.`}
 
         closeModal();
         finish(5, "ACTIVE");
+
+        // Save settings snapshot (so dashboard has everything)
+        saveAgentSettings({
+          market: selectedMarket,
+          industryKey: selectedIndustryKey,
+          role: selectedRole,
+          templateKey: selectedTemplateKey,
+          voiceId: selectedVoiceId,
+          script: finalScript
+        });
       } catch(err){
         console.error(err);
         alert("Error starting demo call. Check console + /api/config.");
+      }
+    }
+
+    // ============================
+    // DEPLOY
+    // ============================
+    function openStripeCheckout(url){
+      // open in a new tab to keep this state alive
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+
+    function manualActivateAfterPayment(){
+      // This is the front-end “manual” activation switch (until Stripe webhook is implemented)
+      // In production you should set deployed via webhook + signed session.
+      setDeployed(true);
+      finish(6, "READY");
+      refreshDashboardButtonState();
+      triggerModal("dashboard");
+      confetti();
+    }
+
+    function refreshDashboardButtonState(){
+      const btn = document.getElementById("dashTopBtn");
+      if (!btn) return;
+
+      if (isDeployed()){
+        btn.style.borderColor = "rgba(249,115,22,0.45)";
+        btn.style.background = "rgba(249,115,22,0.12)";
+        btn.title = i18n.t("dash_status_active");
+      } else {
+        btn.style.borderColor = "rgba(255,255,255,0.10)";
+        btn.style.background = "rgba(255,255,255,0.05)";
+        btn.title = i18n.t("dash_status_inactive");
       }
     }
 
@@ -2032,6 +2730,8 @@ Collect: address, issue description, contact info, urgency.`}
       document.getElementById("heroCta").addEventListener("click", () => handleStep(1));
       document.getElementById("sideCta").addEventListener("click", () => handleStep(1));
       document.getElementById("activationInfoBtn").addEventListener("click", openActivationInfo);
+
+      document.getElementById("dashTopBtn").addEventListener("click", () => openDashboard());
 
       // Community split entry points
       document.getElementById("qaBtn").addEventListener("click", () => openCommunity("QA"));
@@ -2081,6 +2781,21 @@ Collect: address, issue description, contact info, urgency.`}
     // pricing init
     updatePricingUIForMarket("United States");
 
+    // hydrate from storage if present
+    (function hydrateFromStorage(){
+      const st = getAgentSettings();
+      if (st.market) selectedMarket = st.market;
+      if (st.industryKey) selectedIndustryKey = st.industryKey;
+      if (st.role) selectedRole = st.role;
+      if (st.templateKey) selectedTemplateKey = st.templateKey;
+      if (st.voiceId) selectedVoiceId = st.voiceId;
+      if (st.script) agentScript = st.script;
+      if (st.businessName) {
+        const v3 = document.getElementById("v3");
+        if (v3) v3.innerText = st.businessName;
+      }
+    })();
+
     if(isDeployed()){
       document.getElementById('v6').innerText = "READY";
       document.getElementById('s6').classList.add('active');
@@ -2088,6 +2803,7 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     refreshStepLocks();
+    refreshDashboardButtonState();
     i18n.applyTranslations(document);
   </script>
 </body>
