@@ -1,302 +1,591 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI CALL PORT | Dashboard</title>
-
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9E%3C/text%3E%3C/svg%3E">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI CALL PORT — Dashboard</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#0b0f17" />
   <style>
+    :root{
+      --bg:#0b0f17;
+      --panel:#0f1626;
+      --panel2:#0c1322;
+      --text:#e8edf7;
+      --muted:#a7b3c8;
+      --line:#1f2a44;
+      --brand:#7c5cff;
+      --brand2:#00d4ff;
+      --ok:#2ecc71;
+      --warn:#f5c542;
+      --bad:#ff5c5c;
+      --shadow: 0 10px 40px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius2: 22px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
     *{box-sizing:border-box}
     body{
       margin:0;
-      background:#06080f;
-      color:#e2e8f0;
-      font-family:'Plus Jakarta Sans',sans-serif;
-      min-height:100vh;
-    }
-
-    .app-shell{
-      max-width:1200px;
-      margin:20px auto;
-      padding:14px;
-    }
-
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:14px 16px;
-      border-radius:18px;
-      background:rgba(10,12,18,.85);
-      border:1px solid rgba(255,255,255,.10);
-      backdrop-filter:blur(10px);
-    }
-    .topbar-left{display:flex;align-items:center;gap:10px}
-    .brand{font-weight:900;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
-    .badge{
-      font-weight:900;
-      font-size:9px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      padding:4px 8px;
-      border-radius:999px;
-      background:rgba(249,115,22,.14);
-      border:1px solid rgba(249,115,22,.35);
-      color:#fff;
-    }
-    .topbar-right{display:flex;gap:8px;flex-wrap:wrap}
-    .topbar-btn{
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.04);
-      color:#fff;
-      font-weight:900;
-      font-size:10px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      cursor:pointer;
-    }
-    .topbar-btn.active{
-      border-color:rgba(249,115,22,.45);
-      background:rgba(249,115,22,.12);
-    }
-
-    .app-body{
-      display:grid;
-      grid-template-columns:260px 1fr;
-      gap:14px;
-      margin-top:14px;
-    }
-    @media (max-width: 980px){
-      .app-body{grid-template-columns:1fr}
-      .sidebar{position:relative}
-    }
-
-    .sidebar{
-      background:rgba(10,12,18,.85);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;
-      padding:14px;
-      backdrop-filter:blur(10px);
-    }
-    .sidebar-title{
-      font-weight:900;
-      font-size:10px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:rgba(148,163,184,.9);
-      margin-bottom:10px;
-    }
-    .side-link{
-      width:100%;
-      text-align:left;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.03);
-      color:#fff;
-      font-weight:900;
-      font-size:10px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      cursor:pointer;
-      margin-bottom:8px;
-    }
-    .side-link.active{
-      border-color:rgba(249,115,22,.45);
-      background:rgba(249,115,22,.12);
-    }
-
-    .sidebar-footer{
-      margin-top:12px;
-      padding-top:12px;
-      border-top:1px solid rgba(255,255,255,.06);
-    }
-    .small-muted{
-      font-weight:900;
-      font-size:10px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:rgba(148,163,184,.75);
-      margin-bottom:8px;
-    }
-    .status-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid rgba(249,115,22,.25);
-      background:rgba(249,115,22,.08);
-      color:#fff;
-      font-weight:900;
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-    }
-
-    .app-main{
-      background:rgba(10,12,18,.85);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;
-      padding:16px;
-      backdrop-filter:blur(10px);
-      min-height:520px;
-    }
-
-    .page{display:none}
-    .page.active{display:block}
-    .page-title{
-      font-weight:900;
-      font-size:12px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:#fff;
-      margin-bottom:12px;
-    }
-    .page-card{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px;
-      padding:14px;
-      color:rgba(226,232,240,.9);
-      font-weight:600;
-      font-size:13px;
+      font-family: var(--sans);
+      background: radial-gradient(1000px 700px at 15% 10%, rgba(124,92,255,.26), transparent 55%),
+                  radial-gradient(900px 600px at 85% 20%, rgba(0,212,255,.14), transparent 50%),
+                  var(--bg);
+      color:var(--text);
       line-height:1.5;
     }
-    a.back-home{
-      color:rgba(249,115,22,.95);
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      font-size:10px;
+    a{color:inherit}
+    .app{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 60px;
+      display:grid;
+      grid-template-columns: 270px 1fr;
+      gap:14px;
+    }
+    @media (max-width: 900px){
+      .app{grid-template-columns: 1fr}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .pad{padding:16px}
+    .brandRow{display:flex;align-items:center;gap:10px}
+    .mark{
+      width:34px;height:34px;border-radius:12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: var(--shadow);
+    }
+    .brandName{font-weight:800;letter-spacing:.35px}
+    .mini{color:var(--muted);font-size:12px;font-family:var(--mono)}
+    .nav{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+    .nav button{
+      width:100%;
+      text-align:left;
+      border-radius:14px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      cursor:pointer;
+      font-weight:650;
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+    }
+    .nav button:hover{border-color: rgba(124,92,255,.55)}
+    .nav button.active{
+      background: linear-gradient(135deg, rgba(124,92,255,.35), rgba(0,212,255,.12));
+      border-color: rgba(255,255,255,.14);
+    }
+    .pill{
+      font-size:12px;color:var(--muted);
+      border:1px solid var(--line);
+      padding:4px 8px;border-radius:999px;
+      background: rgba(0,0,0,.12);
+      font-family: var(--mono);
+    }
+
+    h1{margin:0 0 8px;font-size:28px}
+    h2{margin:18px 0 10px;font-size:18px}
+    .muted{color:var(--muted)}
+    .row{display:grid;grid-template-columns: 1fr 1fr;gap:10px}
+    @media (max-width: 780px){.row{grid-template-columns:1fr}}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input, select, textarea{
+      width:100%;
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color:var(--text);
+      border-radius: 12px;
+      padding:10px 12px;
+      outline:none;
+      font-size:14px;
+    }
+    textarea{min-height:92px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:rgba(124,92,255,.6)}
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    button, .btn{
+      appearance:none;border:none;cursor:pointer;
+      border-radius: 12px;
+      padding:10px 14px;
+      font-weight:650;
+      color:var(--text);
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      text-decoration:none;
+      display:inline-flex;align-items:center;gap:8px;
+    }
+    button:hover,.btn:hover{border-color: rgba(124,92,255,.55)}
+    .primary{
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(0,212,255,.55));
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .primary:hover{filter:brightness(1.05)}
+    .danger{
+      border-color: rgba(255,92,92,.35);
+      background: rgba(255,92,92,.08);
+    }
+    .status{
+      font-size:12px;font-family:var(--mono);
+      padding:8px 10px;border-radius:12px;border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+    }
+    .status.ok{border-color: rgba(46,204,113,.35); color: #c9f3d8; background: rgba(46,204,113,.08)}
+    .status.bad{border-color: rgba(255,92,92,.35); color: #ffd0d0; background: rgba(255,92,92,.07)}
+    .monoBox{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      border-radius: 14px;
+      padding: 12px;
+      overflow:auto;
+      max-height: 260px;
+    }
+    .divider{height:1px;background: var(--line);margin:14px 0}
+    .rightTop{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap
+    }
+    .kpiGrid{
+      display:grid;grid-template-columns: repeat(3, 1fr);gap:10px;margin-top:10px
+    }
+    @media (max-width: 780px){.kpiGrid{grid-template-columns:1fr}}
+    .kpi{
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.16);
+      border-radius: 16px;
+      padding:12px;
+    }
+    .kpi .n{font-size:22px;font-weight:800}
+    .kpi .l{color:var(--muted);font-size:12px}
+    .tag{
+      display:inline-flex;align-items:center;gap:8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      border-radius: 999px;
+      padding: 6px 10px;
     }
   </style>
 </head>
 
 <body>
-  <div class="app-shell">
-    <div class="topbar">
-      <div class="topbar-left">
-        <div class="brand">AI CALL PORT</div>
-        <div class="badge">BETA</div>
-      </div>
+  <div class="app">
+    <!-- Left: Shell / Navigation -->
+    <aside class="card">
+      <div class="pad">
+        <div class="brandRow">
+          <div class="mark" aria-hidden="true"></div>
+          <div>
+            <div class="brandName">AI CALL PORT</div>
+            <div class="mini">/app dashboard</div>
+          </div>
+        </div>
 
-      <div class="topbar-right">
-        <button class="topbar-btn" data-page="pageSetup">Setup</button>
-        <button class="topbar-btn" data-page="pageActivity">Activity</button>
-        <button class="topbar-btn" data-page="pageBilling">Billing</button>
-        <a class="topbar-btn" href="/">Home</a>
-      </div>
-    </div>
+        <div class="divider"></div>
 
-    <div class="app-body">
-      <div class="sidebar">
-        <div class="sidebar-title">Navigation</div>
+        <div id="activationBadge" class="status">Checking activation…</div>
 
-        <button class="side-link" data-page="pageDashboard">Overview</button>
-        <button class="side-link" data-page="pageSetup">Setup</button>
-        <button class="side-link" data-page="pageActivity">Call Logs</button>
-        <button class="side-link" data-page="pageBilling">Plan & Billing</button>
+        <div class="nav" style="margin-top:12px">
+          <button data-route="overview" class="active">Overview <span class="pill">01</span></button>
+          <button data-route="setup">Setup <span class="pill">02</span></button>
+          <button data-route="activity">Activity <span class="pill">03</span></button>
+          <button data-route="billing">Billing <span class="pill">04</span></button>
+        </div>
 
-        <div class="sidebar-footer">
-          <div class="small-muted">Status</div>
-          <div class="status-pill">GLOBAL LIVE</div>
+        <div class="divider"></div>
+
+        <div class="btnrow">
+          <a class="btn" href="/">← Marketing</a>
+          <button class="danger" id="clearActivation">Clear activation</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="mini">
+          Storage key:
+          <div style="margin-top:6px" class="monoBox" id="storageKeyBox"></div>
         </div>
       </div>
+    </aside>
 
-      <div class="app-main">
-        <div id="pageDashboard" class="page active">
-  <div class="page-title">Overview</div>
+    <!-- Right: Content -->
+    <main class="card">
+      <div class="pad">
+        <div class="rightTop">
+          <div>
+            <h1 id="pageTitle">Overview</h1>
+            <div class="muted" id="pageSubtitle">Workspace summary and quick actions.</div>
+          </div>
+          <div class="tag" id="workspaceTag">Workspace: —</div>
+        </div>
 
-  <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
+        <!-- OVERVIEW -->
+        <section data-page="overview">
+          <div class="kpiGrid">
+            <div class="kpi">
+              <div class="n" id="kpiIndustry">—</div>
+              <div class="l">Industry</div>
+            </div>
+            <div class="kpi">
+              <div class="n" id="kpiMarket">—</div>
+              <div class="l">Market</div>
+            </div>
+            <div class="kpi">
+              <div class="n" id="kpiRole">—</div>
+              <div class="l">Role</div>
+            </div>
+          </div>
 
-    <div class="page-card">
-      <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin-bottom:8px;">
-        Active Calls
-      </div>
-      <div style="font-size:32px;font-weight:900;color:white;">
-        12
-      </div>
-    </div>
+          <h2>Activation object</h2>
+          <div class="monoBox" id="activationDump">No activation loaded.</div>
 
-    <div class="page-card">
-      <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin-bottom:8px;">
-        Calls Today
-      </div>
-      <div style="font-size:32px;font-weight:900;color:white;">
-        84
-      </div>
-    </div>
+          <div class="divider"></div>
 
-    <div class="page-card">
-      <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin-bottom:8px;">
-        Conversion Rate
-      </div>
-      <div style="font-size:32px;font-weight:900;color:white;">
-        27%
-      </div>
-    </div>
+          <h2>Vapi demo call</h2>
+          <div class="muted" style="max-width:80ch">
+            This uses the Vapi Web SDK pattern: create a client with your <strong>Public Key</strong> and start a call with your <strong>Assistant ID</strong>. :contentReference[oaicite:1]{index=1}
+          </div>
 
-    <div class="page-card">
-      <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin-bottom:8px;">
-        Plan
-      </div>
-      <div style="font-size:20px;font-weight:900;color:white;">
-        Beta Small Business
-      </div>
-    </div>
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label for="demoPublicKey">Vapi Public Key</label>
+              <input id="demoPublicKey" placeholder="pk_..." />
+            </div>
+            <div>
+              <label for="demoAssistantId">Vapi Assistant ID</label>
+              <input id="demoAssistantId" placeholder="asst_..." />
+            </div>
+          </div>
 
+          <div class="btnrow">
+            <button class="primary" id="startCall">Start call</button>
+            <button id="stopCall">Stop call</button>
+            <span class="status" id="callStatus">Idle</span>
+          </div>
+
+          <div class="hint muted" style="margin-top:8px">
+            If audio won’t start: ensure the page is on HTTPS, allow microphone permissions, and verify your key/assistant ID.
+          </div>
+        </section>
+
+        <!-- SETUP -->
+        <section data-page="setup" hidden>
+          <h2>Workspace settings</h2>
+          <div class="muted" style="max-width:80ch">
+            Edit and save activation settings locally. This keeps the architecture simple (no backend) while your shell/pages are built.
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label for="businessName">Business name</label>
+              <input id="businessName" />
+            </div>
+            <div>
+              <label for="businessWebsite">Website</label>
+              <input id="businessWebsite" placeholder="https://example.com" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="marketRegion">Market region</label>
+              <input id="marketRegion" />
+            </div>
+            <div>
+              <label for="marketCountry">Primary country</label>
+              <input id="marketCountry" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="industryName">Industry</label>
+              <input id="industryName" />
+            </div>
+            <div>
+              <label for="userRole">Your role</label>
+              <input id="userRole" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="grid-column:1/-1">
+              <label for="businessGoal">Goal</label>
+              <textarea id="businessGoal"></textarea>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <h2>Vapi defaults</h2>
+          <div class="row">
+            <div>
+              <label for="vapiPublicKey">Vapi Public Key</label>
+              <input id="vapiPublicKey" placeholder="pk_..." />
+            </div>
+            <div>
+              <label for="vapiAssistantId">Vapi Assistant ID</label>
+              <input id="vapiAssistantId" placeholder="asst_..." />
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <button class="primary" id="saveSettings">Save</button>
+            <span class="status" id="saveStatus">Not saved</span>
+          </div>
+        </section>
+
+        <!-- ACTIVITY -->
+        <section data-page="activity" hidden>
+          <h2>Activity</h2>
+          <div class="muted" style="max-width:80ch">
+            Placeholder for call logs, transcripts, outcomes, and events. For now we keep this static and simple.
+          </div>
+
+          <div class="divider"></div>
+          <div class="monoBox">
+            [ ] Call started<br/>
+            [ ] User intent captured<br/>
+            [ ] Lead qualified<br/>
+            [ ] Appointment booked<br/>
+            <br/>
+            When you’re ready, this can be wired to Vapi webhooks or your own call event endpoint.
+          </div>
+        </section>
+
+        <!-- BILLING -->
+        <section data-page="billing" hidden>
+          <h2>Billing</h2>
+          <div class="muted" style="max-width:80ch">
+            Placeholder for plan selection and payment handling. Keep this separate from marketing; add Stripe later without changing your core structure.
+          </div>
+          <div class="divider"></div>
+          <div class="monoBox">
+            Plan: Starter (placeholder)<br/>
+            Next invoice: —<br/>
+            Payment method: —<br/>
+          </div>
+        </section>
+      </div>
+    </main>
   </div>
 
-  <div style="margin-top:20px;" class="page-card">
-    <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin-bottom:12px;">
-      Recent Calls
-    </div>
+  <script type="module">
+    const STORAGE_KEY = "aicallport_activation_v1";
 
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <div style="display:flex;justify-content:space-between;">
-        <span>Inbound — Dental Clinic</span>
-        <span style="color:#22c55e;">Booked</span>
-      </div>
+    const $ = (id) => document.getElementById(id);
+    const pages = Array.from(document.querySelectorAll("[data-page]"));
+    const navButtons = Array.from(document.querySelectorAll(".nav button[data-route]"));
 
-      <div style="display:flex;justify-content:space-between;">
-        <span>Inbound — HVAC Repair</span>
-        <span style="color:#f97316;">Follow-up</span>
-      </div>
+    $("storageKeyBox").textContent = STORAGE_KEY;
 
-      <div style="display:flex;justify-content:space-between;">
-        <span>Inbound — Restaurant</span>
-        <span style="color:#94a3b8;">Missed</span>
-      </div>
-    </div>
-  </div>
-</div>
+    function safeTrim(v){ return (v ?? "").toString().trim(); }
 
-  <script>
-    function showPage(pageId){
-      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-      const page = document.getElementById(pageId);
-      if(page) page.classList.add("active");
-
-      document.querySelectorAll(".side-link").forEach(b => b.classList.toggle("active", b.dataset.page === pageId));
-      document.querySelectorAll(".topbar-btn").forEach(b => {
-        if(!b.dataset.page) return;
-        b.classList.toggle("active", b.dataset.page === pageId);
-      });
+    function readActivation(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return null;
+        return JSON.parse(raw);
+      }catch(e){
+        return null;
+      }
     }
 
-    document.querySelectorAll("[data-page]").forEach(btn => {
-      btn.addEventListener("click", () => showPage(btn.dataset.page));
+    function writeActivation(obj){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+    }
+
+    function setActivationBadge(act){
+      const el = $("activationBadge");
+      if(act?.activatedAt){
+        el.textContent = "Activated";
+        el.classList.add("ok");
+        el.classList.remove("bad");
+      } else {
+        el.textContent = "Not activated — return to / to run Activation Protocol";
+        el.classList.add("bad");
+        el.classList.remove("ok");
+      }
+    }
+
+    function renderOverview(act){
+      const business = act?.business?.name || "—";
+      const industry = act?.industry?.name || "—";
+      const market = act?.market ? `${act.market.region || "—"} / ${act.market.country || "—"}` : "—";
+      const role = act?.user?.role || "—";
+
+      $("workspaceTag").textContent = `Workspace: ${business}`;
+      $("kpiIndustry").textContent = industry;
+      $("kpiMarket").textContent = (act?.market?.country ? act.market.country : "—");
+      $("kpiRole").textContent = role;
+
+      $("activationDump").textContent = act ? JSON.stringify(act, null, 2) : "No activation loaded.";
+    }
+
+    function renderSetup(act){
+      $("businessName").value = act?.business?.name || "";
+      $("businessWebsite").value = act?.business?.website || "";
+      $("marketRegion").value = act?.market?.region || "";
+      $("marketCountry").value = act?.market?.country || "";
+      $("industryName").value = act?.industry?.name || "";
+      $("userRole").value = act?.user?.role || "";
+      $("businessGoal").value = act?.business?.goal || "";
+      $("vapiPublicKey").value = act?.vapi?.publicKey || "";
+      $("vapiAssistantId").value = act?.vapi?.assistantId || "";
+
+      // Also sync demo inputs on overview
+      $("demoPublicKey").value = act?.vapi?.publicKey || "";
+      $("demoAssistantId").value = act?.vapi?.assistantId || "";
+    }
+
+    function setRoute(route){
+      const titleMap = {
+        overview: ["Overview", "Workspace summary and quick actions."],
+        setup: ["Setup", "Configure workspace settings and defaults."],
+        activity: ["Activity", "Events and logs (placeholder)."],
+        billing: ["Billing", "Plans and payment (placeholder)."]
+      };
+
+      pages.forEach(p => p.hidden = (p.getAttribute("data-page") !== route));
+      navButtons.forEach(b => b.classList.toggle("active", b.getAttribute("data-route") === route));
+
+      const [t, s] = titleMap[route] || titleMap.overview;
+      $("pageTitle").textContent = t;
+      $("pageSubtitle").textContent = s;
+
+      history.replaceState(null, "", `#${route}`);
+    }
+
+    navButtons.forEach(b => {
+      b.addEventListener("click", () => setRoute(b.getAttribute("data-route")));
     });
 
-    // Default
-    showPage("pageDashboard");
+    // Activation lifecycle
+    $("clearActivation").addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      location.href = "/"; // clean separation: send user back to marketing to re-activate
+    });
+
+    $("saveSettings").addEventListener("click", () => {
+      const current = readActivation() || { version: 1, activatedAt: new Date().toISOString() };
+      const updated = {
+        ...current,
+        market: {
+          region: safeTrim($("marketRegion").value),
+          country: safeTrim($("marketCountry").value)
+        },
+        industry: {
+          name: safeTrim($("industryName").value),
+          other: safeTrim(current?.industry?.other || "")
+        },
+        business: {
+          name: safeTrim($("businessName").value),
+          website: safeTrim($("businessWebsite").value),
+          goal: safeTrim($("businessGoal").value)
+        },
+        user: {
+          role: safeTrim($("userRole").value),
+          name: safeTrim(current?.user?.name || "")
+        },
+        vapi: {
+          publicKey: safeTrim($("vapiPublicKey").value),
+          assistantId: safeTrim($("vapiAssistantId").value)
+        }
+      };
+
+      writeActivation(updated);
+      $("saveStatus").textContent = "Saved";
+      $("saveStatus").classList.add("ok");
+      $("saveStatus").classList.remove("bad");
+
+      renderOverview(updated);
+      renderSetup(updated);
+    });
+
+    // Initial load
+    const act = readActivation();
+    setActivationBadge(act);
+    renderOverview(act);
+    renderSetup(act);
+
+    // Route initial
+    const initialRoute = (location.hash || "#overview").replace("#", "");
+    setRoute(["overview","setup","activity","billing"].includes(initialRoute) ? initialRoute : "overview");
+
+    // -----------------------------
+    // Vapi demo call (no build step)
+    // -----------------------------
+    // Use ESM import from esm.sh to avoid bundlers.
+    // Vapi usage pattern: new Vapi(publicKey) and start(assistantId). :contentReference[oaicite:2]{index=2}
+    let vapi = null;
+    let callActive = false;
+
+    const callStatus = $("callStatus");
+    function setCallStatus(text, kind){
+      callStatus.textContent = text;
+      callStatus.classList.remove("ok","bad");
+      if(kind) callStatus.classList.add(kind);
+    }
+
+    async function ensureVapi(publicKey){
+      if(vapi) return vapi;
+      // Dynamic import so page still loads even if user never clicks demo.
+      const mod = await import("https://esm.sh/@vapi-ai/web");
+      const Vapi = mod.default;
+      vapi = new Vapi(publicKey);
+      return vapi;
+    }
+
+    $("startCall").addEventListener("click", async () => {
+      try{
+        const publicKey = safeTrim($("demoPublicKey").value);
+        const assistantId = safeTrim($("demoAssistantId").value);
+
+        if(!publicKey || !assistantId){
+          setCallStatus("Missing Vapi Public Key or Assistant ID", "bad");
+          return;
+        }
+
+        setCallStatus("Starting…");
+        const client = await ensureVapi(publicKey);
+
+        // Some environments expose events; not required for basic demo.
+        // Start voice conversation:
+        await client.start(assistantId); // :contentReference[oaicite:3]{index=3}
+        callActive = true;
+        setCallStatus("In call", "ok");
+      } catch(err){
+        console.error(err);
+        setCallStatus("Failed to start (check console / mic permissions)", "bad");
+      }
+    });
+
+    $("stopCall").addEventListener("click", async () => {
+      try{
+        if(!vapi || !callActive){
+          setCallStatus("Idle");
+          return;
+        }
+        // Vapi clients typically support stop(); if not, this will throw.
+        if(typeof vapi.stop === "function"){
+          await vapi.stop();
+        }
+        callActive = false;
+        setCallStatus("Stopped");
+      } catch(err){
+        console.error(err);
+        setCallStatus("Failed to stop (check console)", "bad");
+      }
+    });
   </script>
 </body>
 </html>
