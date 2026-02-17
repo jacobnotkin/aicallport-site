@@ -1,591 +1,2417 @@
-<!doctype html>
+The thing is that my website was designed differently, you suggested to make changes and you forgot the main idea. I will send you my original code for the refreshment of your memory. After that we will talk it over.                                                                                                                          <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI CALL PORT — Dashboard</title>
-  <meta name="robots" content="noindex" />
-  <meta name="theme-color" content="#0b0f17" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <title>AI CALL PORT | Global SMALL BUSINESS Activation</title>
+
+  <!-- Tailwind (CDN OK for prototype) -->
+  <script>
+    // Optional: small tailwind config (keeps it predictable)
+    window.tailwind = window.tailwind || {};
+    tailwind.config = {
+      theme: { extend: {} },
+      corePlugins: { preflight: true }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
+
+  <!-- ✅ IMPORTANT:
+       Removed @vapi-ai/web CDN script because it can throw:
+       "Uncaught ReferenceError: exports is not defined"
+       We use the browser-safe html-script-tag SDK dynamically in JS instead. -->
+
   <style>
-    :root{
-      --bg:#0b0f17;
-      --panel:#0f1626;
-      --panel2:#0c1322;
-      --text:#e8edf7;
-      --muted:#a7b3c8;
-      --line:#1f2a44;
-      --brand:#7c5cff;
-      --brand2:#00d4ff;
-      --ok:#2ecc71;
-      --warn:#f5c542;
-      --bad:#ff5c5c;
-      --shadow: 0 10px 40px rgba(0,0,0,.35);
-      --radius: 16px;
-      --radius2: 22px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      background: #06080f;
+      color: #e2e8f0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: var(--sans);
-      background: radial-gradient(1000px 700px at 15% 10%, rgba(124,92,255,.26), transparent 55%),
-                  radial-gradient(900px 600px at 85% 20%, rgba(0,212,255,.14), transparent 50%),
-                  var(--bg);
-      color:var(--text);
-      line-height:1.5;
-    }
-    a{color:inherit}
-    .app{
-      max-width:1200px;
-      margin:0 auto;
-      padding:18px 16px 60px;
-      display:grid;
-      grid-template-columns: 270px 1fr;
-      gap:14px;
-    }
-    @media (max-width: 900px){
-      .app{grid-template-columns: 1fr}
-    }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .pad{padding:16px}
-    .brandRow{display:flex;align-items:center;gap:10px}
-    .mark{
-      width:34px;height:34px;border-radius:12px;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      box-shadow: var(--shadow);
-    }
-    .brandName{font-weight:800;letter-spacing:.35px}
-    .mini{color:var(--muted);font-size:12px;font-family:var(--mono)}
-    .nav{margin-top:14px;display:flex;flex-direction:column;gap:8px}
-    .nav button{
-      width:100%;
-      text-align:left;
-      border-radius:14px;
-      padding:10px 12px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
-      color: var(--text);
-      cursor:pointer;
-      font-weight:650;
-      display:flex;justify-content:space-between;align-items:center;gap:10px;
-    }
-    .nav button:hover{border-color: rgba(124,92,255,.55)}
-    .nav button.active{
-      background: linear-gradient(135deg, rgba(124,92,255,.35), rgba(0,212,255,.12));
-      border-color: rgba(255,255,255,.14);
-    }
-    .pill{
-      font-size:12px;color:var(--muted);
-      border:1px solid var(--line);
-      padding:4px 8px;border-radius:999px;
-      background: rgba(0,0,0,.12);
-      font-family: var(--mono);
+    body { padding: 12px; }
+    @media (min-width: 1024px) { body { padding: 24px; } }
+
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%);
+      pointer-events: none;
     }
 
-    h1{margin:0 0 8px;font-size:28px}
-    h2{margin:18px 0 10px;font-size:18px}
-    .muted{color:var(--muted)}
-    .row{display:grid;grid-template-columns: 1fr 1fr;gap:10px}
-    @media (max-width: 780px){.row{grid-template-columns:1fr}}
-    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-    input, select, textarea{
-      width:100%;
-      background: rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      color:var(--text);
+    .console-container {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(10, 12, 18, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 20px;
+      position: relative;
+      z-index: 10;
+      margin: 0 auto 40px auto;
+    }
+
+    .hero-title {
+      background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .orange-btn {
+      background: linear-gradient(90deg, #f97316, #ea580c);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: 0.2s;
+      color: white;
+    }
+    .orange-btn:active { transform: scale(0.98); }
+
+    .step-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px;
       border-radius: 12px;
-      padding:10px 12px;
-      outline:none;
-      font-size:14px;
+      opacity: 0.35;
+      transition: 0.3s;
+      cursor: pointer;
+      user-select: none;
+      pointer-events: auto;
     }
-    textarea{min-height:92px;resize:vertical}
-    input:focus,select:focus,textarea:focus{border-color:rgba(124,92,255,.6)}
-    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    button, .btn{
-      appearance:none;border:none;cursor:pointer;
+    .step-card.active {
+      border-color: #f97316 !important;
+      background: rgba(249, 115, 22, 0.1) !important;
+      opacity: 1 !important;
+    }
+    .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
+
+    /* ✅ NEW: locked state */
+    .step-card.locked { opacity: 0.22; cursor: not-allowed; }
+    .step-card.locked:hover { border-color: rgba(255, 255, 255, 0.1); }
+
+    @keyframes border-glow {
+      0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
+      50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
+    }
+
+    .floating-lang { position: fixed; top: 15px; right: 15px; z-index: 1000; }
+    .lang-trigger {
+      background: rgba(10, 12, 18, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 12px;
       border-radius: 12px;
-      padding:10px 14px;
-      font-weight:650;
-      color:var(--text);
-      background: rgba(255,255,255,.06);
-      border:1px solid var(--line);
-      text-decoration:none;
-      display:inline-flex;align-items:center;gap:8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      pointer-events: auto;
     }
-    button:hover,.btn:hover{border-color: rgba(124,92,255,.55)}
-    .primary{
-      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(0,212,255,.55));
-      border:1px solid rgba(255,255,255,.14);
-    }
-    .primary:hover{filter:brightness(1.05)}
-    .danger{
-      border-color: rgba(255,92,92,.35);
-      background: rgba(255,92,92,.08);
-    }
-    .status{
-      font-size:12px;font-family:var(--mono);
-      padding:8px 10px;border-radius:12px;border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
-      color:var(--muted);
-    }
-    .status.ok{border-color: rgba(46,204,113,.35); color: #c9f3d8; background: rgba(46,204,113,.08)}
-    .status.bad{border-color: rgba(255,92,92,.35); color: #ffd0d0; background: rgba(255,92,92,.07)}
-    .monoBox{
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--muted);
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      border-radius: 14px;
-      padding: 12px;
-      overflow:auto;
-      max-height: 260px;
-    }
-    .divider{height:1px;background: var(--line);margin:14px 0}
-    .rightTop{
-      display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap
-    }
-    .kpiGrid{
-      display:grid;grid-template-columns: repeat(3, 1fr);gap:10px;margin-top:10px
-    }
-    @media (max-width: 780px){.kpiGrid{grid-template-columns:1fr}}
-    .kpi{
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.16);
+    #langMenu {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 16px;
-      padding:12px;
+      padding: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      width: 280px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      pointer-events: auto;
     }
-    .kpi .n{font-size:22px;font-weight:800}
-    .kpi .l{color:var(--muted);font-size:12px}
-    .tag{
-      display:inline-flex;align-items:center;gap:8px;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--muted);
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
+
+    .search-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 8px;
+      color: white;
+      font-size: 11px;
+      outline: none;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
+    .modal-scroll {
+      max-height: 520px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 2px;
+      pointer-events: auto;
+    }
+
+    #setupModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      pointer-events: auto;
+    }
+
+    .modal-shell {
+      background: rgba(10, 12, 18, 0.92);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 520px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+      pointer-events: auto;
+    }
+    .modal-shell.role-wide { max-width: 1120px; }
+    .modal-shell.info-wide { max-width: 900px; }
+    .modal-shell.dashboard-wide { max-width: 1120px; }
+    .modal-shell.community-wide { max-width: 1120px; }
+
+    .modal-btn {
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      font-size: 9px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      text-align: left;
+      letter-spacing: 0.14em;
+      line-height: 1.1;
+      pointer-events: auto;
+    }
+    .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: #f97316; }
+    .modal-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 12px;
       border-radius: 999px;
-      padding: 6px 10px;
+      border: 1px solid rgba(249,115,22,0.25);
+      background: rgba(249,115,22,0.08);
+      color: white;
+      font-weight: 900;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      width: 100%;
+    }
+
+    .muted-hint {
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(148,163,184,0.85);
+      line-height: 1.4;
+    }
+
+    .select-theme {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: white;
+      border-radius: 12px;
+      padding: 10px 12px;
+      outline: none;
+      font-weight: 900;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .select-theme option { background: #0b1224; color: white; }
+
+    .textarea-theme {
+      width: 100%;
+      min-height: 190px;
+      resize: vertical;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      padding: 12px;
+      color: white;
+      outline: none;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
+    @keyframes pulse-green {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .card-theme {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 20px;
+      padding: 16px;
+    }
+    .mini {
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(148,163,184,0.9);
+    }
+    .divider {
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: rgba(148,163,184,0.55);
+      text-align: center;
+      margin: 10px 0 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 6px;
+    }
+
+    .tabbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0 14px 0;
+    }
+    .tab {
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      font-weight: 900;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      cursor: pointer;
+      user-select: none;
+    }
+    .tab.active {
+      border-color: rgba(249,115,22,0.45);
+      background: rgba(249,115,22,0.12);
     }
   </style>
+
+  <!-- ✅ Language Engine -->
+  <script>
+    const LANG_STORAGE_KEY = "aicallport_lang";
+    const I18N_CACHE_KEY = "aicallport_i18n_cache_v1";
+    const SUPPORTED_LANGS = [
+      "EN","ZH","HI","ES","FR","AR","BN","PT","RU","UR",
+      "ID","DE","JA","PCM","MR","TE","TR","TA","YUE","VI",
+      "TL","WU","KO","FA","HA","SW","JV","IT","PA","KN","HE"
+    ];
+    const RTL_LANGS = new Set(["AR","HE"]);
+
+    function mapBrowserLangToCode(browserLang) {
+      const b = (browserLang || "").toLowerCase();
+      if (b.startsWith("en")) return "EN";
+      if (b.startsWith("es")) return "ES";
+      if (b.startsWith("fr")) return "FR";
+      if (b.startsWith("de")) return "DE";
+      if (b.startsWith("pt")) return "PT";
+      if (b.startsWith("ru")) return "RU";
+      if (b.startsWith("ar")) return "AR";
+      if (b.startsWith("he") || b.startsWith("iw")) return "HE";
+      if (b.startsWith("hi")) return "HI";
+      if (b.startsWith("bn")) return "BN";
+      if (b.startsWith("ur")) return "UR";
+      if (b.startsWith("id")) return "ID";
+      if (b.startsWith("tr")) return "TR";
+      if (b.startsWith("it")) return "IT";
+      if (b.startsWith("fa")) return "FA";
+      if (b.startsWith("sw")) return "SW";
+      if (b.startsWith("ha")) return "HA";
+      if (b.startsWith("ja")) return "JA";
+      if (b.startsWith("ko")) return "KO";
+      if (b.startsWith("vi")) return "VI";
+      if (b.startsWith("tl") || b.startsWith("fil")) return "TL";
+      if (b.startsWith("zh")) return "ZH";
+      return "EN";
+    }
+
+    window.APP_I18N = { current: "EN" };
+
+    const translations = {
+      EN: {
+        community: "Community",
+        newsletter_no_deploy: "Join Newsletter (No Deploy)",
+        activation_steps_info: "Activation Steps Info",
+        close: "Close",
+        next: "Next",
+        go_back: "Go Back",
+        start_activation: "Start Activation",
+        activate_now: "Activate Now",
+        save: "Save",
+        confirm: "Confirm",
+        search_languages: "SEARCH LANGUAGES...",
+        search_countries: "SEARCH COUNTRIES...",
+        search_industries: "SEARCH INDUSTRIES...",
+        search_templates: "SEARCH TEMPLATES...",
+        no_matching: "NO MATCHING RESULTS",
+
+        setup: "Setup",
+        dashboard: "Dashboard",
+        post: "Post",
+        reply: "Reply",
+        title: "Title",
+        email: "Email",
+        name_optional: "Name (Optional)",
+        tell_us_updates: "Tell us what you want updates about (optional)",
+        write_question: "Write your question or feedback...",
+        write_reply: "Write a reply...",
+        ask_question: "Ask a question...",
+        thinking: "Thinking...",
+        needs_backend: "This feature needs a backend endpoint.",
+
+        hero_h1: "GLOBAL ZERO-HUMAN<br>AI RECEPTIONIST",
+        hero_p:
+          "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. " +
+          "<span class='text-orange-500'>Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>",
+        beta_access: "BETA ACCESS - SMALL BUSINESS",
+        regular: "Regular",
+        global_live: "Global Live",
+        per_month: "/mo",
+
+        feat_1: "Unlimited Inbound Calling",
+        feat_2: "Pay Monthly",
+        feat_3: "No Contract",
+
+        step_01: "01 Market",
+        step_02: "02 Industry",
+        step_03: "03 Business",
+        step_04: "04 Agent Role",
+        step_05: "05 Demo",
+        step_06: "06 Deploy",
+
+        select: "Select",
+        sync: "Sync",
+        choose: "Choose",
+        sandbox: "Sandbox",
+        instant: "Instant",
+
+        role_templates_voice: "ROLE • TEMPLATES • VOICE",
+        agent_role: "Agent Role",
+        templates: "Templates",
+        editable_script: "Editable Script",
+        reset_template: "Reset Template",
+        preview_voice: "Preview Voice",
+        voice: "Voice",
+        voice_tuning: "Voice Tuning",
+        stability: "Stability",
+        similarity: "Similarity",
+        style: "Style",
+        speaker_boost: "Speaker Boost",
+        on: "ON",
+        off: "OFF",
+        confirm_role_template_voice: "CONFIRM ROLE + TEMPLATE + VOICE",
+
+        receptionist: "Receptionist",
+        sales_agent: "Sales Agent",
+        support_agent: "Support Agent",
+
+        demo_call: "START DEMO CALL",
+        deploy_get_number: "GET MY NUMBER",
+
+        dashboard_sample: "CUSTOMER DASHBOARD (SAMPLE)",
+        account: "Account",
+        agent: "Agent",
+        template_pack: "Template Pack",
+        current_script: "Current Script",
+        edit_role: "Edit Role",
+        edit_script: "Edit Script",
+        edit_voice: "Edit Voice",
+
+        community_portal: "Community Portal",
+        newsletter: "Newsletter",
+        forum: "Forum",
+        ai_qa: "AI Q&A",
+        join_list: "Join List",
+        ask_ai: "Ask AI",
+
+        privacy: "Privacy",
+        terms: "Terms",
+        support: "Support",
+        active_agents: "ACTIVE AGENTS",
+
+        business_name: "Business Name"
+      },
+
+      ES: {
+        community: "Comunidad",
+        newsletter_no_deploy: "Boletín (Sin Activar)",
+        activation_steps_info: "Info de Activación",
+        close: "Cerrar",
+        next: "Siguiente",
+        go_back: "Atrás",
+        start_activation: "Iniciar Activación",
+        activate_now: "Activar Ahora",
+        save: "Guardar",
+        confirm: "Confirmar",
+        search_languages: "BUSCAR IDIOMAS...",
+        search_countries: "BUSCAR PAÍSES...",
+        search_industries: "BUSCAR INDUSTRIAS...",
+        search_templates: "BUSCAR PLANTILLAS...",
+        no_matching: "SIN RESULTADOS",
+
+        setup: "Configuración",
+        dashboard: "Panel",
+        post: "Publicar",
+        reply: "Responder",
+        title: "Título",
+        email: "Correo",
+        name_optional: "Nombre (Opcional)",
+        tell_us_updates: "Dinos sobre qué quieres actualizaciones (opcional)",
+        write_question: "Escribe tu pregunta o comentario...",
+        write_reply: "Escribe una respuesta...",
+        ask_question: "Haz una pregunta...",
+        thinking: "Pensando...",
+
+        hero_h1: "RECEPCIONISTA IA GLOBAL<br>SIN HUMANOS",
+        hero_p:
+          "Activación instantánea para <span class='text-orange-500'>NEGOCIOS</span>. " +
+          "<span class='text-orange-500'>Implementación mundial. Multilingüe. Sin humanos.</span>",
+        beta_access: "ACCESO BETA - PEQUEÑAS EMPRESAS",
+        regular: "Regular",
+        global_live: "En Vivo",
+        per_month: "/mes",
+
+        feat_1: "Llamadas Ilimitadas",
+        feat_2: "Pago Mensual",
+        feat_3: "Sin Contrato",
+
+        step_01: "01 Mercado",
+        step_02: "02 Industria",
+        step_03: "03 Empresa",
+        step_04: "04 Rol",
+        step_05: "05 Demo",
+        step_06: "06 Desplegar",
+
+        select: "Elegir",
+        sync: "Sync",
+        choose: "Elegir",
+        sandbox: "Sandbox",
+        instant: "Instantáneo",
+
+        role_templates_voice: "ROL • PLANTILLAS • VOZ",
+        agent_role: "Rol del Agente",
+        templates: "Plantillas",
+        editable_script: "Script Editable",
+        reset_template: "Restablecer",
+        preview_voice: "Probar Voz",
+        voice: "Voz",
+        voice_tuning: "Ajustes de Voz",
+        stability: "Estabilidad",
+        similarity: "Similitud",
+        style: "Estilo",
+        speaker_boost: "Refuerzo",
+        on: "SI",
+        off: "NO",
+        confirm_role_template_voice: "CONFIRMAR ROL + PLANTILLA + VOZ",
+
+        receptionist: "Recepcionista",
+        sales_agent: "Agente de Ventas",
+        support_agent: "Soporte",
+
+        demo_call: "INICIAR DEMO",
+        deploy_get_number: "OBTENER MI NÚMERO",
+
+        dashboard_sample: "PANEL DEL CLIENTE (EJEMPLO)",
+        account: "Cuenta",
+        agent: "Agente",
+        template_pack: "Paquete",
+        current_script: "Script Actual",
+        edit_role: "Editar Rol",
+        edit_script: "Editar Script",
+        edit_voice: "Editar Voz",
+
+        community_portal: "Portal Comunitario",
+        newsletter: "Boletín",
+        forum: "Foro",
+        ai_qa: "Preguntas IA",
+        join_list: "Unirse",
+        ask_ai: "Preguntar IA",
+
+        privacy: "Privacidad",
+        terms: "Términos",
+        support: "Soporte",
+        active_agents: "AGENTES ACTIVOS",
+
+        business_name: "Nombre de la empresa"
+      },
+
+      FR: {
+        community: "Communauté",
+        newsletter_no_deploy: "Newsletter (Sans déploiement)",
+        activation_steps_info: "Infos d’activation",
+        close: "Fermer",
+        next: "Suivant",
+        go_back: "Retour",
+        start_activation: "Démarrer",
+        activate_now: "Activer",
+        save: "Enregistrer",
+        confirm: "Confirmer",
+        search_languages: "RECHERCHER LANGUES...",
+        search_countries: "RECHERCHER PAYS...",
+        search_industries: "RECHERCHER INDUSTRIES...",
+        search_templates: "RECHERCHER MODÈLES...",
+        no_matching: "AUCUN RÉSULTAT",
+
+        setup: "Configuration",
+        dashboard: "Tableau de bord",
+        post: "Publier",
+        reply: "Répondre",
+        title: "Titre",
+        email: "Email",
+        name_optional: "Nom (Optionnel)",
+        tell_us_updates: "Dites-nous les mises à jour souhaitées (optionnel)",
+        write_question: "Écrivez votre question ou avis...",
+        write_reply: "Écrire une réponse...",
+        ask_question: "Poser une question...",
+        thinking: "Réflexion...",
+
+        hero_h1: "RÉCEPTIONNISTE IA GLOBAL<br>SANS HUMAINS",
+        hero_p:
+          "Activation instantanée <span class='text-orange-500'>PETITE ENTREPRISE</span>. " +
+          "<span class='text-orange-500'>Déploiement mondial. Multilingue. Sans humains.</span>",
+        beta_access: "ACCÈS BÊTA - PETITES ENTREPRISES",
+        regular: "Régulier",
+        global_live: "En Direct",
+        per_month: "/mois",
+
+        feat_1: "Appels Illimités",
+        feat_2: "Paiement Mensuel",
+        feat_3: "Sans Contrat",
+
+        step_01: "01 Marché",
+        step_02: "02 Industrie",
+        step_03: "03 Entreprise",
+        step_04: "04 Rôle",
+        step_05: "05 Démo",
+        step_06: "06 Déployer",
+
+        select: "Choisir",
+        sync: "Sync",
+        choose: "Choisir",
+        sandbox: "Sandbox",
+        instant: "Instant",
+
+        role_templates_voice: "RÔLE • MODÈLES • VOIX",
+        agent_role: "Rôle de l’agent",
+        templates: "Modèles",
+        editable_script: "Script modifiable",
+        reset_template: "Réinitialiser",
+        preview_voice: "Aperçu voix",
+        voice: "Voix",
+        voice_tuning: "Réglages voix",
+        stability: "Stabilité",
+        similarity: "Similarité",
+        style: "Style",
+        speaker_boost: "Boost",
+        on: "ON",
+        off: "OFF",
+        confirm_role_template_voice: "CONFIRMER RÔLE + MODÈLE + VOIX",
+
+        receptionist: "Réceptionniste",
+        sales_agent: "Ventes",
+        support_agent: "Support",
+
+        demo_call: "DÉMARRER DÉMO",
+        deploy_get_number: "OBTENIR MON NUMÉRO",
+
+        dashboard_sample: "TABLEAU DE BORD (EXEMPLE)",
+        account: "Compte",
+        agent: "Agent",
+        template_pack: "Pack",
+        current_script: "Script actuel",
+        edit_role: "Modifier rôle",
+        edit_script: "Modifier script",
+        edit_voice: "Modifier voix",
+
+        community_portal: "Portail Communautaire",
+        newsletter: "Newsletter",
+        forum: "Forum",
+        ai_qa: "Q&R IA",
+        join_list: "Rejoindre",
+        ask_ai: "Demander à l’IA",
+
+        privacy: "Confidentialité",
+        terms: "Conditions",
+        support: "Support",
+        active_agents: "AGENTS ACTIFS",
+
+        business_name: "Nom de l’entreprise"
+      },
+
+      AR: {
+        start_activation: "بدء التفعيل",
+        activate_now: "فعّل الآن",
+        activation_steps_info: "معلومات خطوات التفعيل",
+        close: "إغلاق",
+        next: "التالي",
+        go_back: "رجوع",
+        community: "المجتمع",
+        newsletter_no_deploy: "النشرة (بدون نشر)",
+        search_languages: "ابحث عن اللغات...",
+        search_countries: "ابحث عن الدول...",
+        search_industries: "ابحث عن الصناعات...",
+        search_templates: "ابحث عن القوالب...",
+        no_matching: "لا نتائج",
+
+        setup: "إعداد",
+        dashboard: "لوحة التحكم",
+        post: "نشر",
+        reply: "رد",
+        title: "العنوان",
+        email: "البريد",
+        name_optional: "الاسم (اختياري)",
+        tell_us_updates: "أخبرنا عن التحديثات التي تريدها (اختياري)",
+        write_question: "اكتب سؤالك أو ملاحظتك...",
+        write_reply: "اكتب ردًا...",
+        ask_question: "اسأل سؤالاً...",
+        thinking: "جارٍ التفكير...",
+
+        hero_h1: "موظف استقبال ذكاء اصطناعي عالمي<br>بدون بشر",
+        hero_p: "تفعيل فوري <span class='text-orange-500'>للأعمال الصغيرة</span>. <span class='text-orange-500'>نشر عالمي. متعدد اللغات.</span>",
+        beta_access: "وصول تجريبي - أعمال صغيرة",
+        regular: "عادي",
+        global_live: "مباشر",
+        per_month: "/شهر",
+
+        feat_1: "مكالمات غير محدودة",
+        feat_2: "دفع شهري",
+        feat_3: "بدون عقد",
+        step_01: "01 السوق",
+        step_02: "02 الصناعة",
+        step_03: "03 العمل",
+        step_04: "04 الدور",
+        step_05: "05 تجربة",
+        step_06: "06 نشر",
+        select: "اختر",
+        sync: "مزامنة",
+        choose: "اختر",
+        sandbox: "Sandbox",
+        instant: "فوري",
+
+        demo_call: "ابدأ مكالمة تجريبية",
+        deploy_get_number: "احصل على رقمي",
+        privacy: "الخصوصية",
+        terms: "الشروط",
+        support: "الدعم",
+        active_agents: "وكلاء نشطون",
+
+        business_name: "اسم النشاط",
+
+        /* ✅ FIX: role labels */
+        receptionist: "موظف استقبال",
+        sales_agent: "مندوب مبيعات",
+        support_agent: "دعم"
+      },
+
+      HE: {
+        start_activation: "התחל הפעלה",
+        activate_now: "הפעל עכשיו",
+        activation_steps_info: "מידע על שלבי הפעלה",
+        close: "סגור",
+        next: "הבא",
+        go_back: "חזור",
+        community: "קהילה",
+        newsletter_no_deploy: "ניוזלטר (ללא פריסה)",
+        search_languages: "חפש שפות...",
+        search_countries: "חפש מדינות...",
+        search_industries: "חפש תעשיות...",
+        search_templates: "חפש תבניות...",
+        no_matching: "אין תוצאות",
+
+        setup: "הגדרה",
+        dashboard: "לוח בקרה",
+        post: "פרסם",
+        reply: "השב",
+        title: "כותרת",
+        email: "אימייל",
+        name_optional: "שם (אופציונלי)",
+        tell_us_updates: "ספר לנו על עדכונים שתרצה (אופציונלי)",
+        write_question: "כתוב שאלה או משוב...",
+        write_reply: "כתוב תגובה...",
+        ask_question: "שאל שאלה...",
+        thinking: "חושב...",
+
+        hero_h1: "פקיד קבלה AI גלובלי<br>ללא בני אדם",
+        hero_p: "הפעלה מיידית <span class='text-orange-500'>לעסקים קטנים</span>. <span class='text-orange-500'>פריסה עולמית. רב-לשוני.</span>",
+        beta_access: "גישה ניסיונית - עסקים קטנים",
+        regular: "רגיל",
+        global_live: "שידור חי",
+        per_month: "/חודש",
+
+        feat_1: "שיחות ללא הגבלה",
+        feat_2: "תשלום חודשי",
+        feat_3: "ללא חוזה",
+        step_01: "01 שוק",
+        step_02: "02 תעשייה",
+        step_03: "03 עסק",
+        step_04: "04 תפקיד",
+        step_05: "05 דמו",
+        step_06: "06 פריסה",
+        select: "בחר",
+        sync: "סנכרון",
+        choose: "בחר",
+        sandbox: "Sandbox",
+        instant: "מיידי",
+
+        demo_call: "התחל דמו",
+        deploy_get_number: "קבל מספר",
+        privacy: "פרטיות",
+        terms: "תנאים",
+        support: "תמיכה",
+        active_agents: "סוכנים פעילים",
+
+        business_name: "שם העסק",
+
+        /* ✅ FIX: role labels */
+        receptionist: "פקיד קבלה",
+        sales_agent: "איש מכירות",
+        support_agent: "תמיכה"
+      }
+    };
+
+    SUPPORTED_LANGS.forEach(code => { if (!translations[code]) translations[code] = {}; });
+
+    function loadI18nCache(){
+      try { return JSON.parse(localStorage.getItem(I18N_CACHE_KEY) || "{}"); }
+      catch { return {}; }
+    }
+    function saveI18nCache(cache){
+      try { localStorage.setItem(I18N_CACHE_KEY, JSON.stringify(cache || {})); } catch {}
+    }
+    const dynamicCache = loadI18nCache();
+
+    function dynGet(lang, namespace, key){
+      return dynamicCache?.[lang]?.[namespace]?.[key] || null;
+    }
+    function dynSet(lang, namespace, map){
+      dynamicCache[lang] ||= {};
+      dynamicCache[lang][namespace] ||= {};
+      Object.entries(map || {}).forEach(([k,v]) => {
+        if (v != null && String(v).trim().length) dynamicCache[lang][namespace][k] = v;
+      });
+      saveI18nCache(dynamicCache);
+    }
+
+    async function ensureDynamicTranslations(lang, namespace, items){
+      const code = (lang || "EN").toUpperCase();
+      if (code === "EN") return;
+
+      const missing = (items || []).filter(x => !dynGet(code, namespace, x));
+      if (!missing.length) return;
+
+      try{
+        const res = await fetch("/api/i18n-batch", {
+          method: "POST",
+          headers: { "content-type":"application/json" },
+          body: JSON.stringify({ lang: code, namespace, items: missing })
+        });
+        if (!res.ok) throw new Error("no backend");
+        const data = await res.json();
+        if (data && data.map) dynSet(code, namespace, data.map);
+      } catch(e){
+        // no backend: keep EN fallback
+      }
+    }
+
+    function getDict(lang) { return translations[lang] || translations.EN; }
+    function t(key) {
+      const lang = window.APP_I18N.current || "EN";
+      const dict = getDict(lang);
+      return (dict[key] != null ? dict[key] : (translations.EN[key] != null ? translations.EN[key] : key));
+    }
+
+    function applyTranslations(root = document) {
+      const html = document.documentElement;
+      html.lang = (window.APP_I18N.current || "EN").toLowerCase();
+      html.dir = RTL_LANGS.has(window.APP_I18N.current) ? "rtl" : "ltr";
+
+      root.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        el.textContent = t(key);
+      });
+      root.querySelectorAll("[data-i18n-html]").forEach(el => {
+        const key = el.getAttribute("data-i18n-html");
+        el.innerHTML = t(key);
+      });
+      root.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        el.setAttribute("placeholder", t(key));
+      });
+      root.querySelectorAll("[data-i18n-title]").forEach(el => {
+        const key = el.getAttribute("data-i18n-title");
+        el.setAttribute("title", t(key));
+      });
+      root.querySelectorAll("[data-i18n-aria]").forEach(el => {
+        const key = el.getAttribute("data-i18n-aria");
+        el.setAttribute("aria-label", t(key));
+      });
+    }
+
+    function setLanguage(langCode) {
+      const code = (langCode || "EN").toUpperCase();
+      window.APP_I18N.current = SUPPORTED_LANGS.includes(code) ? code : "EN";
+      localStorage.setItem(LANG_STORAGE_KEY, window.APP_I18N.current);
+      applyTranslations(document);
+      if (typeof window.onLanguageChanged === "function") window.onLanguageChanged(window.APP_I18N.current);
+    }
+
+    (function initLanguageEngine() {
+      let stored = localStorage.getItem(LANG_STORAGE_KEY);
+      if (!stored) stored = mapBrowserLangToCode(navigator.language || navigator.userLanguage || "en");
+      setLanguage(stored);
+    })();
+
+    window.i18n = {
+      t, setLanguage, applyTranslations, translations,
+      ensureDynamicTranslations, dynGet
+    };
+  </script>
 </head>
 
-<body>
-  <div class="app">
-    <!-- Left: Shell / Navigation -->
-    <aside class="card">
-      <div class="pad">
-        <div class="brandRow">
-          <div class="mark" aria-hidden="true"></div>
-          <div>
-            <div class="brandName">AI CALL PORT</div>
-            <div class="mini">/app dashboard</div>
-          </div>
-        </div>
+<body onmousemove="updateParallax(event)">
+  <div class="bg-glow"></div>
 
-        <div class="divider"></div>
-
-        <div id="activationBadge" class="status">Checking activation…</div>
-
-        <div class="nav" style="margin-top:12px">
-          <button data-route="overview" class="active">Overview <span class="pill">01</span></button>
-          <button data-route="setup">Setup <span class="pill">02</span></button>
-          <button data-route="activity">Activity <span class="pill">03</span></button>
-          <button data-route="billing">Billing <span class="pill">04</span></button>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="btnrow">
-          <a class="btn" href="/">← Marketing</a>
-          <button class="danger" id="clearActivation">Clear activation</button>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="mini">
-          Storage key:
-          <div style="margin-top:6px" class="monoBox" id="storageKeyBox"></div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Right: Content -->
-    <main class="card">
-      <div class="pad">
-        <div class="rightTop">
-          <div>
-            <h1 id="pageTitle">Overview</h1>
-            <div class="muted" id="pageSubtitle">Workspace summary and quick actions.</div>
-          </div>
-          <div class="tag" id="workspaceTag">Workspace: —</div>
-        </div>
-
-        <!-- OVERVIEW -->
-        <section data-page="overview">
-          <div class="kpiGrid">
-            <div class="kpi">
-              <div class="n" id="kpiIndustry">—</div>
-              <div class="l">Industry</div>
-            </div>
-            <div class="kpi">
-              <div class="n" id="kpiMarket">—</div>
-              <div class="l">Market</div>
-            </div>
-            <div class="kpi">
-              <div class="n" id="kpiRole">—</div>
-              <div class="l">Role</div>
-            </div>
-          </div>
-
-          <h2>Activation object</h2>
-          <div class="monoBox" id="activationDump">No activation loaded.</div>
-
-          <div class="divider"></div>
-
-          <h2>Vapi demo call</h2>
-          <div class="muted" style="max-width:80ch">
-            This uses the Vapi Web SDK pattern: create a client with your <strong>Public Key</strong> and start a call with your <strong>Assistant ID</strong>. :contentReference[oaicite:1]{index=1}
-          </div>
-
-          <div class="row" style="margin-top:10px">
-            <div>
-              <label for="demoPublicKey">Vapi Public Key</label>
-              <input id="demoPublicKey" placeholder="pk_..." />
-            </div>
-            <div>
-              <label for="demoAssistantId">Vapi Assistant ID</label>
-              <input id="demoAssistantId" placeholder="asst_..." />
-            </div>
-          </div>
-
-          <div class="btnrow">
-            <button class="primary" id="startCall">Start call</button>
-            <button id="stopCall">Stop call</button>
-            <span class="status" id="callStatus">Idle</span>
-          </div>
-
-          <div class="hint muted" style="margin-top:8px">
-            If audio won’t start: ensure the page is on HTTPS, allow microphone permissions, and verify your key/assistant ID.
-          </div>
-        </section>
-
-        <!-- SETUP -->
-        <section data-page="setup" hidden>
-          <h2>Workspace settings</h2>
-          <div class="muted" style="max-width:80ch">
-            Edit and save activation settings locally. This keeps the architecture simple (no backend) while your shell/pages are built.
-          </div>
-
-          <div class="row" style="margin-top:10px">
-            <div>
-              <label for="businessName">Business name</label>
-              <input id="businessName" />
-            </div>
-            <div>
-              <label for="businessWebsite">Website</label>
-              <input id="businessWebsite" placeholder="https://example.com" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label for="marketRegion">Market region</label>
-              <input id="marketRegion" />
-            </div>
-            <div>
-              <label for="marketCountry">Primary country</label>
-              <input id="marketCountry" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label for="industryName">Industry</label>
-              <input id="industryName" />
-            </div>
-            <div>
-              <label for="userRole">Your role</label>
-              <input id="userRole" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div style="grid-column:1/-1">
-              <label for="businessGoal">Goal</label>
-              <textarea id="businessGoal"></textarea>
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <h2>Vapi defaults</h2>
-          <div class="row">
-            <div>
-              <label for="vapiPublicKey">Vapi Public Key</label>
-              <input id="vapiPublicKey" placeholder="pk_..." />
-            </div>
-            <div>
-              <label for="vapiAssistantId">Vapi Assistant ID</label>
-              <input id="vapiAssistantId" placeholder="asst_..." />
-            </div>
-          </div>
-
-          <div class="btnrow">
-            <button class="primary" id="saveSettings">Save</button>
-            <span class="status" id="saveStatus">Not saved</span>
-          </div>
-        </section>
-
-        <!-- ACTIVITY -->
-        <section data-page="activity" hidden>
-          <h2>Activity</h2>
-          <div class="muted" style="max-width:80ch">
-            Placeholder for call logs, transcripts, outcomes, and events. For now we keep this static and simple.
-          </div>
-
-          <div class="divider"></div>
-          <div class="monoBox">
-            [ ] Call started<br/>
-            [ ] User intent captured<br/>
-            [ ] Lead qualified<br/>
-            [ ] Appointment booked<br/>
-            <br/>
-            When you’re ready, this can be wired to Vapi webhooks or your own call event endpoint.
-          </div>
-        </section>
-
-        <!-- BILLING -->
-        <section data-page="billing" hidden>
-          <h2>Billing</h2>
-          <div class="muted" style="max-width:80ch">
-            Placeholder for plan selection and payment handling. Keep this separate from marketing; add Stripe later without changing your core structure.
-          </div>
-          <div class="divider"></div>
-          <div class="monoBox">
-            Plan: Starter (placeholder)<br/>
-            Next invoice: —<br/>
-            Payment method: —<br/>
-          </div>
-        </section>
-      </div>
-    </main>
+  <div class="floating-lang" id="langWrap">
+    <button id="langTrigger" class="lang-trigger" type="button">
+      <img id="curFlag" src="https://flagcdn.com/us.svg" class="w-4" alt="Flag" />
+      <span id="curLangText" class="text-[9px] font-black text-white uppercase">US | EN</span>
+    </button>
+    <div id="langMenu">
+      <input type="text" id="langSearch" class="search-box" data-i18n-placeholder="search_languages" onkeyup="filterList('langList', this.value)" />
+      <div class="modal-scroll" id="langList"></div>
+    </div>
   </div>
 
-  <script type="module">
-    const STORAGE_KEY = "aicallport_activation_v1";
+  <div class="console-container">
+    <div class="flex justify-between items-center mb-6 lg:mb-12">
+      <div class="flex items-center gap-2">
+        <span class="font-black italic text-base lg:text-xl uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
+        <div class="ml-2 px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase leading-none">BETA</div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="communityBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="community" type="button">
+          Community
+        </button>
+        <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
+          <div class="dot-blink"></div>
+          <span id="live-label" class="text-[7px] font-black text-orange-500 uppercase tracking-widest text-nowrap" data-i18n="global_live">Global Live</span>
+        </div>
+      </div>
+    </div>
 
-    const $ = (id) => document.getElementById(id);
-    const pages = Array.from(document.querySelectorAll("[data-page]"));
-    const navButtons = Array.from(document.querySelectorAll(".nav button[data-route]"));
+    <div class="grid lg:grid-cols-5 gap-6 lg:gap-12 items-center">
+      <div class="lg:col-span-3 text-center lg:text-left">
+        <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title" data-i18n-html="hero_h1">
+          GLOBAL ZERO-HUMAN<br /> AI RECEPTIONIST
+        </h1>
+        <p id="hero-p" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider" data-i18n-html="hero_p">
+          Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation.
+          <span class="text-orange-500">Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>
+        </p>
+        <div class="grid gap-2 sm:flex sm:gap-3 sm:items-center">
+          <button id="heroCta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic" data-i18n="start_activation" type="button">
+            Start Activation
+          </button>
+          <button id="activationInfoBtn" class="w-full sm:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="activation_steps_info" type="button">
+            Activation Steps Info
+          </button>
+        </div>
+      </div>
 
-    $("storageKeyBox").textContent = STORAGE_KEY;
+      <div class="lg:col-span-2">
+        <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-6 text-center">
+          <h3 id="beta-txt" class="text-[10px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]" data-i18n="beta_access">
+            BETA ACCESS - SMALL BUSINESS
+          </h3>
+          <div class="flex flex-col items-center mb-4">
+            <span id="reg-txt" class="text-slate-600 line-through text-xs font-bold">$399 Regular</span>
+            <div class="flex items-baseline gap-1">
+              <span id="main-currency" class="text-4xl lg:text-5xl font-black text-white">$</span>
+              <span id="main-price" class="text-4xl lg:text-5xl font-black text-white">199</span>
+              <span class="text-orange-500 font-bold" data-i18n="per_month">/mo</span>
+            </div>
+          </div>
 
-    function safeTrim(v){ return (v ?? "").toString().trim(); }
+          <div class="space-y-2 mb-6 text-left max-w-[240px] mx-auto border-y border-white/5 py-4">
+            <div class="flex items-center gap-2">
+              <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter feat-txt" data-i18n="feat_1">Unlimited Inbound Calling</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter feat-txt" data-i18n="feat_2">Pay Monthly</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter feat-txt" data-i18n="feat_3">No Contract</span>
+            </div>
+          </div>
 
-    function readActivation(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return null;
-        return JSON.parse(raw);
-      }catch(e){
-        return null;
+          <div id="timer" class="text-xs font-mono text-white/30 mb-4">00:00:00</div>
+          <button id="sideCta" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic" data-i18n="start_activation" type="button">
+            Start Activation
+          </button>
+          <button id="newsletterBtn" class="mt-2 w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 bg-white/5 hover:bg-white/10 transition" data-i18n="newsletter_no_deploy" type="button">
+            Join Newsletter (No Deploy)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-10 lg:mt-16">
+      <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
+        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">AI Receptionist Activation Protocol</span>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+        <div id="s1" class="step-card unlocked next-focus">
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_01">01 Market</p>
+          <p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
+        </div>
+        <div id="s2" class="step-card locked">
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_02">02 Industry</p>
+          <p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
+        </div>
+        <div id="s3" class="step-card locked">
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_03">03 Business</p>
+          <p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="sync">Sync</p>
+        </div>
+        <div id="s4" class="step-card locked">
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_04">04 Agent Role</p>
+          <p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="choose">Choose</p>
+        </div>
+        <div id="s5" class="step-card locked">
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_05">05 Demo</p>
+          <p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="sandbox">Sandbox</p>
+        </div>
+        <div id="s6" class="step-card locked">
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_06">06 Deploy</p>
+          <p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="instant">Instant</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="setupModal">
+    <div id="modalShell" class="modal-shell">
+      <h2 id="mTitle" class="text-lg font-black uppercase text-white mb-4" data-i18n="setup">Setup</h2>
+      <div id="modalSearchContainer"></div>
+      <div id="mContent" class="modal-scroll"></div>
+      <button id="mClose" class="mt-6 text-[10px] text-slate-500 uppercase font-black hover:text-white" data-i18n="close" type="button">Close</button>
+    </div>
+  </div>
+
+  <footer class="mt-auto py-10 w-full text-center border-t border-white/5 bg-black/20">
+    <div class="max-w-xs mx-auto opacity-40 hover:opacity-100 transition-opacity duration-500">
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+        <span class="text-[8px] font-black text-white uppercase tracking-widest"><span id="agentCount">14,202</span> <span data-i18n="active_agents">ACTIVE AGENTS</span></span>
+      </div>
+      <div class="flex justify-center gap-6 text-[9px] font-black uppercase tracking-widest text-slate-500 mb-4">
+        <a href="#" class="hover:text-orange-500" data-i18n="privacy">Privacy</a>
+        <a href="#" class="hover:text-orange-500" data-i18n="terms">Terms</a>
+        <a href="#" class="hover:text-orange-500" data-i18n="support">Support</a>
+      </div>
+      <p class="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">&copy; 2026 AI CALL PORT. GLOBAL SMALL BUSINESS PROTOCOL.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ============================
+    // VAPI KEY (NO HARDCODE)
+    // ============================
+    let vapiApiKey = null;
+    async function loadVapiKey() {
+      if (vapiApiKey) return vapiApiKey;
+      const res = await fetch("/api/config", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to load /api/config");
+      const data = await res.json();
+      if (!data || !data.vapiPublicKey) throw new Error("Missing vapiPublicKey in /api/config response");
+      vapiApiKey = data.vapiPublicKey;
+      return vapiApiKey;
+    }
+
+    // ============================
+    // ✅ VAPI LOADER (BROWSER-SAFE)
+    // Always use html-script-tag SDK (avoids "exports is not defined").
+    // ============================
+    let vapiFallbackInstance = null;
+
+    function loadScriptOnce(src) {
+      return new Promise((resolve, reject) => {
+        const existing = [...document.scripts].find(s => s.src === src);
+        if (existing) return resolve();
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.defer = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("Failed to load: " + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    async function getVapiClientOrFallback() {
+      const apiKey = await loadVapiKey();
+
+      // Always use the browser-safe html-script-tag SDK
+      await loadScriptOnce("https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js");
+
+      if (!window.vapiSDK || typeof window.vapiSDK.run !== "function") {
+        throw new Error("Vapi SDK (html-script-tag) did not initialize");
       }
+
+      return { mode: "script", apiKey, client: null };
     }
 
-    function writeActivation(obj){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+    async function vapiStartCall(assistantId, assistantOverrides) {
+      const { apiKey } = await getVapiClientOrFallback();
+
+      // Keep a single instance to avoid multiple overlays
+      if (vapiFallbackInstance && vapiFallbackInstance.stop) {
+        try { vapiFallbackInstance.stop(); } catch {}
+      }
+
+      vapiFallbackInstance = window.vapiSDK.run({
+        apiKey,
+        assistant: assistantId,
+        assistantOverrides: assistantOverrides || {}
+      });
+
+      return vapiFallbackInstance;
     }
 
-    function setActivationBadge(act){
-      const el = $("activationBadge");
-      if(act?.activatedAt){
-        el.textContent = "Activated";
-        el.classList.add("ok");
-        el.classList.remove("bad");
+    // ============================
+    // ASSISTANTS (fallback mapping)
+    // ============================
+    const assistants = {
+      "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+      "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
+      "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65",
+      "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f"
+    };
+
+    // ============================
+    // STATE
+    // ============================
+    let completedSteps = 0;
+    let currentIndustryIdx = 0;
+
+    // ✅ Canonical industry key (not translated UI label)
+    let selectedIndustryKey = "Electrical";
+
+    let selectedMarket = "United States";
+
+    let selectedRole = "Receptionist";
+    let selectedTemplateKey = null;
+    let agentScript = "";
+
+    let templateCategoryFilter = "ALL";
+    let templateSearchQuery = "";
+
+    const LS_DEPLOYED = "aicallport_deployed";
+    function setDeployed(v) { localStorage.setItem(LS_DEPLOYED, v ? "1" : "0"); }
+    function isDeployed() { return localStorage.getItem(LS_DEPLOYED) === "1"; }
+
+// ============================
+// VAPI VOICES (matches your dashboard)
+// ============================
+const vapiVoices = [
+  { id: "Mia", label: "Mia (Professional / Articulate)" },
+  { id: "Leah", label: "Leah (Warm / Gentle)" },
+  { id: "Dan", label: "Dan (Friendly / Casual)" },
+  { id: "Zac", label: "Zac (Enthusiastic / Dynamic)" },
+  { id: "Jess", label: "Jess (Energetic / Youthful)" },
+  { id: "Zoe", label: "Zoe (Calm / Soothing)" },
+  { id: "Leo", label: "Leo (Authoritative / Deep)" },
+  { id: "Savannah", label: "Savannah (American / Southern)" },
+  { id: "Rohan", label: "Rohan (Bright / Energetic)" },
+  { id: "Elliot", label: "Elliot (Canadian / Soothing)" }
+];
+
+let selectedVoiceId = "Mia";
+    // ✅ keep this only so existing UI code won't crash
+let selectedVoiceSettings = {
+  stability: 0.5,
+  similarityBoost: 0.8,
+  style: 0.2,
+  useSpeakerBoost: false
+};
+
+
+// For Vapi provider voices:
+function getSelectedVapiVoice() {
+  return { provider: "vapi", voiceId: selectedVoiceId };
+}
+
+
+    // ============================
+    // MARKETS (continent list)
+    // ============================
+    const DEFAULT_PRICE = "199";
+    const DEFAULT_REG = "399";
+
+    const marketsByContinent = {
+      "Europe": [
+        "Albania","Andorra","Armenia","Austria","Azerbaijan","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus",
+        "Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Hungary","Iceland","Ireland","Italy","Latvia",
+        "Lithuania","Luxembourg","Malta","Moldova","Monaco","Montenegro","Netherlands","North Macedonia","Norway","Poland","Portugal","Romania",
+        "San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom"
+      ],
+      "Asia & Oceania": [
+        "Australia","Bahrain","Bangladesh","Cambodia","China","Fiji","Hong Kong","India","Indonesia","Iraq","Israel","Japan","Jordan","Kazakhstan",
+        "Kuwait","Kyrgyzstan","Laos","Lebanon","Macao","Malaysia","Maldives","Mongolia","New Zealand","Oman","Pakistan","Papua New Guinea",
+        "Philippines","Qatar","Saudi Arabia","Singapore","South Korea","Sri Lanka","Taiwan","Thailand","Turkey","United Arab Emirates","Uzbekistan","Vietnam"
+      ],
+      "North America & Caribbean": [
+        "Antigua and Barbuda","Bahamas","Barbados","Belize","Bermuda","Canada","Costa Rica","Cuba","Dominican Republic","El Salvador","Greenland",
+        "Grenada","Guatemala","Haiti","Honduras","Jamaica","Mexico","Nicaragua","Panama","Puerto Rico","Saint Kitts and Nevis","Saint Lucia",
+        "Saint Vincent and the Grenadines","Trinidad and Tobago","United States"
+      ],
+      "Africa": [
+        "Angola","Benin","Botswana","Burkina Faso","Cameroon","Egypt","Ethiopia","Gabon","Ghana","Ivory Coast","Kenya","Madagascar","Malawi","Mali",
+        "Mauritius","Morocco","Namibia","Nigeria","Rwanda","Senegal","Seychelles","South Africa","Tanzania","Togo","Tunisia","Uganda","Zambia","Zimbabwe"
+      ],
+      "South America": [
+        "Argentina","Bolivia","Brazil","Chile","Colombia","Ecuador","Falkland Islands","French Guiana","Guyana","Paraguay","Peru","Suriname","Uruguay","Venezuela"
+      ]
+    };
+
+    const currencySymbol = {
+      "Albania":"L","Andorra":"€","Armenia":"֏","Austria":"€","Azerbaijan":"₼","Belarus":"Br","Belgium":"€","Bosnia and Herzegovina":"KM",
+      "Bulgaria":"лв","Croatia":"€","Cyprus":"€","Czech Republic":"Kč","Denmark":"kr","Estonia":"€","Finland":"€","France":"€","Georgia":"₾",
+      "Germany":"€","Greece":"€","Hungary":"Ft","Iceland":"kr","Ireland":"€","Italy":"€","Latvia":"€","Lithuania":"€","Luxembourg":"€","Malta":"€",
+      "Moldova":"L","Monaco":"€","Montenegro":"€","Netherlands":"€","North Macedonia":"ден","Norway":"kr","Poland":"zł","Portugal":"€","Romania":"lei",
+      "San Marino":"€","Serbia":"дин","Slovakia":"€","Slovenia":"€","Spain":"€","Sweden":"kr","Switzerland":"CHF","Ukraine":"₴","United Kingdom":"£",
+
+      "Australia":"$","Bahrain":"BD","Bangladesh":"৳","Cambodia":"៛","China":"¥","Fiji":"$","Hong Kong":"$","India":"₹","Indonesia":"Rp","Iraq":"د.ع",
+      "Israel":"₪","Japan":"¥","Jordan":"JD","Kazakhstan":"₸","Kuwait":"KD","Kyrgyzstan":"сом","Laos":"₭","Lebanon":"ل.ل","Macao":"$","Malaysia":"RM",
+      "Maldives":"Rf","Mongolia":"₮","New Zealand":"$","Oman":"OMR","Pakistan":"₨","Papua New Guinea":"K","Philippines":"₱","Qatar":"QAR",
+      "Saudi Arabia":"﷼","Singapore":"$","South Korea":"₩","Sri Lanka":"Rs","Taiwan":"$","Thailand":"฿","Turkey":"₺","United Arab Emirates":"AED",
+      "Uzbekistan":"so'm","Vietnam":"₫",
+
+      "Antigua and Barbuda":"$","Bahamas":"$","Barbados":"$","Belize":"$","Bermuda":"$","Canada":"$","Costa Rica":"₡","Cuba":"$","Dominican Republic":"RD$",
+      "El Salvador":"$","Greenland":"kr","Grenada":"$","Guatemala":"Q","Haiti":"G","Honduras":"L","Jamaica":"J$","Mexico":"$","Nicaragua":"C$","Panama":"B/.",
+      "Puerto Rico":"$","Saint Kitts and Nevis":"$","Saint Lucia":"$","Saint Vincent and the Grenadines":"$","Trinidad and Tobago":"TT$","United States":"$",
+
+      "Angola":"Kz","Benin":"CFA","Botswana":"P","Burkina Faso":"CFA","Cameroon":"CFA","Egypt":"E£","Ethiopia":"Br","Gabon":"CFA","Ghana":"₵","Ivory Coast":"CFA",
+      "Kenya":"KSh","Madagascar":"Ar","Malawi":"MK","Mali":"CFA","Mauritius":"₨","Morocco":"DH","Namibia":"$","Nigeria":"₦","Rwanda":"FRw","Senegal":"CFA",
+      "Seychelles":"₨","South Africa":"R","Tanzania":"TSh","Togo":"CFA","Tunisia":"DT","Uganda":"USh","Zambia":"ZK","Zimbabwe":"$",
+
+      "Argentina":"$","Bolivia":"Bs","Brazil":"R$","Chile":"$","Colombia":"$","Ecuador":"$","Falkland Islands":"£","French Guiana":"€","Guyana":"$",
+      "Paraguay":"₲","Peru":"S/","Suriname":"$","Uruguay":"$","Venezuela":"Bs"
+    };
+
+    const marketCurrency = {};
+    Object.entries(marketsByContinent).forEach(([continent, list]) => {
+      list.forEach(country => {
+        marketCurrency[country] = {
+          continent,
+          cur: currencySymbol[country] || "$",
+          price: DEFAULT_PRICE,
+          reg: DEFAULT_REG,
+          prefix: "",
+          active: true
+        };
+      });
+    });
+
+    function normalizeMarketData(m) {
+      const d = marketCurrency[m] || marketCurrency["United States"];
+      const out = { ...d };
+      out.active = true;
+      if (!out.price) out.price = DEFAULT_PRICE;
+      if (!out.reg) out.reg = DEFAULT_REG;
+      return out;
+    }
+
+    // ============================
+    // LANG MENU
+    // ============================
+    const languageList = [
+      { id:"EN", n:"English", f:"us" },
+      { id:"ZH", n:"Mandarin Chinese", f:"cn" },
+      { id:"HI", n:"Hindi", f:"in" },
+      { id:"ES", n:"Spanish", f:"mx" },
+      { id:"FR", n:"French", f:"fr" },
+      { id:"AR", n:"Arabic", f:"sa" },
+      { id:"BN", n:"Bengali", f:"bd" },
+      { id:"PT", n:"Portuguese", f:"pt" },
+      { id:"RU", n:"Russian", f:"ru" },
+      { id:"UR", n:"Urdu", f:"pk" },
+      { id:"ID", n:"Indonesian", f:"id" },
+      { id:"DE", n:"German", f:"de" },
+      { id:"JA", n:"Japanese", f:"jp" },
+      { id:"PCM", n:"Nigerian Pidgin", f:"ng" },
+      { id:"MR", n:"Marathi", f:"in" },
+      { id:"TE", n:"Telugu", f:"in" },
+      { id:"TR", n:"Turkish", f:"tr" },
+      { id:"TA", n:"Tamil", f:"in" },
+      { id:"YUE", n:"Cantonese (Yue)", f:"hk" },
+      { id:"VI", n:"Vietnamese", f:"vn" },
+      { id:"TL", n:"Tagalog (Filipino)", f:"ph" },
+      { id:"WU", n:"Wu Chinese", f:"cn" },
+      { id:"KO", n:"Korean", f:"kr" },
+      { id:"FA", n:"Persian (Farsi)", f:"ir" },
+      { id:"HA", n:"Hausa", f:"ng" },
+      { id:"SW", n:"Swahili", f:"tz" },
+      { id:"JV", n:"Javanese", f:"id" },
+      { id:"IT", n:"Italian", f:"it" },
+      { id:"PA", n:"Punjabi", f:"in" },
+      { id:"KN", n:"Kannada", f:"in" },
+      { id:"HE", n:"Hebrew", f:"il" }
+    ];
+
+    window.onLanguageChanged = async () => {
+      const curModalOpen = document.getElementById("setupModal").style.display === "flex";
+      if (curModalOpen && lastModalStep != null) {
+        await triggerModal(lastModalStep, { preserve: true });
+      }
+      updateCurrencyUI(selectedMarket);
+      i18n.applyTranslations(document);
+    };
+
+    // ============================
+    // ACTIVATION INFO
+    // ============================
+    const activationInfoSlides = [
+      { keyTitle:"STEP 1 — MARKET", keyText:"Choose the country/market. Pricing and deployment routing adjust automatically based on your selection." },
+      { keyTitle:"STEP 2 — INDUSTRY", keyText:"Select your industry. Industry packs determine the scripts/templates you start with." },
+      { keyTitle:"STEP 3 — BUSINESS", keyText:"Enter your business name. Used in greetings and scripts." },
+      { keyTitle:"STEP 4 — ROLE + TEMPLATES + VOICE", keyText:"Pick the role. Choose an industry template pack, search templates by category, edit script, choose an ElevenLabs voice, preview it." },
+      { keyTitle:"STEP 5 — DEMO", keyText:"Run a test call using your selected role + script + voice." },
+      { keyTitle:"STEP 6 — DEPLOY + DASHBOARD", keyText:"After payment, your agent deploys. Customer gets a dashboard to edit role, script, voice, routing, and business info anytime." }
+    ];
+    let infoIdx = 0;
+    function openActivationInfo(){ infoIdx = 0; triggerModal("info"); }
+
+    function escapeHtml(str){
+      return String(str || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+    }
+
+    function renderInfoSlide(){
+      const slide = activationInfoSlides[infoIdx];
+      const c = document.getElementById('mContent');
+      c.innerHTML = `
+        <div class="pill mb-4">${escapeHtml(i18n.t("activation_steps_info"))}</div>
+        <div class="card-theme text-left">
+          <div class="mini text-orange-500 mb-2">${escapeHtml(slide.keyTitle)}</div>
+          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(slide.keyText)}</div>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-2 mt-4">
+          <button class="modal-btn justify-center text-center" type="button" onclick="infoPrev()" ${infoIdx===0 ? 'style="opacity:.35;pointer-events:none"' : ''}>${escapeHtml(i18n.t("go_back"))}</button>
+          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="infoNext()">
+            ${escapeHtml(infoIdx === activationInfoSlides.length - 1 ? i18n.t("start_activation") : i18n.t("next"))}
+          </button>
+          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+        </div>
+        <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">${infoIdx+1} / ${activationInfoSlides.length}</div>
+      `;
+      i18n.applyTranslations(document.getElementById("setupModal"));
+    }
+    function infoPrev(){ if(infoIdx>0){ infoIdx--; renderInfoSlide(); } }
+    function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
+
+    // ============================
+    // INDUSTRIES
+    // ============================
+    const industryKeys = [
+      "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door Repair","Locksmith","Handyman","Appliance Repair",
+      "Home Cleaning","Commercial Cleaning","Carpet Cleaning","Pressure Washing","Gutter Cleaning","Chimney Sweep","Junk Removal",
+      "Pest Control","Landscaping","Lawn Care","Tree Service","Irrigation","Pool Service","Septic Service","Moving Company",
+      "Solar Installer","General Contractor","Remodeling","Painter","Flooring","Tile & Stone","Concrete","Fencing","Masonry","Drywall",
+      "Insulation","Paving","Glass Repair","Water Damage Restoration","Fire Damage Restoration","Mold Remediation",
+      "Auto Repair","Tire Shop","Oil Change","Auto Body Shop","Car Detailing","Car Wash","Car Rental","Towing","Motorcycle Repair","Boat Repair",
+      "Dental","Orthodontics","Chiropractic","Physical Therapy","Massage Therapy","Urgent Care","Primary Care","Dermatology","Optometry",
+      "Mental Health Clinic","Counseling","Med Spa","Aesthetics Clinic","IV Therapy","Home Health Care","Senior Care","Pharmacy",
+      "Hair Salon","Barbershop","Nail Salon","Spa","Esthetics","Tattoo Studio","Cosmetology School",
+      "Veterinary","Pet Grooming","Pet Boarding","Dog Training","Pet Daycare","Animal Rescue",
+      "Law Firm","Personal Injury Law","Family Law","Immigration Law","Accounting","Bookkeeping","Tax Prep","Insurance Agency",
+      "Financial Advisor","Mortgage Broker","Real Estate","Property Management","Title Company",
+      "IT Services","Managed IT","Cybersecurity","Marketing Agency","SEO Agency","Web Design","Graphic Design","Photography Studio",
+      "Videography","Event Planning","Staffing Agency","Recruiting","Consulting","Translation Services","Printing Services",
+      "Daycare","Preschool","Tutoring Center","Driving School","Music School","Dance Studio","Martial Arts School","Language School",
+      "Boutique","Jewelry Store","Florist","Bakery","Cafe","Coffee Shop","Restaurant","Catering","Food Truck","Grocery Store",
+      "Liquor Store","Convenience Store","Pharmacy Retail","Furniture Store","Mattress Store","Electronics Store","Cell Phone Shop",
+      "Smoke Shop","Pet Store",
+      "Hotel","Motel","Bed & Breakfast","Vacation Rental Management","Travel Agency","Tour Operator",
+      "Gym","Personal Training","Yoga Studio","Pilates Studio","CrossFit","Sports Club",
+      "Warehouse","Logistics","Courier Service","Manufacturing","Wholesale","B2B Sales","Call Center","After Hours"
+    ];
+
+    const industryCategories = {
+      "Home Services": [
+        "Plumbing","Electrical","HVAC","Roofing","Windows & Doors","Garage Door Repair","Locksmith","Handyman","Appliance Repair",
+        "Home Cleaning","Commercial Cleaning","Carpet Cleaning","Pressure Washing","Gutter Cleaning","Chimney Sweep","Junk Removal",
+        "Pest Control","Landscaping","Lawn Care","Tree Service","Irrigation","Pool Service","Septic Service","Moving Company",
+        "Solar Installer","General Contractor","Remodeling","Painter","Flooring","Tile & Stone","Concrete","Fencing","Masonry","Drywall",
+        "Insulation","Paving","Glass Repair","Water Damage Restoration","Fire Damage Restoration","Mold Remediation"
+      ],
+      "Automotive": ["Auto Repair","Tire Shop","Oil Change","Auto Body Shop","Car Detailing","Car Wash","Car Rental","Towing","Motorcycle Repair","Boat Repair"],
+      "Healthcare": ["Dental","Orthodontics","Chiropractic","Physical Therapy","Massage Therapy","Urgent Care","Primary Care","Dermatology","Optometry","Mental Health Clinic","Counseling","Med Spa","Aesthetics Clinic","IV Therapy","Home Health Care","Senior Care","Pharmacy"],
+      "Beauty": ["Hair Salon","Barbershop","Nail Salon","Spa","Esthetics","Tattoo Studio","Cosmetology School"],
+      "Pets": ["Veterinary","Pet Grooming","Pet Boarding","Dog Training","Pet Daycare","Animal Rescue"],
+      "Legal & Finance": ["Law Firm","Personal Injury Law","Family Law","Immigration Law","Accounting","Bookkeeping","Tax Prep","Insurance Agency","Financial Advisor","Mortgage Broker","Real Estate","Property Management","Title Company"],
+      "Professional Services": ["IT Services","Managed IT","Cybersecurity","Marketing Agency","SEO Agency","Web Design","Graphic Design","Photography Studio","Videography","Event Planning","Staffing Agency","Recruiting","Consulting","Translation Services","Printing Services"],
+      "Education": ["Daycare","Preschool","Tutoring Center","Driving School","Music School","Dance Studio","Martial Arts School","Language School"],
+      "Retail & Food": ["Boutique","Jewelry Store","Florist","Bakery","Cafe","Coffee Shop","Restaurant","Catering","Food Truck","Grocery Store","Liquor Store","Convenience Store","Pharmacy Retail","Furniture Store","Mattress Store","Electronics Store","Cell Phone Shop","Smoke Shop","Pet Store"],
+      "Hospitality & Travel": ["Hotel","Motel","Bed & Breakfast","Vacation Rental Management","Travel Agency","Tour Operator"],
+      "Fitness": ["Gym","Personal Training","Yoga Studio","Pilates Studio","CrossFit","Sports Club"],
+      "B2B & Operations": ["Warehouse","Logistics","Courier Service","Manufacturing","Wholesale","B2B Sales","Call Center","After Hours"]
+    };
+
+    function buildCategorizedIndustryList(){
+      const all = new Set(industryKeys);
+      const out = [];
+      Object.keys(industryCategories).forEach(cat => {
+        const items = (industryCategories[cat]||[]).filter(x => all.has(x));
+        if(items.length) out.push({cat, items});
+      });
+      const covered = new Set(out.flatMap(g => g.items));
+      const leftovers = industryKeys.filter(x => !covered.has(x));
+      if(leftovers.length) out.push({cat:"Uncategorized", items:leftovers});
+      return out;
+    }
+
+    function dt(namespace, key, fallback){
+      const lang = (window.APP_I18N.current || "EN").toUpperCase();
+      const v = i18n.dynGet(lang, namespace, key);
+      return v != null ? v : (fallback != null ? fallback : key);
+    }
+
+    // ============================
+    // TEMPLATES
+    // ============================
+    const templateCategories = ["ALL","Popular","Recommended","Appointments","Emergency","After Hours","Sales","Support","Intake","Info"];
+
+    const industryPacks = {
+      GLOBAL: {
+        Receptionist: [
+          { key:"pop_rec_standard", title:"Popular: Standard Receptionist + Booking", category:"Popular",
+            script:`You are the AI receptionist for {{BUSINESS_NAME}} in {{MARKET}}.
+Primary goals:
+- Answer calls politely
+- Provide basic info
+- Book appointments or take messages
+Collect: name, phone, reason, preferred date/time, email (optional)
+Always confirm details before ending the call.`},
+
+          { key:"rec_after_hours", title:"Recommended: After-Hours Message Capture", category:"Recommended",
+            script:`You are the after-hours AI receptionist for {{BUSINESS_NAME}}.
+Collect: caller name, callback number, reason, best time to call back, and email (optional).
+Repeat the details back and confirm accuracy.`},
+
+          { key:"appt_booking", title:"Appointment Booking + FAQs", category:"Appointments",
+            script:`You are the AI receptionist for {{BUSINESS_NAME}}.
+Answer FAQs briefly, then guide the caller to book.
+Ask: service needed, preferred date/time, location, name + phone.`},
+
+          { key:"support_triage", title:"Support Triage + Ticket", category:"Support",
+            script:`You are the AI support agent for {{BUSINESS_NAME}}.
+Collect issue summary + callback number. Identify urgency. If critical, escalate or advise next steps.`}
+        ],
+        "Sales Agent": [
+          { key:"pop_sales_qual", title:"Popular: Sales Lead Qualifier + Booking", category:"Popular",
+            script:`You are the AI sales agent for {{BUSINESS_NAME}}.
+Qualify leads quickly and book appointments.
+Ask: service needed, location, timeline, budget range (optional), contact info.`}
+        ],
+        "Support Agent": [
+          { key:"rec_support_helpdesk", title:"Recommended: Helpdesk + Escalation", category:"Recommended",
+            script:`You are the AI support agent for {{BUSINESS_NAME}}.
+Collect: name, phone, account/order (if applicable), issue description, urgency.
+Provide a short helpful step, then create a ticket and confirm callback.`}
+        ]
+      },
+
+      Plumbing: {
+        Receptionist: [
+          { key:"pl_pop_dispatch", title:"Popular: Plumbing Dispatcher (Urgent + Standard)", category:"Popular",
+            script:`You are the AI receptionist/dispatcher for {{BUSINESS_NAME}} (Plumbing).
+Ask: Is there active leaking/flooding? If yes: URGENT.
+Collect: address, shutoff status, access notes, caller name + phone, preferred arrival window.`}
+        ]
+      },
+
+      Electrical: {
+        Receptionist: [
+          { key:"el_rec_safety", title:"Recommended: Electrical Safety First", category:"Recommended",
+            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electrical).
+Ask: sparking/burning smell/smoke? If yes, advise to turn off breaker if safe and call emergency services if needed.
+Collect: address, issue description, contact info, urgency.`}
+        ]
+      },
+
+      "Real Estate": {
+        Receptionist: [
+          { key:"re_appt_showing", title:"Popular: Showing Scheduler + Lead Capture", category:"Popular",
+            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Real Estate).
+Ask: buying/selling/renting, desired area, timeline.
+Offer to schedule a call or showing. Collect name, phone, and availability.`}
+        ]
+      }
+    };
+
+    function getCurrentIndustryKey(){ return selectedIndustryKey || "GLOBAL"; }
+    function getPackFor(industryKey){ return industryPacks[industryKey] || industryPacks.GLOBAL; }
+
+    function getTemplatesFor(roleName){
+      const industryKey = getCurrentIndustryKey();
+      const pack = getPackFor(industryKey);
+      const roleList = pack[roleName] || [];
+      if(!roleList.length){
+        const globalRoleList = industryPacks.GLOBAL[roleName] || [];
+        return { templates: globalRoleList, packName: "GLOBAL" };
+      }
+      return { templates: roleList, packName: industryKey };
+    }
+
+    function applyVars(text){
+      const businessName = (document.getElementById('v3')?.innerText && document.getElementById('v3').innerText !== i18n.t("sync"))
+        ? document.getElementById('v3').innerText
+        : "YOUR BUSINESS";
+      return (text || "")
+        .replaceAll("{{BUSINESS_NAME}}", businessName)
+        .replaceAll("{{MARKET}}", selectedMarket || "YOUR MARKET");
+    }
+
+    function refreshTemplatesForCurrentSelection(forceResetScript){
+      const { templates } = getTemplatesFor(selectedRole);
+      if(!templates.length){
+        selectedTemplateKey = null;
+        if(forceResetScript) agentScript = "";
+        return;
+      }
+      if(!selectedTemplateKey || !templates.find(t => t.key === selectedTemplateKey)){
+        selectedTemplateKey = templates[0].key;
+      }
+      if(forceResetScript){
+        const chosen = templates.find(t => t.key === selectedTemplateKey) || templates[0];
+        agentScript = applyVars(chosen.script);
       } else {
-        el.textContent = "Not activated — return to / to run Activation Protocol";
-        el.classList.add("bad");
-        el.classList.remove("ok");
+        agentScript = applyVars(agentScript);
       }
     }
 
-    function renderOverview(act){
-      const business = act?.business?.name || "—";
-      const industry = act?.industry?.name || "—";
-      const market = act?.market ? `${act.market.region || "—"} / ${act.market.country || "—"}` : "—";
-      const role = act?.user?.role || "—";
-
-      $("workspaceTag").textContent = `Workspace: ${business}`;
-      $("kpiIndustry").textContent = industry;
-      $("kpiMarket").textContent = (act?.market?.country ? act.market.country : "—");
-      $("kpiRole").textContent = role;
-
-      $("activationDump").textContent = act ? JSON.stringify(act, null, 2) : "No activation loaded.";
+    function initTemplateCategoryDropdown(){
+      const dd = document.getElementById('templateCategory');
+      dd.innerHTML = "";
+      templateCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat.toUpperCase();
+        dd.appendChild(opt);
+      });
+      dd.value = templateCategoryFilter || "ALL";
+      const search = document.getElementById('templateSearch');
+      search.value = templateSearchQuery || "";
     }
 
-    function renderSetup(act){
-      $("businessName").value = act?.business?.name || "";
-      $("businessWebsite").value = act?.business?.website || "";
-      $("marketRegion").value = act?.market?.region || "";
-      $("marketCountry").value = act?.market?.country || "";
-      $("industryName").value = act?.industry?.name || "";
-      $("userRole").value = act?.user?.role || "";
-      $("businessGoal").value = act?.business?.goal || "";
-      $("vapiPublicKey").value = act?.vapi?.publicKey || "";
-      $("vapiAssistantId").value = act?.vapi?.assistantId || "";
-
-      // Also sync demo inputs on overview
-      $("demoPublicKey").value = act?.vapi?.publicKey || "";
-      $("demoAssistantId").value = act?.vapi?.assistantId || "";
+    function getFilteredTemplates(){
+      const { templates } = getTemplatesFor(selectedRole);
+      const cat = templateCategoryFilter || "ALL";
+      const q = (templateSearchQuery || "").trim().toUpperCase();
+      return templates.filter(tpl => {
+        const catOk = (cat === "ALL") ? true : (String(tpl.category || "").toUpperCase() === cat);
+        const text = `${tpl.title} ${tpl.category}`.toUpperCase();
+        const qOk = q ? text.includes(q) : true;
+        return catOk && qOk;
+      });
     }
 
-    function setRoute(route){
-      const titleMap = {
-        overview: ["Overview", "Workspace summary and quick actions."],
-        setup: ["Setup", "Configure workspace settings and defaults."],
-        activity: ["Activity", "Events and logs (placeholder)."],
-        billing: ["Billing", "Plans and payment (placeholder)."]
+    async function initTemplateDropdown(){
+      const templateSelect = document.getElementById('templateSelect');
+      const scriptBox = document.getElementById('scriptBox');
+      templateSelect.innerHTML = "";
+
+      const { packName } = getTemplatesFor(selectedRole);
+      const filtered = getFilteredTemplates();
+
+      const tplTitles = filtered.map(x => x.title);
+      const tplScripts = filtered.map(x => x.script);
+      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "template_titles", tplTitles);
+      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "template_scripts", tplScripts);
+
+      if(!filtered.length){
+        const opt = document.createElement('option');
+        opt.value = "";
+        opt.textContent = i18n.t("no_matching");
+        templateSelect.appendChild(opt);
+        scriptBox.value = agentScript || "";
+        return;
+      }
+
+      if(!selectedTemplateKey || !filtered.find(x => x.key === selectedTemplateKey)){
+        selectedTemplateKey = filtered[0].key;
+        agentScript = applyVars(filtered[0].script);
+      }
+
+      filtered.forEach(tpl => {
+        const opt = document.createElement('option');
+        opt.value = tpl.key;
+        const shownTitle = dt("template_titles", tpl.title, tpl.title);
+        opt.textContent = `${shownTitle} — ${tpl.category} — ${packName}`.toUpperCase();
+        templateSelect.appendChild(opt);
+      });
+
+      templateSelect.value = selectedTemplateKey;
+
+      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      if(!agentScript || agentScript.trim().length < 10) agentScript = applyVars(shownScript);
+      scriptBox.value = agentScript;
+    }
+
+    function onTemplateCategoryChange(cat){ templateCategoryFilter = cat; initTemplateDropdown(); }
+    function onTemplateSearchChange(q){ templateSearchQuery = q || ""; initTemplateDropdown(); }
+    function onTemplateChange(key){
+      const filtered = getFilteredTemplates();
+      const chosen = filtered.find(x => x.key === key);
+      if(!chosen) return;
+      selectedTemplateKey = key;
+
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      agentScript = applyVars(shownScript);
+
+      document.getElementById('scriptBox').value = agentScript;
+    }
+    function onScriptEdit(){ agentScript = document.getElementById('scriptBox').value; }
+    function resetTemplate(){
+      const filtered = getFilteredTemplates();
+      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
+      if(!chosen) return;
+
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      agentScript = applyVars(shownScript);
+      document.getElementById('scriptBox').value = agentScript;
+    }
+
+    // ============================
+    // VOICE UI
+    // ============================
+    function initVoiceDropdown(){
+  const voiceSelect = document.getElementById('voiceSelect');
+  if(!voiceSelect) return;
+
+  voiceSelect.innerHTML = "";
+
+  vapiVoices.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v.id;
+    opt.textContent = v.label.toUpperCase();
+    voiceSelect.appendChild(opt);
+  });
+
+  voiceSelect.value = selectedVoiceId;
+}
+
+    function onVoiceChange(id){ selectedVoiceId = id; }
+    function onVoiceTuningChange(){
+      const st = document.getElementById('stabilityRange');
+      const sim = document.getElementById('simRange');
+      const style = document.getElementById('styleRange');
+      const boost = document.getElementById('boostSelect');
+      if(!st || !sim || !style || !boost) return;
+      selectedVoiceSettings.stability = Number(st.value);
+      selectedVoiceSettings.similarityBoost = Number(sim.value);
+      selectedVoiceSettings.style = Number(style.value);
+      selectedVoiceSettings.useSpeakerBoost = (boost.value === "true");
+    }
+
+    // ============================
+    // COMMUNITY
+    // ============================
+    let communityTab = "NEWSLETTER";
+    function openCommunity(){ communityTab = "NEWSLETTER"; triggerModal("community"); }
+    function openNewsletterPortal(){ communityTab = "NEWSLETTER"; triggerModal("community"); }
+    function setCommunityTab(tab){ communityTab = tab; renderCommunity(); }
+
+    const LS_FORUM = "aicallport_forum_posts";
+    function loadForumPosts(){ try { return JSON.parse(localStorage.getItem(LS_FORUM) || "[]"); } catch { return []; } }
+    function saveForumPosts(posts){ localStorage.setItem(LS_FORUM, JSON.stringify(posts || [])); }
+
+    const LS_NEWSLETTER = "aicallport_newsletter_signups";
+    function loadNewsletter(){ try { return JSON.parse(localStorage.getItem(LS_NEWSLETTER) || "[]"); } catch { return []; } }
+    function saveNewsletter(list){ localStorage.setItem(LS_NEWSLETTER, JSON.stringify(list || [])); }
+
+    function maskEmail(email){
+      return String(email || "").replace(/^(.)(.*)(@.*)$/, (_, a, b, c) => a + "*".repeat(Math.min(8, b.length)) + c);
+    }
+
+    async function submitNewsletter(){
+      const email = document.getElementById("nlEmail")?.value || "";
+      const name = document.getElementById("nlName")?.value || "";
+      const note = document.getElementById("nlNote")?.value || "";
+      if(!email.includes("@")){
+        document.getElementById("nlEmail").style.borderColor = "red";
+        return;
+      }
+
+      const payload = {
+        email, name, note,
+        market: selectedMarket,
+        industryKey: selectedIndustryKey,
+        industryLabel: document.getElementById("v2")?.innerText || "",
+        deployed: isDeployed()
       };
 
-      pages.forEach(p => p.hidden = (p.getAttribute("data-page") !== route));
-      navButtons.forEach(b => b.classList.toggle("active", b.getAttribute("data-route") === route));
+      // ✅ Store only masked email locally
+      const list = loadNewsletter();
+      list.unshift({ ...payload, email: maskEmail(email), ts: Date.now() });
+      saveNewsletter(list);
 
-      const [t, s] = titleMap[route] || titleMap.overview;
-      $("pageTitle").textContent = t;
-      $("pageSubtitle").textContent = s;
+      // Send real email only to backend
+      try {
+        await fetch("/api/newsletter", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {}
 
-      history.replaceState(null, "", `#${route}`);
+      const msg = document.getElementById("nlMsg");
+      if(msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">Subscribed</div>
+        <div class="text-slate-400 font-bold text-[10px] uppercase tracking-wider mt-1">You are on the list.</div>`;
+      setTimeout(() => { renderCommunity(); }, 900);
     }
 
-    navButtons.forEach(b => {
-      b.addEventListener("click", () => setRoute(b.getAttribute("data-route")));
-    });
-
-    // Activation lifecycle
-    $("clearActivation").addEventListener("click", () => {
-      localStorage.removeItem(STORAGE_KEY);
-      location.href = "/"; // clean separation: send user back to marketing to re-activate
-    });
-
-    $("saveSettings").addEventListener("click", () => {
-      const current = readActivation() || { version: 1, activatedAt: new Date().toISOString() };
-      const updated = {
-        ...current,
-        market: {
-          region: safeTrim($("marketRegion").value),
-          country: safeTrim($("marketCountry").value)
-        },
-        industry: {
-          name: safeTrim($("industryName").value),
-          other: safeTrim(current?.industry?.other || "")
-        },
-        business: {
-          name: safeTrim($("businessName").value),
-          website: safeTrim($("businessWebsite").value),
-          goal: safeTrim($("businessGoal").value)
-        },
-        user: {
-          role: safeTrim($("userRole").value),
-          name: safeTrim(current?.user?.name || "")
-        },
-        vapi: {
-          publicKey: safeTrim($("vapiPublicKey").value),
-          assistantId: safeTrim($("vapiAssistantId").value)
-        }
-      };
-
-      writeActivation(updated);
-      $("saveStatus").textContent = "Saved";
-      $("saveStatus").classList.add("ok");
-      $("saveStatus").classList.remove("bad");
-
-      renderOverview(updated);
-      renderSetup(updated);
-    });
-
-    // Initial load
-    const act = readActivation();
-    setActivationBadge(act);
-    renderOverview(act);
-    renderSetup(act);
-
-    // Route initial
-    const initialRoute = (location.hash || "#overview").replace("#", "");
-    setRoute(["overview","setup","activity","billing"].includes(initialRoute) ? initialRoute : "overview");
-
-    // -----------------------------
-    // Vapi demo call (no build step)
-    // -----------------------------
-    // Use ESM import from esm.sh to avoid bundlers.
-    // Vapi usage pattern: new Vapi(publicKey) and start(assistantId). :contentReference[oaicite:2]{index=2}
-    let vapi = null;
-    let callActive = false;
-
-    const callStatus = $("callStatus");
-    function setCallStatus(text, kind){
-      callStatus.textContent = text;
-      callStatus.classList.remove("ok","bad");
-      if(kind) callStatus.classList.add(kind);
+    function cryptoRandomId(){
+      try {
+        const a = crypto.getRandomValues(new Uint8Array(10));
+        return Array.from(a).map(x => x.toString(16).padStart(2,"0")).join("");
+      } catch {
+        return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
+      }
     }
 
-    async function ensureVapi(publicKey){
-      if(vapi) return vapi;
-      // Dynamic import so page still loads even if user never clicks demo.
-      const mod = await import("https://esm.sh/@vapi-ai/web");
-      const Vapi = mod.default;
-      vapi = new Vapi(publicKey);
-      return vapi;
+    function addForumPost(){
+      const title = (document.getElementById("fpTitle")?.value || "").trim();
+      const body = (document.getElementById("fpBody")?.value || "").trim();
+      if(title.length < 3 || body.length < 10){
+        alert("Please add a longer title and message.");
+        return;
+      }
+      const posts = loadForumPosts();
+      posts.unshift({ id: cryptoRandomId(), title, body, replies: [], ts: Date.now() });
+      saveForumPosts(posts);
+      renderCommunity();
     }
 
-    $("startCall").addEventListener("click", async () => {
+    function addForumReply(postId){
+      const input = document.getElementById("reply_" + postId);
+      const text = (input?.value || "").trim();
+      if(text.length < 3) return;
+
+      const posts = loadForumPosts();
+      const p = posts.find(x => x.id === postId);
+      if(!p) return;
+      p.replies.push({ text, ts: Date.now() });
+      saveForumPosts(posts);
+      renderCommunity();
+    }
+
+    async function askAiQuestion(){
+      const q = (document.getElementById("qaQuestion")?.value || "").trim();
+      if(q.length < 5) return;
+
+      const out = document.getElementById("qaAnswer");
+      out.innerHTML = `<div class="text-slate-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("thinking"))}</div>`;
+
       try{
-        const publicKey = safeTrim($("demoPublicKey").value);
-        const assistantId = safeTrim($("demoAssistantId").value);
+        const res = await fetch("/api/ai-qa", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            question: q,
+            context: {
+              market: selectedMarket,
+              industryKey: selectedIndustryKey,
+              role: selectedRole,
+              deployed: isDeployed()
+            }
+          })
+        });
+        if(!res.ok) throw new Error("Bad response");
+        const data = await res.json();
+        const answer = data?.answer || data?.text || "No answer returned.";
+        out.innerHTML = `<div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
+          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap">${escapeHtml(answer)}</div>`;
+      } catch(e){
+        out.innerHTML = `
+          <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
+          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+            ${escapeHtml(i18n.t("needs_backend"))}
+            <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 text-[11px] text-slate-300 font-semibold">
+              POST <span class="text-orange-500">/api/ai-qa</span> → { answer: "..." }
+            </div>
+          </div>`;
+      }
+    }
 
-        if(!publicKey || !assistantId){
-          setCallStatus("Missing Vapi Public Key or Assistant ID", "bad");
-          return;
-        }
+    function renderNewsletterListHtml(){
+      const list = loadNewsletter().slice(0, 8);
+      if(!list.length) return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-6">No signups yet</div>`;
+      return list.map(x => `
+        <div class="flex items-start justify-between gap-3 py-2 border-b border-white/5">
+          <div>
+            <div class="text-[10px] font-black uppercase tracking-wider text-white">${escapeHtml(x.email)}</div>
+            <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">${escapeHtml(x.name || "—")} • ${escapeHtml(x.market || "—")} • ${escapeHtml(x.industryLabel || x.industryKey || "—")}</div>
+          </div>
+          <div class="text-[9px] font-black uppercase tracking-widest ${x.deployed ? "text-green-400" : "text-slate-400"}">
+            ${x.deployed ? "DEPLOYED" : "NO DEPLOY"}
+          </div>
+        </div>
+      `).join("");
+    }
 
-        setCallStatus("Starting…");
-        const client = await ensureVapi(publicKey);
+    function renderForumHtml(){
+      const posts = loadForumPosts().slice(0, 20);
+      if(!posts.length) return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10">No posts yet</div>`;
+      return posts.map(p => `
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mb-3">
+          <div class="text-[10px] font-black uppercase tracking-wider text-orange-500">${escapeHtml(p.title)}</div>
+          <div class="text-[11px] text-slate-300 font-semibold leading-relaxed mt-1 whitespace-pre-wrap">${escapeHtml(p.body)}</div>
+          <div class="divider mt-3">Replies</div>
+          <div class="space-y-2">
+            ${(p.replies||[]).slice(-3).map(r => `
+              <div class="text-[11px] text-slate-300 font-semibold leading-relaxed bg-black/20 border border-white/5 rounded-xl p-2 whitespace-pre-wrap">${escapeHtml(r.text)}</div>
+            `).join("") || `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-2">No replies yet</div>`}
+          </div>
+          <div class="grid grid-cols-4 gap-2 mt-3">
+            <input id="reply_${p.id}" class="select-theme col-span-3" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="write_reply" placeholder="${escapeHtml(i18n.t("write_reply"))}" />
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="addForumReply('${p.id}')">${escapeHtml(i18n.t("reply"))}</button>
+          </div>
+        </div>
+      `).join("");
+    }
 
-        // Some environments expose events; not required for basic demo.
-        // Start voice conversation:
-        await client.start(assistantId); // :contentReference[oaicite:3]{index=3}
-        callActive = true;
-        setCallStatus("In call", "ok");
+    function renderCommunity(){
+      const c = document.getElementById("mContent");
+      const deployedBadge = isDeployed()
+        ? `<span class="text-[9px] font-black uppercase tracking-widest text-green-400">Deployed: YES</span>`
+        : `<span class="text-[9px] font-black uppercase tracking-widest text-slate-400">Deployed: NO</span>`;
+
+      c.innerHTML = `
+        <div class="pill mb-3">${escapeHtml(i18n.t("community_portal"))}</div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">${escapeHtml(i18n.t("newsletter"))} • ${escapeHtml(i18n.t("forum"))} • ${escapeHtml(i18n.t("ai_qa"))}</div>
+          ${deployedBadge}
+        </div>
+
+        <div class="tabbar">
+          <div class="tab ${communityTab==="NEWSLETTER"?"active":""}" onclick="setCommunityTab('NEWSLETTER')">${escapeHtml(i18n.t("newsletter"))}</div>
+          <div class="tab ${communityTab==="FORUM"?"active":""}" onclick="setCommunityTab('FORUM')">${escapeHtml(i18n.t("forum"))}</div>
+          <div class="tab ${communityTab==="QA"?"active":""}" onclick="setCommunityTab('QA')">${escapeHtml(i18n.t("ai_qa"))}</div>
+        </div>
+
+        <div id="communityBody"></div>
+
+        <div class="grid sm:grid-cols-2 gap-2 mt-4">
+          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="handleStep(1)">${escapeHtml(i18n.t("start_activation"))}</button>
+        </div>
+      `;
+
+      const body = document.getElementById("communityBody");
+      if(communityTab === "NEWSLETTER"){
+        body.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("newsletter"))}</div>
+
+            <div class="grid sm:grid-cols-2 gap-2 mt-3">
+              <input id="nlName" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="name_optional" placeholder="${escapeHtml(i18n.t("name_optional"))}" />
+              <input id="nlEmail" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="email" placeholder="${escapeHtml(i18n.t("email"))}" />
+            </div>
+            <textarea id="nlNote" class="textarea-theme mt-2" style="min-height:110px" data-i18n-placeholder="tell_us_updates" placeholder="${escapeHtml(i18n.t("tell_us_updates"))}"></textarea>
+            <div id="nlMsg" class="mt-2"></div>
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="submitNewsletter()">
+              ${escapeHtml(i18n.t("join_list"))}
+            </button>
+
+            <div class="divider mt-4">Recent Signups (Local)</div>
+            <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 max-h-[160px] overflow-auto">
+              ${renderNewsletterListHtml()}
+            </div>
+          </div>
+        `;
+      }
+
+      if(communityTab === "FORUM"){
+        body.innerHTML = `
+          <div class="grid lg:grid-cols-2 gap-4 text-left">
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("forum"))}</div>
+              <input id="fpTitle" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="title" placeholder="${escapeHtml(i18n.t("title"))}" />
+              <textarea id="fpBody" class="textarea-theme mt-2" data-i18n-placeholder="write_question" placeholder="${escapeHtml(i18n.t("write_question"))}"></textarea>
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="addForumPost()">
+                ${escapeHtml(i18n.t("post"))}
+              </button>
+            </div>
+
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">Forum Threads</div>
+              <div class="max-h-[420px] overflow-auto pr-1">
+                ${renderForumHtml()}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if(communityTab === "QA"){
+        body.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
+            <textarea id="qaQuestion" class="textarea-theme mt-2" style="min-height:110px" data-i18n-placeholder="ask_question" placeholder="${escapeHtml(i18n.t("ask_question"))}"></textarea>
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="askAiQuestion()">
+              ${escapeHtml(i18n.t("ask_ai"))}
+            </button>
+            <div id="qaAnswer" class="mt-4"></div>
+          </div>
+        `;
+      }
+
+      i18n.applyTranslations(document.getElementById("setupModal"));
+    }
+
+    // ============================
+    // MODAL FLOW
+    // ============================
+    let lastModalStep = null;
+
+    function createBtn(txt, fn){
+      const b = document.createElement('button');
+      b.type = "button";
+      b.className = "modal-btn";
+      b.innerText = txt;
+      b.onclick = fn;
+      return b;
+    }
+
+    function closeModal(){ document.getElementById('setupModal').style.display = 'none'; }
+
+    async function triggerModal(step){
+      lastModalStep = step;
+
+      const m = document.getElementById('setupModal');
+      const c = document.getElementById('mContent');
+      const s = document.getElementById('modalSearchContainer');
+      const tEl = document.getElementById('mTitle');
+      const shell = document.getElementById('modalShell');
+
+      shell.classList.remove('role-wide','info-wide','dashboard-wide','community-wide');
+      m.style.display = 'flex';
+      c.innerHTML = "";
+      s.innerHTML = "";
+      c.className = "modal-scroll";
+
+      if(step === "info"){
+        shell.classList.add('info-wide');
+        tEl.innerText = i18n.t("activation_steps_info");
+        renderInfoSlide();
+        return;
+      }
+      if(step === "community"){
+        shell.classList.add('community-wide');
+        tEl.innerText = i18n.t("community");
+        renderCommunity();
+        return;
+      }
+
+      if(step === 1){
+        tEl.innerText = i18n.t("step_01");
+        s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_countries" placeholder="${escapeHtml(i18n.t("search_countries"))}" onkeyup="filterMarket(this.value)">`;
+        renderMarketByContinent("");
+        i18n.applyTranslations(document.getElementById("setupModal"));
+        return;
+      }
+
+      if(step === 2){
+        tEl.innerText = i18n.t("step_02");
+        s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_industries" placeholder="${escapeHtml(i18n.t("search_industries"))}" onkeyup="filterIndustryCategories(this.value)">`;
+        await i18n.ensureDynamicTranslations(window.APP_I18N.current, "industries", industryKeys);
+        renderIndustryCategoryList("");
+        i18n.applyTranslations(document.getElementById("setupModal"));
+        return;
+      }
+
+      if(step === 3){
+        tEl.innerText = i18n.t("step_03");
+        c.innerHTML = `
+          <input id="bn" data-i18n-placeholder="business_name" placeholder="${escapeHtml(i18n.t("business_name"))}" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
+          <button type="button" onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">${escapeHtml(i18n.t("save"))}</button>
+        `;
+        i18n.applyTranslations(document.getElementById("setupModal"));
+        return;
+      }
+
+      if(step === 4){
+        shell.classList.add('role-wide');
+        tEl.innerText = i18n.t("step_04");
+
+        c.innerHTML = `
+          <div class="pill mb-4">${escapeHtml(i18n.t("role_templates_voice"))}</div>
+
+          <div class="grid lg:grid-cols-3 gap-4 text-left">
+            <div class="card-theme">
+              <div class="muted-hint mb-3">${escapeHtml(i18n.t("agent_role"))}</div>
+              <div id="roleList" class="grid gap-2"></div>
+              <div class="mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
+                Current Industry: <span class="text-orange-500">${escapeHtml(getCurrentIndustryKey())}</span>
+              </div>
+            </div>
+
+            <div class="card-theme">
+              <div class="muted-hint mb-3">${escapeHtml(i18n.t("templates"))}</div>
+
+              <div class="grid grid-cols-2 gap-2 mb-2">
+                <select id="templateCategory" class="select-theme" onchange="onTemplateCategoryChange(this.value)"></select>
+                <input id="templateSearch" class="search-box" style="margin:0" data-i18n-placeholder="search_templates" placeholder="${escapeHtml(i18n.t("search_templates"))}" oninput="onTemplateSearchChange(this.value)" />
+              </div>
+
+              <select id="templateSelect" class="select-theme" onchange="onTemplateChange(this.value)"></select>
+
+              <div class="mt-3 muted-hint">${escapeHtml(i18n.t("editable_script"))}</div>
+              <textarea id="scriptBox" class="textarea-theme mt-2" oninput="onScriptEdit()"></textarea>
+
+              <div class="grid grid-cols-2 gap-2 mt-3">
+                <button class="modal-btn justify-center text-center" type="button" onclick="resetTemplate()">${escapeHtml(i18n.t("reset_template"))}</button>
+                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="closeModal()">${escapeHtml(i18n.t("save"))}</button>
+              </div>
+            </div>
+
+            <div class="card-theme">
+              <div class="muted-hint mb-3">Choose Agent Voice</div>
+
+              <select id="voiceSelect" class="select-theme" onchange="onVoiceChange(this.value)"></select>
+
+              <div class="grid grid-cols-2 gap-2 mt-3">
+                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="previewVoice()">${escapeHtml(i18n.t("preview_voice"))}</button>
+                <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("save"))}</button>
+              </div>
+
+              <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mt-4">
+                <div class="muted-hint mb-2">${escapeHtml(i18n.t("voice_tuning"))}</div>
+                <div class="grid grid-cols-2 gap-2">
+                  <label class="text-[9px] font-black uppercase text-slate-400">${escapeHtml(i18n.t("stability"))}
+                    <input id="stabilityRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.stability}" oninput="onVoiceTuningChange()" class="w-full">
+                  </label>
+                  <label class="text-[9px] font-black uppercase text-slate-400">${escapeHtml(i18n.t("similarity"))}
+                    <input id="simRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.similarityBoost}" oninput="onVoiceTuningChange()" class="w-full">
+                  </label>
+                  <label class="text-[9px] font-black uppercase text-slate-400">${escapeHtml(i18n.t("style"))}
+                    <input id="styleRange" type="range" min="0" max="1" step="0.01" value="${selectedVoiceSettings.style}" oninput="onVoiceTuningChange()" class="w-full">
+                  </label>
+                  <label class="text-[9px] font-black uppercase text-slate-400">${escapeHtml(i18n.t("speaker_boost"))}
+                    <select id="boostSelect" class="select-theme" onchange="onVoiceTuningChange()">
+                      <option value="true">${escapeHtml(i18n.t("on"))}</option>
+                      <option value="false">${escapeHtml(i18n.t("off"))}</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-2 mt-4">
+            <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="finish(4, selectedRole)">
+              ${escapeHtml(i18n.t("confirm_role_template_voice"))}
+            </button>
+          </div>
+        `;
+
+        const roleList = document.getElementById('roleList');
+        roleList.innerHTML = "";
+        const roles = [
+          { key:"receptionist", value:"Receptionist" },
+          { key:"sales_agent", value:"Sales Agent" },
+          { key:"support_agent", value:"Support Agent" }
+        ];
+        roles.forEach(r => {
+          const label = i18n.t(r.key);
+          const b = createBtn(label, () => {
+            selectedRole = r.value;
+            templateCategoryFilter = "ALL";
+            templateSearchQuery = "";
+            refreshTemplatesForCurrentSelection(true);
+            triggerModal(4);
+          });
+          b.style.fontSize = "10px";
+          b.style.padding = "14px";
+          b.innerHTML = `${escapeHtml(label)}${selectedRole === r.value ? " ✓" : ""}`;
+          roleList.appendChild(b);
+        });
+
+        initTemplateCategoryDropdown();
+        await initTemplateDropdown();
+        initVoiceDropdown();
+        i18n.applyTranslations(document.getElementById("setupModal"));
+        return;
+      }
+
+      if(step === 5){
+        tEl.innerText = i18n.t("step_05");
+        c.innerHTML = "";
+        c.appendChild(createBtn(i18n.t("demo_call"), runVoice));
+        const note = document.createElement('div');
+        note.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2 text-center";
+        note.innerText = "Demo uses your chosen role, script, and ElevenLabs voice.";
+        c.appendChild(note);
+        return;
+      }
+
+      if(step === 6){
+        tEl.innerText = i18n.t("step_06");
+        c.innerHTML = "";
+        c.appendChild(createBtn(i18n.t("deploy_get_number"), () => {
+          confetti();
+          setDeployed(true);
+          finish(6, "READY");
+
+          // ✅ FIX: avoid popup blockers, redirect same tab
+          setTimeout(() => {
+            window.location.href = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
+          }, 900);
+        }));
+        return;
+      }
+    }
+
+    // ============================
+    // Step 1 rendering
+    // ============================
+    function renderMarketByContinent(searchQuery){
+      const c = document.getElementById('mContent');
+      c.innerHTML = "";
+      const q = (searchQuery || "").trim().toUpperCase();
+
+      Object.keys(marketsByContinent).forEach(continent => {
+        const list = (marketsByContinent[continent] || []).slice().sort((a,b) => a.localeCompare(b));
+        const filtered = list.filter(name => name.toUpperCase().includes(q));
+        if(!filtered.length) return;
+
+        const div = document.createElement('div');
+        div.className = "divider";
+        div.innerText = continent.toUpperCase();
+        c.appendChild(div);
+
+        filtered.forEach(name => {
+          const btn = createBtn(name, () => { updateCurrencyUI(name); finish(1, name); });
+          btn.setAttribute('data-n', name);
+          btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${escapeHtml(name)}`;
+          c.appendChild(btn);
+        });
+      });
+
+      if(!c.children.length){
+        const hint = document.createElement('div');
+        hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
+        hint.innerText = i18n.t("no_matching");
+        c.appendChild(hint);
+      }
+    }
+    function filterMarket(query){ renderMarketByContinent(query); }
+
+    // Step 2 rendering
+    function renderIndustryCategoryList(searchQuery){
+      const c = document.getElementById('mContent');
+      c.innerHTML = "";
+      const q = (searchQuery || "").trim().toUpperCase();
+
+      const groups = buildCategorizedIndustryList();
+      groups.forEach(g => {
+        const filtered = g.items.filter(name => {
+          const shown = dt("industries", name, name);
+          return shown.toUpperCase().includes(q) || name.toUpperCase().includes(q);
+        });
+        if(!filtered.length) return;
+
+        const div = document.createElement('div');
+        div.className = "divider";
+        div.innerText = g.cat.toUpperCase();
+        c.appendChild(div);
+
+        filtered.forEach(name => {
+          const idx = industryKeys.indexOf(name);
+          const shown = dt("industries", name, name);
+
+          const btn = createBtn(shown, () => {
+            currentIndustryIdx = idx >= 0 ? idx : currentIndustryIdx;
+            selectedIndustryKey = name; // ✅ Canonical key
+            finish(2, shown);           // UI label
+            refreshTemplatesForCurrentSelection(true);
+          });
+          btn.setAttribute('data-n', shown);
+          c.appendChild(btn);
+        });
+      });
+
+      if(!c.children.length){
+        const hint = document.createElement('div');
+        hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
+        hint.innerText = i18n.t("no_matching");
+        c.appendChild(hint);
+      }
+    }
+    function filterIndustryCategories(query){ renderIndustryCategoryList(query); }
+
+    // ============================
+    // ACTIONS + LOCK STATE
+    // ============================
+    function refreshStepLocks(){
+      for(let i=1;i<=6;i++){
+        const el = document.getElementById(`s${i}`);
+        if(!el) continue;
+        const unlocked = completedSteps >= i-1;
+        el.classList.toggle("locked", !unlocked);
+      }
+    }
+
+    function handleStep(s){
+      if (s === 1 || completedSteps >= s - 1) triggerModal(s);
+    }
+
+    function finish(s, v){
+      completedSteps = Math.max(completedSteps, s);
+      const valEl = document.getElementById(`v${s}`);
+      if(valEl) valEl.innerText = v;
+
+      document.getElementById(`s${s}`)?.classList.add('active');
+      closeModal();
+
+      // next focus
+      for(let i=1;i<=6;i++){
+        document.getElementById(`s${i}`)?.classList.remove("next-focus");
+      }
+      if(s < 6) document.getElementById(`s${s + 1}`)?.classList.add('next-focus');
+
+      refreshStepLocks();
+    }
+
+    function saveB(){
+      const v = document.getElementById('bn').value;
+      if(v){
+        finish(3, v);
+        agentScript = applyVars(agentScript);
+      }
+    }
+
+    // ============================
+    // Language menu
+    // ============================
+    function toggleLangMenu(force){
+      const d = document.getElementById('langMenu');
+      if(force === true) d.style.display = 'flex';
+      else if(force === false) d.style.display = 'none';
+      else d.style.display = (d.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function setLang(cc, langCode){
+      document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
+      document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${langCode}`;
+      i18n.setLanguage(langCode);
+      toggleLangMenu(false);
+    }
+
+    function updateCurrencyUI(m){
+      selectedMarket = m;
+      const data = normalizeMarketData(m);
+
+      document.getElementById('main-currency').innerText = data.cur;
+      document.getElementById('main-price').innerText = data.price;
+      document.getElementById('reg-txt').innerText = `${data.cur}${data.reg} ${i18n.t("regular")}`;
+
+      agentScript = applyVars(agentScript);
+    }
+
+    function filterList(containerId, query){
+      const q = (query || "").toUpperCase();
+      document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
+        const name = b.getAttribute('data-n') || b.innerText;
+        b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function initLangList(){
+      const list = document.getElementById('langList');
+      list.innerHTML = "";
+      languageList.forEach(l => {
+        const b = createBtn(l.n, () => setLang(l.f, l.id));
+        b.setAttribute('data-n', l.n);
+        const hasStatic = !!(i18n.translations[l.id] && Object.keys(i18n.translations[l.id]).length > 0);
+        const hint = (l.id !== "EN" && !hasStatic) ? ` <span style="opacity:.55">• EN fallback</span>` : "";
+        b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3" alt=""> <span>${escapeHtml(l.n)}</span>${hint}`;
+        list.appendChild(b);
+      });
+      i18n.applyTranslations(document);
+    }
+
+    function updateParallax(e){
+      if(!e) return;
+      document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
+      document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
+    }
+
+    // ============================
+    // VAPI: Preview + Demo
+    // ============================
+    async function previewVoice(){
+      try{
+        const industry = getCurrentIndustryKey();
+        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
+
+        await vapiStartCall(assistantId, {
+          voice: getSelectedVapiVoice(),
+          firstMessage: "Hi! This is a quick voice preview. How does this voice sound to you?"
+        });
+
+        closeModal();
+      } catch(e){
+        console.error(e);
+        alert("Preview failed. Check console + /api/config.");
+      }
+    }
+
+    async function runVoice(){
+      try{
+        const industry = getCurrentIndustryKey();
+        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
+
+        const businessName = document.getElementById('v3')?.innerText || "YOUR BUSINESS";
+        const finalScript = applyVars(agentScript || "");
+
+        await vapiStartCall(assistantId, {
+  voice: getSelectedVapiVoice(),
+  firstMessage: `Hi! Thank you for calling ${businessName}. How can I help you today?`,
+  model: {
+    provider: "openai",
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: finalScript }
+    ]
+  }
+});
+
+
+        closeModal();
+        finish(5, "ACTIVE");
       } catch(err){
         console.error(err);
-        setCallStatus("Failed to start (check console / mic permissions)", "bad");
+        alert("Error starting demo call. Check console + /api/config.");
       }
-    });
+    }
 
-    $("stopCall").addEventListener("click", async () => {
-      try{
-        if(!vapi || !callActive){
-          setCallStatus("Idle");
-          return;
-        }
-        // Vapi clients typically support stop(); if not, this will throw.
-        if(typeof vapi.stop === "function"){
-          await vapi.stop();
-        }
-        callActive = false;
-        setCallStatus("Stopped");
-      } catch(err){
-        console.error(err);
-        setCallStatus("Failed to stop (check console)", "bad");
+    // ============================
+    // TIMER + COUNTER
+    // ============================
+    setInterval(() => {
+      const now = new Date();
+      const h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds();
+      document.getElementById('timer').textContent =
+        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+      if (Math.random() > 0.8) {
+        const el = document.getElementById('agentCount');
+        let count = parseInt(el.innerText.replace(',', ''), 10);
+        el.innerText = (count + 1).toLocaleString();
       }
-    });
+    }, 1000);
+
+    // ============================
+    // INIT
+    // ============================
+    function wireTopButtons(){
+      document.getElementById("heroCta").addEventListener("click", () => handleStep(1));
+      document.getElementById("sideCta").addEventListener("click", () => handleStep(1));
+      document.getElementById("activationInfoBtn").addEventListener("click", openActivationInfo);
+      document.getElementById("communityBtn").addEventListener("click", openCommunity);
+      document.getElementById("newsletterBtn").addEventListener("click", openNewsletterPortal);
+
+      document.getElementById("s1").addEventListener("click", () => handleStep(1));
+      document.getElementById("s2").addEventListener("click", () => handleStep(2));
+      document.getElementById("s3").addEventListener("click", () => handleStep(3));
+      document.getElementById("s4").addEventListener("click", () => handleStep(4));
+      document.getElementById("s5").addEventListener("click", () => handleStep(5));
+      document.getElementById("s6").addEventListener("click", () => handleStep(6));
+
+      document.getElementById("mClose").addEventListener("click", closeModal);
+
+      document.getElementById("langTrigger").addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleLangMenu();
+      });
+
+      document.addEventListener("click", (e) => {
+        const menu = document.getElementById("langMenu");
+        const wrap = document.getElementById("langWrap");
+        if(menu.style.display === "flex" && !wrap.contains(e.target)){
+          toggleLangMenu(false);
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if(e.key === "Escape"){
+          closeModal();
+          toggleLangMenu(false);
+        }
+      });
+    }
+
+    initLangList();
+    wireTopButtons();
+
+    // Default industry
+    selectedIndustryKey = "Electrical";
+    currentIndustryIdx = Math.max(0, industryKeys.indexOf(selectedIndustryKey));
+    refreshTemplatesForCurrentSelection(true);
+    const initTemplates = getTemplatesFor(selectedRole).templates;
+    if(initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
+
+    updateCurrencyUI("United States");
+
+    if(isDeployed()){
+      document.getElementById('v6').innerText = "READY";
+      document.getElementById('s6').classList.add('active');
+      completedSteps = Math.max(completedSteps, 6);
+    }
+
+    refreshStepLocks();
+    i18n.applyTranslations(document);
   </script>
 </body>
 </html>
