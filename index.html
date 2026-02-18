@@ -8,10 +8,7 @@
   <!-- Tailwind (CDN OK for prototype) -->
   <script>
     window.tailwind = window.tailwind || {};
-    tailwind.config = {
-      theme: { extend: {} },
-      corePlugins: { preflight: true }
-    };
+    tailwind.config = { theme: { extend: {} }, corePlugins: { preflight: true } };
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -89,7 +86,6 @@
       opacity: 1 !important;
     }
     .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
-
     .step-card.locked { opacity: 0.22; cursor: not-allowed; }
     .step-card.locked:hover { border-color: rgba(255, 255, 255, 0.1); }
 
@@ -98,7 +94,6 @@
       50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
     }
 
-    /* ✅ blinking SMB benefits button (uses same glow feel) */
     .benefits-blink {
       animation: border-glow 2s infinite ease-in-out !important;
       border-color: rgba(249, 115, 22, 0.55) !important;
@@ -378,14 +373,27 @@
       transition: 0.18s;
       outline: none;
     }
-    /* ✅ hover highlight removed (per request) */
-
+    /* hover highlight intentionally removed */
     .benefit-row.active {
       border-color: rgba(249,115,22,0.8);
       background: rgba(249,115,22,0.14);
     }
 
-    /* Hidden tooltip content kept for future reuse (does not affect layout) */
+    /* ✅ Mobile inline explanation (opens under clicked row) */
+    .benefit-inline {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.55;
+      color: rgba(226,232,240,0.9);
+      white-space: pre-wrap;
+      display: none; /* only shows for active on mobile */
+    }
+    .benefit-row.active .benefit-inline { display: block; }
+
+    /* Hidden tooltip content kept for future reuse */
     .benefit-tip { display: none; }
   </style>
 
@@ -904,12 +912,10 @@
     };
 
     const FX_CACHE_KEY = "aicallport_fx_cache_v1";
-
     function roundNice(amount, code){
       if (code === "JPY" || code === "KRW") return Math.round(amount);
       return Math.round(amount);
     }
-
     function getFxCache(){ try { return JSON.parse(localStorage.getItem(FX_CACHE_KEY)||"{}"); } catch { return {}; } }
     function setFxCache(obj){ try { localStorage.setItem(FX_CACHE_KEY, JSON.stringify(obj||{})); } catch {} }
 
@@ -975,7 +981,6 @@
     // STATE
     // ============================
     let completedSteps = 0;
-    let currentIndustryIdx = 0;
     let selectedIndustryKey = "Electrical";
     let selectedMarket = "United States";
 
@@ -1003,7 +1008,6 @@
       { id: "Elliot", label: "Elliot (Canadian / Soothing)" }
     ];
     let selectedVoiceId = "Mia";
-    let selectedVoiceSettings = { stability: 0.5, similarityBoost: 0.8, style: 0.2, useSpeakerBoost: false };
     function getSelectedVapiVoice() { return { provider: "vapi", voiceId: selectedVoiceId }; }
 
     // ============================
@@ -1084,7 +1088,7 @@
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
     // ============================
-    // ✅ SMB BENEFITS (click-to-explain; hover removed; keyboard arrows)
+    // ✅ SMB BENEFITS (Desktop: right panel. Mobile: inline accordion under row.)
     // ============================
     const smbBenefits = [
       { titleEN: "High Quality AI Call Agents", descEN: "Reliable inbound call handling built for real small businesses. No call-center scripts. Professional tone and fast capture of details." },
@@ -1100,6 +1104,11 @@
     ];
 
     let activeBenefitIdx = 0;
+
+    function isDesktopBenefitsLayout(){
+      // desktop = lg and up (matches your existing 2-column layout)
+      return window.matchMedia("(min-width: 1024px)").matches;
+    }
 
     function bdt(namespace, key, fallback){
       const lang = (window.APP_I18N.current || "EN").toUpperCase();
@@ -1119,20 +1128,20 @@
     async function renderBenefits(){
       const c = document.getElementById("mContent");
 
-      // Ensure translation support (backend optional)
       const titles = smbBenefits.map(x => x.titleEN);
       const descs  = smbBenefits.map(x => x.descEN);
       await i18n.ensureDynamicTranslations(window.APP_I18N.current, "benefit_titles", titles);
       await i18n.ensureDynamicTranslations(window.APP_I18N.current, "benefit_descs", descs);
 
-      const current = smbBenefits[activeBenefitIdx] || smbBenefits[0];
-      const shownDesc = bdt("benefit_descs", current.descEN, current.descEN);
+      const desktop = isDesktopBenefitsLayout();
 
+      // Desktop keeps the original two-column list + explanation.
+      // Mobile switches to one-column accordion: explanation opens right under clicked row.
       c.innerHTML = `
         <div class="pill mb-3">${escapeHtml(i18n.t("smb_benefits_title"))}</div>
         <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4" data-i18n="click_to_learn">${escapeHtml(i18n.t("click_to_learn"))}</div>
 
-        <div class="grid lg:grid-cols-2 gap-4 text-left">
+        <div class="${desktop ? "grid lg:grid-cols-2 gap-4" : "grid gap-4"} text-left">
           <div class="card-theme">
             <div class="mini text-orange-500 mb-2">Benefits</div>
             <div id="benefitsList"
@@ -1143,13 +1152,15 @@
                  aria-activedescendant="benefit-opt-0"></div>
           </div>
 
-          <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">Explanation</div>
-            <div id="benefitExplain" class="text-[12px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap"></div>
-            <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
-              Tip: This content can also be reused later inside the client dashboard.
+          ${desktop ? `
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">Explanation</div>
+              <div id="benefitExplain" class="text-[12px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap"></div>
+              <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Tip: This content can also be reused later inside the client dashboard.
+              </div>
             </div>
-          </div>
+          ` : ``}
         </div>
 
         <div class="modal-footer">
@@ -1163,10 +1174,11 @@
       `;
 
       const list = document.getElementById("benefitsList");
+      const desktopNow = isDesktopBenefitsLayout();
 
       list.innerHTML = smbBenefits.map((b, idx) => {
         const shownTitle = bdt("benefit_titles", b.titleEN, b.titleEN);
-        const shownDescLocal = bdt("benefit_descs", b.descEN, b.descEN);
+        const shownDesc  = bdt("benefit_descs",  b.descEN,  b.descEN);
 
         return `
           <div class="benefit-row ${idx===activeBenefitIdx ? "active":""}"
@@ -1175,17 +1187,24 @@
                aria-selected="${idx===activeBenefitIdx ? "true" : "false"}"
                tabindex="-1"
                data-idx="${idx}"
-               onclick="setActiveBenefit(${idx}, { focusList:true })">
+               onclick="setActiveBenefit(${idx}, { focusList:true, toggleMobile:true })">
             <div class="text-[10px] font-black uppercase tracking-widest text-white">${escapeHtml(shownTitle)}</div>
-            <div class="benefit-tip">${escapeHtml(shownDescLocal)}</div>
+            <div class="benefit-tip">${escapeHtml(shownDesc)}</div>
+            ${desktopNow ? `` : `<div class="benefit-inline">${escapeHtml(shownDesc)}</div>`}
           </div>
         `;
       }).join("");
 
-      const explain = document.getElementById("benefitExplain");
-      explain.textContent = shownDesc || "";
+      if (desktopNow) {
+        const current = smbBenefits[activeBenefitIdx] || smbBenefits[0];
+        const shownDesc = bdt("benefit_descs", current.descEN, current.descEN);
+        const explain = document.getElementById("benefitExplain");
+        if (explain) explain.textContent = shownDesc || "";
+      }
 
-      // Keyboard: Up/Down cycles benefits when listbox focused (no layout change)
+      // Keyboard: Up/Down cycles benefits when listbox focused
+      // - Desktop: updates right panel
+      // - Mobile: opens inline explanation under active row
       list.addEventListener("keydown", (e) => {
         const max = smbBenefits.length - 1;
 
@@ -1197,29 +1216,52 @@
           else if (e.key === "ArrowDown") activeBenefitIdx = (activeBenefitIdx + 1) > max ? 0 : (activeBenefitIdx + 1);
           else if (e.key === "ArrowUp") activeBenefitIdx = (activeBenefitIdx - 1) < 0 ? max : (activeBenefitIdx - 1);
 
-          setActiveBenefit(activeBenefitIdx);
+          setActiveBenefit(activeBenefitIdx, { toggleMobile:false });
         }
 
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          setActiveBenefit(activeBenefitIdx);
+          setActiveBenefit(activeBenefitIdx, { toggleMobile:true });
         }
       }, { passive: false });
+
+      // If user rotates / resizes while modal open, rerender to switch layouts cleanly.
+      window.__benefitsResizeHandler ||= (() => {
+        let last = isDesktopBenefitsLayout();
+        return () => {
+          const cur = isDesktopBenefitsLayout();
+          if (cur !== last) {
+            last = cur;
+            renderBenefits();
+          }
+        };
+      })();
+      window.addEventListener("resize", window.__benefitsResizeHandler);
 
       i18n.applyTranslations(document.getElementById("setupModal"));
     }
 
     function setActiveBenefit(idx, opts){
-      activeBenefitIdx = idx;
+      const desktop = isDesktopBenefitsLayout();
 
-      const current = smbBenefits[activeBenefitIdx] || smbBenefits[0];
-      const shownDesc = bdt("benefit_descs", current.descEN, current.descEN);
+      // Mobile behavior:
+      // - clicking currently active row toggles open/close (accordion)
+      // - clicking a different row opens that row
+      const wantToggleMobile = !!(opts && opts.toggleMobile);
 
-      const explain = document.getElementById("benefitExplain");
-      if (explain) explain.textContent = shownDesc || "";
+      if (!desktop && wantToggleMobile) {
+        if (activeBenefitIdx === idx) {
+          // toggle off
+          activeBenefitIdx = -1;
+        } else {
+          activeBenefitIdx = idx;
+        }
+      } else {
+        activeBenefitIdx = idx;
+      }
 
       const listbox = document.getElementById("benefitsList");
-      if (listbox) listbox.setAttribute("aria-activedescendant", `benefit-opt-${activeBenefitIdx}`);
+      if (listbox && activeBenefitIdx >= 0) listbox.setAttribute("aria-activedescendant", `benefit-opt-${activeBenefitIdx}`);
 
       document.querySelectorAll(".benefit-row").forEach((el) => {
         const i = Number(el.getAttribute("data-idx"));
@@ -1228,8 +1270,25 @@
         el.setAttribute("aria-selected", isActive ? "true" : "false");
       });
 
+      // Desktop explanation panel updates
+      if (desktop) {
+        const current = smbBenefits[activeBenefitIdx] || smbBenefits[0];
+        const shownDesc = bdt("benefit_descs", current.descEN, current.descEN);
+        const explain = document.getElementById("benefitExplain");
+        if (explain) explain.textContent = shownDesc || "";
+      }
+
+      // keep keyboard focus on listbox
       if (opts && opts.focusList && listbox && typeof listbox.focus === "function") {
         listbox.focus();
+      }
+
+      // ensure active row visible
+      if (activeBenefitIdx >= 0) {
+        const activeEl = document.getElementById(`benefit-opt-${activeBenefitIdx}`);
+        if (activeEl && typeof activeEl.scrollIntoView === "function") {
+          activeEl.scrollIntoView({ block: "nearest" });
+        }
       }
     }
 
@@ -1238,7 +1297,6 @@
     // ============================
     const industryKeys = ["Plumbing","Electrical","HVAC","Roofing","Real Estate","After Hours"];
     const industryCategories = { "Home Services":["Plumbing","Electrical","HVAC","Roofing"], "Business":["Real Estate","After Hours"] };
-
     function buildCategorizedIndustryList(){
       const out = [];
       Object.keys(industryCategories).forEach(cat => out.push({cat, items: industryCategories[cat]}));
@@ -1426,243 +1484,6 @@ Collect: address, issue description, contact info, urgency.`}
     function onVoiceChange(id){ selectedVoiceId = id; }
 
     // ============================
-    // Community (same)
-    // ============================
-    let communityTab = "NEWSLETTER";
-
-    const LS_FORUM = "aicallport_forum_posts";
-    const LS_NEWSLETTER = "aicallport_newsletter_signups";
-    function loadForumPosts(){ try { return JSON.parse(localStorage.getItem(LS_FORUM) || "[]"); } catch { return []; } }
-    function saveForumPosts(posts){ localStorage.setItem(LS_FORUM, JSON.stringify(posts || [])); }
-    function loadNewsletter(){ try { return JSON.parse(localStorage.getItem(LS_NEWSLETTER) || "[]"); } catch { return []; } }
-    function saveNewsletter(list){ localStorage.setItem(LS_NEWSLETTER, JSON.stringify(list || [])); }
-
-    function cryptoRandomId(){
-      try {
-        const a = crypto.getRandomValues(new Uint8Array(10));
-        return Array.from(a).map(x => x.toString(16).padStart(2,"0")).join("");
-      } catch {
-        return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
-      }
-    }
-
-    function maskEmail(email){
-      return String(email || "").replace(/^(.)(.*)(@.*)$/, (_, a, b, c) => a + "*".repeat(Math.min(8, b.length)) + c);
-    }
-
-    async function submitNewsletter(){
-      const email = document.getElementById("nlEmail")?.value || "";
-      const name = document.getElementById("nlName")?.value || "";
-      const note = document.getElementById("nlNote")?.value || "";
-      if(!email.includes("@")){
-        document.getElementById("nlEmail").style.borderColor = "red";
-        return;
-      }
-      const payload = { email, name, note, market: selectedMarket, industryKey: selectedIndustryKey, deployed: isDeployed() };
-
-      const list = loadNewsletter();
-      list.unshift({ ...payload, email: maskEmail(email), ts: Date.now() });
-      saveNewsletter(list);
-
-      try {
-        await fetch("/api/newsletter", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      } catch (e) {}
-
-      const msg = document.getElementById("nlMsg");
-      if(msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("subscribed"))}</div>`;
-      setTimeout(() => { renderCommunity(); }, 700);
-    }
-
-    function addForumPost(){
-      const title = (document.getElementById("fpTitle")?.value || "").trim();
-      const body = (document.getElementById("fpBody")?.value || "").trim();
-      if(title.length < 3 || body.length < 10) return;
-
-      const posts = loadForumPosts();
-      posts.unshift({ id: cryptoRandomId(), title, body, replies: [], ts: Date.now() });
-      saveForumPosts(posts);
-      renderCommunity();
-    }
-
-    function addForumReply(postId){
-      const input = document.getElementById("reply_" + postId);
-      const text = (input?.value || "").trim();
-      if(text.length < 3) return;
-
-      const posts = loadForumPosts();
-      const p = posts.find(x => x.id === postId);
-      if(!p) return;
-      p.replies.push({ text, ts: Date.now() });
-      saveForumPosts(posts);
-      renderCommunity();
-    }
-
-    async function askAiQuestion(){
-      const q = (document.getElementById("qaQuestion")?.value || "").trim();
-      if(q.length < 5) return;
-
-      const out = document.getElementById("qaAnswer");
-      out.innerHTML = `<div class="text-slate-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("thinking"))}</div>`;
-
-      try{
-        const res = await fetch("/api/ai-qa", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            question: q,
-            context: { market: selectedMarket, industryKey: selectedIndustryKey, role: selectedRole, deployed: isDeployed() }
-          })
-        });
-        if(!res.ok) throw new Error("Bad response");
-        const data = await res.json();
-        const answer = data?.answer || data?.text || "No answer returned.";
-        out.innerHTML = `<div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
-          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap">${escapeHtml(answer)}</div>`;
-      } catch(e){
-        out.innerHTML = `
-          <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
-          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-            ${escapeHtml(i18n.t("needs_backend"))}
-            <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 text-[11px] text-slate-300 font-semibold">
-              POST <span class="text-orange-500">/api/ai-qa</span> → { answer: "..." }
-            </div>
-          </div>`;
-      }
-    }
-
-    function renderNewsletterListHtml(){
-      const list = loadNewsletter().slice(0, 8);
-      if(!list.length) return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-6">${escapeHtml(i18n.t("no_signups"))}</div>`;
-      return list.map(x => `
-        <div class="flex items-start justify-between gap-3 py-2 border-b border-white/5">
-          <div>
-            <div class="text-[10px] font-black uppercase tracking-wider text-white">${escapeHtml(x.email)}</div>
-            <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">${escapeHtml(x.name || "—")} • ${escapeHtml(x.market || "—")} • ${escapeHtml(x.industryKey || "—")}</div>
-          </div>
-          <div class="text-[9px] font-black uppercase tracking-widest ${x.deployed ? "text-green-400" : "text-slate-400"}">
-            ${x.deployed ? "DEPLOYED" : "NO DEPLOY"}
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function renderForumHtml(){
-      const posts = loadForumPosts().slice(0, 20);
-      if(!posts.length) return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10">${escapeHtml(i18n.t("no_posts"))}</div>`;
-      return posts.map(p => `
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mb-3">
-          <div class="text-[10px] font-black uppercase tracking-wider text-orange-500">${escapeHtml(p.title)}</div>
-          <div class="text-[11px] text-slate-300 font-semibold leading-relaxed mt-1 whitespace-pre-wrap">${escapeHtml(p.body)}</div>
-          <div class="divider mt-3">Replies</div>
-          <div class="space-y-2">
-            ${(p.replies||[]).slice(-3).map(r => `
-              <div class="text-[11px] text-slate-300 font-semibold leading-relaxed bg-black/20 border border-white/5 rounded-xl p-2 whitespace-pre-wrap">${escapeHtml(r.text)}</div>
-            `).join("") || `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-2">No replies yet</div>`}
-          </div>
-          <div class="grid grid-cols-4 gap-2 mt-3">
-            <input id="reply_${p.id}" class="select-theme col-span-3" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="write_reply" />
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="addForumReply('${p.id}')">${escapeHtml(i18n.t("reply"))}</button>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function setCommunityTab(tab){ communityTab = tab; renderCommunity(); }
-
-    function renderCommunity(){
-      const c = document.getElementById("mContent");
-      const deployedBadge = isDeployed()
-        ? `<span class="text-[9px] font-black uppercase tracking-widest text-green-400">${escapeHtml(i18n.t("deployed_yes"))}</span>`
-        : `<span class="text-[9px] font-black uppercase tracking-widest text-slate-400">${escapeHtml(i18n.t("deployed_no"))}</span>`;
-
-      c.innerHTML = `
-        <div class="pill mb-3">${escapeHtml(i18n.t("community_portal"))}</div>
-        <div class="flex items-center justify-between mb-2">
-          <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">${escapeHtml(i18n.t("newsletter"))} • ${escapeHtml(i18n.t("forum"))} • ${escapeHtml(i18n.t("ai_qa"))}</div>
-          ${deployedBadge}
-        </div>
-
-        <div class="tabbar">
-          <div class="tab ${communityTab==="NEWSLETTER"?"active":""}" onclick="setCommunityTab('NEWSLETTER')">${escapeHtml(i18n.t("newsletter"))}</div>
-          <div class="tab ${communityTab==="FORUM"?"active":""}" onclick="setCommunityTab('FORUM')">${escapeHtml(i18n.t("forum"))}</div>
-          <div class="tab ${communityTab==="QA"?"active":""}" onclick="setCommunityTab('QA')">${escapeHtml(i18n.t("ai_qa"))}</div>
-        </div>
-
-        <div id="communityBody"></div>
-      `;
-
-      const body = document.getElementById("communityBody");
-
-      if(communityTab === "NEWSLETTER"){
-        body.innerHTML = `
-          <div class="card-theme text-left">
-            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("newsletter"))}</div>
-            <div class="grid sm:grid-cols-2 gap-2 mt-3">
-              <input id="nlName" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="name_optional" />
-              <input id="nlEmail" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="email" />
-            </div>
-            <textarea id="nlNote" class="textarea-theme mt-2" style="min-height:110px" data-i18n-placeholder="tell_us_updates"></textarea>
-            <div id="nlMsg" class="mt-2"></div>
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="submitNewsletter()">
-              ${escapeHtml(i18n.t("join_list"))}
-            </button>
-
-            <div class="divider mt-4">Recent Signups (Local)</div>
-            <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 max-h-[160px] overflow-auto">
-              ${renderNewsletterListHtml()}
-            </div>
-          </div>
-        `;
-      }
-
-      if(communityTab === "FORUM"){
-        body.innerHTML = `
-          <div class="grid lg:grid-cols-2 gap-4 text-left">
-            <div class="card-theme">
-              <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("forum"))}</div>
-              <input id="fpTitle" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="title" />
-              <textarea id="fpBody" class="textarea-theme mt-2" data-i18n-placeholder="write_question"></textarea>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="addForumPost()">
-                ${escapeHtml(i18n.t("post"))}
-              </button>
-            </div>
-
-            <div class="card-theme">
-              <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("forum_threads"))}</div>
-              <div class="max-h-[420px] overflow-auto pr-1">
-                ${renderForumHtml()}
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      if(communityTab === "QA"){
-        body.innerHTML = `
-          <div class="card-theme text-left">
-            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
-            <textarea id="qaQuestion" class="textarea-theme mt-2" style="min-height:110px" data-i18n-placeholder="ask_question"></textarea>
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="askAiQuestion()">
-              ${escapeHtml(i18n.t("ask_ai"))}
-            </button>
-            <div id="qaAnswer" class="mt-4"></div>
-          </div>
-        `;
-      }
-
-      i18n.applyTranslations(document.getElementById("setupModal"));
-    }
-
-    function openCommunity(tab){
-      communityTab = tab || "NEWSLETTER";
-      triggerModal("community");
-    }
-
-    // ============================
     // Script Editor (same)
     // ============================
     let scriptEditorDraft = null;
@@ -1792,13 +1613,6 @@ Collect: address, issue description, contact info, urgency.`}
         shell.classList.add('info-wide');
         tEl.innerText = i18n.t("activation_steps_info");
         renderInfoSlide();
-        return;
-      }
-
-      if(step === "community"){
-        shell.classList.add('community-wide');
-        tEl.innerText = i18n.t("community");
-        renderCommunity();
         return;
       }
 
@@ -2184,11 +1998,6 @@ Collect: address, issue description, contact info, urgency.`}
 
       document.getElementById("smbBenefitsBtn").addEventListener("click", openBenefits);
 
-      document.getElementById("qaBtn").addEventListener("click", () => openCommunity("QA"));
-      document.getElementById("forumBtn").addEventListener("click", () => openCommunity("FORUM"));
-      document.getElementById("newsletterTopBtn").addEventListener("click", () => openCommunity("NEWSLETTER"));
-      document.getElementById("newsletterBtn").addEventListener("click", () => openCommunity("NEWSLETTER"));
-
       document.getElementById("s1").addEventListener("click", () => handleStep(1));
       document.getElementById("s2").addEventListener("click", () => handleStep(2));
       document.getElementById("s3").addEventListener("click", () => handleStep(3));
@@ -2222,6 +2031,7 @@ Collect: address, issue description, contact info, urgency.`}
     initLangList();
     wireTopButtons();
 
+    // Template init
     selectedIndustryKey = "Electrical";
     refreshTemplatesForCurrentSelection(true);
     const initTemplates = getTemplatesFor(selectedRole).templates;
