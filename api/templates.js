@@ -6,41 +6,55 @@ export default function handler(req, res) {
     const { industry } = req.query;
 
     const basePath = path.join(process.cwd(), "data", "templates");
-
-    // Load global templates
     const globalPath = path.join(basePath, "global.json");
+
+    // Debug info
+    const debug = {
+      cwd: process.cwd(),
+      basePath,
+      globalPath,
+      baseExists: fs.existsSync(basePath),
+      globalExists: fs.existsSync(globalPath),
+    };
+
+    if (!debug.baseExists) {
+      return res.status(500).json({ error: "Templates folder not found", debug });
+    }
+    if (!debug.globalExists) {
+      return res.status(500).json({ error: "global.json not found", debug });
+    }
+
     const globalRaw = fs.readFileSync(globalPath, "utf8");
-    const globalTemplates = JSON.parse(globalRaw);
 
-    let finalTemplates = globalTemplates.templates || {};
+    let globalJson;
+    try {
+      globalJson = JSON.parse(globalRaw);
+    } catch (jsonErr) {
+      return res.status(500).json({
+        error: "global.json is invalid JSON",
+        jsonError: jsonErr.message,
+        hint: "Most common cause: quotes/newlines in script field not escaped",
+        debug,
+      });
+    }
 
-    // If industry requested and not global, try to merge
+    let finalTemplates = globalJson.templates || {};
+
     if (industry && industry !== "global") {
       const industryPath = path.join(basePath, `${industry}.json`);
-
       if (fs.existsSync(industryPath)) {
         const industryRaw = fs.readFileSync(industryPath, "utf8");
-        const industryTemplates = JSON.parse(industryRaw);
-
-        finalTemplates = {
-          ...finalTemplates,
-          ...(industryTemplates.templates || {})
-        };
+        const industryJson = JSON.parse(industryRaw);
+        finalTemplates = { ...finalTemplates, ...(industryJson.templates || {}) };
       }
     }
 
-    res.setHeader(
-      "Cache-Control",
-      "public, s-maxage=86400, stale-while-revalidate=604800"
-    );
-
-    res.status(200).json({
-      industry: industry || "global",
-      templates: finalTemplates
-    });
-
+    res.status(200).json({ industry: industry || "global", templates: finalTemplates, debug });
   } catch (err) {
-    console.error("Templates API error:", err);
-    res.status(500).json({ error: "Failed to load templates" });
+    res.status(500).json({
+      error: "Templates API crashed",
+      message: err.message,
+      stack: err.stack,
+    });
   }
 }
