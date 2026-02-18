@@ -1142,8 +1142,13 @@
 // =========================
 function enableBenefitsArrowNav() {
   const listEl = document.getElementById("benefitsList");
-  if (!listEl || listEl.dataset.arrowNav === "1") return;
-  listEl.dataset.arrowNav = "1";
+  if (!listEl) return;
+
+// ✅ Prevent double-binding (causes “skips one”)
+if (listEl.dataset.arrowNavBound === "1") return;
+listEl.dataset.arrowNavBound = "1";
+
+  
 
   // Helper: get rows
   const getRows = () => [...listEl.querySelectorAll(".benefit-row")];
@@ -1170,32 +1175,34 @@ function enableBenefitsArrowNav() {
   obs.observe(listEl, { childList: true, subtree: true });
 
   // Key handling
-  listEl.addEventListener("keydown", (e) => {
-    const rows = getRows();
-    if (!rows.length) return;
+// Key handling (overwrite handler to prevent double-binding / “skips one”)
+listEl.onkeydown = (e) => {
+  const rows = getRows();
+  if (!rows.length) return;
 
-    // Enter/Space activates the focused row (like click)
-    if (e.key === "Enter" || e.key === " ") {
-      const focused = document.activeElement?.closest?.(".benefit-row");
-      if (focused && listEl.contains(focused)) {
-        e.preventDefault();
-        focused.click();
-      }
-      return;
-    }
-
-    // Arrow nav cycles + activates
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+  // Enter/Space activates the focused row (like click)
+  if (e.key === "Enter" || e.key === " ") {
+    const focused = document.activeElement?.closest?.(".benefit-row");
+    if (focused && listEl.contains(focused)) {
       e.preventDefault();
-
-      const cur = getActiveIndex();
-      const dir = e.key === "ArrowDown" ? 1 : -1;
-      const next = (cur + dir + rows.length) % rows.length;
-
-      rows[next].focus();
-      rows[next].click(); // keep behavior: moving also updates explanation
+      focused.click();
     }
-  });
+    return;
+  }
+
+  // Arrow nav cycles + activates
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+
+    const cur = getActiveIndex();
+    const dir = e.key === "ArrowDown" ? 1 : -1;
+    const next = (cur + dir + rows.length) % rows.length;
+
+    rows[next].focus();
+    rows[next].click(); // keeps behavior: moving also updates explanation
+  }
+};
+
 }
 
     async function renderBenefits(){
