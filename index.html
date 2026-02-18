@@ -395,6 +395,16 @@
 
     /* Hidden tooltip content kept for future reuse */
     .benefit-tip { display: none; }
+    /* ============================
+   /* A11Y: Keyboard Focus Ring (No layout changes) */
+
+============================ */
+:focus-visible {
+  outline: 2px solid rgba(249, 115, 22, 0.75);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
   </style>
 
   <!-- ✅ Language Engine -->
@@ -1126,6 +1136,67 @@
         if (lb && typeof lb.focus === "function") lb.focus();
       }, 0);
     }
+// =========================
+// A11Y: Benefits keyboard navigation (Arrow Up/Down cycles)
+// Works with #benefitsList and clickable .benefit-row items
+// =========================
+function enableBenefitsArrowNav() {
+  const listEl = document.getElementById("benefitsList");
+  if (!listEl || listEl.dataset.arrowNav === "1") return;
+  listEl.dataset.arrowNav = "1";
+
+  // Helper: get rows
+  const getRows = () => [...listEl.querySelectorAll(".benefit-row")];
+
+  // Helper: current index (based on .active if present, else 0)
+  const getActiveIndex = () => {
+    const rows = getRows();
+    const active = rows.findIndex(r => r.classList.contains("active"));
+    return active >= 0 ? active : 0;
+  };
+
+  // Make benefit rows keyboard-focusable + button semantics (no layout changes)
+  const ensureFocusable = () => {
+    getRows().forEach((row) => {
+      if (!row.hasAttribute("tabindex")) row.setAttribute("tabindex", "0");
+      if (!row.hasAttribute("role")) row.setAttribute("role", "option");
+    });
+  };
+
+  ensureFocusable();
+
+  // Keep focusability if rerender happens
+  const obs = new MutationObserver(() => ensureFocusable());
+  obs.observe(listEl, { childList: true, subtree: true });
+
+  // Key handling
+  listEl.addEventListener("keydown", (e) => {
+    const rows = getRows();
+    if (!rows.length) return;
+
+    // Enter/Space activates the focused row (like click)
+    if (e.key === "Enter" || e.key === " ") {
+      const focused = document.activeElement?.closest?.(".benefit-row");
+      if (focused && listEl.contains(focused)) {
+        e.preventDefault();
+        focused.click();
+      }
+      return;
+    }
+
+    // Arrow nav cycles + activates
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+
+      const cur = getActiveIndex();
+      const dir = e.key === "ArrowDown" ? 1 : -1;
+      const next = (cur + dir + rows.length) % rows.length;
+
+      rows[next].focus();
+      rows[next].click(); // keep behavior: moving also updates explanation
+    }
+  });
+}
 
     async function renderBenefits(){
       const c = document.getElementById("mContent");
@@ -1196,6 +1267,8 @@
           </div>
         `;
       }).join("");
+      enableBenefitsArrowNav();
+
 
       if (desktopNow) {
         const current = smbBenefits[activeBenefitIdx] || smbBenefits[0];
@@ -1580,6 +1653,92 @@ Collect: address, issue description, contact info, urgency.`}
       document.getElementById("modalShell").classList.remove("script-wide");
       triggerModal(4);
     }
+    // ============================
+// ✅ Accessibility: Focus Trap + Restore Focus
+// ============================
+
+let lastFocusEl = null;
+let focusTrapCleanup = null;
+
+function getFocusableElements(container){
+  const selectors = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+  ];
+  return Array.from(container.querySelectorAll(selectors.join(',')))
+    .filter(el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length));
+}
+
+function enableFocusTrap(modalRoot, contentRoot){
+  if(typeof focusTrapCleanup === "function") focusTrapCleanup();
+
+  function onKeyDown(e){
+    if(e.key !== "Tab") return;
+
+    const focusables = getFocusableElements(contentRoot);
+    if(!focusables.length){
+      e.preventDefault();
+      modalRoot.focus();
+      return;
+    }
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+
+    if(e.shiftKey){
+      if(active === first || active === modalRoot){
+        e.preventDefault();
+        last.focus();
+      }
+      return;
+    }
+
+    if(active === last){
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
+  modalRoot.addEventListener("keydown", onKeyDown);
+
+  focusTrapCleanup = () => {
+    modalRoot.removeEventListener("keydown", onKeyDown);
+    focusTrapCleanup = null;
+  };
+}
+
+function focusFirstInModal(){
+  const modal = document.getElementById("setupModal");
+  const shell = document.getElementById("modalShell");
+  const focusables = getFocusableElements(shell);
+  if(focusables.length) focusables[0].focus();
+  else modal.focus();
+}
+
+function openModalA11y(){
+  lastFocusEl = document.activeElement;
+  const modal = document.getElementById("setupModal");
+  const shell = document.getElementById("modalShell");
+
+  enableFocusTrap(modal, shell);
+  setTimeout(focusFirstInModal, 0);
+}
+
+function closeModalA11y(){
+  if(typeof focusTrapCleanup === "function") focusTrapCleanup();
+
+  if(lastFocusEl && typeof lastFocusEl.focus === "function"){
+    setTimeout(() => {
+      try { lastFocusEl.focus(); } catch {}
+    }, 0);
+  }
+  lastFocusEl = null;
+}
 
     // ============================
     // MODAL FLOW
@@ -1595,7 +1754,10 @@ Collect: address, issue description, contact info, urgency.`}
       return b;
     }
 
-    function closeModal(){ document.getElementById('setupModal').style.display = 'none'; }
+    function closeModal(){
+  document.getElementById('setupModal').style.display = 'none';
+  closeModalA11y();
+}
 
     async function triggerModal(step){
       lastModalStep = step;
@@ -1608,8 +1770,11 @@ Collect: address, issue description, contact info, urgency.`}
 
       shell.classList.remove('role-wide','info-wide','community-wide','script-wide','benefits-wide');
       m.style.display = 'flex';
-      c.innerHTML = "";
-      s.innerHTML = "";
+      m.style.display = 'flex';
+c.innerHTML = "";
+s.innerHTML = "";
+openModalA11y();
+
 
       if(step === "info"){
         shell.classList.add('info-wide');
@@ -2008,6 +2173,11 @@ Collect: address, issue description, contact info, urgency.`}
       document.getElementById("s6").addEventListener("click", () => handleStep(6));
 
       document.getElementById("mClose").addEventListener("click", closeModal);
+      // ✅ Click outside modal content closes modal (overlay only)
+document.getElementById("setupModal").addEventListener("click", (e) => {
+  if (e.target && e.target.id === "setupModal") closeModal();
+});
+
 
       document.getElementById("langTrigger").addEventListener("click", (e) => {
         e.stopPropagation();
