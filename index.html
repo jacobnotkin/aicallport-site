@@ -98,7 +98,7 @@
       50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
     }
 
-    /* blinking SMB benefits button (uses same glow feel) */
+    /* ✅ NEW: blinking SMB benefits button (uses same glow feel) */
     .benefits-blink {
       animation: border-glow 2s infinite ease-in-out !important;
       border-color: rgba(249, 115, 22, 0.55) !important;
@@ -156,7 +156,6 @@
       pointer-events: auto;
     }
 
-    /* Modal */
     #setupModal {
       position: fixed;
       inset: 0;
@@ -189,6 +188,7 @@
     .modal-shell.info-wide { max-width: 900px; }
     .modal-shell.community-wide { max-width: 1120px; }
     .modal-shell.script-wide { max-width: 1120px; }
+    /* ✅ benefits wide */
     .modal-shell.benefits-wide { max-width: 1120px; }
 
     .modal-content-wrap {
@@ -368,7 +368,7 @@
       overflow: auto;
     }
 
-    /* Benefits list styling */
+    /* ✅ Benefits rows (clickable, no hover-select) */
     .benefit-row {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.10);
@@ -377,36 +377,70 @@
       cursor: pointer;
       user-select: none;
       transition: 0.18s;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
-    /* no hover needed; keep minimal */
+    /* keep visual hover, but does NOT change selection */
+    .benefit-row:hover {
+      border-color: rgba(249,115,22,0.55);
+      background: rgba(249,115,22,0.10);
+    }
     .benefit-row.active {
       border-color: rgba(249,115,22,0.8);
       background: rgba(249,115,22,0.14);
     }
-
-    /* Mobile inline explanation area under a benefit row */
-    .benefit-inline {
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 12px;
-      background: rgba(0,0,0,0.25);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: rgba(226,232,240,0.92);
-      font-size: 12px;
-      font-weight: 700;
-      line-height: 1.55;
-      white-space: pre-wrap;
+    .benefit-row:focus-visible{
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.35);
+      border-color: rgba(249,115,22,0.8);
     }
 
-    /* A11Y: Keyboard Focus Ring (No layout changes) */
-    :focus-visible {
-      outline: 2px solid rgba(249, 115, 22, 0.75);
-      outline-offset: 3px;
+    /* ✅ (C) Selected marker icon */
+    .benefit-marker{
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(249,115,22,0.95);
+      opacity: 0;
+      transform: translateY(-1px);
+      transition: 0.15s;
+      flex: 0 0 auto;
+    }
+    .benefit-row.active .benefit-marker{
+      opacity: 1;
+    }
+
+    /* ✅ (A) Mobile inline explanation expand/collapse animation */
+    .benefit-inline {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.06);
       border-radius: 12px;
+      margin-top: 10px;
+      padding: 10px 12px;
+
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+
+      transition: max-height 260ms ease, opacity 220ms ease;
+      will-change: max-height, opacity;
+    }
+    .benefit-inline.open {
+      max-height: 260px; /* enough for multi-line copy */
+      opacity: 1;
+    }
+
+    /* Helper: show/hide desktop panel vs mobile inline */
+    @media (max-width: 1023px){
+      .benefits-desktop-panel { display: none !important; }
+    }
+    @media (min-width: 1024px){
+      .benefits-mobile-inline { display: none !important; }
     }
   </style>
 
-  <!-- Language Engine -->
+  <!-- ✅ Language Engine -->
   <script>
     const LANG_STORAGE_KEY = "aicallport_lang";
     const I18N_CACHE_KEY = "aicallport_i18n_cache_v1";
@@ -564,9 +598,10 @@
         deployed_yes: "Deployed: YES",
         deployed_no: "Deployed: NO",
 
+        /* ✅ SMB Benefits */
         smb_benefits: "SMB Benefits",
         smb_benefits_title: "Small Business Benefits",
-        hover_to_learn: "Select a benefit to see details",
+        hover_to_learn: "Click a benefit to see details",
         benefits_close: "Close"
       },
 
@@ -609,7 +644,7 @@
         const data = await res.json();
         if (data && data.map) dynSet(code, namespace, data.map);
       } catch(e){
-        // fallback
+        // no backend: EN fallback
       }
     }
 
@@ -814,8 +849,8 @@
   </div>
 
   <!-- Modal -->
-  <div id="setupModal" role="dialog" aria-modal="true" tabindex="-1">
-    <div id="modalShell" class="modal-shell" role="document" aria-labelledby="mTitle">
+  <div id="setupModal">
+    <div id="modalShell" class="modal-shell">
       <div class="modal-content-wrap">
         <div class="modal-titlebar">
           <h2 id="mTitle" class="text-lg font-black uppercase text-white" data-i18n="setup">Setup</h2>
@@ -1100,25 +1135,25 @@
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
     // ============================
-    // SMB BENEFITS
+    // SMB BENEFITS (clickable, keyboard, mobile inline, A/B/C)
     // ============================
     const smbBenefits = [
-      { title:"High Quality AI Call Agents", desc:"Reliable inbound call handling built for real small businesses. No call-center scripts. Professional tone and fast capture of details." },
-      { title:"Multiple Roles (Receptionist, Booking, Sales, Support, After-Hours)", desc:"Choose the agent role you need today — and switch anytime. Use different roles for business hours vs after-hours/weekends." },
-      { title:"Full Control Before + After Deployment", desc:"Select role, template, and voice before deployment. After deployment, you keep control via your client dashboard (role/voice/script/hours)." },
-      { title:"Deploy in Minutes (6-Step Protocol)", desc:"A simple activation protocol — Market → Industry → Business → Role/Template/Voice → Demo → Deploy. No meetings. No onboarding calls." },
-      { title:"Worldwide + Multilingual", desc:"Global routing + multilingual experience for your customers. Your business can answer calls in the language your customer speaks." },
-      { title:"Unlimited Inbound Calls", desc:"No per-minute surprises. Handle inbound calls at scale." },
-      { title:"Pay Monthly • No Contract", desc:"Fair and transparent: monthly billing, cancel anytime." },
-      { title:"Secure Payments via Stripe", desc:"Secure payment processing through Stripe." },
-      { title:"No Salesman • No Human Layer", desc:"This is a self-serve operational console. No human gatekeepers. Turn ON your AI call agent when you are ready." },
-      { title:"Referral Discount (Up to $0/mo)", desc:"After activation you get a referral link. Each referral reduces your monthly payment by $10. More referrals = lower monthly cost (down to $0/mo)." }
+      { title: "High Quality AI Call Agents", desc: "Reliable inbound call handling built for real small businesses. No call-center scripts. Professional tone and fast capture of details." },
+      { title: "Multiple Roles (Receptionist, Booking, Sales, Support, After-Hours)", desc: "Choose the agent role you need today — and switch anytime. Use different roles for business hours vs after-hours/weekends." },
+      { title: "Full Control Before + After Deployment", desc: "Select role, template, and voice before deployment. After deployment, you keep control via your client dashboard (role/voice/script/hours)." },
+      { title: "Deploy in Minutes (6-Step Protocol)", desc: "A simple activation protocol — Market → Industry → Business → Role/Template/Voice → Demo → Deploy. No meetings. No onboarding calls." },
+      { title: "Worldwide + Multilingual", desc: "Global routing + multilingual experience for your customers. Your business can answer calls in the language your customer speaks." },
+      { title: "Unlimited Inbound Calls", desc: "No per-minute surprises. Handle inbound calls at scale." },
+      { title: "Pay Monthly • No Contract", desc: "Fair and transparent: monthly billing, cancel anytime." },
+      { title: "Secure Payments via Stripe", desc: "Secure payment processing through Stripe." },
+      { title: "No Salesman • No Human Layer", desc: "This is a self-serve operational console. No human gatekeepers. Turn ON your AI call agent when you are ready." },
+      { title: "Referral Discount (Up to $0/mo)", desc: "After activation you get a referral link. Each referral reduces your monthly payment by $10. More referrals = lower monthly cost (down to $0/mo)." }
     ];
 
     let activeBenefitIdx = 0;
 
-    function isDesktopBenefitsLayout(){
-      return window.innerWidth >= 1024;
+    function isMobileBenefitsMode(){
+      return window.matchMedia && window.matchMedia("(max-width: 1023px)").matches;
     }
 
     function openBenefits(){
@@ -1126,25 +1161,8 @@
       triggerModal("benefits");
     }
 
-    // Step 1 UX polish: smooth scroll active into view
-    function scrollBenefitIntoView(idx, behavior){
-      const list = document.getElementById("benefitsList");
-      if (!list) return;
-      const el = document.getElementById(`benefit-opt-${idx}`);
-      if (!el) return;
-
-      // only scroll the list container, not the whole page
-      try {
-        el.scrollIntoView({ block: "nearest", inline: "nearest", behavior: behavior || "smooth" });
-      } catch {
-        // older browsers
-        el.scrollIntoView();
-      }
-    }
-
     function renderBenefits(){
       const c = document.getElementById("mContent");
-      const desktopNow = isDesktopBenefitsLayout();
       const current = smbBenefits[activeBenefitIdx] || smbBenefits[0];
 
       c.innerHTML = `
@@ -1154,12 +1172,23 @@
         <div class="grid lg:grid-cols-2 gap-4 text-left">
           <div class="card-theme">
             <div class="mini text-orange-500 mb-2">Benefits</div>
-            <div id="benefitsList" class="grid gap-2" role="listbox" tabindex="0" aria-activedescendant="benefit-opt-0"></div>
+
+            <!-- listbox for keyboard -->
+            <div id="benefitsListWrap"
+                 role="listbox"
+                 aria-label="SMB Benefits"
+                 aria-activedescendant="benefit_opt_${activeBenefitIdx}"
+                 tabindex="0"
+                 class="grid gap-2">
+              <!-- rows injected -->
+            </div>
           </div>
 
-          <div class="card-theme ${desktopNow ? "" : "hidden"}" id="benefitsExplainCard">
+          <!-- Desktop explanation panel -->
+          <div class="card-theme benefits-desktop-panel">
             <div class="mini text-orange-500 mb-2">Explanation</div>
-            <div id="benefitExplain" class="text-[12px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap"></div>
+            <!-- font +15%: 12px -> 14px -->
+            <div id="benefitExplain" class="text-[14px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap"></div>
             <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
               Tip: This content can also be reused later inside the client dashboard.
             </div>
@@ -1176,211 +1205,142 @@
         </div>
       `;
 
-      const list = document.getElementById("benefitsList");
-
-      list.innerHTML = smbBenefits.map((b, idx) => {
+      const listWrap = document.getElementById("benefitsListWrap");
+      listWrap.innerHTML = smbBenefits.map((b, idx) => {
         const isActive = idx === activeBenefitIdx;
-        const inlineMobile = (!desktopNow && isActive) ? `
-          <div class="benefit-inline" id="benefit-inline-${idx}">
-            ${escapeHtml(b.desc)}
-          </div>
-        ` : "";
+        const inlineOpen = isActive ? "open" : "";
+        const inlineId = `benefit_inline_${idx}`;
 
         return `
-          <div
-            id="benefit-opt-${idx}"
-            class="benefit-row ${isActive ? "active" : ""}"
-            data-idx="${idx}"
-            role="option"
-            aria-selected="${isActive ? "true" : "false"}"
-            tabindex="-1"
-            onclick="onBenefitClick(${idx})"
-          >
-            <div class="text-[10px] font-black uppercase tracking-widest text-white">${escapeHtml(b.title)}</div>
-            ${inlineMobile}
+          <div>
+            <div id="benefit_opt_${idx}"
+                 class="benefit-row ${isActive ? "active" : ""}"
+                 role="option"
+                 aria-selected="${isActive ? "true" : "false"}"
+                 tabindex="-1"
+                 data-idx="${idx}"
+                 onclick="selectBenefit(${idx}, { scroll:true, focusList:false })">
+              <div class="text-[10px] font-black uppercase tracking-widest text-white">
+                ${escapeHtml(b.title)}
+              </div>
+              <span class="benefit-marker" aria-hidden="true">✓</span>
+            </div>
+
+            <!-- Mobile-only inline explanation (A: animated expand/collapse) -->
+            <div id="${inlineId}" class="benefit-inline benefits-mobile-inline ${inlineOpen}">
+              <div class="text-[14px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap">
+                ${escapeHtml(b.desc)}
+              </div>
+            </div>
           </div>
         `;
       }).join("");
 
-      // Desktop explanation panel
+      // Desktop panel content
       const explain = document.getElementById("benefitExplain");
       if (explain) explain.textContent = current?.desc || "";
 
-      // Step 1 polish: keep active in view
-      list.setAttribute("aria-activedescendant", `benefit-opt-${activeBenefitIdx}`);
-      scrollBenefitIntoView(activeBenefitIdx, "auto");
-
-      // Bind keyboard nav once
-      enableBenefitsArrowNav();
+      // Keyboard (Arrow Up/Down, Home/End, Enter/Space)
+      bindBenefitsKeyboard();
 
       i18n.applyTranslations(document.getElementById("setupModal"));
     }
 
-    function onBenefitClick(idx){
-      const desktop = isDesktopBenefitsLayout();
-      // On mobile: toggles inline explanation open/close for same row
-      const same = idx === activeBenefitIdx;
-      if (!desktop && same){
-        // toggle mobile inline by setting "no active"
-        // But we still want one active always for keyboard; so we emulate toggle
-        // by just re-rendering (inline only exists on active)
-        // If you want true close-to-none, we can add a "mobileExpanded" flag.
-        renderBenefits();
-        scrollBenefitIntoView(idx, "smooth");
-        return;
+    function selectBenefit(idx, opts){
+      const options = opts || {};
+      const clamped = Math.max(0, Math.min(smbBenefits.length - 1, Number(idx)));
+      if (!Number.isFinite(clamped)) return;
+
+      activeBenefitIdx = clamped;
+
+      // Update aria-activedescendant
+      const wrap = document.getElementById("benefitsListWrap");
+      if (wrap) wrap.setAttribute("aria-activedescendant", `benefit_opt_${activeBenefitIdx}`);
+
+      // Update active class + aria-selected + marker is handled by class
+      document.querySelectorAll(".benefit-row").forEach((el) => {
+        const i = Number(el.getAttribute("data-idx"));
+        const isActive = i === activeBenefitIdx;
+        el.classList.toggle("active", isActive);
+        el.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+
+      // Update desktop explanation
+      const explain = document.getElementById("benefitExplain");
+      const current = smbBenefits[activeBenefitIdx];
+      if (explain && current) explain.textContent = current.desc;
+
+      // Update mobile inline open/close (A: animation via class)
+      for(let i=0;i<smbBenefits.length;i++){
+        const inline = document.getElementById(`benefit_inline_${i}`);
+        if (!inline) continue;
+        inline.classList.toggle("open", i === activeBenefitIdx);
       }
 
-      activeBenefitIdx = idx;
-      renderBenefits();
-      scrollBenefitIntoView(idx, "smooth");
-    }
-
-    // ============================
-    // Accessibility: Focus Trap + Restore Focus
-    // ============================
-    let lastFocusEl = null;
-    let focusTrapCleanup = null;
-
-    function getFocusableElements(container){
-      const selectors = [
-        'a[href]',
-        'button:not([disabled])',
-        'input:not([disabled])',
-        'select:not([disabled])',
-        'textarea:not([disabled])',
-        '[tabindex]:not([tabindex="-1"])'
-      ];
-      return Array.from(container.querySelectorAll(selectors.join(',')))
-        .filter(el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length));
-    }
-
-    function enableFocusTrap(modalRoot, contentRoot){
-      if(typeof focusTrapCleanup === "function") focusTrapCleanup();
-
-      function onKeyDown(e){
-        if(e.key !== "Tab") return;
-
-        const focusables = getFocusableElements(contentRoot);
-        if(!focusables.length){
-          e.preventDefault();
-          modalRoot.focus();
-          return;
-        }
-
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-        const active = document.activeElement;
-
-        if(e.shiftKey){
-          if(active === first || active === modalRoot){
-            e.preventDefault();
-            last.focus();
-          }
-          return;
-        }
-
-        if(active === last){
-          e.preventDefault();
-          first.focus();
+      // Scroll active into view (keyboard usability)
+      if (options.scroll){
+        const activeEl = document.getElementById(`benefit_opt_${activeBenefitIdx}`);
+        if (activeEl && typeof activeEl.scrollIntoView === "function"){
+          activeEl.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
         }
       }
 
-      modalRoot.addEventListener("keydown", onKeyDown);
-
-      focusTrapCleanup = () => {
-        modalRoot.removeEventListener("keydown", onKeyDown);
-        focusTrapCleanup = null;
-      };
-    }
-
-    function focusFirstInModal(){
-      const modal = document.getElementById("setupModal");
-      const shell = document.getElementById("modalShell");
-      const focusables = getFocusableElements(shell);
-      if(focusables.length) focusables[0].focus();
-      else modal.focus();
-    }
-
-    function openModalA11y(){
-      lastFocusEl = document.activeElement;
-      const modal = document.getElementById("setupModal");
-      const shell = document.getElementById("modalShell");
-      enableFocusTrap(modal, shell);
-      setTimeout(focusFirstInModal, 0);
-    }
-
-    function closeModalA11y(){
-      if(typeof focusTrapCleanup === "function") focusTrapCleanup();
-      if(lastFocusEl && typeof lastFocusEl.focus === "function"){
-        setTimeout(() => {
-          try { lastFocusEl.focus(); } catch {}
-        }, 0);
+      // Optional: keep keyboard focus on the list container
+      if (options.focusList){
+        document.getElementById("benefitsListWrap")?.focus();
       }
-      lastFocusEl = null;
     }
 
-    // ============================
-    // Benefits keyboard navigation (single handler, no skipping)
-    // ============================
-    function enableBenefitsArrowNav(){
-      const listEl = document.getElementById("benefitsList");
-      if (!listEl) return;
+    let benefitsKeyboardBound = false;
+    function bindBenefitsKeyboard(){
+      if (benefitsKeyboardBound) return;
+      benefitsKeyboardBound = true;
 
-      // prevent rebinding
-      if (listEl.dataset.arrowNavBound === "1") return;
-      listEl.dataset.arrowNavBound = "1";
+      const wrap = document.getElementById("benefitsListWrap");
+      if (!wrap) return;
 
-      const getRows = () => [...listEl.querySelectorAll(".benefit-row")];
-      const getActiveIndex = () => {
-        const rows = getRows();
-        const active = rows.findIndex(r => r.classList.contains("active"));
-        return active >= 0 ? active : 0;
-      };
-
-      // listbox pattern: keep focus on list, rows not tabbable
-      const ensureFocusable = () => {
-        if (!listEl.hasAttribute("tabindex")) listEl.setAttribute("tabindex", "0");
-        if (!listEl.hasAttribute("role")) listEl.setAttribute("role", "listbox");
-        getRows().forEach(row => {
-          row.setAttribute("tabindex", "-1");
-          row.setAttribute("role", "option");
-        });
-      };
-      ensureFocusable();
-
-      // keydown capture + stopImmediatePropagation prevents any future duplicates
-      listEl.addEventListener("keydown", (e) => {
+      // Make the list focusable (already tabindex=0)
+      wrap.addEventListener("keydown", (e) => {
         const key = e.key;
-        if (key !== "ArrowDown" && key !== "ArrowUp" && key !== "Enter" && key !== " ") return;
+
+        // only handle keys we care about
+        const handled =
+          key === "ArrowDown" || key === "ArrowUp" ||
+          key === "Home" || key === "End" ||
+          key === "Enter" || key === " ";
+
+        if (!handled) return;
 
         e.preventDefault();
-        e.stopImmediatePropagation();
         e.stopPropagation();
 
-        const rows = getRows();
-        if (!rows.length) return;
-
-        const cur = getActiveIndex();
-
-        if (key === "ArrowDown" || key === "ArrowUp") {
-          const dir = key === "ArrowDown" ? 1 : -1;
-          const next = (cur + dir + rows.length) % rows.length;
-
-          activeBenefitIdx = next;
-          renderBenefits();
-
-          // Step 1 polish: smooth keep-in-view
-          setTimeout(() => scrollBenefitIntoView(next, "smooth"), 0);
-
-          // keep focus on list
-          if (document.activeElement !== listEl) listEl.focus();
+        // (B) Home / End support
+        if (key === "Home") {
+          selectBenefit(0, { scroll:true, focusList:false });
+          return;
+        }
+        if (key === "End") {
+          selectBenefit(smbBenefits.length - 1, { scroll:true, focusList:false });
           return;
         }
 
-        // Enter/Space activates current row (mobile toggles inline; desktop updates panel)
-        onBenefitClick(cur);
-        if (document.activeElement !== listEl) listEl.focus();
-      }, true);
+        if (key === "ArrowDown") {
+          const next = (activeBenefitIdx + 1) % smbBenefits.length;
+          selectBenefit(next, { scroll:true, focusList:false });
+          return;
+        }
+        if (key === "ArrowUp") {
+          const prev = (activeBenefitIdx - 1 + smbBenefits.length) % smbBenefits.length;
+          selectBenefit(prev, { scroll:true, focusList:false });
+          return;
+        }
+
+        // Enter/Space activates (same as selecting, keeps list focused)
+        if (key === "Enter" || key === " ") {
+          selectBenefit(activeBenefitIdx, { scroll:true, focusList:false });
+          return;
+        }
+      });
     }
 
     // ============================
@@ -1576,7 +1536,7 @@ Collect: address, issue description, contact info, urgency.`}
     function onVoiceChange(id){ selectedVoiceId = id; }
 
     // ============================
-    // Community (same)
+    // Community (same as your version)
     // ============================
     let communityTab = "NEWSLETTER";
 
@@ -1813,7 +1773,7 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     // ============================
-    // Script Editor (kept)
+    // Script Editor (same)
     // ============================
     let scriptEditorDraft = null;
 
@@ -1909,9 +1869,10 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     // ============================
-    // MODAL FLOW
+    // MODAL FLOW + Accessibility helpers
     // ============================
     let lastModalStep = null;
+    let lastFocusedEl = null;
 
     function createBtn(txt, fn){
       const b = document.createElement('button');
@@ -1922,13 +1883,60 @@ Collect: address, issue description, contact info, urgency.`}
       return b;
     }
 
+    function trapFocusInModal(){
+      const modal = document.getElementById("setupModal");
+      const shell = document.getElementById("modalShell");
+      if(!modal || !shell) return;
+
+      const selectors = [
+        'button:not([disabled])',
+        'a[href]',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        '[tabindex]:not([tabindex="-1"])'
+      ].join(',');
+
+      const focusables = () => Array.from(shell.querySelectorAll(selectors))
+        .filter(el => el.offsetParent !== null); // visible
+
+      function onKeydown(e){
+        if(modal.style.display !== "flex") return;
+        if(e.key !== "Tab") return;
+
+        const items = focusables();
+        if(!items.length) return;
+
+        const first = items[0];
+        const last = items[items.length - 1];
+
+        if(e.shiftKey && document.activeElement === first){
+          e.preventDefault(); last.focus(); return;
+        }
+        if(!e.shiftKey && document.activeElement === last){
+          e.preventDefault(); first.focus(); return;
+        }
+      }
+
+      // ensure only one listener
+      if(!window.__aicallport_modalTrapBound){
+        window.__aicallport_modalTrapBound = true;
+        document.addEventListener("keydown", onKeydown, true);
+      }
+    }
+
     function closeModal(){
       document.getElementById('setupModal').style.display = 'none';
-      closeModalA11y();
+      // restore focus for accessibility
+      try { lastFocusedEl?.focus?.(); } catch(e){}
+      lastFocusedEl = null;
     }
 
     async function triggerModal(step){
       lastModalStep = step;
+
+      // record last focus before opening
+      lastFocusedEl = document.activeElement;
 
       const m = document.getElementById('setupModal');
       const c = document.getElementById('mContent');
@@ -1940,7 +1948,8 @@ Collect: address, issue description, contact info, urgency.`}
       m.style.display = 'flex';
       c.innerHTML = "";
       s.innerHTML = "";
-      openModalA11y();
+
+      trapFocusInModal();
 
       if(step === "info"){
         shell.classList.add('info-wide');
@@ -1959,12 +1968,10 @@ Collect: address, issue description, contact info, urgency.`}
       if(step === "benefits"){
         shell.classList.add('benefits-wide');
         tEl.innerText = i18n.t("smb_benefits");
+        benefitsKeyboardBound = false; // allow rebinding safely per open
         renderBenefits();
-        // keep focus on listbox for keyboard users
-        setTimeout(() => {
-          const list = document.getElementById("benefitsList");
-          if(list) list.focus();
-        }, 0);
+        // focus list container after paint
+        setTimeout(() => document.getElementById("benefitsListWrap")?.focus(), 30);
         return;
       }
 
@@ -2112,7 +2119,9 @@ Collect: address, issue description, contact info, urgency.`}
       }
     }
 
+    // ============================
     // Step 1 rendering
+    // ============================
     function renderMarketByContinent(searchQuery){
       const c = document.getElementById('mContent');
       c.innerHTML = "";
@@ -2338,7 +2347,6 @@ Collect: address, issue description, contact info, urgency.`}
       document.getElementById("heroCta").addEventListener("click", () => handleStep(1));
       document.getElementById("sideCta").addEventListener("click", () => handleStep(1));
       document.getElementById("activationInfoBtn").addEventListener("click", openActivationInfo);
-
       document.getElementById("smbBenefitsBtn").addEventListener("click", openBenefits);
 
       document.getElementById("qaBtn").addEventListener("click", () => openCommunity("QA"));
@@ -2355,7 +2363,7 @@ Collect: address, issue description, contact info, urgency.`}
 
       document.getElementById("mClose").addEventListener("click", closeModal);
 
-      // click outside modal closes (overlay only)
+      // Click outside modal closes
       document.getElementById("setupModal").addEventListener("click", (e) => {
         if (e.target && e.target.id === "setupModal") closeModal();
       });
