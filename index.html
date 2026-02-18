@@ -438,6 +438,13 @@
     @media (min-width: 1024px){
       .benefits-mobile-inline { display: none !important; }
     }
+
+    /* ✅ Reduced motion (no redesign) */
+    @media (prefers-reduced-motion: reduce){
+      .benefit-inline { transition: none !important; }
+      .benefits-blink { animation: none !important; }
+      .next-focus { animation: none !important; }
+    }
   </style>
 
   <!-- ✅ Language Engine -->
@@ -1136,6 +1143,7 @@
 
     // ============================
     // SMB BENEFITS (clickable, keyboard, mobile inline, A/B/C)
+    // + Persistence + Deep-link + Typeahead (extension only)
     // ============================
     const smbBenefits = [
       { title: "High Quality AI Call Agents", desc: "Reliable inbound call handling built for real small businesses. No call-center scripts. Professional tone and fast capture of details." },
@@ -1152,12 +1160,49 @@
 
     let activeBenefitIdx = 0;
 
+    // ✅ Persist + deep-link helpers (session storage + URL hash)
+    const BENEFITS_SEL_KEY = "aicallport_benefits_selected_idx";
+    const BENEFITS_HASH_PREFIX = "benefits=";
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function getSavedBenefitIdx(){
+      const v = Number(sessionStorage.getItem(BENEFITS_SEL_KEY));
+      return Number.isFinite(v) ? clamp(v, 0, smbBenefits.length - 1) : null;
+    }
+    function saveBenefitIdx(idx){
+      try { sessionStorage.setItem(BENEFITS_SEL_KEY, String(idx)); } catch {}
+    }
+
+    function readBenefitsIdxFromHash(){
+      const h = (location.hash || "").replace("#", "").trim();
+      if(!h.startsWith(BENEFITS_HASH_PREFIX)) return null;
+      const raw = h.slice(BENEFITS_HASH_PREFIX.length);
+      const n = Number(raw);
+      return Number.isFinite(n) ? clamp(n, 0, smbBenefits.length - 1) : null;
+    }
+
+    function writeBenefitsIdxToHash(idx){
+      try{
+        const next = `#${BENEFITS_HASH_PREFIX}${idx}`;
+        if(location.hash === next) return;
+        history.replaceState(null, "", next);
+      } catch {}
+    }
+
     function isMobileBenefitsMode(){
       return window.matchMedia && window.matchMedia("(max-width: 1023px)").matches;
     }
 
+    // ✅ Updated: restores selection (hash > saved > default)
     function openBenefits(){
-      activeBenefitIdx = 0;
+      const fromHash = readBenefitsIdxFromHash();
+      const fromSaved = getSavedBenefitIdx();
+
+      if(fromHash != null) activeBenefitIdx = fromHash;
+      else if(fromSaved != null) activeBenefitIdx = fromSaved;
+      else activeBenefitIdx = 0;
+
       triggerModal("benefits");
     }
 
@@ -1240,7 +1285,7 @@
       const explain = document.getElementById("benefitExplain");
       if (explain) explain.textContent = current?.desc || "";
 
-      // Keyboard (Arrow Up/Down, Home/End, Enter/Space)
+      // Keyboard (Arrow Up/Down, Home/End, Enter/Space) + Typeahead
       bindBenefitsKeyboard();
 
       i18n.applyTranslations(document.getElementById("setupModal"));
@@ -1252,6 +1297,10 @@
       if (!Number.isFinite(clamped)) return;
 
       activeBenefitIdx = clamped;
+
+      // ✅ Persist + URL sync (extension only)
+      saveBenefitIdx(activeBenefitIdx);
+      writeBenefitsIdxToHash(activeBenefitIdx);
 
       // Update aria-activedescendant
       const wrap = document.getElementById("benefitsListWrap");
@@ -1291,38 +1340,52 @@
       }
     }
 
-    let benefitsKeyboardBound = false;
+    // ✅ Keyboard: dedupe binding + typeahead buffer
+    let __benefitsTypeahead = { buf: "", t: null };
+
     function bindBenefitsKeyboard(){
-      if (benefitsKeyboardBound) return;
-      benefitsKeyboardBound = true;
-
       const wrap = document.getElementById("benefitsListWrap");
-      if (!wrap) return;
+      if(!wrap) return;
 
-      // Make the list focusable (already tabindex=0)
+      // Prevent duplicate binding on re-open
+      if (wrap.dataset.bound === "1") return;
+      wrap.dataset.bound = "1";
+
       wrap.addEventListener("keydown", (e) => {
         const key = e.key;
 
-        // only handle keys we care about
+        // existing nav keys
         const handled =
           key === "ArrowDown" || key === "ArrowUp" ||
           key === "Home" || key === "End" ||
           key === "Enter" || key === " ";
 
-        if (!handled) return;
+        // typeahead: alphanumerics
+        const isTypeKey = key.length === 1 && /[a-z0-9]/i.test(key);
 
+        if (!handled && !isTypeKey) return;
+
+        // Typeahead
+        if (isTypeKey){
+          e.preventDefault();
+          e.stopPropagation();
+
+          clearTimeout(__benefitsTypeahead.t);
+          __benefitsTypeahead.buf += key.toLowerCase();
+          __benefitsTypeahead.t = setTimeout(() => { __benefitsTypeahead.buf = ""; }, 700);
+
+          const q = __benefitsTypeahead.buf;
+          const found = smbBenefits.findIndex(b => (b.title || "").toLowerCase().startsWith(q));
+          if(found >= 0) selectBenefit(found, { scroll:true, focusList:false });
+          return;
+        }
+
+        // Navigation keys
         e.preventDefault();
         e.stopPropagation();
 
-        // (B) Home / End support
-        if (key === "Home") {
-          selectBenefit(0, { scroll:true, focusList:false });
-          return;
-        }
-        if (key === "End") {
-          selectBenefit(smbBenefits.length - 1, { scroll:true, focusList:false });
-          return;
-        }
+        if (key === "Home") { selectBenefit(0, { scroll:true, focusList:false }); return; }
+        if (key === "End")  { selectBenefit(smbBenefits.length - 1, { scroll:true, focusList:false }); return; }
 
         if (key === "ArrowDown") {
           const next = (activeBenefitIdx + 1) % smbBenefits.length;
@@ -1335,7 +1398,6 @@
           return;
         }
 
-        // Enter/Space activates (same as selecting, keeps list focused)
         if (key === "Enter" || key === " ") {
           selectBenefit(activeBenefitIdx, { scroll:true, focusList:false });
           return;
@@ -1800,6 +1862,8 @@ Collect: address, issue description, contact info, urgency.`}
       shell.classList.add("script-wide");
 
       m.style.display = "flex";
+      lockBodyScroll(); // ✅ extension: lock background scroll
+
       s.innerHTML = "";
       tEl.innerText = i18n.t("script_editor_title");
 
@@ -1874,6 +1938,34 @@ Collect: address, issue description, contact info, urgency.`}
     let lastModalStep = null;
     let lastFocusedEl = null;
 
+    // ✅ Extension: Body scroll lock for modal (no UI changes)
+    let __scrollY = 0;
+    let __bodyLocked = false;
+
+    function lockBodyScroll(){
+      if (__bodyLocked) return;
+      __bodyLocked = true;
+      __scrollY = window.scrollY || 0;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${__scrollY}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
+    }
+
+    function unlockBodyScroll(){
+      if (!__bodyLocked) return;
+      __bodyLocked = false;
+      const top = document.body.style.top;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      const y = top ? Math.abs(parseInt(top, 10)) : __scrollY;
+      window.scrollTo(0, y || 0);
+    }
+
     function createBtn(txt, fn){
       const b = document.createElement('button');
       b.type = "button";
@@ -1926,7 +2018,17 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     function closeModal(){
-      document.getElementById('setupModal').style.display = 'none';
+      const modal = document.getElementById('setupModal');
+      if (modal.style.display !== "flex") {
+        // still ensure unlock is safe
+        unlockBodyScroll();
+        return;
+      }
+      modal.style.display = 'none';
+
+      // ✅ extension: unlock background scroll
+      unlockBodyScroll();
+
       // restore focus for accessibility
       try { lastFocusedEl?.focus?.(); } catch(e){}
       lastFocusedEl = null;
@@ -1946,6 +2048,10 @@ Collect: address, issue description, contact info, urgency.`}
 
       shell.classList.remove('role-wide','info-wide','community-wide','script-wide','benefits-wide');
       m.style.display = 'flex';
+
+      // ✅ extension: lock background scroll
+      lockBodyScroll();
+
       c.innerHTML = "";
       s.innerHTML = "";
 
@@ -1968,7 +2074,6 @@ Collect: address, issue description, contact info, urgency.`}
       if(step === "benefits"){
         shell.classList.add('benefits-wide');
         tEl.innerText = i18n.t("smb_benefits");
-        benefitsKeyboardBound = false; // allow rebinding safely per open
         renderBenefits();
         // focus list container after paint
         setTimeout(() => document.getElementById("benefitsListWrap")?.focus(), 30);
@@ -2407,6 +2512,13 @@ Collect: address, issue description, contact info, urgency.`}
 
     refreshStepLocks();
     i18n.applyTranslations(document);
+
+    // ✅ Deep-link entry: auto-open benefits if hash requests it
+    const initialBenefit = readBenefitsIdxFromHash();
+    if (initialBenefit != null){
+      activeBenefitIdx = initialBenefit;
+      triggerModal("benefits");
+    }
   </script>
 </body>
 </html>
