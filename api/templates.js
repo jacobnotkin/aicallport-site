@@ -1,54 +1,46 @@
 import fs from "fs";
 import path from "path";
 
-function safeReadJSON(filePath) {
-  try {
-    const raw = fs.readFileSync(filePath, "utf8");
-    return JSON.parse(raw);
-  } catch (e) {
-    return null;
-  }
-}
-
 export default function handler(req, res) {
   try {
-    const { industry = "global", role = "" } = req.query;
+    const { industry } = req.query;
 
-    // Paths
-    const templatesDir = path.join(process.cwd(), "data", "templates");
-    const globalPath = path.join(templatesDir, "global.json");
-    const industryPath = path.join(templatesDir, `${industry}.json`);
+    const basePath = path.join(process.cwd(), "data", "templates");
 
-    // Load JSON (industry file optional)
-    const globalTemplates = safeReadJSON(globalPath);
-    const industryTemplates = safeReadJSON(industryPath);
+    // Load global templates
+    const globalPath = path.join(basePath, "global.json");
+    const globalRaw = fs.readFileSync(globalPath, "utf8");
+    const globalTemplates = JSON.parse(globalRaw);
 
-    // Merge logic: industry overrides global if same role exists
-    const merged = {
-      industry,
-      templates: {
-        ...(globalTemplates?.templates || {}),
-        ...(industryTemplates?.templates || {})
+    let finalTemplates = globalTemplates.templates || {};
+
+    // If industry requested and not global, try to merge
+    if (industry && industry !== "global") {
+      const industryPath = path.join(basePath, `${industry}.json`);
+
+      if (fs.existsSync(industryPath)) {
+        const industryRaw = fs.readFileSync(industryPath, "utf8");
+        const industryTemplates = JSON.parse(industryRaw);
+
+        finalTemplates = {
+          ...finalTemplates,
+          ...(industryTemplates.templates || {})
+        };
       }
-    };
-
-    // If role requested, return only that role’s templates
-    if (role) {
-      const roleTemplates = merged.templates[role] || [];
-      res.setHeader(
-        "Cache-Control",
-        "public, s-maxage=86400, stale-while-revalidate=604800"
-      );
-      return res.status(200).json({ industry, role, templates: roleTemplates });
     }
 
     res.setHeader(
       "Cache-Control",
       "public, s-maxage=86400, stale-while-revalidate=604800"
     );
-    return res.status(200).json(merged);
+
+    res.status(200).json({
+      industry: industry || "global",
+      templates: finalTemplates
+    });
+
   } catch (err) {
     console.error("Templates API error:", err);
-    return res.status(500).json({ error: "Failed to load templates" });
+    res.status(500).json({ error: "Failed to load templates" });
   }
 }
