@@ -98,7 +98,7 @@
       50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
     }
 
-    /* ✅ NEW: blinking SMB benefits button (uses same glow feel) */
+    /* ✅ blinking SMB benefits button (uses same glow feel) */
     .benefits-blink {
       animation: border-glow 2s infinite ease-in-out !important;
       border-color: rgba(249, 115, 22, 0.55) !important;
@@ -188,7 +188,7 @@
     .modal-shell.info-wide { max-width: 900px; }
     .modal-shell.community-wide { max-width: 1120px; }
     .modal-shell.script-wide { max-width: 1120px; }
-    /* ✅ NEW: benefits wide */
+    /* ✅ benefits wide */
     .modal-shell.benefits-wide { max-width: 1120px; }
 
     .modal-content-wrap {
@@ -368,7 +368,7 @@
       overflow: auto;
     }
 
-    /* ✅ NEW: benefits list styling (no redesign, just consistent cards) */
+    /* ✅ benefits list styling (consistent cards) */
     .benefit-row {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.10);
@@ -377,6 +377,8 @@
       cursor: pointer;
       user-select: none;
       transition: 0.18s;
+      position: relative; /* for tooltip */
+      outline: none;
     }
     .benefit-row:hover {
       border-color: rgba(249,115,22,0.55);
@@ -385,6 +387,35 @@
     .benefit-row.active {
       border-color: rgba(249,115,22,0.8);
       background: rgba(249,115,22,0.14);
+    }
+
+    /* ✅ ADD: hover tooltip for each benefit (explanation on hover) */
+    .benefit-tip {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: calc(100% + 8px);
+      z-index: 50;
+      background: rgba(10, 12, 18, 0.96);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 18px 55px rgba(0,0,0,0.65);
+      color: rgba(226,232,240,0.95);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.45;
+
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: 0.14s ease;
+    }
+    .benefit-row:hover .benefit-tip,
+    .benefit-row:focus-within .benefit-tip,
+    .benefit-row:focus .benefit-tip {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 
@@ -518,6 +549,10 @@
         sales_agent: "Sales Agent",
         support_agent: "Support Agent",
 
+        Receptionist: "Receptionist",
+        "Sales Agent": "Sales Agent",
+        "Support Agent": "Support Agent",
+
         role_help_receptionist: "Handles inbound calls, captures caller info, books appointments, and routes urgent cases.",
         role_help_sales: "Qualifies leads fast, captures contact details, and books consultations.",
         role_help_support: "Collects issue details, prioritizes urgency, and escalates when needed.",
@@ -546,11 +581,47 @@
         deployed_yes: "Deployed: YES",
         deployed_no: "Deployed: NO",
 
-        /* ✅ NEW: SMB Benefits */
+        /* ✅ SMB Benefits */
         smb_benefits: "SMB Benefits",
         smb_benefits_title: "Small Business Benefits",
         hover_to_learn: "Hover a benefit to see details",
-        benefits_close: "Close"
+        benefits_close: "Close",
+
+        /* ✅ SMB Benefits modal labels */
+        benefits_label: "Benefits",
+        benefits_explanation_label: "Explanation",
+        benefits_tip: "Tip: This content can also be reused later inside the client dashboard.",
+
+        /* ✅ SMB Benefits items (keys) */
+        benefit_01_title: "High Quality AI Call Agents",
+        benefit_01_desc: "Reliable inbound call handling built for real small businesses. No call-center scripts. Professional tone and fast capture of details.",
+
+        benefit_02_title: "Multiple Roles (Receptionist, Booking, Sales, Support, After-Hours)",
+        benefit_02_desc: "Choose the agent role you need today — and switch anytime. Use different roles for business hours vs after-hours/weekends.",
+
+        benefit_03_title: "Full Control Before + After Deployment",
+        benefit_03_desc: "Select role, template, and voice before deployment. After deployment, you keep control via your client dashboard (role/voice/script/hours).",
+
+        benefit_04_title: "Deploy in Minutes (6-Step Protocol)",
+        benefit_04_desc: "A simple activation protocol — Market → Industry → Business → Role/Template/Voice → Demo → Deploy. No meetings. No onboarding calls.",
+
+        benefit_05_title: "Worldwide + Multilingual",
+        benefit_05_desc: "Global routing + multilingual experience for your customers. Your business can answer calls in the language your customer speaks.",
+
+        benefit_06_title: "Unlimited Inbound Calls",
+        benefit_06_desc: "No per-minute surprises. Handle inbound calls at scale.",
+
+        benefit_07_title: "Pay Monthly • No Contract",
+        benefit_07_desc: "Fair and transparent: monthly billing, cancel anytime.",
+
+        benefit_08_title: "Secure Payments via Stripe",
+        benefit_08_desc: "Secure payment processing through Stripe.",
+
+        benefit_09_title: "No Salesman • No Human Layer",
+        benefit_09_desc: "This is a self-serve operational console. No human gatekeepers. Turn ON your AI call agent when you are ready.",
+
+        benefit_10_title: "Referral Discount (Up to $0/mo)",
+        benefit_10_desc: "After activation you get a referral link. Each referral reduces your monthly payment by $10. More referrals = lower monthly cost (down to $0/mo)."
       },
 
       ES: { community:"Comunidad", newsletter:"Boletín", forum:"Foro", ai_qa:"Preguntas IA", close:"Cerrar", start_activation:"Iniciar Activación", confirm:"Confirmar", smb_benefits:"Beneficios SMB" },
@@ -670,7 +741,6 @@
       </div>
 
       <div class="flex items-center gap-2 flex-wrap justify-end">
-        <!-- ✅ Split Community into 3 entry buttons -->
         <button id="qaBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="open_ai_qa" type="button">AI Q&A</button>
         <button id="forumBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="open_forum" type="button">Forum</button>
         <button id="newsletterTopBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="open_newsletter" type="button">Newsletter</button>
@@ -692,7 +762,6 @@
           <span class="text-orange-500">Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>
         </p>
 
-        <!-- ✅ Buttons row (layout untouched) -->
         <div class="grid gap-2 sm:flex sm:gap-3 sm:items-center">
           <button id="heroCta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic" data-i18n="start_activation" type="button">
             Start Activation
@@ -701,7 +770,6 @@
             Activation Steps Info
           </button>
 
-          <!-- ✅ NEW: blinking SMB Benefits button -->
           <button id="smbBenefitsBtn"
             class="w-full sm:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition benefits-blink"
             data-i18n="smb_benefits"
@@ -717,7 +785,6 @@
             BETA ACCESS - SMALL BUSINESS
           </h3>
 
-          <!-- Pricing: USD + Local estimate -->
           <div class="flex flex-col items-center mb-4">
             <div class="text-slate-600 text-xs font-bold line-through">
               <span id="reg-usd">$399</span> <span data-i18n="regular">Regular</span>
@@ -1087,61 +1154,98 @@
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
     // ============================
-    // ✅ NEW: SMB BENEFITS (hover explanation)
+    // ✅ SMB BENEFITS (hover tooltip + translation + keyboard arrows)
     // ============================
+
+    // local helper: translated-from-dynamic cache (same style as dt later, but defined here)
+    function bdt(namespace, key, fallback){
+      const lang = (window.APP_I18N.current || "EN").toUpperCase();
+      const v = i18n.dynGet(lang, namespace, key);
+      return v != null ? v : (fallback != null ? fallback : key);
+    }
+
+    // Keys-based list (titles + desc translate via i18n + optional dynamic cache)
     const smbBenefits = [
-      {
-        title: "High Quality AI Call Agents",
-        desc: "Reliable inbound call handling built for real small businesses. No call-center scripts. Professional tone and fast capture of details."
-      },
-      {
-        title: "Multiple Roles (Receptionist, Booking, Sales, Support, After-Hours)",
-        desc: "Choose the agent role you need today — and switch anytime. Use different roles for business hours vs after-hours/weekends."
-      },
-      {
-        title: "Full Control Before + After Deployment",
-        desc: "Select role, template, and voice before deployment. After deployment, you keep control via your client dashboard (role/voice/script/hours)."
-      },
-      {
-        title: "Deploy in Minutes (6-Step Protocol)",
-        desc: "A simple activation protocol — Market → Industry → Business → Role/Template/Voice → Demo → Deploy. No meetings. No onboarding calls."
-      },
-      {
-        title: "Worldwide + Multilingual",
-        desc: "Global routing + multilingual experience for your customers. Your business can answer calls in the language your customer speaks."
-      },
-      {
-        title: "Unlimited Inbound Calls",
-        desc: "No per-minute surprises. Handle inbound calls at scale."
-      },
-      {
-        title: "Pay Monthly • No Contract",
-        desc: "Fair and transparent: monthly billing, cancel anytime."
-      },
-      {
-        title: "Secure Payments via Stripe",
-        desc: "Secure payment processing through Stripe."
-      },
-      {
-        title: "No Salesman • No Human Layer",
-        desc: "This is a self-serve operational console. No human gatekeepers. Turn ON your AI call agent when you are ready."
-      },
-      {
-        title: "Referral Discount (Up to $0/mo)",
-        desc: "After activation you get a referral link. Each referral reduces your monthly payment by $10. More referrals = lower monthly cost (down to $0/mo)."
-      }
+      { titleKey: "benefit_01_title", descKey: "benefit_01_desc" },
+      { titleKey: "benefit_02_title", descKey: "benefit_02_desc" },
+      { titleKey: "benefit_03_title", descKey: "benefit_03_desc" },
+      { titleKey: "benefit_04_title", descKey: "benefit_04_desc" },
+      { titleKey: "benefit_05_title", descKey: "benefit_05_desc" },
+      { titleKey: "benefit_06_title", descKey: "benefit_06_desc" },
+      { titleKey: "benefit_07_title", descKey: "benefit_07_desc" },
+      { titleKey: "benefit_08_title", descKey: "benefit_08_desc" },
+      { titleKey: "benefit_09_title", descKey: "benefit_09_desc" },
+      { titleKey: "benefit_10_title", descKey: "benefit_10_desc" }
     ];
 
     let activeBenefitIdx = 0;
+    let benefitsKeyHandlerBound = false;
+    let benefitsLastFocus = null;
 
-    function openBenefits(){
+    function isBenefitsOpen(){
+      return document.getElementById("setupModal").style.display === "flex" && lastModalStep === "benefits";
+    }
+
+    function focusBenefitRow(idx){
+      const row = document.querySelector(`.benefit-row[data-idx="${idx}"]`);
+      if (row && typeof row.focus === "function") row.focus();
+    }
+
+    function bindBenefitsKeyboard(){
+      if (benefitsKeyHandlerBound) return;
+      benefitsKeyHandlerBound = true;
+
+      document.addEventListener("keydown", onBenefitsKeyDown, true);
+    }
+
+    function unbindBenefitsKeyboard(){
+      if (!benefitsKeyHandlerBound) return;
+      benefitsKeyHandlerBound = false;
+
+      document.removeEventListener("keydown", onBenefitsKeyDown, true);
+    }
+
+    function onBenefitsKeyDown(e){
+      if (!isBenefitsOpen()) return;
+
+      // Arrow Up / Down cycles benefits. Home/End jump.
+      if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Home" || e.key === "End") {
+        e.preventDefault();
+
+        const max = smbBenefits.length - 1;
+
+        if (e.key === "Home") activeBenefitIdx = 0;
+        else if (e.key === "End") activeBenefitIdx = max;
+        else if (e.key === "ArrowDown") activeBenefitIdx = (activeBenefitIdx + 1) > max ? 0 : (activeBenefitIdx + 1);
+        else if (e.key === "ArrowUp") activeBenefitIdx = (activeBenefitIdx - 1) < 0 ? max : (activeBenefitIdx - 1);
+
+        setActiveBenefit(activeBenefitIdx, { focus: true });
+      }
+    }
+
+    async function openBenefits(){
+      benefitsLastFocus = document.activeElement || null;
       activeBenefitIdx = 0;
+
+      // dynamic translation support for benefit strings (only for non-EN; EN is immediate)
+      // backend expects string-items; we provide EN strings (or current strings) as keys
+      const titleItems = smbBenefits.map(b => i18n.t(b.titleKey));
+      const descItems  = smbBenefits.map(b => i18n.t(b.descKey));
+      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "benefit_titles", titleItems);
+      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "benefit_descs", descItems);
+
       triggerModal("benefits");
+      bindBenefitsKeyboard();
+
+      // focus the first row after render
+      setTimeout(() => focusBenefitRow(0), 0);
     }
 
     function renderBenefits(){
       const c = document.getElementById("mContent");
       const current = smbBenefits[activeBenefitIdx] || smbBenefits[0];
+      const curDescEN = current ? i18n.t(current.descKey) : "";
+      const curDescShown = current ? bdt("benefit_descs", curDescEN, curDescEN) : "";
 
       c.innerHTML = `
         <div class="pill mb-3">${escapeHtml(i18n.t("smb_benefits_title"))}</div>
@@ -1149,15 +1253,15 @@
 
         <div class="grid lg:grid-cols-2 gap-4 text-left">
           <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">Benefits</div>
+            <div class="mini text-orange-500 mb-2" data-i18n="benefits_label">${escapeHtml(i18n.t("benefits_label"))}</div>
             <div id="benefitsList" class="grid gap-2"></div>
           </div>
 
           <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">Explanation</div>
+            <div class="mini text-orange-500 mb-2" data-i18n="benefits_explanation_label">${escapeHtml(i18n.t("benefits_explanation_label"))}</div>
             <div id="benefitExplain" class="text-[12px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap"></div>
             <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
-              Tip: This content can also be reused later inside the client dashboard.
+              <span data-i18n="benefits_tip">${escapeHtml(i18n.t("benefits_tip"))}</span>
             </div>
           </div>
         </div>
@@ -1173,31 +1277,51 @@
       `;
 
       const list = document.getElementById("benefitsList");
-      list.innerHTML = smbBenefits.map((b, idx) => `
-        <div class="benefit-row ${idx===activeBenefitIdx ? "active":""}"
-             onmouseenter="setActiveBenefit(${idx})"
-             data-idx="${idx}">
-          <div class="text-[10px] font-black uppercase tracking-widest text-white">${escapeHtml(b.title)}</div>
-        </div>
-      `).join("");
+      list.innerHTML = smbBenefits.map((b, idx) => {
+        const titleEN = i18n.t(b.titleKey);
+        const descEN  = i18n.t(b.descKey);
+        const shownTitle = bdt("benefit_titles", titleEN, titleEN);
+        const shownDesc  = bdt("benefit_descs", descEN, descEN);
+
+        return `
+          <div class="benefit-row ${idx===activeBenefitIdx ? "active":""}"
+               onmouseenter="setActiveBenefit(${idx})"
+               onclick="setActiveBenefit(${idx},{focus:true})"
+               tabindex="0"
+               role="button"
+               aria-label="${escapeHtml(shownTitle)}"
+               data-idx="${idx}">
+            <div class="text-[10px] font-black uppercase tracking-widest text-white">${escapeHtml(shownTitle)}</div>
+            <div class="benefit-tip">${escapeHtml(shownDesc)}</div>
+          </div>
+        `;
+      }).join("");
 
       const explain = document.getElementById("benefitExplain");
-      explain.textContent = current?.desc || "";
+      explain.textContent = curDescShown || "";
 
       i18n.applyTranslations(document.getElementById("setupModal"));
     }
 
-    function setActiveBenefit(idx){
+    function setActiveBenefit(idx, opts){
       activeBenefitIdx = idx;
-      // re-render only UI parts for simplicity & reliability
+
       const explain = document.getElementById("benefitExplain");
       const current = smbBenefits[activeBenefitIdx];
-      if(explain && current) explain.textContent = current.desc;
+      if (explain && current){
+        const descEN = i18n.t(current.descKey);
+        const shownDesc = bdt("benefit_descs", descEN, descEN);
+        explain.textContent = shownDesc || "";
+      }
 
       document.querySelectorAll(".benefit-row").forEach((el) => {
         const i = Number(el.getAttribute("data-idx"));
         el.classList.toggle("active", i === activeBenefitIdx);
       });
+
+      if (opts && opts.focus) {
+        focusBenefitRow(activeBenefitIdx);
+      }
     }
 
     // ============================
@@ -1739,7 +1863,17 @@ Collect: address, issue description, contact info, urgency.`}
       return b;
     }
 
-    function closeModal(){ document.getElementById('setupModal').style.display = 'none'; }
+    function closeModal(){
+      document.getElementById('setupModal').style.display = 'none';
+
+      // ✅ cleanup benefits keyboard handler and restore focus
+      if (lastModalStep === "benefits") {
+        unbindBenefitsKeyboard();
+        if (benefitsLastFocus && typeof benefitsLastFocus.focus === "function") {
+          try { benefitsLastFocus.focus(); } catch {}
+        }
+      }
+    }
 
     async function triggerModal(step){
       lastModalStep = step;
@@ -1769,7 +1903,6 @@ Collect: address, issue description, contact info, urgency.`}
         return;
       }
 
-      /* ✅ NEW: Benefits modal */
       if(step === "benefits"){
         shell.classList.add('benefits-wide');
         tEl.innerText = i18n.t("smb_benefits");
@@ -2150,7 +2283,7 @@ Collect: address, issue description, contact info, urgency.`}
       document.getElementById("sideCta").addEventListener("click", () => handleStep(1));
       document.getElementById("activationInfoBtn").addEventListener("click", openActivationInfo);
 
-      /* ✅ NEW: SMB Benefits button opens benefits modal */
+      // ✅ SMB Benefits
       document.getElementById("smbBenefitsBtn").addEventListener("click", openBenefits);
 
       document.getElementById("qaBtn").addEventListener("click", () => openCommunity("QA"));
