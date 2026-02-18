@@ -3,58 +3,25 @@ import path from "path";
 
 export default function handler(req, res) {
   try {
-    const { industry } = req.query;
+    const industry = (req.query.industry || "global").toString().toLowerCase();
 
     const basePath = path.join(process.cwd(), "data", "templates");
+    const industryPath = path.join(basePath, `${industry}.json`);
     const globalPath = path.join(basePath, "global.json");
 
-    // Debug info
-    const debug = {
-      cwd: process.cwd(),
-      basePath,
-      globalPath,
-      baseExists: fs.existsSync(basePath),
-      globalExists: fs.existsSync(globalPath),
-    };
+    const filePath = fs.existsSync(industryPath) ? industryPath : globalPath;
 
-    if (!debug.baseExists) {
-      return res.status(500).json({ error: "Templates folder not found", debug });
-    }
-    if (!debug.globalExists) {
-      return res.status(500).json({ error: "global.json not found", debug });
-    }
+    const raw = fs.readFileSync(filePath, "utf8");
+    const data = JSON.parse(raw);
 
-    const globalRaw = fs.readFileSync(globalPath, "utf8");
+    res.setHeader(
+      "Cache-Control",
+      "public, s-maxage=86400, stale-while-revalidate=604800"
+    );
 
-    let globalJson;
-    try {
-      globalJson = JSON.parse(globalRaw);
-    } catch (jsonErr) {
-      return res.status(500).json({
-        error: "global.json is invalid JSON",
-        jsonError: jsonErr.message,
-        hint: "Most common cause: quotes/newlines in script field not escaped",
-        debug,
-      });
-    }
-
-    let finalTemplates = globalJson.templates || {};
-
-    if (industry && industry !== "global") {
-      const industryPath = path.join(basePath, `${industry}.json`);
-      if (fs.existsSync(industryPath)) {
-        const industryRaw = fs.readFileSync(industryPath, "utf8");
-        const industryJson = JSON.parse(industryRaw);
-        finalTemplates = { ...finalTemplates, ...(industryJson.templates || {}) };
-      }
-    }
-
-    res.status(200).json({ industry: industry || "global", templates: finalTemplates, debug });
+    return res.status(200).json(data);
   } catch (err) {
-    res.status(500).json({
-      error: "Templates API crashed",
-      message: err.message,
-      stack: err.stack,
-    });
+    console.error("Templates API error:", err);
+    return res.status(500).json({ error: "Failed to load templates" });
   }
 }
