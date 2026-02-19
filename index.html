@@ -2222,6 +2222,54 @@ Collect: address, issue description, contact info, urgency.`}
     // ============================
     // Step 1 rendering
     // ============================
+    
+let _marketsByContinentCache = null;
+
+async function getMarketsGroupedByContinent() {
+  if (_marketsByContinentCache) return _marketsByContinentCache;
+
+  // If Supabase is available in the browser, use it
+  if (typeof supabase !== "undefined") {
+    const { data, error } = await supabase
+      .from("countries")
+      .select("name, continent, active")
+      .order("continent", { ascending: true })
+      .order("name", { ascending: true });
+
+    if (error) {
+      console.error("Supabase countries fetch error:", error);
+      return {};
+    }
+
+    const grouped = {};
+    (data || []).forEach((row) => {
+      if (row.active !== true) return;
+      (grouped[row.continent] ||= []).push(row.name);
+    });
+
+    _marketsByContinentCache = grouped;
+    return grouped;
+  }
+
+  // Fallback: expects an API endpoint that returns countries
+  const res = await fetch("/api/countries");
+  if (!res.ok) {
+    console.error("Missing /api/countries endpoint (and supabase not available in browser).");
+    return {};
+  }
+
+  const rows = await res.json();
+  const grouped = {};
+  (rows || []).forEach((row) => {
+    if (row.active !== true) return;
+    (grouped[row.continent] ||= []).push(row.name);
+  });
+
+  _marketsByContinentCache = grouped;
+  return grouped;
+}
+
+
     async function renderMarketByContinent(searchQuery){
 
       const c = document.getElementById('mContent');
