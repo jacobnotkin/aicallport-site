@@ -2177,20 +2177,22 @@ Collect: address, issue description, contact info, urgency.`}
           { key:"support_agent", value:"Support Agent" }
         ];
 
-        roles.forEach(r => {
-          const label = i18n.t(r.key);
-          const b = createBtn(label, () => {
-            selectedRole = r.value;
-            templateCategoryFilter = "ALL";
-            templateSearchQuery = "";
-            refreshTemplatesForCurrentSelection(true);
-            triggerModal(4);
-          });
-          b.style.fontSize = "10px";
-          b.style.padding = "14px";
-          b.innerHTML = `${escapeHtml(label)}${selectedRole === r.value ? " ✓" : ""}`;
-          roleList.appendChild(b);
-        });
+        for (const r of roles) {
+  const label = i18n.t(r.key);
+
+  const b = createBtn(label, async () => {
+    selectedRole = r.value;
+    templateCategoryFilter = "ALL";
+    templateSearchQuery = "";
+    await refreshTemplatesForCurrentSelection(true);
+    triggerModal(4);
+  });
+
+  b.style.fontSize = "10px";
+  b.style.padding = "14px";
+  b.innerHTML = `${escapeHtml(label)}${selectedRole === r.value ? " ✓" : ""}`;
+  roleList.appendChild(b);
+}
 
         const roleDesc = document.getElementById("roleDesc");
         roleDesc.textContent = i18n.t(getRoleHelpKey(selectedRole));
