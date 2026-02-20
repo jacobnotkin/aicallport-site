@@ -12,7 +12,7 @@ export default function handler(req, res) {
       "public, s-maxage=86400, stale-while-revalidate=604800"
     );
 
-    res.status(200).json({ industries });
+    res.status(200).json(industries);
   } catch (err) {
     console.error("Industries API error:", err);
     res.status(500).json({ error: "Failed to load industries.json" });
