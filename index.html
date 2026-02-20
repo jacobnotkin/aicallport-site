@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1066,9 +1065,16 @@
     function getSelectedVapiVoice() { return { provider: "vapi", voiceId: selectedVoiceId }; }
 
     // ============================
-    // MARKETS
+    // MARKETS (Fallback list so Step 1 always works)
     // ============================
-    
+    const DEFAULT_MARKETS_BY_CONTINENT = {
+      "North America": ["United States", "Canada"],
+      "Europe": ["United Kingdom", "France", "Germany", "Spain", "Italy"],
+      "Asia": ["Azerbaijan"],
+      "Oceania": [],
+      "South America": [],
+      "Africa": []
+    };
 
     // ============================
     // LANG MENU
@@ -2222,53 +2228,49 @@ Collect: address, issue description, contact info, urgency.`}
     // ============================
     // Step 1 rendering
     // ============================
-    
-let _marketsByContinentCache = null;
+    let _marketsByContinentCache = null;
 
-async function getMarketsGroupedByContinent() {
-  if (_marketsByContinentCache) return _marketsByContinentCache;
+    // ✅ UPDATED: Always works (tries /api/countries, else uses DEFAULT_MARKETS_BY_CONTINENT)
+    async function getMarketsGroupedByContinent() {
+      if (_marketsByContinentCache) return _marketsByContinentCache;
 
-  // If Supabase is available in the browser, use it
-  if (typeof supabase !== "undefined") {
-    const { data, error } = await supabase
-      .from("countries")
-      .select("name, continent, active")
-      .order("continent", { ascending: true })
-      .order("name", { ascending: true });
+      // 1) Try API first (if you create it later)
+      try {
+        const res = await fetch("/api/countries", { cache: "no-store" });
+        if (res.ok) {
+          const rows = await res.json();
+          const grouped = {};
 
-    if (error) {
-      console.error("Supabase countries fetch error:", error);
-      return {};
+          (rows || []).forEach((row) => {
+            // Accept "active" true, OR status === "ACTIVE"
+            const isActive =
+              row.active === true ||
+              String(row.status || "").toUpperCase() === "ACTIVE";
+
+            if (!isActive) return;
+
+            const cont = row.continent || "Other";
+            const name = row.name || row.country || row.code;
+            if (!name) return;
+
+            (grouped[cont] ||= []).push(name);
+          });
+
+          // If API returned something usable, keep it
+          const hasAny = Object.values(grouped).some(arr => (arr || []).length);
+          if (hasAny) {
+            _marketsByContinentCache = grouped;
+            return grouped;
+          }
+        }
+      } catch (e) {
+        // ignore and fall back
+      }
+
+      // 2) Fallback: always show at least default markets
+      _marketsByContinentCache = DEFAULT_MARKETS_BY_CONTINENT;
+      return DEFAULT_MARKETS_BY_CONTINENT;
     }
-
-    const grouped = {};
-    (data || []).forEach((row) => {
-      if (row.active !== true) return;
-      (grouped[row.continent] ||= []).push(row.name);
-    });
-
-    _marketsByContinentCache = grouped;
-    return grouped;
-  }
-
-  // Fallback: expects an API endpoint that returns countries
-  const res = await fetch("/api/countries");
-  if (!res.ok) {
-    console.error("Missing /api/countries endpoint (and supabase not available in browser).");
-    return {};
-  }
-
-  const rows = await res.json();
-  const grouped = {};
-  (rows || []).forEach((row) => {
-    if (row.active !== true) return;
-    (grouped[row.continent] ||= []).push(row.name);
-  });
-
-  _marketsByContinentCache = grouped;
-  return grouped;
-}
-
 
     async function renderMarketByContinent(searchQuery){
 
@@ -2276,10 +2278,7 @@ async function getMarketsGroupedByContinent() {
       c.innerHTML = "";
       const q = (searchQuery || "").trim().toUpperCase();
 
-
-  const marketsByContinent = await getMarketsGroupedByContinent();
-
-  
+      const marketsByContinent = await getMarketsGroupedByContinent();
 
       Object.keys(marketsByContinent).forEach(continent => {
         const list = (marketsByContinent[continent] || []).slice().sort((a,b) => a.localeCompare(b));
@@ -2306,7 +2305,8 @@ async function getMarketsGroupedByContinent() {
       if(!c.children.length){
         const hint = document.createElement('div');
         hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
-        hint.innerText = i18n.t("no_matching");
+        // ✅ UPDATED message so it’s clear what’s going on
+        hint.innerText = "No markets available yet. (Backend countries endpoint not connected)";
         c.appendChild(hint);
       }
     }
@@ -2317,7 +2317,6 @@ async function getMarketsGroupedByContinent() {
       const c = document.getElementById('mContent');
       c.innerHTML = "";
       const q = (searchQuery || "").trim().toUpperCase();
-      
 
       const groups = buildCategorizedIndustryList();
       groups.forEach(g => {
