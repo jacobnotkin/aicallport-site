@@ -2230,47 +2230,49 @@ Collect: address, issue description, contact info, urgency.`}
     // ============================
     let _marketsByContinentCache = null;
 
-    // ✅ UPDATED: Always works (tries /api/countries, else uses DEFAULT_MARKETS_BY_CONTINENT)
+    // ✅ Step 1: Markets loaded from /api/markets (grouped by region)
     async function getMarketsGroupedByContinent() {
-      if (_marketsByContinentCache) return _marketsByContinentCache;
+  if (_marketsByContinentCache) return _marketsByContinentCache;
 
-      // 1) Try API first (if you create it later)
-      try {
-        const res = await fetch("/api/countries", { cache: "no-store" });
-        if (res.ok) {
-          const rows = await res.json();
-          const grouped = {};
+  const res = await fetch("/api/markets", { cache: "no-store" });
 
-          (rows || []).forEach((row) => {
-            // Accept "active" true, OR status === "ACTIVE"
-            const isActive =
-              row.active === true ||
-              String(row.status || "").toUpperCase() === "ACTIVE";
+  if (!res.ok) {
+    console.error("Failed to load /api/markets:", res.status);
+    _marketsByContinentCache = {};
+    return _marketsByContinentCache;
+  }
 
-            if (!isActive) return;
+  const rows = await res.json();
+  const grouped = {};
 
-            const cont = row.continent || "Other";
-            const name = row.name || row.country || row.code;
-            if (!name) return;
+  (rows || []).forEach((row) => {
+    const continent = row.region || "Other";
+    const name = row.name || "";
+    const iso2 = row.iso2 || "";
 
-            (grouped[cont] ||= []).push(name);
-          });
+    if (!name) return;
 
-          // If API returned something usable, keep it
-          const hasAny = Object.values(grouped).some(arr => (arr || []).length);
-          if (hasAny) {
-            _marketsByContinentCache = grouped;
-            return grouped;
-          }
-        }
-      } catch (e) {
-        // ignore and fall back
-      }
-
-      // 2) Fallback: always show at least default markets
-      _marketsByContinentCache = DEFAULT_MARKETS_BY_CONTINENT;
-      return DEFAULT_MARKETS_BY_CONTINENT;
+    if (!grouped[continent]) {
+      grouped[continent] = [];
     }
+
+    grouped[continent].push({
+      ...row,
+      name,
+      iso2,
+      continent
+    });
+  });
+
+  Object.keys(grouped).forEach((k) => {
+    grouped[k].sort((a, b) =>
+      String(a.name).localeCompare(String(b.name))
+    );
+  });
+
+  _marketsByContinentCache = grouped;
+  return grouped;
+}
 
     async function renderMarketByContinent(searchQuery){
 
