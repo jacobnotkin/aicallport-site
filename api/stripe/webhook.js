@@ -1,6 +1,13 @@
 import Stripe from "stripe";
+import { createClient } from "@supabase/supabase-js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Supabase admin client (server-side only)
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 async function getRawBody(req) {
   const chunks = [];
@@ -16,7 +23,6 @@ export default async function handler(req, res) {
   }
 
   const signature = req.headers["stripe-signature"];
-
   if (!signature) {
     return res.status(400).send("Missing Stripe-Signature header");
   }
@@ -35,10 +41,48 @@ export default async function handler(req, res) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Handle events here
-  if (event.type === "checkout.session.completed") {
-    console.log("Checkout completed");
-  }
+  try {
+    // ✅ Handle checkout completion
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
 
-  return res.status(200).json({ received: true });
+      // session.customer_details.email is usually present
+      const email =
+        session?.customer_details?.email ||
+        session?.customer_email ||
+        null;
+
+      if (email) {
+        // Insert customer if not already exists (by email)
+        const { data: existing, error: findError } = await supabase
+          .from("customers")
+          .select("id")
+          .eq("email", email)
+          .maybeSingle();
+
+        if (findError) {
+          console.error("Supabase find error:", findError);
+        } else if (!existing) {
+          const { error: insertError } = await supabase
+            .from("customers")
+            .insert([{ email }]);
+
+          if (insertError) {
+            console.error("Supabase insert error:", insertError);
+          } else {
+            console.log("Inserted customer:", email);
+          }
+        } else {
+          console.log("Customer already exists:", email);
+        }
+      } else {
+        console.warn("No email found on checkout session");
+      }
+    }
+
+    return res.status(200).json({ received: true });
+  } catch (e) {
+    console.error("Webhook handler error:", e);
+    return res.status(500).send("Webhook handler failed");
+  }
 }
