@@ -98,7 +98,7 @@
       50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
     }
 
-    /* ✅ NEW: blinking SMB benefits button (uses same glow feel) */
+    /* blinking SMB benefits button */
     .benefits-blink {
       animation: border-glow 2s infinite ease-in-out !important;
       border-color: rgba(249, 115, 22, 0.55) !important;
@@ -188,8 +188,9 @@
     .modal-shell.info-wide { max-width: 900px; }
     .modal-shell.community-wide { max-width: 1120px; }
     .modal-shell.script-wide { max-width: 1120px; }
-    /* ✅ benefits wide */
     .modal-shell.benefits-wide { max-width: 1120px; }
+    .modal-shell.plan-wide { max-width: 920px; }
+    .modal-shell.activate-wide { max-width: 920px; }
 
     .modal-content-wrap {
       overflow: hidden;
@@ -368,7 +369,7 @@
       overflow: auto;
     }
 
-    /* ✅ Benefits rows (clickable, no hover-select) */
+    /* Benefits rows */
     .benefit-row {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.10);
@@ -383,7 +384,6 @@
       justify-content: space-between;
       gap: 10px;
     }
-    /* keep visual hover, but does NOT change selection */
     .benefit-row:hover {
       border-color: rgba(249,115,22,0.55);
       background: rgba(249,115,22,0.10);
@@ -397,7 +397,6 @@
       border-color: rgba(249,115,22,0.8);
     }
 
-    /* ✅ (C) Selected marker icon */
     .benefit-marker{
       font-size: 12px;
       font-weight: 900;
@@ -407,31 +406,22 @@
       transition: 0.15s;
       flex: 0 0 auto;
     }
-    .benefit-row.active .benefit-marker{
-      opacity: 1;
-    }
+    .benefit-row.active .benefit-marker{ opacity: 1; }
 
-    /* ✅ (A) Mobile inline explanation expand/collapse animation */
     .benefit-inline {
       background: rgba(0,0,0,0.25);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 12px;
       margin-top: 10px;
       padding: 10px 12px;
-
       max-height: 0;
       opacity: 0;
       overflow: hidden;
-
       transition: max-height 260ms ease, opacity 220ms ease;
       will-change: max-height, opacity;
     }
-    .benefit-inline.open {
-      max-height: 260px; /* enough for multi-line copy */
-      opacity: 1;
-    }
+    .benefit-inline.open { max-height: 260px; opacity: 1; }
 
-    /* Helper: show/hide desktop panel vs mobile inline */
     @media (max-width: 1023px){
       .benefits-desktop-panel { display: none !important; }
     }
@@ -439,7 +429,6 @@
       .benefits-mobile-inline { display: none !important; }
     }
 
-    /* ✅ Reduced motion (no redesign) */
     @media (prefers-reduced-motion: reduce){
       .benefit-inline { transition: none !important; }
       .benefits-blink { animation: none !important; }
@@ -447,7 +436,7 @@
     }
   </style>
 
-  <!-- ✅ Language Engine -->
+  <!-- Language Engine -->
   <script>
     const LANG_STORAGE_KEY = "aicallport_lang";
     const I18N_CACHE_KEY = "aicallport_i18n_cache_v1";
@@ -538,12 +527,14 @@
         feat_2: "Pay Monthly",
         feat_3: "No Contract",
 
-        step_01: "01 Market",
+        /* ✅ UPDATED: 7-step protocol labels */
+        step_01: "01 Country",
         step_02: "02 Industry",
-        step_03: "03 Business",
-        step_04: "04 Agent Role",
-        step_05: "05 Demo",
-        step_06: "06 Deploy",
+        step_03: "03 Agent",
+        step_04: "04 Company",
+        step_05: "05 Plan",
+        step_06: "06 Demo",
+        step_07: "07 Activate",
 
         select: "Select",
         sync: "Sync",
@@ -571,7 +562,7 @@
         speaker_boost: "Speaker Boost",
         on: "ON",
         off: "OFF",
-        confirm_role_template_voice: "CONFIRM ROLE + TEMPLATE + VOICE",
+        confirm_role_template_voice: "CONFIRM AGENT SETUP",
 
         receptionist: "Receptionist",
         sales_agent: "Sales Agent",
@@ -581,8 +572,28 @@
         role_help_sales: "Qualifies leads fast, captures contact details, and books consultations.",
         role_help_support: "Collects issue details, prioritizes urgency, and escalates when needed.",
 
+        business_name: "Company Name",
+
         demo_call: "START DEMO CALL",
-        deploy_get_number: "GET MY NUMBER",
+        satisfied: "SATISFIED",
+        demos_policy: "2 demos, 30 seconds each",
+        demos_used: "Demo calls used",
+        demo_required: "You must run at least 1 demo call before SATISFIED unlocks activation.",
+
+        plan_select_title: "Select Plan",
+        plan_299: "$299 /mo",
+        plan_599: "$599 /mo",
+        includes: "Includes",
+        minutes: "minutes",
+        overage: "Overage",
+        per_min: "per minute",
+        billed_next: "billed next invoice",
+        confirm_plan: "CONFIRM PLAN",
+
+        activate_title: "Activation Checklist",
+        activate_ready: "READY TO ACTIVATE",
+        activate_locked: "LOCKED UNTIL SATISFIED",
+        activate_btn: "ACTIVATE",
 
         community_portal: "Community Portal",
         join_list: "Join List",
@@ -592,8 +603,6 @@
         terms: "Terms",
         support: "Support",
         active_agents: "ACTIVE AGENTS",
-
-        business_name: "Business Name",
 
         open_ai_qa: "AI Q&A",
         open_forum: "Forum",
@@ -605,7 +614,6 @@
         deployed_yes: "Deployed: YES",
         deployed_no: "Deployed: NO",
 
-        /* ✅ SMB Benefits */
         smb_benefits: "SMB Benefits",
         smb_benefits_title: "Small Business Benefits",
         hover_to_learn: "Click a benefit to see details",
@@ -651,7 +659,7 @@
         const data = await res.json();
         if (data && data.map) dynSet(code, namespace, data.map);
       } catch(e){
-        // no backend: EN fallback
+        // EN fallback
       }
     }
 
@@ -826,30 +834,42 @@
       <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
         <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">AI Receptionist Activation Protocol</span>
       </div>
-      <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+
+      <!-- ✅ UPDATED: 7 steps -->
+      <div class="grid grid-cols-2 lg:grid-cols-7 gap-3">
         <div id="s1" class="step-card unlocked next-focus">
-          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_01">01 Market</p>
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_01">01 Country</p>
           <p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
         </div>
+
         <div id="s2" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_02">02 Industry</p>
           <p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
         </div>
+
         <div id="s3" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_03">03 Business</p>
-          <p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="sync">Sync</p>
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_03">03 Agent</p>
+          <p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="choose">Choose</p>
         </div>
+
         <div id="s4" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_04">04 Agent Role</p>
-          <p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="choose">Choose</p>
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_04">04 Company</p>
+          <p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="sync">Sync</p>
         </div>
+
         <div id="s5" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_05">05 Demo</p>
-          <p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="sandbox">Sandbox</p>
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_05">05 Plan</p>
+          <p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="choose">Choose</p>
         </div>
+
         <div id="s6" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_06">06 Deploy</p>
-          <p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="instant">Instant</p>
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_06">06 Demo</p>
+          <p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="sandbox">Sandbox</p>
+        </div>
+
+        <div id="s7" class="step-card locked">
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_07">07 Activate</p>
+          <p id="v7" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="instant">Instant</p>
         </div>
       </div>
     </div>
@@ -888,7 +908,7 @@
 
   <script>
     // ============================
-    // CONFIG (Vapi key)
+    // CONFIG
     // ============================
     let vapiApiKey = null;
     async function loadVapiKey() {
@@ -927,6 +947,7 @@
         throw new Error("Vapi SDK did not initialize");
       }
 
+      // Always stop any prior call instance first
       if (vapiFallbackInstance && vapiFallbackInstance.stop) {
         try { vapiFallbackInstance.stop(); } catch {}
       }
@@ -1030,23 +1051,65 @@
     };
 
     // ============================
-    // STATE
+    // STATE (Stable gating booleans)
     // ============================
+    // completedSteps is UI-only progress (not unlock logic)
     let completedSteps = 0;
-    let currentIndustryIdx = 0;
-    let selectedIndustryKey = "Electrical";
+
+    // Selections / values
     let selectedMarket = "United States";
+    let selectedIndustryKey = "Electrical";
 
     let selectedRole = "Receptionist";
     let selectedTemplateKey = null;
     let agentScript = "";
+    let selectedVoiceId = "Mia";
+    let selectedVoiceSettings = { stability: 0.5, similarityBoost: 0.8, style: 0.2, useSpeakerBoost: false };
 
     let templateCategoryFilter = "ALL";
     let templateSearchQuery = "";
 
+    let companyName = "";
+
+    // Plan
+    const PLANS = [
+      { id: "plan_299", price: 299, minutes: 1000 },
+      { id: "plan_599", price: 599, minutes: 2500 }
+    ];
+    const OVERAGE_PER_MIN = 0.30;
+    let selectedPlanId = null;
+
+    // Demo gate
+    let demoCallsUsed = 0;           // max 2
+    let demoCompletedOnce = false;   // becomes true after first demo ends
+    let activationUnlocked = false;  // SATISFIED pressed after at least one demo
+    let demoStopTimeout = null;
+
+    // Readiness booleans (computed)
+    function marketSelected(){ return !!(selectedMarket && selectedMarket.trim()); }
+    function industrySelected(){ return !!(selectedIndustryKey && selectedIndustryKey.trim()); }
+    function agentConfigured(){
+      return !!(selectedRole && selectedTemplateKey && selectedVoiceId && (agentScript || "").trim().length >= 10);
+    }
+    function companyNameSet(){ return !!(companyName && companyName.trim().length >= 2); }
+    function planSelected(){ return !!selectedPlanId; }
+
+    // Activate button enabled only when ALL are true
+    function canActivate(){
+      return marketSelected() &&
+        industrySelected() &&
+        agentConfigured() &&
+        companyNameSet() &&
+        planSelected() &&
+        demoCompletedOnce &&
+        activationUnlocked;
+    }
+
     const LS_DEPLOYED = "aicallport_deployed";
     function setDeployed(v) { localStorage.setItem(LS_DEPLOYED, v ? "1" : "0"); }
     function isDeployed() { return localStorage.getItem(LS_DEPLOYED) === "1"; }
+
+    function getSelectedVapiVoice() { return { provider: "vapi", voiceId: selectedVoiceId }; }
 
     const vapiVoices = [
       { id: "Mia", label: "Mia (Professional / Articulate)" },
@@ -1060,20 +1123,11 @@
       { id: "Rohan", label: "Rohan (Bright / Energetic)" },
       { id: "Elliot", label: "Elliot (Canadian / Soothing)" }
     ];
-    let selectedVoiceId = "Mia";
-    let selectedVoiceSettings = { stability: 0.5, similarityBoost: 0.8, style: 0.2, useSpeakerBoost: false };
-    function getSelectedVapiVoice() { return { provider: "vapi", voiceId: selectedVoiceId }; }
 
-    // ============================
-    // MARKETS (Fallback list so Step 1 always works)
-    // ============================
-    const DEFAULT_MARKETS_BY_CONTINENT = {
-      "North America": ["United States", "Canada"],
-      "Europe": ["United Kingdom", "France", "Germany", "Spain", "Italy"],
-      "Asia": ["Azerbaijan"],
-      "Oceania": [],
-      "South America": [],
-      "Africa": []
+    // Stripe links (placeholder; swap as needed)
+    const STRIPE_CHECKOUT_LINKS = {
+      plan_299: "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01",
+      plan_599: "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"
     };
 
     // ============================
@@ -1099,15 +1153,16 @@
     };
 
     // ============================
-    // Activation Info
+    // Activation Info (✅ UPDATED: 7 slides)
     // ============================
     const activationInfoSlides = [
-      { keyTitle:"STEP 1 — MARKET", keyText:"Choose the country/market. Pricing and deployment routing adjust automatically based on your selection." },
-      { keyTitle:"STEP 2 — INDUSTRY", keyText:"Select your industry. Industry packs determine the scripts/templates you start with." },
-      { keyTitle:"STEP 3 — BUSINESS", keyText:"Enter your business name. Used in greetings and scripts." },
-      { keyTitle:"STEP 4 — ROLE + TEMPLATES + VOICE", keyText:"Pick the role. Choose an industry template pack, edit script, choose a voice, preview it." },
-      { keyTitle:"STEP 5 — DEMO", keyText:"Run a test call using your selected role + script + voice." },
-      { keyTitle:"STEP 6 — DEPLOY + DASHBOARD", keyText:"After payment, your agent deploys. Customer gets a dashboard to edit role, script, voice, routing, and business info anytime." }
+      { keyTitle:"STEP 1 — COUNTRY", keyText:"Choose the country/market. Pricing and deployment routing adjust automatically based on your selection." },
+      { keyTitle:"STEP 2 — INDUSTRY", keyText:"Select your industry. Industry packs determine the templates you start with." },
+      { keyTitle:"STEP 3 — AGENT", keyText:"Configure role + template + voice. Edit the script to match your company and workflow." },
+      { keyTitle:"STEP 4 — COMPANY", keyText:"Enter your company name. Used in greetings and scripts." },
+      { keyTitle:"STEP 5 — PLAN", keyText:"Select your plan. Included minutes + overage rules are shown before activation." },
+      { keyTitle:"STEP 6 — DEMO (2×30s)", keyText:"You get 2 demo calls, 30 seconds each. After at least one demo call, press SATISFIED to unlock activation." },
+      { keyTitle:"STEP 7 — ACTIVATE", keyText:"Activation prepares payment + provisioning. After payment, your agent deploys and you receive a dashboard to manage settings." }
     ];
     let infoIdx = 0;
 
@@ -1143,25 +1198,23 @@
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
     // ============================
-    // SMB BENEFITS (clickable, keyboard, mobile inline, A/B/C)
-    // + Persistence + Deep-link + Typeahead (extension only)
+    // SMB BENEFITS (✅ UPDATED 7-step text)
     // ============================
     const smbBenefits = [
-      { title: "High Quality AI Call Agents", desc: "Reliable inbound call handling built for real small businesses. No call-center scripts. Professional tone and fast capture of details." },
+      { title: "High Quality AI Call Agents", desc: "Reliable inbound call handling built for real small businesses. Professional tone and fast capture of details." },
       { title: "Multiple Roles (Receptionist, Booking, Sales, Support, After-Hours)", desc: "Choose the agent role you need today — and switch anytime. Use different roles for business hours vs after-hours/weekends." },
       { title: "Full Control Before + After Deployment", desc: "Select role, template, and voice before deployment. After deployment, you keep control via your client dashboard (role/voice/script/hours)." },
-      { title: "Deploy in Minutes (6-Step Protocol)", desc: "A simple activation protocol — Market → Industry → Business → Role/Template/Voice → Demo → Deploy. No meetings. No onboarding calls." },
+      { title: "Deploy in Minutes (7-Step Protocol)", desc: "Country → Industry → Agent → Company → Plan → Demo → Activate. No meetings. No onboarding calls." },
       { title: "Worldwide + Multilingual", desc: "Global routing + multilingual experience for your customers. Your business can answer calls in the language your customer speaks." },
-      { title: "Unlimited Inbound Calls", desc: "No per-minute surprises. Handle inbound calls at scale." },
-      { title: "Pay Monthly • No Contract", desc: "Fair and transparent: monthly billing, cancel anytime." },
+      { title: "Unlimited Inbound Calls", desc: "Handle inbound calls at scale." },
+      { title: "Pay Monthly • No Contract", desc: "Monthly billing, cancel anytime." },
       { title: "Secure Payments via Stripe", desc: "Secure payment processing through Stripe." },
-      { title: "No Salesman • No Human Layer", desc: "This is a self-serve operational console. No human gatekeepers. Turn ON your AI call agent when you are ready." },
+      { title: "No Salesman • No Human Layer", desc: "Self-serve operational console. No human gatekeepers. Turn ON your AI call agent when you are ready." },
       { title: "Referral Discount (Up to $0/mo)", desc: "After activation you get a referral link. Each referral reduces your monthly payment by $10. More referrals = lower monthly cost (down to $0/mo)." }
     ];
 
     let activeBenefitIdx = 0;
 
-    // ✅ Persist + deep-link helpers (session storage + URL hash)
     const BENEFITS_SEL_KEY = "aicallport_benefits_selected_idx";
     const BENEFITS_HASH_PREFIX = "benefits=";
 
@@ -1191,11 +1244,6 @@
       } catch {}
     }
 
-    function isMobileBenefitsMode(){
-      return window.matchMedia && window.matchMedia("(max-width: 1023px)").matches;
-    }
-
-    // ✅ Updated: restores selection (hash > saved > default)
     function openBenefits(){
       const fromHash = readBenefitsIdxFromHash();
       const fromSaved = getSavedBenefitIdx();
@@ -1219,21 +1267,16 @@
           <div class="card-theme">
             <div class="mini text-orange-500 mb-2">Benefits</div>
 
-            <!-- listbox for keyboard -->
             <div id="benefitsListWrap"
                  role="listbox"
                  aria-label="SMB Benefits"
                  aria-activedescendant="benefit_opt_${activeBenefitIdx}"
                  tabindex="0"
-                 class="grid gap-2">
-              <!-- rows injected -->
-            </div>
+                 class="grid gap-2"></div>
           </div>
 
-          <!-- Desktop explanation panel -->
           <div class="card-theme benefits-desktop-panel">
             <div class="mini text-orange-500 mb-2">Explanation</div>
-            <!-- font +15%: 12px -> 14px -->
             <div id="benefitExplain" class="text-[14px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap"></div>
             <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
               Tip: This content can also be reused later inside the client dashboard.
@@ -1272,7 +1315,6 @@
               <span class="benefit-marker" aria-hidden="true">✓</span>
             </div>
 
-            <!-- Mobile-only inline explanation (A: animated expand/collapse) -->
             <div id="${inlineId}" class="benefit-inline benefits-mobile-inline ${inlineOpen}">
               <div class="text-[14px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap">
                 ${escapeHtml(b.desc)}
@@ -1282,13 +1324,10 @@
         `;
       }).join("");
 
-      // Desktop panel content
       const explain = document.getElementById("benefitExplain");
       if (explain) explain.textContent = current?.desc || "";
 
-      // Keyboard (Arrow Up/Down, Home/End, Enter/Space) + Typeahead
       bindBenefitsKeyboard();
-
       i18n.applyTranslations(document.getElementById("setupModal"));
     }
 
@@ -1298,16 +1337,12 @@
       if (!Number.isFinite(clamped)) return;
 
       activeBenefitIdx = clamped;
-
-      // ✅ Persist + URL sync (extension only)
       saveBenefitIdx(activeBenefitIdx);
       writeBenefitsIdxToHash(activeBenefitIdx);
 
-      // Update aria-activedescendant
       const wrap = document.getElementById("benefitsListWrap");
       if (wrap) wrap.setAttribute("aria-activedescendant", `benefit_opt_${activeBenefitIdx}`);
 
-      // Update active class + aria-selected + marker is handled by class
       document.querySelectorAll(".benefit-row").forEach((el) => {
         const i = Number(el.getAttribute("data-idx"));
         const isActive = i === activeBenefitIdx;
@@ -1315,58 +1350,45 @@
         el.setAttribute("aria-selected", isActive ? "true" : "false");
       });
 
-      // Update desktop explanation
       const explain = document.getElementById("benefitExplain");
       const current = smbBenefits[activeBenefitIdx];
       if (explain && current) explain.textContent = current.desc;
 
-      // Update mobile inline open/close (A: animation via class)
       for(let i=0;i<smbBenefits.length;i++){
         const inline = document.getElementById(`benefit_inline_${i}`);
         if (!inline) continue;
         inline.classList.toggle("open", i === activeBenefitIdx);
       }
 
-      // Scroll active into view (keyboard usability)
       if (options.scroll){
         const activeEl = document.getElementById(`benefit_opt_${activeBenefitIdx}`);
         if (activeEl && typeof activeEl.scrollIntoView === "function"){
           activeEl.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
         }
       }
-
-      // Optional: keep keyboard focus on the list container
       if (options.focusList){
         document.getElementById("benefitsListWrap")?.focus();
       }
     }
 
-    // ✅ Keyboard: dedupe binding + typeahead buffer
     let __benefitsTypeahead = { buf: "", t: null };
 
     function bindBenefitsKeyboard(){
       const wrap = document.getElementById("benefitsListWrap");
       if(!wrap) return;
-
-      // Prevent duplicate binding on re-open
       if (wrap.dataset.bound === "1") return;
       wrap.dataset.bound = "1";
 
       wrap.addEventListener("keydown", (e) => {
         const key = e.key;
-
-        // existing nav keys
         const handled =
           key === "ArrowDown" || key === "ArrowUp" ||
           key === "Home" || key === "End" ||
           key === "Enter" || key === " ";
 
-        // typeahead: alphanumerics
         const isTypeKey = key.length === 1 && /[a-z0-9]/i.test(key);
-
         if (!handled && !isTypeKey) return;
 
-        // Typeahead
         if (isTypeKey){
           e.preventDefault();
           e.stopPropagation();
@@ -1381,7 +1403,6 @@
           return;
         }
 
-        // Navigation keys
         e.preventDefault();
         e.stopPropagation();
 
@@ -1432,7 +1453,7 @@
       GLOBAL: {
         Receptionist: [
           { key:"pop_rec_standard", title:"Popular: Standard Receptionist + Booking", category:"Popular",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} in {{MARKET}}.
+            script:`You are the AI receptionist for {{COMPANY_NAME}} in {{MARKET}}.
 Primary goals:
 - Answer calls politely
 - Provide basic info
@@ -1442,13 +1463,13 @@ Always confirm details before ending the call.`}
         ],
         "Sales Agent": [
           { key:"pop_sales_qual", title:"Popular: Sales Lead Qualifier + Booking", category:"Popular",
-            script:`You are the AI sales agent for {{BUSINESS_NAME}}.
+            script:`You are the AI sales agent for {{COMPANY_NAME}}.
 Qualify leads quickly and book appointments.
 Ask: service needed, location, timeline, budget range (optional), contact info.`}
         ],
         "Support Agent": [
           { key:"rec_support_helpdesk", title:"Recommended: Helpdesk + Escalation", category:"Recommended",
-            script:`You are the AI support agent for {{BUSINESS_NAME}}.
+            script:`You are the AI support agent for {{COMPANY_NAME}}.
 Collect: name, phone, account/order (if applicable), issue description, urgency.
 Provide a short helpful step, then create a ticket and confirm callback.`}
         ]
@@ -1456,7 +1477,7 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
       Electrical: {
         Receptionist: [
           { key:"el_rec_safety", title:"Recommended: Electrical Safety First", category:"Recommended",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electrical).
+            script:`You are the AI receptionist for {{COMPANY_NAME}} (Electrical).
 Ask: sparking/burning smell/smoke? If yes, advise to turn off breaker if safe and call emergency services if needed.
 Collect: address, issue description, contact info, urgency.`}
         ]
@@ -1477,11 +1498,9 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     function applyVars(text){
-      const businessName = (document.getElementById('v3')?.innerText && document.getElementById('v3').innerText !== i18n.t("sync"))
-        ? document.getElementById('v3').innerText
-        : "YOUR BUSINESS";
+      const cn = (companyName && companyName.trim().length) ? companyName.trim() : "YOUR COMPANY";
       return (text || "")
-        .replaceAll("{{BUSINESS_NAME}}", businessName)
+        .replaceAll("{{COMPANY_NAME}}", cn)
         .replaceAll("{{MARKET}}", selectedMarket || "YOUR MARKET");
     }
 
@@ -1598,8 +1617,21 @@ Collect: address, issue description, contact info, urgency.`}
     }
     function onVoiceChange(id){ selectedVoiceId = id; }
 
+    function getTemplateSummaryForStep(){
+      const { templates } = getTemplatesFor(selectedRole);
+      const t = templates.find(x => x.key === selectedTemplateKey) || templates[0];
+      const title = t ? dt("template_titles", t.title, t.title) : "Template";
+      return title;
+    }
+
+    function getAgentSummary(){
+      // Example: Receptionist • Popular: Standard • Mia
+      const tplTitle = getTemplateSummaryForStep();
+      return `${selectedRole} • ${tplTitle} • ${selectedVoiceId}`.toUpperCase();
+    }
+
     // ============================
-    // Community (same as your version)
+    // Community (unchanged)
     // ============================
     let communityTab = "NEWSLETTER";
 
@@ -1836,7 +1868,7 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     // ============================
-    // Script Editor (same)
+    // Script Editor
     // ============================
     let scriptEditorDraft = null;
 
@@ -1859,16 +1891,16 @@ Collect: address, issue description, contact info, urgency.`}
       const tEl = document.getElementById("mTitle");
       const shell = document.getElementById("modalShell");
 
-      shell.classList.remove("role-wide","info-wide","community-wide","benefits-wide");
+      shell.classList.remove("role-wide","info-wide","community-wide","benefits-wide","plan-wide","activate-wide");
       shell.classList.add("script-wide");
 
       m.style.display = "flex";
-      lockBodyScroll(); // ✅ extension: lock background scroll
+      lockBodyScroll();
 
       s.innerHTML = "";
       tEl.innerText = i18n.t("script_editor_title");
 
-      const businessName = (document.getElementById("v3")?.innerText || "").trim() || "YOUR BUSINESS";
+      const cn = (companyName && companyName.trim().length) ? companyName.trim() : "YOUR COMPANY";
       const industry = (selectedIndustryKey || "GLOBAL");
       const market = (selectedMarket || "YOUR MARKET");
       const roleHelp = i18n.t(getRoleHelpKey(selectedRole));
@@ -1883,7 +1915,7 @@ Collect: address, issue description, contact info, urgency.`}
             <div class="script-badges">
               <div class="badge">${escapeHtml(market)}</div>
               <div class="badge">${escapeHtml(industry)}</div>
-              <div class="badge">${escapeHtml(businessName)}</div>
+              <div class="badge">${escapeHtml(cn)}</div>
               <div class="badge">${escapeHtml(selectedRole)}</div>
             </div>
           </div>
@@ -1892,7 +1924,7 @@ Collect: address, issue description, contact info, urgency.`}
             <div class="mini text-orange-500 mb-2">Role Behavior</div>
             <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(roleHelp)}</div>
             <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">
-              Variables: <span class="text-orange-500">{{BUSINESS_NAME}}</span>, <span class="text-orange-500">{{MARKET}}</span>
+              Variables: <span class="text-orange-500">{{COMPANY_NAME}}</span>, <span class="text-orange-500">{{MARKET}}</span>
             </div>
           </div>
 
@@ -1930,16 +1962,15 @@ Collect: address, issue description, contact info, urgency.`}
 
     function scriptEditorBackToRoleModal(){
       document.getElementById("modalShell").classList.remove("script-wide");
-      triggerModal(4);
+      triggerModal(3);
     }
 
     // ============================
-    // MODAL FLOW + Accessibility helpers
+    // MODAL FLOW + Accessibility
     // ============================
     let lastModalStep = null;
     let lastFocusedEl = null;
 
-    // ✅ Extension: Body scroll lock for modal (no UI changes)
     let __scrollY = 0;
     let __bodyLocked = false;
 
@@ -1991,7 +2022,7 @@ Collect: address, issue description, contact info, urgency.`}
       ].join(',');
 
       const focusables = () => Array.from(shell.querySelectorAll(selectors))
-        .filter(el => el.offsetParent !== null); // visible
+        .filter(el => el.offsetParent !== null);
 
       function onKeydown(e){
         if(modal.style.display !== "flex") return;
@@ -2011,7 +2042,6 @@ Collect: address, issue description, contact info, urgency.`}
         }
       }
 
-      // ensure only one listener
       if(!window.__aicallport_modalTrapBound){
         window.__aicallport_modalTrapBound = true;
         document.addEventListener("keydown", onKeydown, true);
@@ -2021,25 +2051,25 @@ Collect: address, issue description, contact info, urgency.`}
     function closeModal(){
       const modal = document.getElementById('setupModal');
       if (modal.style.display !== "flex") {
-        // still ensure unlock is safe
         unlockBodyScroll();
         return;
       }
       modal.style.display = 'none';
-
-      // ✅ extension: unlock background scroll
       unlockBodyScroll();
 
-      // restore focus for accessibility
       try { lastFocusedEl?.focus?.(); } catch(e){}
       lastFocusedEl = null;
     }
 
-    async function triggerModal(step){
-      lastModalStep = step;
+    function resetShellClasses(shell){
+      shell.classList.remove('role-wide','info-wide','community-wide','script-wide','benefits-wide','plan-wide','activate-wide');
+    }
 
-      // record last focus before opening
+    async function triggerModal(step, opts){
+      lastModalStep = step;
       lastFocusedEl = document.activeElement;
+
+      const options = opts || {};
 
       const m = document.getElementById('setupModal');
       const c = document.getElementById('mContent');
@@ -2047,15 +2077,12 @@ Collect: address, issue description, contact info, urgency.`}
       const tEl = document.getElementById('mTitle');
       const shell = document.getElementById('modalShell');
 
-      shell.classList.remove('role-wide','info-wide','community-wide','script-wide','benefits-wide');
+      resetShellClasses(shell);
       m.style.display = 'flex';
-
-      // ✅ extension: lock background scroll
       lockBodyScroll();
 
       c.innerHTML = "";
       s.innerHTML = "";
-
       trapFocusInModal();
 
       if(step === "info"){
@@ -2076,19 +2103,20 @@ Collect: address, issue description, contact info, urgency.`}
         shell.classList.add('benefits-wide');
         tEl.innerText = i18n.t("smb_benefits");
         renderBenefits();
-        // focus list container after paint
         setTimeout(() => document.getElementById("benefitsListWrap")?.focus(), 30);
         return;
       }
 
+      // Step 1: Country (Markets)
       if(step === 1){
         tEl.innerText = i18n.t("step_01");
         s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_countries" onkeyup="filterMarket(this.value)">`;
-        renderMarketByContinent("");
+        await renderMarketByContinent("");
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
 
+      // Step 2: Industry
       if(step === 2){
         tEl.innerText = i18n.t("step_02");
         s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_industries" onkeyup="filterIndustryCategories(this.value)">`;
@@ -2098,19 +2126,10 @@ Collect: address, issue description, contact info, urgency.`}
         return;
       }
 
+      // Step 3: Agent Setup (role/template/voice + script editor)
       if(step === 3){
-        tEl.innerText = i18n.t("step_03");
-        c.innerHTML = `
-          <input id="bn" data-i18n-placeholder="business_name" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
-          <button type="button" onclick="saveB()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">${escapeHtml(i18n.t("save"))}</button>
-        `;
-        i18n.applyTranslations(document.getElementById("setupModal"));
-        return;
-      }
-
-      if(step === 4){
         shell.classList.add('role-wide');
-        tEl.innerText = i18n.t("step_04");
+        tEl.innerText = i18n.t("step_03");
 
         c.innerHTML = `
           <div class="pill mb-4">${escapeHtml(i18n.t("role_templates_voice"))}</div>
@@ -2163,7 +2182,7 @@ Collect: address, issue description, contact info, urgency.`}
           <div class="modal-footer">
             <div class="grid sm:grid-cols-2 gap-2">
               <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="finish(4, selectedRole)">
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="confirmAgentSetup()">
                 ${escapeHtml(i18n.t("confirm_role_template_voice"))}
               </button>
             </div>
@@ -2185,7 +2204,7 @@ Collect: address, issue description, contact info, urgency.`}
             templateCategoryFilter = "ALL";
             templateSearchQuery = "";
             refreshTemplatesForCurrentSelection(true);
-            triggerModal(4);
+            triggerModal(3, { preserve: true });
           });
           b.style.fontSize = "10px";
           b.style.padding = "14px";
@@ -2203,82 +2222,229 @@ Collect: address, issue description, contact info, urgency.`}
         return;
       }
 
-      if(step === 5){
-        tEl.innerText = i18n.t("step_05");
-        c.innerHTML = "";
-        c.appendChild(createBtn(i18n.t("demo_call"), runVoice));
+      // Step 4: Company name
+      if(step === 4){
+        tEl.innerText = i18n.t("step_04");
+        c.innerHTML = `
+          <div class="pill mb-4">${escapeHtml(i18n.t("business_name"))}</div>
+          <input id="companyNameInput" data-i18n-placeholder="business_name" value="${escapeHtml(companyName || "")}"
+            class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
+          <button type="button" onclick="saveCompanyName()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px]">
+            ${escapeHtml(i18n.t("save"))}
+          </button>
+        `;
+        i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
 
+      // Step 5: Plan
+      if(step === 5){
+        shell.classList.add('plan-wide');
+        tEl.innerText = i18n.t("step_05");
+
+        const cur = PLANS.find(p => p.id === selectedPlanId) || null;
+
+        c.innerHTML = `
+          <div class="pill mb-4">${escapeHtml(i18n.t("plan_select_title"))}</div>
+
+          <div class="grid lg:grid-cols-2 gap-4 text-left">
+            ${PLANS.map(p => {
+              const active = p.id === selectedPlanId;
+              return `
+                <div class="card-theme" style="${active ? "border-color: rgba(249,115,22,0.55); background: rgba(249,115,22,0.10);" : ""}">
+                  <div class="mini text-orange-500 mb-2">Plan</div>
+                  <div class="text-white font-black text-2xl">${escapeHtml(`$${p.price}`)}<span class="text-[12px] text-slate-400 font-black uppercase tracking-widest"> /mo</span></div>
+                  <div class="mt-2 text-[12px] text-slate-300 font-semibold leading-relaxed">
+                    <span class="text-slate-400 font-black uppercase tracking-widest">${escapeHtml(i18n.t("includes"))}:</span>
+                    <span class="text-white font-black"> ${escapeHtml(String(p.minutes))} </span>
+                    <span class="text-slate-400 font-black uppercase tracking-widest">${escapeHtml(i18n.t("minutes"))}</span>
+                  </div>
+                  <div class="mt-2 text-[12px] text-slate-300 font-semibold leading-relaxed">
+                    <span class="text-slate-400 font-black uppercase tracking-widest">${escapeHtml(i18n.t("overage"))}:</span>
+                    <span class="text-white font-black"> $${escapeHtml(String(OVERAGE_PER_MIN.toFixed(2)))} </span>
+                    <span class="text-slate-400 font-black uppercase tracking-widest">${escapeHtml(i18n.t("per_min"))}</span>
+                    <span class="text-slate-500"> • ${escapeHtml(i18n.t("billed_next"))}</span>
+                  </div>
+
+                  <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-4" type="button" onclick="selectPlan('${p.id}')">
+                    ${active ? "SELECTED" : "SELECT"}
+                  </button>
+                </div>
+              `;
+            }).join("")}
+          </div>
+
+          <div class="modal-footer">
+            <div class="grid sm:grid-cols-2 gap-2">
+              <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic ${selectedPlanId ? "" : "opacity-40 pointer-events-none"}"
+                type="button" onclick="confirmPlan()">
+                ${escapeHtml(i18n.t("confirm_plan"))}
+              </button>
+            </div>
+          </div>
+        `;
+
+        i18n.applyTranslations(document.getElementById("setupModal"));
+        return;
+      }
+
+      // Step 6: Demo gate (2×30s + SATISFIED)
       if(step === 6){
         tEl.innerText = i18n.t("step_06");
-        c.innerHTML = "";
-        c.appendChild(createBtn(i18n.t("deploy_get_number"), () => {
-          confetti();
-          setDeployed(true);
-          finish(6, "READY");
-          setTimeout(() => {
-            window.location.href = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
-          }, 900);
-        }));
+
+        const used = demoCallsUsed;
+        const max = 2;
+        const demosLeft = Math.max(0, max - used);
+
+        c.innerHTML = `
+          <div class="pill mb-3">${escapeHtml(i18n.t("step_06"))}</div>
+
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("demos_policy"))}</div>
+            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+              <span class="text-slate-400 font-black uppercase tracking-widest">${escapeHtml(i18n.t("demos_used"))}:</span>
+              <span class="text-white font-black" id="demoUsedCount">${used}/${max}</span>
+            </div>
+
+            <div class="mt-3 grid sm:grid-cols-2 gap-2">
+              <button id="demoBtn"
+                class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic ${used >= max ? "opacity-40 pointer-events-none" : ""}"
+                type="button"
+                onclick="runDemoCall()">
+                ${escapeHtml(i18n.t("demo_call"))}
+              </button>
+
+              <button id="satisfiedBtn"
+                class="modal-btn justify-center text-center"
+                type="button"
+                onclick="pressSatisfied()">
+                ${escapeHtml(i18n.t("satisfied"))}
+              </button>
+            </div>
+
+            <div id="demoMsg" class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              ${demoCompletedOnce ? "Demo completed once. SATISFIED unlocks activation." : escapeHtml(i18n.t("demo_required"))}
+            </div>
+
+            <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              On each demo call, the system will stop automatically at 30 seconds.
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <div class="grid sm:grid-cols-2 gap-2">
+              <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="handleStep(7)">
+                ${escapeHtml(i18n.t("step_07"))}
+              </button>
+            </div>
+          </div>
+        `;
+
+        i18n.applyTranslations(document.getElementById("setupModal"));
+        return;
+      }
+
+      // Step 7: Activate (Checklist + big ACTIVATE button)
+      if(step === 7){
+        shell.classList.add('activate-wide');
+        tEl.innerText = i18n.t("step_07");
+
+        const checklist = [
+          { ok: marketSelected(), label: "Country selected" },
+          { ok: industrySelected(), label: "Industry selected" },
+          { ok: agentConfigured(), label: "Agent configured" },
+          { ok: companyNameSet(), label: "Company name set" },
+          { ok: planSelected(), label: "Plan selected" },
+          { ok: demoCompletedOnce, label: "At least 1 demo completed" },
+          { ok: activationUnlocked, label: "SATISFIED pressed" }
+        ];
+
+        c.innerHTML = `
+          <div class="pill mb-4">${escapeHtml(i18n.t("activate_title"))}</div>
+
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">Checklist</div>
+
+            <div class="grid gap-2">
+              ${checklist.map(x => `
+                <div class="flex items-center justify-between gap-3 bg-white/5 border border-white/10 rounded-xl p-3">
+                  <div class="text-[10px] font-black uppercase tracking-widest text-white">${escapeHtml(x.label)}</div>
+                  <div class="text-[10px] font-black uppercase tracking-widest ${x.ok ? "text-green-400" : "text-slate-500"}">
+                    ${x.ok ? "OK" : "PENDING"}
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+
+            <div class="mt-3 text-[10px] font-black uppercase tracking-widest ${activationUnlocked ? "text-green-400" : "text-slate-500"}">
+              ${activationUnlocked ? escapeHtml(i18n.t("activate_ready")) : escapeHtml(i18n.t("activate_locked"))}
+            </div>
+          </div>
+
+          <button class="orange-btn w-full py-4 rounded-xl font-black text-[11px] uppercase italic mt-4 ${canActivate() ? "" : "opacity-40 pointer-events-none"}"
+            type="button"
+            onclick="activateNow()">
+            ${escapeHtml(i18n.t("activate_btn"))}
+          </button>
+
+          <div class="modal-footer">
+            <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+          </div>
+        `;
+
+        i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
     }
 
     // ============================
-    // Step 1 rendering
+    // Step 1 rendering (✅ /api/markets only; stable; no double sort; clear empty)
     // ============================
     let _marketsByContinentCache = null;
 
-    // ✅ Step 1: Markets loaded from /api/markets (grouped by region)
     async function getMarketsGroupedByContinent() {
-  if (_marketsByContinentCache) return _marketsByContinentCache;
+      if (_marketsByContinentCache) return _marketsByContinentCache;
 
-  const res = await fetch("/api/markets", { cache: "no-store" });
+      const res = await fetch("/api/markets", { cache: "no-store" });
+      if (!res.ok) {
+        console.error("Failed to load /api/markets:", res.status);
+        _marketsByContinentCache = {};
+        return _marketsByContinentCache;
+      }
 
-  if (!res.ok) {
-    console.error("Failed to load /api/markets:", res.status);
-    _marketsByContinentCache = {};
-    return _marketsByContinentCache;
-  }
+      const rows = await res.json();
+      const grouped = {};
 
-  const rows = await res.json();
-  const grouped = {};
+      (rows || []).forEach((row) => {
+        const continent = row.region || "Other";
+        const name = row.name || "";
+        if (!name) return;
 
-  (rows || []).forEach((row) => {
-    const continent = row.region || "Other";
-    const name = row.name || "";
-    const iso2 = row.iso2 || "";
+        grouped[continent] ||= [];
+        grouped[continent].push(name);
+      });
 
-    if (!name) return;
+      // Sort once per continent
+      Object.keys(grouped).forEach((k) => {
+        grouped[k].sort((a, b) => String(a).localeCompare(String(b)));
+      });
 
-    if (!grouped[continent]) {
-      grouped[continent] = [];
+      _marketsByContinentCache = grouped;
+      return grouped;
     }
 
-    grouped[continent].push(name);
-  });
-
-  Object.keys(grouped).forEach((k) => {
-  grouped[k].sort((a, b) =>
-    String(a).localeCompare(String(b))
-  );
-});
-
-  _marketsByContinentCache = grouped;
-  return grouped;
-}
-
     async function renderMarketByContinent(searchQuery){
-
       const c = document.getElementById('mContent');
       c.innerHTML = "";
       const q = (searchQuery || "").trim().toUpperCase();
 
       const marketsByContinent = await getMarketsGroupedByContinent();
+      const continents = Object.keys(marketsByContinent);
 
-      Object.keys(marketsByContinent).forEach(continent => {
-        const list = (marketsByContinent[continent] || []).slice().sort((a,b) => a.localeCompare(b));
+      continents.forEach(continent => {
+        const list = (marketsByContinent[continent] || []);
         const filtered = list.filter(name => name.toUpperCase().includes(q));
         if(!filtered.length) return;
 
@@ -2291,7 +2457,7 @@ Collect: address, issue description, contact info, urgency.`}
           const btn = createBtn(name, async () => {
             selectedMarket = name;
             await updatePricingUIForMarket(name);
-            finish(1, name);
+            finishStep(1, name);
           });
           btn.setAttribute('data-n', name);
           btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${escapeHtml(name)}`;
@@ -2302,8 +2468,9 @@ Collect: address, issue description, contact info, urgency.`}
       if(!c.children.length){
         const hint = document.createElement('div');
         hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
-        // ✅ UPDATED message so it’s clear what’s going on
-        hint.innerText = "No markets available yet. (Backend countries endpoint not connected)";
+        hint.innerText = (continents.length === 0)
+          ? "No markets returned."
+          : i18n.t("no_matching");
         c.appendChild(hint);
       }
     }
@@ -2332,8 +2499,8 @@ Collect: address, issue description, contact info, urgency.`}
           const shown = dt("industries", name, name);
           const btn = createBtn(shown, () => {
             selectedIndustryKey = name;
-            finish(2, shown);
             refreshTemplatesForCurrentSelection(true);
+            finishStep(2, shown.toUpperCase());
           });
           btn.setAttribute('data-n', shown);
           c.appendChild(btn);
@@ -2350,43 +2517,204 @@ Collect: address, issue description, contact info, urgency.`}
     function filterIndustryCategories(query){ renderIndustryCategoryList(query); }
 
     // ============================
-    // ACTIONS + LOCK STATE
+    // PLAN actions
     // ============================
-    function refreshStepLocks(){
-      for(let i=1;i<=6;i++){
-        const el = document.getElementById(`s${i}`);
-        if(!el) continue;
-        const unlocked = completedSteps >= i-1;
-        el.classList.toggle("locked", !unlocked);
+    function selectPlan(planId){
+      selectedPlanId = planId;
+      triggerModal(5, { preserve: true });
+    }
+
+    function confirmPlan(){
+      if(!selectedPlanId) return;
+      const p = PLANS.find(x => x.id === selectedPlanId);
+      const label = p ? `$${p.price} • ${p.minutes} MIN` : "PLAN";
+      finishStep(5, label);
+    }
+
+    // ============================
+    // Demo gate actions (2 calls, 30s each; SATISFIED unlock)
+    // ============================
+    function stopActiveDemoCall(){
+      try { vapiFallbackInstance?.stop?.(); } catch {}
+    }
+
+    async function runDemoCall(){
+      if (demoCallsUsed >= 2) return;
+
+      try{
+        const industry = getCurrentIndustryKey();
+        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
+
+        const cn = (companyName && companyName.trim().length) ? companyName.trim() : "YOUR COMPANY";
+        const finalScript = applyVars(agentScript || "");
+
+        await vapiStartCall(assistantId, {
+          voice: getSelectedVapiVoice(),
+          firstMessage: `Hi! Thank you for calling ${cn}. How can I help you today?`,
+          model: { provider: "openai", model: "gpt-4o-mini", messages: [{ role: "system", content: finalScript }] }
+        });
+
+        demoCallsUsed += 1;
+        updateDemoModalUI();
+
+        // Auto-stop at 30 seconds
+        if (demoStopTimeout) clearTimeout(demoStopTimeout);
+        demoStopTimeout = setTimeout(() => {
+          stopActiveDemoCall();
+          onDemoEnded();
+        }, 30_000);
+
+        // If user closes modal, call continues; that’s OK.
+        // We count demo once started, and mark completed once stop fires.
+        closeModal();
+        finishStep(6, `DEMO ${Math.min(2, demoCallsUsed)}/2`);
+      } catch(err){
+        console.error(err);
+        alert("Error starting demo call. Check console + /api/config.");
       }
     }
 
-    function handleStep(s){
-      if (s === 1 || completedSteps >= s - 1) triggerModal(s);
-    }
-
-    function finish(s, v){
-      completedSteps = Math.max(completedSteps, s);
-      const valEl = document.getElementById(`v${s}`);
-      if(valEl) valEl.innerText = v;
-
-      document.getElementById(`s${s}`)?.classList.add('active');
-      closeModal();
-
-      for(let i=1;i<=6;i++){
-        document.getElementById(`s${i}`)?.classList.remove("next-focus");
+    function onDemoEnded(){
+      demoCompletedOnce = true;
+      // update tiles if they still say default
+      const v6 = document.getElementById("v6");
+      if (v6 && (v6.innerText || "").toUpperCase().includes("SANDBOX")){
+        v6.innerText = `DEMO ${Math.min(2, demoCallsUsed)}/2`;
       }
-      if(s < 6) document.getElementById(`s${s + 1}`)?.classList.add('next-focus');
-
       refreshStepLocks();
     }
 
-    function saveB(){
-      const raw = (document.getElementById('bn').value || "");
+    function updateDemoModalUI(){
+      const usedEl = document.getElementById("demoUsedCount");
+      if (usedEl) usedEl.textContent = `${demoCallsUsed}/2`;
+
+      const msg = document.getElementById("demoMsg");
+      if (msg){
+        msg.textContent = demoCompletedOnce
+          ? "Demo completed once. SATISFIED unlocks activation."
+          : i18n.t("demo_required");
+      }
+
+      const demoBtn = document.getElementById("demoBtn");
+      if (demoBtn){
+        if (demoCallsUsed >= 2){
+          demoBtn.classList.add("opacity-40","pointer-events-none");
+        } else {
+          demoBtn.classList.remove("opacity-40","pointer-events-none");
+        }
+      }
+    }
+
+    function pressSatisfied(){
+      if (!demoCompletedOnce){
+        const msg = document.getElementById("demoMsg");
+        if (msg) msg.textContent = i18n.t("demo_required");
+        return;
+      }
+      activationUnlocked = true;
+
+      // Update Step 7 value and open activation modal
+      finishStep(7, "READY");
+      triggerModal(7);
+    }
+
+    // ============================
+    // Activate
+    // ============================
+    function activateNow(){
+      if (!canActivate()) return;
+
+      try { confetti(); } catch {}
+      setDeployed(true);
+
+      const link = STRIPE_CHECKOUT_LINKS[selectedPlanId] || STRIPE_CHECKOUT_LINKS.plan_299;
+      setTimeout(() => {
+        window.location.href = link;
+      }, 900);
+    }
+
+    // ============================
+    // ACTIONS + LOCK STATE (✅ explicit readiness checks)
+    // ============================
+    function stepUnlocked(step){
+      // Step 1 always unlocked
+      if (step === 1) return true;
+
+      // Must satisfy prior readiness in sequence
+      if (step === 2) return marketSelected();
+      if (step === 3) return marketSelected() && industrySelected();
+      if (step === 4) return marketSelected() && industrySelected() && agentConfigured();
+      if (step === 5) return marketSelected() && industrySelected() && agentConfigured() && companyNameSet();
+      if (step === 6) return marketSelected() && industrySelected() && agentConfigured() && companyNameSet() && planSelected();
+      if (step === 7) return marketSelected() && industrySelected() && agentConfigured() && companyNameSet() && planSelected() && demoCompletedOnce && activationUnlocked;
+
+      return false;
+    }
+
+    function refreshStepLocks(){
+      for(let i=1;i<=7;i++){
+        const el = document.getElementById(`s${i}`);
+        if(!el) continue;
+        const unlocked = stepUnlocked(i);
+        el.classList.toggle("locked", !unlocked && i !== 1);
+      }
+
+      // next-focus hint: first step that is "next" by readiness
+      for(let i=1;i<=7;i++){
+        document.getElementById(`s${i}`)?.classList.remove("next-focus");
+      }
+
+      // Determine "next focus"
+      const next =
+        !marketSelected() ? 1 :
+        !industrySelected() ? 2 :
+        !agentConfigured() ? 3 :
+        !companyNameSet() ? 4 :
+        !planSelected() ? 5 :
+        (!demoCompletedOnce || !activationUnlocked) ? 6 :
+        7;
+
+      document.getElementById(`s${next}`)?.classList.add("next-focus");
+    }
+
+    function handleStep(s){
+      if (s === 1) return triggerModal(1);
+      if (!stepUnlocked(s)) return;
+      triggerModal(s);
+    }
+
+    function finishStep(stepNumber, valueText){
+      // UI-only progress, no unlock logic
+      completedSteps = Math.max(completedSteps, stepNumber);
+
+      const valEl = document.getElementById(`v${stepNumber}`);
+      if(valEl && valueText != null) valEl.innerText = String(valueText);
+
+      document.getElementById(`s${stepNumber}`)?.classList.add('active');
+      closeModal();
+      refreshStepLocks();
+    }
+
+    function confirmAgentSetup(){
+      // Ensure script is current with variables
+      agentScript = applyVars(agentScript);
+
+      // Create a useful summary for v3
+      const summary = getAgentSummary();
+      finishStep(3, summary);
+
+      // After agent configured, Step 4 unlock
+      refreshStepLocks();
+    }
+
+    function saveCompanyName(){
+      const raw = (document.getElementById('companyNameInput')?.value || "");
       const v = raw.trim().slice(0, 60);
       if(v.length >= 2){
-        finish(3, v);
+        companyName = v;
+        // Update scripts with company name variable
         agentScript = applyVars(agentScript);
+        finishStep(4, v.toUpperCase());
       }
     }
 
@@ -2434,7 +2762,7 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     // ============================
-    // VAPI: Preview + Demo
+    // VAPI: Preview
     // ============================
     async function previewVoice(){
       try{
@@ -2450,28 +2778,6 @@ Collect: address, issue description, contact info, urgency.`}
       } catch(e){
         console.error(e);
         alert("Preview failed. Check console + /api/config.");
-      }
-    }
-
-    async function runVoice(){
-      try{
-        const industry = getCurrentIndustryKey();
-        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
-
-        const businessName = document.getElementById('v3')?.innerText || "YOUR BUSINESS";
-        const finalScript = applyVars(agentScript || "");
-
-        await vapiStartCall(assistantId, {
-          voice: getSelectedVapiVoice(),
-          firstMessage: `Hi! Thank you for calling ${businessName}. How can I help you today?`,
-          model: { provider: "openai", model: "gpt-4o-mini", messages: [{ role: "system", content: finalScript }] }
-        });
-
-        closeModal();
-        finish(5, "ACTIVE");
-      } catch(err){
-        console.error(err);
-        alert("Error starting demo call. Check console + /api/config.");
       }
     }
 
@@ -2511,10 +2817,10 @@ Collect: address, issue description, contact info, urgency.`}
       document.getElementById("s4").addEventListener("click", () => handleStep(4));
       document.getElementById("s5").addEventListener("click", () => handleStep(5));
       document.getElementById("s6").addEventListener("click", () => handleStep(6));
+      document.getElementById("s7").addEventListener("click", () => handleStep(7));
 
       document.getElementById("mClose").addEventListener("click", closeModal);
 
-      // Click outside modal closes
       document.getElementById("setupModal").addEventListener("click", (e) => {
         if (e.target && e.target.id === "setupModal") closeModal();
       });
@@ -2543,23 +2849,26 @@ Collect: address, issue description, contact info, urgency.`}
     initLangList();
     wireTopButtons();
 
+    // Initialize templates
     selectedIndustryKey = "Electrical";
     refreshTemplatesForCurrentSelection(true);
     const initTemplates = getTemplatesFor(selectedRole).templates;
     if(initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
 
+    // Pricing default
     updatePricingUIForMarket("United States");
 
+    // If deployed previously, mark activation tile
     if(isDeployed()){
-      document.getElementById('v6').innerText = "READY";
-      document.getElementById('s6').classList.add('active');
-      completedSteps = Math.max(completedSteps, 6);
+      document.getElementById('v7').innerText = "DEPLOYED";
+      document.getElementById('s7').classList.add('active');
+      completedSteps = Math.max(completedSteps, 7);
     }
 
     refreshStepLocks();
     i18n.applyTranslations(document);
 
-    // ✅ Deep-link entry: auto-open benefits if hash requests it
+    // Deep-link benefits
     const initialBenefit = readBenefitsIdxFromHash();
     if (initialBenefit != null){
       activeBenefitIdx = initialBenefit;
