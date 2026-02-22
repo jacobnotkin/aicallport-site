@@ -87,7 +87,11 @@
     }
     .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
 
-    .step-card.locked { opacity: 0.22; cursor: not-allowed; }
+    .step-card.locked {
+      opacity: 0.22;
+      cursor: not-allowed;
+      pointer-events: none; /* ✅ only unlocked steps clickable */
+    }
     .step-card.locked:hover { border-color: rgba(255, 255, 255, 0.1); }
 
     @keyframes border-glow {
@@ -95,11 +99,11 @@
       50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
     }
 
-    /* SMB benefits button */
+    /* blinking SMB benefits button */
     .benefits-blink {
       animation: border-glow 2s infinite ease-in-out !important;
-      border-color: rgba(249,115,22,0.55) !important;
-      background: rgba(249,115,22,0.12) !important;
+      border-color: rgba(249, 115, 22, 0.55) !important;
+      background: rgba(249, 115, 22, 0.12) !important;
     }
 
     .floating-lang { position: fixed; top: 15px; right: 15px; z-index: 1000; }
@@ -186,10 +190,16 @@
     .modal-shell.community-wide { max-width: 1120px; }
     .modal-shell.script-wide { max-width: 1120px; }
     .modal-shell.benefits-wide { max-width: 1120px; }
-    .modal-shell.plan-wide { max-width: 980px; }
     .modal-shell.activate-wide { max-width: 900px; }
 
-    .modal-content-wrap { overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+    .modal-content-wrap {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
     .modal-titlebar { display: flex; flex-direction: column; gap: 8px; }
     .modal-body { flex: 1; min-height: 0; overflow: auto; padding-right: 2px; }
 
@@ -208,7 +218,7 @@
       border-radius: 12px;
       font-weight: 900;
       text-transform: uppercase;
-      font-size: 9px;
+      font-size: 10px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
       color: white;
@@ -242,7 +252,7 @@
     }
 
     .muted-hint {
-      font-size: 10px;
+      font-size: 11px; /* ✅ easier to read */
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.18em;
@@ -276,7 +286,7 @@
       color: white;
       outline: none;
       font-weight: 700;
-      font-size: 12px;
+      font-size: 13px; /* ✅ easier to read */
       line-height: 1.5;
     }
 
@@ -336,7 +346,7 @@
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.10);
       background: rgba(255,255,255,0.04);
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.16em;
@@ -354,12 +364,12 @@
       color: white;
       outline: none;
       font-weight: 700;
-      font-size: 12px;
+      font-size: 13px; /* ✅ easier to read */
       line-height: 1.55;
       overflow: auto;
     }
 
-    /* Benefits list */
+    /* Benefits rows */
     .benefit-row {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.10);
@@ -374,10 +384,27 @@
       justify-content: space-between;
       gap: 10px;
     }
-    .benefit-row:hover { border-color: rgba(249,115,22,0.55); background: rgba(249,115,22,0.10); }
-    .benefit-row.active { border-color: rgba(249,115,22,0.8); background: rgba(249,115,22,0.14); }
-    .benefit-row:focus-visible{ box-shadow: 0 0 0 3px rgba(249,115,22,0.35); border-color: rgba(249,115,22,0.8); }
-    .benefit-marker{ font-size: 12px; font-weight: 900; color: rgba(249,115,22,0.95); opacity: 0; transform: translateY(-1px); transition: 0.15s; flex: 0 0 auto; }
+    .benefit-row:hover {
+      border-color: rgba(249,115,22,0.55);
+      background: rgba(249,115,22,0.10);
+    }
+    .benefit-row.active {
+      border-color: rgba(249,115,22,0.8);
+      background: rgba(249,115,22,0.14);
+    }
+    .benefit-row:focus-visible{
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.35);
+      border-color: rgba(249,115,22,0.8);
+    }
+    .benefit-marker{
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(249,115,22,0.95);
+      opacity: 0;
+      transform: translateY(-1px);
+      transition: 0.15s;
+      flex: 0 0 auto;
+    }
     .benefit-row.active .benefit-marker{ opacity: 1; }
 
     .benefit-inline {
@@ -386,30 +413,52 @@
       border-radius: 12px;
       margin-top: 10px;
       padding: 10px 12px;
+
       max-height: 0;
       opacity: 0;
       overflow: hidden;
+
       transition: max-height 260ms ease, opacity 220ms ease;
       will-change: max-height, opacity;
     }
     .benefit-inline.open { max-height: 260px; opacity: 1; }
-    @media (max-width: 1023px){ .benefits-desktop-panel { display: none !important; } }
-    @media (min-width: 1024px){ .benefits-mobile-inline { display: none !important; } }
 
-    /* Plan cards (hero + plan modal) */
-    .plan-card {
-      background: rgba(0,0,0,0.35);
+    @media (max-width: 1023px){
+      .benefits-desktop-panel { display: none !important; }
+    }
+    @media (min-width: 1024px){
+      .benefits-mobile-inline { display: none !important; }
+    }
+
+    /* ✅ Agent list (hero) */
+    .agent-chip {
       border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 20px;
-      padding: 16px;
-      text-align: left;
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      padding: 12px;
       cursor: pointer;
       transition: 0.18s;
       user-select: none;
     }
-    .plan-card:hover { border-color: rgba(249,115,22,0.55); background: rgba(249,115,22,0.08); }
-    .plan-card.active { border-color: rgba(249,115,22,0.95); background: rgba(249,115,22,0.12); }
+    .agent-chip:hover {
+      border-color: rgba(249,115,22,0.55);
+      background: rgba(249,115,22,0.10);
+    }
+    .agent-chip.active {
+      border-color: rgba(249,115,22,0.8);
+      background: rgba(249,115,22,0.12);
+    }
+    .agent-desc {
+      margin-top: 8px;
+      color: rgba(226,232,240,0.85);
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1.45;
+      display: none;
+    }
+    .agent-chip.active .agent-desc { display: block; }
 
+    /* Reduced motion */
     @media (prefers-reduced-motion: reduce){
       .benefit-inline { transition: none !important; }
       .benefits-blink { animation: none !important; }
@@ -489,14 +538,18 @@
         tell_us_updates: "Tell us what you want updates about (optional)",
         write_question: "Write your question or feedback...",
         write_reply: "Write a reply...",
-        ask_question: "Ask a question...",
+        ask_question: "Write your question...",
         thinking: "Thinking...",
         needs_backend: "This feature needs a backend endpoint.",
 
-        hero_h1: "GLOBAL ZERO-HUMAN<br>AI RECEPTIONIST",
+        /* ✅ NEW HERO COPY */
+        hero_h1: "AI CALL PORT",
         hero_p:
+          "Global Activation Platform for AI Call Agents.<br>" +
+          "<span class='text-orange-500'>Custom AI Agents automatically configured to your business workflow.</span><br>" +
           "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. " +
           "<span class='text-orange-500'>Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>",
+
         beta_access: "BETA ACCESS - SMALL BUSINESS",
         regular: "Regular",
         global_live: "Global Live",
@@ -508,8 +561,8 @@
         feat_2: "Pay Monthly",
         feat_3: "No Contract",
 
-        /* ✅ 7-step protocol labels */
-        step_01: "01 Country",
+        /* ✅ 7 steps */
+        step_01: "01 Market",
         step_02: "02 Industry",
         step_03: "03 Agent",
         step_04: "04 Company",
@@ -536,26 +589,28 @@
         reset_template: "Reset Template",
         preview_voice: "Preview Voice",
         voice: "Voice",
-        voice_tuning: "Voice Tuning",
-        stability: "Stability",
-        similarity: "Similarity",
-        style: "Style",
-        speaker_boost: "Speaker Boost",
-        on: "ON",
-        off: "OFF",
-        confirm_role_template_voice: "CONFIRM AGENT SETUP",
+        confirm_role_template_voice: "CONFIRM AGENT CONFIG",
 
         receptionist: "Receptionist",
         sales_agent: "Sales Agent",
-        support_agent: "Support Agent",
+        support_agent: "Customer Service",
 
         role_help_receptionist: "Handles inbound calls, captures caller info, books appointments, and routes urgent cases.",
         role_help_sales: "Qualifies leads fast, captures contact details, and books consultations.",
-        role_help_support: "Collects issue details, prioritizes urgency, and escalates when needed.",
+        role_help_support: "Resolves common issues, collects details, prioritizes urgency, and escalates when needed.",
+
+        business_name: "Company Name",
 
         demo_call: "START DEMO CALL",
         satisfied: "SATISFIED",
+        demo_rules: "2 DEMOS • 30 SECONDS EACH",
+        demos_used: "Demo calls used",
         activate: "ACTIVATE",
+
+        plan_pick: "Select Plan",
+        plan_includes: "Included minutes",
+        plan_overage: "Overage",
+        overage_rule: "$0.30/min (charged next invoice)",
 
         community_portal: "Community Portal",
         join_list: "Join List",
@@ -565,8 +620,6 @@
         terms: "Terms",
         support: "Support",
         active_agents: "ACTIVE AGENTS",
-
-        business_name: "Company Name",
 
         open_ai_qa: "AI Q&A",
         open_forum: "Forum",
@@ -610,6 +663,7 @@
     async function ensureDynamicTranslations(lang, namespace, items){
       const code = (lang || "EN").toUpperCase();
       if (code === "EN") return;
+
       const missing = (items || []).filter(x => !dynGet(code, namespace, x));
       if (!missing.length) return;
 
@@ -712,15 +766,27 @@
       </div>
     </div>
 
-    <div class="grid lg:grid-cols-5 gap-6 lg:gap-12 items-center">
+    <div class="grid lg:grid-cols-5 gap-6 lg:gap-12 items-start">
       <div class="lg:col-span-3 text-center lg:text-left">
-        <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title" data-i18n-html="hero_h1">
-          GLOBAL ZERO-HUMAN<br /> AI RECEPTIONIST
+        <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title" data-i18n="hero_h1">
+          AI CALL PORT
         </h1>
-        <p id="hero-p" class="text-slate-400 text-[11px] lg:text-sm mb-6 max-w-xs mx-auto lg:mx-0 font-bold uppercase tracking-wider" data-i18n-html="hero_p">
-          Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation.
-          <span class="text-orange-500">Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>
+
+        <p id="hero-p" class="text-slate-300 text-[13px] lg:text-base mb-5 max-w-2xl mx-auto lg:mx-0 font-bold tracking-wide leading-relaxed" data-i18n-html="hero_p">
+          Global Activation Platform for AI Call Agents.<br>
+          <span class='text-orange-500'>Custom AI Agents automatically configured to your business workflow.</span><br>
+          Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation.
+          <span class='text-orange-500'>Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>
         </p>
+
+        <!-- ✅ Clickable agent list (2 columns, many agents) -->
+        <div class="card-theme text-left mb-5">
+          <div class="mini text-orange-500 mb-2">AI Call Agents</div>
+          <div class="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-3">
+            Click an agent to view description
+          </div>
+          <div id="agentGrid" class="grid sm:grid-cols-2 gap-2"></div>
+        </div>
 
         <div class="grid gap-2 sm:flex sm:gap-3 sm:items-center">
           <button id="heroCta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic" data-i18n="start_activation" type="button">
@@ -739,42 +805,51 @@
         </div>
       </div>
 
+      <!-- ✅ Two price cards -->
       <div class="lg:col-span-2">
-        <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-6 text-center">
-          <h3 id="beta-txt" class="text-[10px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]" data-i18n="beta_access">
-            BETA ACCESS - SMALL BUSINESS
-          </h3>
-
-          <!-- ✅ TWO PRICE TAGS (two beta specials) -->
-          <div class="grid gap-3 text-left">
-            <div id="heroPlanA" class="plan-card">
-              <div class="text-[9px] font-black uppercase tracking-widest text-orange-500">BETA SPECIAL A</div>
-              <div class="flex items-end justify-between mt-2">
-                <div class="text-white font-black text-3xl"><span>$</span><span id="heroUsdA">299</span></div>
-                <div class="text-[10px] font-black uppercase tracking-widest text-slate-400"><span class="opacity-70 line-through">$</span><span id="heroRegA" class="line-through">499</span> <span class="opacity-70">REG</span></div>
-              </div>
-              <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-200">Up to <span class="text-orange-500">1000</span> minutes</div>
-              <div class="mt-1 text-[9px] font-black uppercase tracking-widest text-slate-500">Overage: <span class="text-orange-500">$0.30/min</span> next invoice</div>
-              <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-300">
-                <span class="opacity-70">≈</span> <span id="heroLocalA">—</span> <span class="opacity-60" data-i18n="per_month">/mo</span>
-              </div>
-            </div>
-
-            <div id="heroPlanB" class="plan-card">
-              <div class="text-[9px] font-black uppercase tracking-widest text-orange-500">BETA SPECIAL B</div>
-              <div class="flex items-end justify-between mt-2">
-                <div class="text-white font-black text-3xl"><span>$</span><span id="heroUsdB">599</span></div>
-                <div class="text-[10px] font-black uppercase tracking-widest text-slate-400"><span class="opacity-70 line-through">$</span><span id="heroRegB" class="line-through">999</span> <span class="opacity-70">REG</span></div>
-              </div>
-              <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-200">Up to <span class="text-orange-500">2500</span> minutes</div>
-              <div class="mt-1 text-[9px] font-black uppercase tracking-widest text-slate-500">Overage: <span class="text-orange-500">$0.30/min</span> next invoice</div>
-              <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-300">
-                <span class="opacity-70">≈</span> <span id="heroLocalB">—</span> <span class="opacity-60" data-i18n="per_month">/mo</span>
-              </div>
+        <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-6">
+          <div class="text-center">
+            <h3 id="beta-txt" class="text-[10px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]" data-i18n="beta_access">
+              BETA ACCESS - SMALL BUSINESS
+            </h3>
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">
+              Pick a plan during Step 5
             </div>
           </div>
 
-          <div class="space-y-2 my-5 text-left max-w-[260px] mx-auto border-y border-white/5 py-4">
+          <div class="grid gap-3">
+            <div id="priceCard_299" class="card-theme cursor-pointer hover:border-orange-500/40 transition" onclick="quickPickPlan('PLAN_299')">
+              <div class="flex items-center justify-between">
+                <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Beta Special</div>
+                <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 line-through">Regular $499</div>
+              </div>
+              <div class="flex items-baseline justify-between mt-2">
+                <div class="text-white font-black text-4xl"><span>$</span><span>299</span><span class="text-[12px] font-black text-orange-500 ml-2">/mo</span></div>
+                <div class="text-right">
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Up to</div>
+                  <div class="text-[12px] font-black uppercase tracking-widest text-orange-500">1000 min</div>
+                </div>
+              </div>
+              <div class="text-[11px] font-bold text-slate-300 mt-2">Overages: $0.30/min (next invoice)</div>
+            </div>
+
+            <div id="priceCard_599" class="card-theme cursor-pointer hover:border-orange-500/40 transition" onclick="quickPickPlan('PLAN_599')">
+              <div class="flex items-center justify-between">
+                <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Beta Special</div>
+                <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 line-through">Regular $999</div>
+              </div>
+              <div class="flex items-baseline justify-between mt-2">
+                <div class="text-white font-black text-4xl"><span>$</span><span>599</span><span class="text-[12px] font-black text-orange-500 ml-2">/mo</span></div>
+                <div class="text-right">
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Up to</div>
+                  <div class="text-[12px] font-black uppercase tracking-widest text-orange-500">2500 min</div>
+                </div>
+              </div>
+              <div class="text-[11px] font-bold text-slate-300 mt-2">Overages: $0.30/min (next invoice)</div>
+            </div>
+          </div>
+
+          <div class="space-y-2 mt-4 mb-4 text-left border-y border-white/5 py-4">
             <div class="flex items-center gap-2">
               <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
               <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter feat-txt" data-i18n="feat_1">Unlimited Inbound Calling</span>
@@ -789,7 +864,8 @@
             </div>
           </div>
 
-          <div id="timer" class="text-xs font-mono text-white/30 mb-4">00:00:00</div>
+          <div id="timer" class="text-xs font-mono text-white/30 mb-4 text-center">00:00:00</div>
+
           <button id="sideCta" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic" data-i18n="start_activation" type="button">
             Start Activation
           </button>
@@ -800,15 +876,14 @@
       </div>
     </div>
 
+    <!-- ✅ 7-step protocol strip -->
     <div class="mt-10 lg:mt-16">
       <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
-        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">AI Receptionist Activation Protocol</span>
+        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">AI Call Agent Activation Protocol</span>
       </div>
-
-      <!-- ✅ 7 steps -->
       <div class="grid grid-cols-2 lg:grid-cols-7 gap-3">
-        <div id="s1" class="step-card unlocked next-focus">
-          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_01">01 Country</p>
+        <div id="s1" class="step-card">
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_01">01 Market</p>
           <p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
         </div>
         <div id="s2" class="step-card locked">
@@ -825,7 +900,7 @@
         </div>
         <div id="s5" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_05">05 Plan</p>
-          <p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="choose">Choose</p>
+          <p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="choose">Choose</p>
         </div>
         <div id="s6" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_06">06 Demo</p>
@@ -925,117 +1000,22 @@
     }
 
     // ============================
-    // PLANS (two beta specials)
+    // PRICING + PLANS
     // ============================
-    const PLANS = [
-      {
-        id: "beta_299",
-        name: "Beta Special A",
-        usd: 299,
-        regUsd: 499,
-        minutes: 1000,
-        overage: 0.30,
-        stripeUrl: "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"
-      },
-      {
-        id: "beta_599",
-        name: "Beta Special B",
-        usd: 599,
-        regUsd: 999,
-        minutes: 2500,
-        overage: 0.30,
-        stripeUrl: "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"
-      }
-    ];
-    let selectedPlanId = "beta_299";
-
-    function getSelectedPlan() {
-      return PLANS.find(p => p.id === selectedPlanId) || PLANS[0];
-    }
-
-    function setSelectedPlan(planId) {
-      selectedPlanId = planId;
-      const a = document.getElementById("heroPlanA");
-      const b = document.getElementById("heroPlanB");
-      a?.classList.toggle("active", selectedPlanId === "beta_299");
-      b?.classList.toggle("active", selectedPlanId === "beta_599");
-      updatePricingUIForMarket(selectedMarket);
-      planSelected = true;
-      updateStepValues();
-      updateStepUI();
-    }
-
-    // ============================
-    // FX (USD + Local estimate)
-    // ============================
-    const marketCurrencyCode = {
-      "United States":"USD",
-      "Canada":"CAD",
-      "United Kingdom":"GBP",
-      "France":"EUR",
-      "Germany":"EUR",
-      "Spain":"EUR",
-      "Italy":"EUR",
-      "Azerbaijan":"AZN"
+    const PLANS = {
+      PLAN_299: { id: "PLAN_299", betaUsd: 299, regularUsd: 499, includedMin: 1000 },
+      PLAN_599: { id: "PLAN_599", betaUsd: 599, regularUsd: 999, includedMin: 2500 }
     };
-    const currencySymbolMap = { USD:"$", EUR:"€", GBP:"£", CAD:"$", AZN:"₼" };
-    const FX_CACHE_KEY = "aicallport_fx_cache_v1";
+    const OVERAGE_RULE = "$0.30/min (charged next invoice)";
 
-    function roundNice(amount, code){
-      if (code === "JPY" || code === "KRW") return Math.round(amount);
-      return Math.round(amount);
-    }
-    function getFxCache(){ try { return JSON.parse(localStorage.getItem(FX_CACHE_KEY)||"{}"); } catch { return {}; } }
-    function setFxCache(obj){ try { localStorage.setItem(FX_CACHE_KEY, JSON.stringify(obj||{})); } catch {} }
+    // ✅ Stripe links (keep existing for now; set your real links anytime)
+    const STRIPE_CHECKOUT_LINKS = {
+      PLAN_299: "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01",
+      PLAN_599: "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"
+    };
 
-    async function fetchFxRate(toCode){
-      const cache = getFxCache();
-      const key = `USD_${toCode}`;
-      const now = Date.now();
-      if (cache[key] && (now - cache[key].ts) < 24*60*60*1000) return cache[key].rate;
-
-      try{
-        const res = await fetch(`/api/fx?base=USD&to=${encodeURIComponent(toCode)}`, { cache: "no-store" });
-        if (!res.ok) throw new Error("fx backend missing");
-        const data = await res.json();
-        const rate = Number(data?.rate);
-        if (!rate || !isFinite(rate)) throw new Error("bad rate");
-        cache[key] = { rate, ts: now };
-        setFxCache(cache);
-        return rate;
-      } catch(e){
-        return null;
-      }
-    }
-
-    async function updatePricingUIForMarket(countryName){
-      const code = marketCurrencyCode[countryName] || "USD";
-      const sym = currencySymbolMap[code] || "$";
-
-      const planA = PLANS[0];
-      const planB = PLANS[1];
-
-      // USD always visible
-      document.getElementById("heroUsdA").textContent = String(planA.usd);
-      document.getElementById("heroRegA").textContent = String(planA.regUsd);
-      document.getElementById("heroUsdB").textContent = String(planB.usd);
-      document.getElementById("heroRegB").textContent = String(planB.regUsd);
-
-      if (code === "USD"){
-        document.getElementById("heroLocalA").textContent = `$${planA.usd}`;
-        document.getElementById("heroLocalB").textContent = `$${planB.usd}`;
-        return;
-      }
-
-      const rate = await fetchFxRate(code);
-      if (!rate){
-        document.getElementById("heroLocalA").textContent = `${sym}${planA.usd}`;
-        document.getElementById("heroLocalB").textContent = `${sym}${planB.usd}`;
-        return;
-      }
-
-      document.getElementById("heroLocalA").textContent = `${sym}${roundNice(planA.usd * rate, code)}`;
-      document.getElementById("heroLocalB").textContent = `${sym}${roundNice(planB.usd * rate, code)}`;
+    function formatPlanLabel(plan){
+      return `$${plan.betaUsd}/mo • up to ${plan.includedMin} min`;
     }
 
     // ============================
@@ -1049,19 +1029,10 @@
     };
 
     // ============================
-    // ✅ STATE (explicit readiness booleans)
+    // STATE (explicit readiness — stable gating)
     // ============================
-    let marketSelected = false;
-    let industrySelected = false;
-    let agentConfigured = false;
-    let companyNameSet = false;
-    let planSelected = false;
-    let demoCompletedOnce = false;
-    let activationUnlocked = false; // SATISFIED pressed
-
-    // values
-    let selectedIndustryKey = "Electrical";
-    let selectedMarket = "United States";
+    let selectedMarket = null;
+    let selectedIndustryKey = null;
 
     let selectedRole = "Receptionist";
     let selectedTemplateKey = null;
@@ -1069,8 +1040,13 @@
     let selectedVoiceId = "Mia";
     let selectedVoiceSettings = { stability: 0.5, similarityBoost: 0.8, style: 0.2, useSpeakerBoost: false };
 
-    let demoCallsUsed = 0;
-    let demoStopTimer = null;
+    let companyName = "";
+    let selectedPlanId = null;
+
+    let demoCallsUsed = 0;          // max 2
+    let demoCompletedOnce = false;  // after first demo ends (or forced stop)
+    let activationUnlocked = false; // SATISFIED pressed (requires demoCompletedOnce)
+    let demoInProgress = false;
 
     const LS_DEPLOYED = "aicallport_deployed";
     function setDeployed(v) { localStorage.setItem(LS_DEPLOYED, v ? "1" : "0"); }
@@ -1078,18 +1054,88 @@
 
     function getSelectedVapiVoice() { return { provider: "vapi", voiceId: selectedVoiceId }; }
 
-    const vapiVoices = [
-      { id: "Mia", label: "Mia (Professional / Articulate)" },
-      { id: "Leah", label: "Leah (Warm / Gentle)" },
-      { id: "Dan", label: "Dan (Friendly / Casual)" },
-      { id: "Zac", label: "Zac (Enthusiastic / Dynamic)" },
-      { id: "Jess", label: "Jess (Energetic / Youthful)" },
-      { id: "Zoe", label: "Zoe (Calm / Soothing)" },
-      { id: "Leo", label: "Leo (Authoritative / Deep)" },
-      { id: "Savannah", label: "Savannah (American / Southern)" },
-      { id: "Rohan", label: "Rohan (Bright / Energetic)" },
-      { id: "Elliot", label: "Elliot (Canadian / Soothing)" }
-    ];
+    // derived readiness
+    function marketSelected(){ return !!(selectedMarket && String(selectedMarket).trim().length); }
+    function industrySelected(){ return !!(selectedIndustryKey && String(selectedIndustryKey).trim().length); }
+    function agentConfigured(){
+      const roleOk = !!(selectedRole && String(selectedRole).trim().length);
+      const tplOk = !!(selectedTemplateKey && String(selectedTemplateKey).trim().length);
+      const voiceOk = !!(selectedVoiceId && String(selectedVoiceId).trim().length);
+      const scriptOk = !!(agentScript && String(agentScript).trim().length >= 10);
+      return roleOk && tplOk && voiceOk && scriptOk;
+    }
+    function companyNameSet(){ return !!(companyName && companyName.trim().length >= 2); }
+    function planSelected(){ return !!(selectedPlanId && PLANS[selectedPlanId]); }
+
+    function activationReadyChecklist(){
+      return [
+        { ok: marketSelected(), label: "Market selected" },
+        { ok: industrySelected(), label: "Industry selected" },
+        { ok: agentConfigured(), label: "Agent configured" },
+        { ok: companyNameSet(), label: "Company name set" },
+        { ok: planSelected(), label: "Plan selected" },
+        { ok: demoCompletedOnce, label: "Demo completed" },
+        { ok: activationUnlocked, label: "Satisfied confirmed" }
+      ];
+    }
+
+    function computeNextRequiredStep(){
+      if (!marketSelected()) return 1;
+      if (!industrySelected()) return 2;
+      if (!agentConfigured()) return 3;
+      if (!companyNameSet()) return 4;
+      if (!planSelected()) return 5;
+      if (!demoCompletedOnce || !activationUnlocked) return 6;
+      return 7;
+    }
+
+    function stepUnlocked(step){
+      // ✅ only allow current step OR already-completed steps to open
+      const next = computeNextRequiredStep();
+      if (step < next) return true;
+      return step === next;
+    }
+
+    // ============================
+    // MARKETS (from /api/markets)
+    // ============================
+    let _marketsByContinentCache = null;
+
+    async function getMarketsGroupedByContinent() {
+      if (_marketsByContinentCache) return _marketsByContinentCache;
+
+      try{
+        const res = await fetch("/api/markets", { cache: "no-store" });
+        if (!res.ok) {
+          console.error("Failed to load /api/markets:", res.status);
+          _marketsByContinentCache = {};
+          return _marketsByContinentCache;
+        }
+
+        const rows = await res.json();
+        const grouped = {};
+
+        (rows || []).forEach((row) => {
+          const continent = row.region || "Other";
+          const name = row.name || "";
+          if (!name) return;
+          grouped[continent] ||= [];
+          grouped[continent].push(name);
+        });
+
+        // ✅ sort once
+        Object.keys(grouped).forEach((k) => {
+          grouped[k].sort((a, b) => String(a).localeCompare(String(b)));
+        });
+
+        _marketsByContinentCache = grouped;
+        return grouped;
+      } catch(e){
+        console.error(e);
+        _marketsByContinentCache = {};
+        return _marketsByContinentCache;
+      }
+    }
 
     // ============================
     // LANG MENU
@@ -1114,16 +1160,16 @@
     };
 
     // ============================
-    // Activation Info (✅ 7 steps)
+    // Activation Info (7 slides)
     // ============================
     const activationInfoSlides = [
-      { keyTitle:"STEP 1 — COUNTRY", keyText:"Choose the country/market. Pricing and deployment routing adjust based on your selection." },
-      { keyTitle:"STEP 2 — INDUSTRY", keyText:"Select your industry. Industry packs determine the scripts/templates you start with." },
-      { keyTitle:"STEP 3 — AGENT", keyText:"Pick the role, template pack, voice, and edit your script. This defines how your AI receptionist behaves." },
-      { keyTitle:"STEP 4 — COMPANY", keyText:"Enter your company name. It’s used in greetings and scripts." },
-      { keyTitle:"STEP 5 — PLAN", keyText:"Choose your beta plan. Minutes included and overage rules are displayed clearly." },
-      { keyTitle:"STEP 6 — DEMO (2×30s)", keyText:"Run up to two demo calls. Each demo auto-stops at 30 seconds. Then press SATISFIED to unlock activation." },
-      { keyTitle:"STEP 7 — ACTIVATE", keyText:"Activation prepares for Stripe checkout + provisioning. Once paid, deployment begins." }
+      { keyTitle:"STEP 1 — MARKET", keyText:"Choose the country/market. Deployment routing adjusts automatically based on your selection." },
+      { keyTitle:"STEP 2 — INDUSTRY", keyText:"Select your industry. Industry packs determine the templates you start with." },
+      { keyTitle:"STEP 3 — AGENT", keyText:"Configure your AI call agent: role, template, voice, and script editor." },
+      { keyTitle:"STEP 4 — COMPANY", keyText:"Enter your company name. Used in greetings and the agent script variables." },
+      { keyTitle:"STEP 5 — PLAN", keyText:"Choose your plan: $299 (up to 1000 min) or $599 (up to 2500 min). Overages: $0.30/min." },
+      { keyTitle:"STEP 6 — DEMO", keyText:"Two demos available. Each demo is 30 seconds. Press SATISFIED to unlock activation." },
+      { keyTitle:"STEP 7 — ACTIVATE", keyText:"Review checklist and activate. Next: Stripe checkout + provisioning." }
     ];
     let infoIdx = 0;
 
@@ -1142,7 +1188,7 @@
         <div class="pill mb-4">${escapeHtml(i18n.t("activation_steps_info"))}</div>
         <div class="card-theme text-left">
           <div class="mini text-orange-500 mb-2">${escapeHtml(slide.keyTitle)}</div>
-          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(slide.keyText)}</div>
+          <div class="text-[13px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(slide.keyText)}</div>
         </div>
         <div class="grid sm:grid-cols-3 gap-2 mt-4">
           <button class="modal-btn justify-center text-center" type="button" onclick="infoPrev()" ${infoIdx===0 ? 'style="opacity:.35;pointer-events:none"' : ''}>${escapeHtml(i18n.t("go_back"))}</button>
@@ -1159,19 +1205,17 @@
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
     // ============================
-    // SMB BENEFITS (✅ 7-step text)
+    // SMB BENEFITS (update 7-step text)
     // ============================
     const smbBenefits = [
       { title: "High Quality AI Call Agents", desc: "Reliable inbound call handling built for real small businesses. Professional tone and fast capture of details." },
-      { title: "Multiple Roles (Receptionist, Booking, Sales, Support, After-Hours)", desc: "Choose the agent role you need today — and switch anytime. Use different roles for business hours vs after-hours/weekends." },
-      { title: "Full Control Before + After Deployment", desc: "Select role, template, and voice before deployment. After deployment, you keep control via your client dashboard (role/voice/script/hours)." },
-      { title: "Deploy in Minutes (7-Step Protocol)", desc: "Country → Industry → Agent → Company → Plan → Demo → Activate. No meetings. No onboarding calls." },
-      { title: "Worldwide + Multilingual", desc: "Global routing + multilingual experience for your customers. Your business can answer calls in the language your customer speaks." },
-      { title: "Unlimited Inbound Calls", desc: "Handle inbound calls at scale. Plan includes minutes and clear overage rules." },
+      { title: "Multiple Roles (Receptionist, Booking, Sales, Customer Service, After-Hours)", desc: "Choose the agent role you need today — and switch anytime. Use different roles for business hours vs after-hours/weekends." },
+      { title: "Full Control Before + After Deployment", desc: "Select role, template, and voice before activation. After activation, you keep control via your client dashboard (role/voice/script/hours)." },
+      { title: "Deploy in Minutes (7-Step Protocol)", desc: "Market → Industry → Agent → Company → Plan → Demo → Activate. No meetings. No onboarding calls." },
+      { title: "Worldwide + Multilingual", desc: "Global routing + multilingual experience for your customers." },
       { title: "Pay Monthly • No Contract", desc: "Fair and transparent: monthly billing, cancel anytime." },
       { title: "Secure Payments via Stripe", desc: "Secure payment processing through Stripe." },
-      { title: "No Salesman • No Human Layer", desc: "This is a self-serve operational console. No human gatekeepers. Turn ON your AI call agent when you are ready." },
-      { title: "Referral Discount (Up to $0/mo)", desc: "After activation you get a referral link. Each referral reduces your monthly payment by $10 (down to $0/mo)." }
+      { title: "No Human Layer", desc: "Self-serve activation console. Turn ON your AI call agent when you are ready." }
     ];
     let activeBenefitIdx = 0;
 
@@ -1219,7 +1263,6 @@
         <div class="grid lg:grid-cols-2 gap-4 text-left">
           <div class="card-theme">
             <div class="mini text-orange-500 mb-2">Benefits</div>
-
             <div id="benefitsListWrap"
                  role="listbox"
                  aria-label="SMB Benefits"
@@ -1231,9 +1274,6 @@
           <div class="card-theme benefits-desktop-panel">
             <div class="mini text-orange-500 mb-2">Explanation</div>
             <div id="benefitExplain" class="text-[14px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap"></div>
-            <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
-              Tip: This content can also be reused later inside the client dashboard.
-            </div>
           </div>
         </div>
 
@@ -1262,7 +1302,7 @@
                  tabindex="-1"
                  data-idx="${idx}"
                  onclick="selectBenefit(${idx}, { scroll:true, focusList:false })">
-              <div class="text-[10px] font-black uppercase tracking-widest text-white">
+              <div class="text-[11px] font-black uppercase tracking-widest text-white">
                 ${escapeHtml(b.title)}
               </div>
               <span class="benefit-marker" aria-hidden="true">✓</span>
@@ -1279,6 +1319,7 @@
 
       const explain = document.getElementById("benefitExplain");
       if (explain) explain.textContent = current?.desc || "";
+
       bindBenefitsKeyboard();
       i18n.applyTranslations(document.getElementById("setupModal"));
     }
@@ -1314,7 +1355,9 @@
 
       if (options.scroll){
         const activeEl = document.getElementById(`benefit_opt_${activeBenefitIdx}`);
-        activeEl?.scrollIntoView?.({ block: "nearest", inline: "nearest", behavior: "smooth" });
+        if (activeEl && typeof activeEl.scrollIntoView === "function"){
+          activeEl.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+        }
       }
       if (options.focusList){
         document.getElementById("benefitsListWrap")?.focus();
@@ -1334,12 +1377,12 @@
           key === "ArrowDown" || key === "ArrowUp" ||
           key === "Home" || key === "End" ||
           key === "Enter" || key === " ";
+
         const isTypeKey = key.length === 1 && /[a-z0-9]/i.test(key);
         if (!handled && !isTypeKey) return;
 
         if (isTypeKey){
-          e.preventDefault();
-          e.stopPropagation();
+          e.preventDefault(); e.stopPropagation();
           clearTimeout(__benefitsTypeahead.t);
           __benefitsTypeahead.buf += key.toLowerCase();
           __benefitsTypeahead.t = setTimeout(() => { __benefitsTypeahead.buf = ""; }, 700);
@@ -1349,8 +1392,7 @@
           return;
         }
 
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         if (key === "Home") { selectBenefit(0, { scroll:true, focusList:false }); return; }
         if (key === "End")  { selectBenefit(smbBenefits.length - 1, { scroll:true, focusList:false }); return; }
         if (key === "ArrowDown") { selectBenefit((activeBenefitIdx + 1) % smbBenefits.length, { scroll:true, focusList:false }); return; }
@@ -1364,11 +1406,13 @@
     // ============================
     const industryKeys = ["Plumbing","Electrical","HVAC","Roofing","Real Estate","After Hours"];
     const industryCategories = { "Home Services":["Plumbing","Electrical","HVAC","Roofing"], "Business":["Real Estate","After Hours"] };
+
     function buildCategorizedIndustryList(){
       const out = [];
       Object.keys(industryCategories).forEach(cat => out.push({cat, items: industryCategories[cat]}));
       return out;
     }
+
     function dt(namespace, key, fallback){
       const lang = (window.APP_I18N.current || "EN").toUpperCase();
       const v = i18n.dynGet(lang, namespace, key);
@@ -1386,7 +1430,7 @@
       GLOBAL: {
         Receptionist: [
           { key:"pop_rec_standard", title:"Popular: Standard Receptionist + Booking", category:"Popular",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} in {{MARKET}}.
+            script:`You are the AI receptionist for {{COMPANY_NAME}} in {{MARKET}}.
 Primary goals:
 - Answer calls politely
 - Provide basic info
@@ -1396,21 +1440,21 @@ Always confirm details before ending the call.`}
         ],
         "Sales Agent": [
           { key:"pop_sales_qual", title:"Popular: Sales Lead Qualifier + Booking", category:"Popular",
-            script:`You are the AI sales agent for {{BUSINESS_NAME}}.
+            script:`You are the AI sales agent for {{COMPANY_NAME}}.
 Qualify leads quickly and book appointments.
 Ask: service needed, location, timeline, budget range (optional), contact info.`}
         ],
-        "Support Agent": [
-          { key:"rec_support_helpdesk", title:"Recommended: Helpdesk + Escalation", category:"Recommended",
-            script:`You are the AI support agent for {{BUSINESS_NAME}}.
-Collect: name, phone, account/order (if applicable), issue description, urgency.
+        "Customer Service": [
+          { key:"rec_support_helpdesk", title:"Recommended: Customer Service + Escalation", category:"Recommended",
+            script:`You are the AI customer service agent for {{COMPANY_NAME}}.
+Collect: name, phone, issue description, urgency.
 Provide a short helpful step, then create a ticket and confirm callback.`}
         ]
       },
       Electrical: {
         Receptionist: [
           { key:"el_rec_safety", title:"Recommended: Electrical Safety First", category:"Recommended",
-            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electrical).
+            script:`You are the AI receptionist for {{COMPANY_NAME}} (Electrical).
 Ask: sparking/burning smell/smoke? If yes, advise to turn off breaker if safe and call emergency services if needed.
 Collect: address, issue description, contact info, urgency.`}
         ]
@@ -1431,11 +1475,9 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     function applyVars(text){
-      const companyName = (document.getElementById('v4')?.innerText && document.getElementById('v4').innerText !== i18n.t("sync"))
-        ? document.getElementById('v4').innerText
-        : "YOUR COMPANY";
+      const bn = (companyName && companyName.trim().length) ? companyName.trim() : "YOUR COMPANY";
       return (text || "")
-        .replaceAll("{{BUSINESS_NAME}}", companyName)
+        .replaceAll("{{COMPANY_NAME}}", bn)
         .replaceAll("{{MARKET}}", selectedMarket || "YOUR MARKET");
     }
 
@@ -1529,6 +1571,7 @@ Collect: address, issue description, contact info, urgency.`}
       const shownScript = dt("template_scripts", chosen.script, chosen.script);
       agentScript = applyVars(shownScript);
     }
+
     function resetTemplate(){
       const filtered = getFilteredTemplates();
       const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
@@ -1537,6 +1580,18 @@ Collect: address, issue description, contact info, urgency.`}
       agentScript = applyVars(shownScript);
     }
 
+    const vapiVoices = [
+      { id: "Mia", label: "Mia (Professional / Articulate)" },
+      { id: "Leah", label: "Leah (Warm / Gentle)" },
+      { id: "Dan", label: "Dan (Friendly / Casual)" },
+      { id: "Zac", label: "Zac (Enthusiastic / Dynamic)" },
+      { id: "Jess", label: "Jess (Energetic / Youthful)" },
+      { id: "Zoe", label: "Zoe (Calm / Soothing)" },
+      { id: "Leo", label: "Leo (Authoritative / Deep)" },
+      { id: "Savannah", label: "Savannah (American / Southern)" },
+      { id: "Rohan", label: "Rohan (Bright / Energetic)" },
+      { id: "Elliot", label: "Elliot (Canadian / Soothing)" }
+    ];
     function initVoiceDropdown(){
       const voiceSelect = document.getElementById('voiceSelect');
       if(!voiceSelect) return;
@@ -1552,10 +1607,44 @@ Collect: address, issue description, contact info, urgency.`}
     function onVoiceChange(id){ selectedVoiceId = id; }
 
     // ============================
-    // Community (same as your version)
+    // HERO AGENT GRID (many, 2 columns, clickable)
+    // ============================
+    const HERO_AGENTS = [
+      { name:"AI Receptionist", desc:"Answers inbound calls, greets callers, captures details, routes requests, and books appointments." },
+      { name:"AI Booking Agent", desc:"Schedules appointments, confirms times, collects availability, and reduces no-shows." },
+      { name:"AI Sales Agent", desc:"Qualifies leads, captures contact info, and books consultations." },
+      { name:"AI Customer Service", desc:"Resolves common questions, collects ticket details, and escalates urgent cases." },
+      { name:"AI After-Hours Agent", desc:"Handles calls after hours, takes messages, and captures urgent requests for follow-up." },
+      { name:"AI Dispatch Agent", desc:"Collects job details, prioritizes urgency, and dispatches to the right workflow." },
+      { name:"AI Lead Capture Agent", desc:"Captures name, phone, email, service needed, and timeline — then routes instantly." },
+      { name:"AI Appointment Reminder", desc:"Confirms and reminds callers, reduces no-shows, and reschedules when needed." },
+      { name:"AI Quote Intake Agent", desc:"Collects quote details and qualifies requests before your team responds." },
+      { name:"AI Support Triage", desc:"Asks the right questions, determines urgency, and routes to the correct channel." },
+      { name:"AI Multilingual Agent", desc:"Answers calls in the language your customer speaks (where supported)." },
+      { name:"AI Overflow Agent", desc:"Handles peak call volume so your business never misses a call." }
+    ];
+    let activeHeroAgentIdx = 0;
+
+    function renderHeroAgentGrid(){
+      const grid = document.getElementById("agentGrid");
+      if(!grid) return;
+      grid.innerHTML = HERO_AGENTS.map((a, idx) => `
+        <div class="agent-chip ${idx===activeHeroAgentIdx ? "active" : ""}" role="button" tabindex="0"
+             onclick="selectHeroAgent(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectHeroAgent(${idx});}">
+          <div class="text-[12px] font-black uppercase tracking-widest text-white">${escapeHtml(a.name)}</div>
+          <div class="agent-desc">${escapeHtml(a.desc)}</div>
+        </div>
+      `).join("");
+    }
+    function selectHeroAgent(idx){
+      activeHeroAgentIdx = Math.max(0, Math.min(HERO_AGENTS.length-1, Number(idx)));
+      renderHeroAgentGrid();
+    }
+
+    // ============================
+    // Community (unchanged, shortened here: keep your original)
     // ============================
     let communityTab = "NEWSLETTER";
-
     const LS_FORUM = "aicallport_forum_posts";
     const LS_NEWSLETTER = "aicallport_newsletter_signups";
     function loadForumPosts(){ try { return JSON.parse(localStorage.getItem(LS_FORUM) || "[]"); } catch { return []; } }
@@ -1571,7 +1660,6 @@ Collect: address, issue description, contact info, urgency.`}
         return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
       }
     }
-
     function maskEmail(email){
       return String(email || "").replace(/^(.)(.*)(@.*)$/, (_, a, b, c) => a + "*".repeat(Math.min(8, b.length)) + c);
     }
@@ -1591,11 +1679,7 @@ Collect: address, issue description, contact info, urgency.`}
       saveNewsletter(list);
 
       try {
-        await fetch("/api/newsletter", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(payload)
-        });
+        await fetch("/api/newsletter", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
       } catch (e) {}
 
       const msg = document.getElementById("nlMsg");
@@ -1607,7 +1691,6 @@ Collect: address, issue description, contact info, urgency.`}
       const title = (document.getElementById("fpTitle")?.value || "").trim();
       const body = (document.getElementById("fpBody")?.value || "").trim();
       if(title.length < 3 || body.length < 10) return;
-
       const posts = loadForumPosts();
       posts.unshift({ id: cryptoRandomId(), title, body, replies: [], ts: Date.now() });
       saveForumPosts(posts);
@@ -1618,7 +1701,6 @@ Collect: address, issue description, contact info, urgency.`}
       const input = document.getElementById("reply_" + postId);
       const text = (input?.value || "").trim();
       if(text.length < 3) return;
-
       const posts = loadForumPosts();
       const p = posts.find(x => x.id === postId);
       if(!p) return;
@@ -1638,16 +1720,13 @@ Collect: address, issue description, contact info, urgency.`}
         const res = await fetch("/api/ai-qa", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            question: q,
-            context: { market: selectedMarket, industryKey: selectedIndustryKey, role: selectedRole, deployed: isDeployed() }
-          })
+          body: JSON.stringify({ question: q, context: { market: selectedMarket, industryKey: selectedIndustryKey, role: selectedRole, deployed: isDeployed() } })
         });
         if(!res.ok) throw new Error("Bad response");
         const data = await res.json();
         const answer = data?.answer || data?.text || "No answer returned.";
         out.innerHTML = `<div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
-          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap">${escapeHtml(answer)}</div>`;
+          <div class="text-[13px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap">${escapeHtml(answer)}</div>`;
       } catch(e){
         out.innerHTML = `
           <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
@@ -1682,11 +1761,11 @@ Collect: address, issue description, contact info, urgency.`}
       return posts.map(p => `
         <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mb-3">
           <div class="text-[10px] font-black uppercase tracking-wider text-orange-500">${escapeHtml(p.title)}</div>
-          <div class="text-[11px] text-slate-300 font-semibold leading-relaxed mt-1 whitespace-pre-wrap">${escapeHtml(p.body)}</div>
+          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed mt-1 whitespace-pre-wrap">${escapeHtml(p.body)}</div>
           <div class="divider mt-3">Replies</div>
           <div class="space-y-2">
             ${(p.replies||[]).slice(-3).map(r => `
-              <div class="text-[11px] text-slate-300 font-semibold leading-relaxed bg-black/20 border border-white/5 rounded-xl p-2 whitespace-pre-wrap">${escapeHtml(r.text)}</div>
+              <div class="text-[12px] text-slate-300 font-semibold leading-relaxed bg-black/20 border border-white/5 rounded-xl p-2 whitespace-pre-wrap">${escapeHtml(r.text)}</div>
             `).join("") || `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-2">No replies yet</div>`}
           </div>
           <div class="grid grid-cols-4 gap-2 mt-3">
@@ -1698,7 +1777,6 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     function setCommunityTab(tab){ communityTab = tab; renderCommunity(); }
-
     function renderCommunity(){
       const c = document.getElementById("mContent");
       const deployedBadge = isDeployed()
@@ -1782,20 +1860,17 @@ Collect: address, issue description, contact info, urgency.`}
 
       i18n.applyTranslations(document.getElementById("setupModal"));
     }
-
-    function openCommunity(tab){
-      communityTab = tab || "NEWSLETTER";
-      triggerModal("community");
-    }
+    function openCommunity(tab){ communityTab = tab || "NEWSLETTER"; triggerModal("community"); }
 
     // ============================
     // Script Editor
     // ============================
     let scriptEditorDraft = null;
+
     function getRoleHelpKey(roleValue){
       if(roleValue === "Receptionist") return "role_help_receptionist";
       if(roleValue === "Sales Agent") return "role_help_sales";
-      if(roleValue === "Support Agent") return "role_help_support";
+      if(roleValue === "Customer Service") return "role_help_support";
       return "role_help_receptionist";
     }
 
@@ -1811,7 +1886,7 @@ Collect: address, issue description, contact info, urgency.`}
       const tEl = document.getElementById("mTitle");
       const shell = document.getElementById("modalShell");
 
-      shell.classList.remove("role-wide","info-wide","community-wide","benefits-wide","plan-wide","activate-wide");
+      shell.classList.remove("role-wide","info-wide","community-wide","benefits-wide","activate-wide");
       shell.classList.add("script-wide");
 
       m.style.display = "flex";
@@ -1820,7 +1895,6 @@ Collect: address, issue description, contact info, urgency.`}
       s.innerHTML = "";
       tEl.innerText = i18n.t("script_editor_title");
 
-      const companyName = (document.getElementById("v4")?.innerText || "").trim() || "YOUR COMPANY";
       const industry = (selectedIndustryKey || "GLOBAL");
       const market = (selectedMarket || "YOUR MARKET");
       const roleHelp = i18n.t(getRoleHelpKey(selectedRole));
@@ -1835,16 +1909,16 @@ Collect: address, issue description, contact info, urgency.`}
             <div class="script-badges">
               <div class="badge">${escapeHtml(market)}</div>
               <div class="badge">${escapeHtml(industry)}</div>
-              <div class="badge">${escapeHtml(companyName)}</div>
+              <div class="badge">${escapeHtml(companyName || "YOUR COMPANY")}</div>
               <div class="badge">${escapeHtml(selectedRole)}</div>
             </div>
           </div>
 
           <div class="card-theme text-left">
             <div class="mini text-orange-500 mb-2">Role Behavior</div>
-            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(roleHelp)}</div>
+            <div class="text-[13px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(roleHelp)}</div>
             <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">
-              Variables: <span class="text-orange-500">{{BUSINESS_NAME}}</span>, <span class="text-orange-500">{{MARKET}}</span>
+              Variables: <span class="text-orange-500">{{COMPANY_NAME}}</span>, <span class="text-orange-500">{{MARKET}}</span>
             </div>
           </div>
 
@@ -1854,7 +1928,7 @@ Collect: address, issue description, contact info, urgency.`}
             <div class="grid sm:grid-cols-3 gap-2">
               <button class="modal-btn justify-center text-center" type="button" onclick="scriptEditorResetToTemplate()">${escapeHtml(i18n.t("reset_to_template"))}</button>
               <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="scriptEditorSave()">${escapeHtml(i18n.t("save_script"))}</button>
-              <button class="modal-btn justify-center text-center" type="button" onclick="scriptEditorBackToRoleModal()">${escapeHtml(i18n.t("close_editor"))}</button>
+              <button class="modal-btn justify-center text-center" type="button" onclick="scriptEditorBackToAgentModal()">${escapeHtml(i18n.t("close_editor"))}</button>
             </div>
           </div>
         </div>
@@ -1865,7 +1939,6 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     function onScriptEditorInput(){ scriptEditorDraft = document.getElementById("scriptEditorBox").value; }
-
     function scriptEditorResetToTemplate(){
       const filtered = getFilteredTemplates();
       const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
@@ -1874,13 +1947,12 @@ Collect: address, issue description, contact info, urgency.`}
       scriptEditorDraft = applyVars(shownScript);
       document.getElementById("scriptEditorBox").value = scriptEditorDraft;
     }
-
     function scriptEditorSave(){
       agentScript = applyVars(String(scriptEditorDraft || ""));
-      scriptEditorBackToRoleModal();
+      scriptEditorBackToAgentModal();
+      refreshProtocolUI();
     }
-
-    function scriptEditorBackToRoleModal(){
+    function scriptEditorBackToAgentModal(){
       document.getElementById("modalShell").classList.remove("script-wide");
       triggerModal(3);
     }
@@ -1941,27 +2013,17 @@ Collect: address, issue description, contact info, urgency.`}
         '[tabindex]:not([tabindex="-1"])'
       ].join(',');
 
-      const focusables = () => Array.from(shell.querySelectorAll(selectors))
-        .filter(el => el.offsetParent !== null);
-
+      const focusables = () => Array.from(shell.querySelectorAll(selectors)).filter(el => el.offsetParent !== null);
       function onKeydown(e){
         if(modal.style.display !== "flex") return;
         if(e.key !== "Tab") return;
-
         const items = focusables();
         if(!items.length) return;
-
         const first = items[0];
         const last = items[items.length - 1];
-
-        if(e.shiftKey && document.activeElement === first){
-          e.preventDefault(); last.focus(); return;
-        }
-        if(!e.shiftKey && document.activeElement === last){
-          e.preventDefault(); first.focus(); return;
-        }
+        if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); return; }
+        if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); return; }
       }
-
       if(!window.__aicallport_modalTrapBound){
         window.__aicallport_modalTrapBound = true;
         document.addEventListener("keydown", onKeydown, true);
@@ -1970,10 +2032,7 @@ Collect: address, issue description, contact info, urgency.`}
 
     function closeModal(){
       const modal = document.getElementById('setupModal');
-      if (modal.style.display !== "flex") {
-        unlockBodyScroll();
-        return;
-      }
+      if (modal.style.display !== "flex") { unlockBodyScroll(); return; }
       modal.style.display = 'none';
       unlockBodyScroll();
       try { lastFocusedEl?.focus?.(); } catch(e){}
@@ -1981,89 +2040,9 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     // ============================
-    // ✅ Step UI (NO completedSteps; prevents flashing)
+    // Step Rendering (7-step mapping)
     // ============================
-    function getUnlockableStep(){
-      if(!marketSelected) return 1;
-      if(!industrySelected) return 2;
-      if(!agentConfigured) return 3;
-      if(!companyNameSet) return 4;
-      if(!planSelected) return 5;
-      if(!demoCompletedOnce) return 6;
-      if(!activationUnlocked) return 6; // still demo step until satisfied
-      return 7;
-    }
-
-    function canOpenStep(step){
-      if(step === 1) return true;
-      if(step === 2) return marketSelected;
-      if(step === 3) return marketSelected && industrySelected;
-      if(step === 4) return marketSelected && industrySelected && agentConfigured;
-      if(step === 5) return marketSelected && industrySelected && agentConfigured && companyNameSet;
-      if(step === 6) return marketSelected && industrySelected && agentConfigured && companyNameSet && planSelected;
-      if(step === 7) return marketSelected && industrySelected && agentConfigured && companyNameSet && planSelected && demoCompletedOnce && activationUnlocked;
-      return false;
-    }
-
-    function updateStepValues(){
-      document.getElementById("v1").innerText = marketSelected ? selectedMarket : i18n.t("select");
-      document.getElementById("v2").innerText = industrySelected ? selectedIndustryKey : i18n.t("select");
-      document.getElementById("v3").innerText = agentConfigured ? `${selectedRole} • ${selectedTemplateKey ? "Template" : "—"} • ${selectedVoiceId}`.toUpperCase() : i18n.t("choose");
-      document.getElementById("v4").innerText = companyNameSet ? (document.getElementById("v4").innerText || "").trim() : i18n.t("sync");
-
-      const plan = getSelectedPlan();
-      document.getElementById("v5").innerText = planSelected ? (`$${plan.usd} • ${plan.minutes} MIN`).toUpperCase() : i18n.t("choose");
-
-      if(!demoCompletedOnce) document.getElementById("v6").innerText = i18n.t("sandbox");
-      else document.getElementById("v6").innerText = (`USED ${Math.min(demoCallsUsed,2)}/2`).toUpperCase();
-
-      document.getElementById("v7").innerText = isDeployed() ? "READY" : i18n.t("instant");
-    }
-
-    function updateStepUI(){
-      const unlockable = getUnlockableStep();
-
-      for(let i=1;i<=7;i++){
-        const el = document.getElementById(`s${i}`);
-        if(!el) continue;
-
-        const unlocked = canOpenStep(i);
-        el.classList.toggle("locked", !unlocked);
-
-        // stop any stale flashing first
-        el.classList.remove("next-focus");
-
-        // mark active (completed) look
-        const done =
-          (i===1 && marketSelected) ||
-          (i===2 && industrySelected) ||
-          (i===3 && agentConfigured) ||
-          (i===4 && companyNameSet) ||
-          (i===5 && planSelected) ||
-          (i===6 && demoCompletedOnce && activationUnlocked) ||
-          (i===7 && isDeployed());
-
-        el.classList.toggle("active", done);
-
-        // only one next-focus: first unlockable step
-        if(i === unlockable) el.classList.add("next-focus");
-      }
-    }
-
-    function handleStep(step){
-      if(!canOpenStep(step)) return;
-      triggerModal(step);
-    }
-
-    function commitStepState(){
-      updateStepValues();
-      updateStepUI();
-    }
-
-    // ============================
-    // MODALS (✅ remapped to new step meanings)
-    // ============================
-    async function triggerModal(step, opts){
+    async function triggerModal(step){
       lastModalStep = step;
       lastFocusedEl = document.activeElement;
 
@@ -2073,9 +2052,10 @@ Collect: address, issue description, contact info, urgency.`}
       const tEl = document.getElementById('mTitle');
       const shell = document.getElementById('modalShell');
 
-      shell.classList.remove('role-wide','info-wide','community-wide','script-wide','benefits-wide','plan-wide','activate-wide');
+      shell.classList.remove('role-wide','info-wide','community-wide','script-wide','benefits-wide','activate-wide');
       m.style.display = 'flex';
       lockBodyScroll();
+
       c.innerHTML = "";
       s.innerHTML = "";
       trapFocusInModal();
@@ -2086,14 +2066,12 @@ Collect: address, issue description, contact info, urgency.`}
         renderInfoSlide();
         return;
       }
-
       if(step === "community"){
         shell.classList.add('community-wide');
         tEl.innerText = i18n.t("community");
         renderCommunity();
         return;
       }
-
       if(step === "benefits"){
         shell.classList.add('benefits-wide');
         tEl.innerText = i18n.t("smb_benefits");
@@ -2102,7 +2080,7 @@ Collect: address, issue description, contact info, urgency.`}
         return;
       }
 
-      // Step 1: Market
+      // STEP 1: Market
       if(step === 1){
         tEl.innerText = i18n.t("step_01");
         s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_countries" onkeyup="filterMarket(this.value)">`;
@@ -2111,7 +2089,7 @@ Collect: address, issue description, contact info, urgency.`}
         return;
       }
 
-      // Step 2: Industry
+      // STEP 2: Industry
       if(step === 2){
         tEl.innerText = i18n.t("step_02");
         s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_industries" onkeyup="filterIndustryCategories(this.value)">`;
@@ -2121,7 +2099,7 @@ Collect: address, issue description, contact info, urgency.`}
         return;
       }
 
-      // Step 3: Agent (role/template/voice/script)
+      // STEP 3: Agent setup (role/template/voice + script editor)
       if(step === 3){
         shell.classList.add('role-wide');
         tEl.innerText = i18n.t("step_03");
@@ -2135,10 +2113,10 @@ Collect: address, issue description, contact info, urgency.`}
               <div id="roleList" class="grid gap-2"></div>
 
               <div class="divider mt-4">Role Description</div>
-              <div id="roleDesc" class="text-[12px] text-slate-300 font-semibold leading-relaxed"></div>
+              <div id="roleDesc" class="text-[13px] text-slate-300 font-semibold leading-relaxed"></div>
 
               <div class="mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
-                Current Industry: <span class="text-orange-500">${escapeHtml(getCurrentIndustryKey())}</span>
+                Industry: <span class="text-orange-500">${escapeHtml(getCurrentIndustryKey())}</span>
               </div>
             </div>
 
@@ -2189,7 +2167,7 @@ Collect: address, issue description, contact info, urgency.`}
         const roles = [
           { key:"receptionist", value:"Receptionist" },
           { key:"sales_agent", value:"Sales Agent" },
-          { key:"support_agent", value:"Support Agent" }
+          { key:"support_agent", value:"Customer Service" }
         ];
 
         roles.forEach(r => {
@@ -2201,13 +2179,13 @@ Collect: address, issue description, contact info, urgency.`}
             refreshTemplatesForCurrentSelection(true);
             triggerModal(3);
           });
-          b.style.fontSize = "10px";
-          b.style.padding = "14px";
           b.innerHTML = `${escapeHtml(label)}${selectedRole === r.value ? " ✓" : ""}`;
           roleList.appendChild(b);
         });
 
-        document.getElementById("roleDesc").textContent = i18n.t(getRoleHelpKey(selectedRole));
+        const roleDesc = document.getElementById("roleDesc");
+        roleDesc.textContent = i18n.t(getRoleHelpKey(selectedRole));
+
         initTemplateCategoryDropdown();
         await initTemplateDropdown();
         initVoiceDropdown();
@@ -2215,125 +2193,208 @@ Collect: address, issue description, contact info, urgency.`}
         return;
       }
 
-      // Step 4: Company name
+      // STEP 4: Company name
       if(step === 4){
         tEl.innerText = i18n.t("step_04");
         c.innerHTML = `
-          <div class="pill mb-4">${escapeHtml(i18n.t("business_name"))}</div>
-          <input id="companyInput" data-i18n-placeholder="business_name" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none" />
-          <button type="button" onclick="saveCompanyName()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic">${escapeHtml(i18n.t("save"))}</button>
+          <div class="pill mb-3">${escapeHtml(i18n.t("step_04"))}</div>
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("business_name"))}</div>
+            <input id="companyInput" value="${escapeHtml(companyName)}"
+              data-i18n-placeholder="business_name"
+              class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-3 text-center text-sm font-black outline-none"
+              style="text-transform:uppercase;letter-spacing:.12em" />
+            <button type="button" onclick="saveCompany()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic">
+              ${escapeHtml(i18n.t("save"))}
+            </button>
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-3">
+              Tip: This name is used in greetings and the script variable <span class="text-orange-500">{{COMPANY_NAME}}</span>.
+            </div>
+          </div>
         `;
-        const existing = (companyNameSet ? (document.getElementById("v4")?.innerText || "") : "");
-        setTimeout(() => { try { document.getElementById("companyInput").value = existing; } catch(e){} }, 30);
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
 
-      // Step 5: Plan (modal)
+      // STEP 5: Plan
       if(step === 5){
-        shell.classList.add("plan-wide");
         tEl.innerText = i18n.t("step_05");
-        renderPlanModal();
+        c.innerHTML = `
+          <div class="pill mb-3">${escapeHtml(i18n.t("plan_pick"))}</div>
+
+          <div class="grid gap-3 text-left">
+            ${renderPlanCardHtml("PLAN_299")}
+            ${renderPlanCardHtml("PLAN_599")}
+          </div>
+
+          <div class="card-theme text-left mt-4">
+            <div class="mini text-orange-500 mb-2">Overages</div>
+            <div class="text-[13px] text-slate-300 font-semibold">${escapeHtml(OVERAGE_RULE)}</div>
+          </div>
+
+          <div class="modal-footer">
+            <div class="grid sm:grid-cols-2 gap-2">
+              <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic ${!planSelected() ? "opacity-40 pointer-events-none" : ""}" type="button" onclick="confirmPlan()">
+                ${escapeHtml(i18n.t("confirm"))}
+              </button>
+            </div>
+          </div>
+        `;
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
 
-      // Step 6: Demo (2×30s) + SATISFIED unlock
+      // STEP 6: Demo gate (2 calls, 30 seconds, SATISFIED unlock)
       if(step === 6){
         tEl.innerText = i18n.t("step_06");
-        renderDemoModal();
+
+        const used = demoCallsUsed;
+        const remaining = Math.max(0, 2 - used);
+        const canDemo = remaining > 0 && !demoInProgress;
+        const canSatisfied = demoCompletedOnce && !activationUnlocked;
+
+        c.innerHTML = `
+          <div class="pill mb-3">${escapeHtml(i18n.t("step_06"))}</div>
+
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("demo_rules"))}</div>
+            <div class="text-[13px] text-slate-300 font-semibold leading-relaxed">
+              <div>${escapeHtml(i18n.t("demos_used"))}: <span class="text-orange-500">${used}/2</span></div>
+              <div class="mt-2 text-slate-400 font-bold">
+                Your demo call will stop automatically at 30 seconds.
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-2 mt-4">
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic ${canDemo ? "" : "opacity-40 pointer-events-none"}" type="button" onclick="startDemoCall()">
+                ${escapeHtml(i18n.t("demo_call"))}
+              </button>
+
+              <button class="modal-btn justify-center text-center ${canSatisfied ? "" : "disabled"}" type="button" onclick="pressSatisfied()">
+                ${escapeHtml(i18n.t("satisfied"))}
+              </button>
+            </div>
+
+            ${demoInProgress ? `
+              <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-orange-500">
+                Demo in progress... (auto-stop at 30s)
+              </div>` : ``}
+
+            ${activationUnlocked ? `
+              <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-green-400">
+                SATISFIED CONFIRMED — Activation unlocked.
+              </div>` : ``}
+          </div>
+
+          <div class="modal-footer">
+            <div class="grid sm:grid-cols-2 gap-2">
+              <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic ${activationUnlocked ? "" : "opacity-40 pointer-events-none"}" type="button" onclick="handleStep(7)">
+                ${escapeHtml(i18n.t("next"))}
+              </button>
+            </div>
+          </div>
+        `;
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
 
-      // Step 7: Activate (checklist + ACTIVATE button)
+      // STEP 7: Activate checklist + button
       if(step === 7){
         shell.classList.add("activate-wide");
         tEl.innerText = i18n.t("step_07");
-        renderActivateModal();
+
+        const checklist = activationReadyChecklist();
+        const allOk = checklist.every(x => x.ok);
+
+        c.innerHTML = `
+          <div class="pill mb-3">${escapeHtml(i18n.t("step_07"))}</div>
+
+          <div class="grid lg:grid-cols-2 gap-4 text-left">
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">Checklist</div>
+              <div class="grid gap-2">
+                ${checklist.map(x => `
+                  <div class="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-3">
+                    <div class="text-[12px] font-black uppercase tracking-widest text-white">${escapeHtml(x.label)}</div>
+                    <div class="text-[10px] font-black uppercase tracking-widest ${x.ok ? "text-green-400" : "text-slate-500"}">
+                      ${x.ok ? "OK" : "PENDING"}
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">Activation</div>
+              <div class="text-[13px] text-slate-300 font-semibold leading-relaxed">
+                Plan: <span class="text-orange-500">${planSelected() ? escapeHtml(formatPlanLabel(PLANS[selectedPlanId])) : "—"}</span><br>
+                Overage: <span class="text-orange-500">${escapeHtml(OVERAGE_RULE)}</span>
+              </div>
+
+              <div class="mt-4">
+                <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic ${allOk ? "" : "opacity-40 pointer-events-none"}" type="button" onclick="activateNow()">
+                  ${escapeHtml(i18n.t("activate"))}
+                </button>
+                <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Next: Stripe checkout + provisioning flow.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+          </div>
+        `;
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
     }
 
     // ============================
-    // Step 1 rendering (✅ /api/markets only; stable empty message)
+    // Step 1 rendering
     // ============================
-    let _marketsByContinentCache = null;
-
-    async function getMarketsGroupedByContinent() {
-      if (_marketsByContinentCache) return _marketsByContinentCache;
-
-      const res = await fetch("/api/markets", { cache: "no-store" });
-      if (!res.ok) {
-        console.error("Failed to load /api/markets:", res.status);
-        _marketsByContinentCache = {};
-        return _marketsByContinentCache;
-      }
-
-      const rows = await res.json();
-      const grouped = {};
-
-      (rows || []).forEach((row) => {
-        const continent = row.region || "Other";
-        const name = row.name || "";
-        if (!name) return;
-        grouped[continent] ||= [];
-        grouped[continent].push(name);
-      });
-
-      Object.keys(grouped).forEach((k) => {
-        grouped[k].sort((a, b) => String(a).localeCompare(String(b)));
-      });
-
-      _marketsByContinentCache = grouped;
-      return grouped;
-    }
-
     async function renderMarketByContinent(searchQuery){
       const c = document.getElementById('mContent');
       c.innerHTML = "";
       const q = (searchQuery || "").trim().toUpperCase();
 
       const marketsByContinent = await getMarketsGroupedByContinent();
-
-      const continents = Object.keys(marketsByContinent);
-      if(!continents.length){
-        const hint = document.createElement('div');
-        hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
-        hint.innerText = "No markets returned.";
-        c.appendChild(hint);
-        return;
-      }
+      const continents = Object.keys(marketsByContinent || {});
+      let rendered = 0;
 
       continents.forEach(continent => {
-        const list = (marketsByContinent[continent] || []); // already sorted once
-        const filtered = list.filter(name => name.toUpperCase().includes(q));
+        const list = (marketsByContinent[continent] || []);
+        const filtered = list.filter(name => String(name).toUpperCase().includes(q));
         if(!filtered.length) return;
 
         const div = document.createElement('div');
         div.className = "divider";
-        div.innerText = continent.toUpperCase();
+        div.innerText = String(continent).toUpperCase();
         c.appendChild(div);
 
         filtered.forEach(name => {
-          const btn = createBtn(name, async () => {
+          const btn = createBtn(name, () => {
             selectedMarket = name;
-            marketSelected = true;
-            await updatePricingUIForMarket(name);
-            commitStepState();
+            setStepValue(1, name);
+            refreshProtocolUI();
             closeModal();
+            // auto-open next step
+            setTimeout(() => handleStep(2), 120);
           });
           btn.setAttribute('data-n', name);
           btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${escapeHtml(name)}`;
           c.appendChild(btn);
+          rendered++;
         });
       });
 
-      if(!c.children.length){
+      if(!rendered){
         const hint = document.createElement('div');
         hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
-        hint.innerText = "No matching markets.";
+        hint.innerText = "No markets returned.";
         c.appendChild(hint);
       }
     }
@@ -2346,6 +2407,8 @@ Collect: address, issue description, contact info, urgency.`}
       const q = (searchQuery || "").trim().toUpperCase();
 
       const groups = buildCategorizedIndustryList();
+      let rendered = 0;
+
       groups.forEach(g => {
         const filtered = g.items.filter(name => {
           const shown = dt("industries", name, name);
@@ -2362,17 +2425,19 @@ Collect: address, issue description, contact info, urgency.`}
           const shown = dt("industries", name, name);
           const btn = createBtn(shown, () => {
             selectedIndustryKey = name;
-            industrySelected = true;
+            setStepValue(2, shown);
             refreshTemplatesForCurrentSelection(true);
-            commitStepState();
+            refreshProtocolUI();
             closeModal();
+            setTimeout(() => handleStep(3), 120);
           });
           btn.setAttribute('data-n', shown);
           c.appendChild(btn);
+          rendered++;
         });
       });
 
-      if(!c.children.length){
+      if(!rendered){
         const hint = document.createElement('div');
         hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
         hint.innerText = i18n.t("no_matching");
@@ -2382,263 +2447,108 @@ Collect: address, issue description, contact info, urgency.`}
     function filterIndustryCategories(query){ renderIndustryCategoryList(query); }
 
     // ============================
-    // Step 3 confirm (✅ store readable summary)
+    // Step 3 confirm (agent setup)
     // ============================
+    function buildAgentSummary(){
+      // Example: Receptionist • Popular: Standard Receptionist + Booking • Mia
+      const filtered = getFilteredTemplates();
+      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
+      const tplTitle = chosen ? chosen.title : "Template";
+      return `${selectedRole} • ${tplTitle} • ${selectedVoiceId}`;
+    }
     function confirmAgentSetup(){
-      // Ensure template and script exist
       refreshTemplatesForCurrentSelection(false);
-      if(!selectedTemplateKey){
-        alert("No template available.");
-        return;
-      }
-      agentConfigured = true;
-      commitStepState();
+      const summary = buildAgentSummary();
+      setStepValue(3, summary);
+      refreshProtocolUI();
       closeModal();
+      setTimeout(() => handleStep(4), 120);
     }
 
     // ============================
     // Step 4 save company
     // ============================
-    function saveCompanyName(){
+    function saveCompany(){
       const raw = (document.getElementById('companyInput')?.value || "");
       const v = raw.trim().slice(0, 60);
       if(v.length >= 2){
-        companyNameSet = true;
-        document.getElementById("v4").innerText = v;
-        agentScript = applyVars(agentScript);
-        commitStepState();
+        companyName = v;
+        setStepValue(4, v.toUpperCase());
+        agentScript = applyVars(agentScript); // keep script synced
+        refreshProtocolUI();
         closeModal();
+        setTimeout(() => handleStep(5), 120);
       }
     }
 
     // ============================
-    // Step 5 plan modal
+    // Step 5 plan selection
     // ============================
-    function renderPlanModal(){
-      const shell = document.getElementById("modalShell");
-      shell.classList.add("plan-wide");
-      const c = document.getElementById("mContent");
-      const p = getSelectedPlan();
-
-      c.innerHTML = `
-        <div class="pill mb-3">PLAN SELECTION</div>
-        <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">
-          Choose your beta plan. Overage is billed next invoice.
-        </div>
-
-        <div class="grid lg:grid-cols-2 gap-3 text-left">
-          ${PLANS.map(plan => `
-            <div class="plan-card ${plan.id === selectedPlanId ? "active" : ""}" onclick="selectPlanFromModal('${plan.id}')">
-              <div class="text-[9px] font-black uppercase tracking-widest text-orange-500">${escapeHtml(plan.name)}</div>
-              <div class="flex items-end justify-between mt-2">
-                <div class="text-white font-black text-4xl">$${plan.usd}<span class="text-[12px] font-black text-orange-500">/mo</span></div>
-                <div class="text-[10px] font-black uppercase tracking-widest text-slate-400"><span class="line-through">$${plan.regUsd}</span> <span class="opacity-70">REG</span></div>
-              </div>
-              <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-200">Up to <span class="text-orange-500">${plan.minutes}</span> minutes</div>
-              <div class="mt-1 text-[9px] font-black uppercase tracking-widest text-slate-500">Overage: <span class="text-orange-500">$${plan.overage.toFixed(2)}/min</span> next invoice</div>
-            </div>
-          `).join("")}
-        </div>
-
-        <div class="modal-footer">
-          <div class="grid sm:grid-cols-2 gap-2">
-            <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="confirmPlanSelection()">
-              CONFIRM PLAN
-            </button>
+    function renderPlanCardHtml(planId){
+      const plan = PLANS[planId];
+      const active = selectedPlanId === planId;
+      return `
+        <div class="card-theme ${active ? "border-orange-500/60" : ""}">
+          <div class="flex items-center justify-between">
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Beta Special</div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 line-through">Regular $${plan.regularUsd}</div>
           </div>
+          <div class="flex items-baseline justify-between mt-2">
+            <div class="text-white font-black text-4xl">$${plan.betaUsd}<span class="text-[12px] font-black text-orange-500 ml-2">/mo</span></div>
+            <div class="text-right">
+              <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">${escapeHtml(i18n.t("plan_includes"))}</div>
+              <div class="text-[12px] font-black uppercase tracking-widest text-orange-500">${plan.includedMin} min</div>
+            </div>
+          </div>
+          <div class="text-[11px] font-bold text-slate-300 mt-2">Overages: ${escapeHtml(OVERAGE_RULE)}</div>
+
+          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="selectPlan('${planId}')">
+            ${active ? "SELECTED ✓" : "SELECT"}
+          </button>
         </div>
       `;
     }
 
-    function selectPlanFromModal(planId){
+    function selectPlan(planId){
+      if(!PLANS[planId]) return;
       selectedPlanId = planId;
-      renderPlanModal();
+      refreshProtocolUI();
+      triggerModal(5); // rerender modal
     }
 
-    function confirmPlanSelection(){
-      planSelected = true;
-      commitStepState();
+    function confirmPlan(){
+      if(!planSelected()) return;
+      setStepValue(5, formatPlanLabel(PLANS[selectedPlanId]).toUpperCase());
+      refreshProtocolUI();
       closeModal();
+      setTimeout(() => handleStep(6), 120);
     }
 
-    // ============================
-    // Step 6 demo (2×30s) + SATISFIED
-    // ============================
-    function renderDemoModal(){
-      const c = document.getElementById("mContent");
-      const used = Math.min(demoCallsUsed, 2);
-      const canDemo = used < 2;
-      const canSatisfied = demoCompletedOnce;
-
-      c.innerHTML = `
-        <div class="pill mb-3">DEMO GATE</div>
-        <div class="card-theme text-left">
-          <div class="mini text-orange-500 mb-2">Rules</div>
-          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-            2 demo calls, 30 seconds each. Demo auto-stops. SATISFIED unlocks activation.
-          </div>
-          <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
-            Demo calls used: <span class="text-orange-500">${used}</span>/2
-          </div>
-        </div>
-
-        <div class="grid sm:grid-cols-2 gap-2 mt-3">
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic ${canDemo ? "" : "opacity-40 pointer-events-none"}"
-            type="button" onclick="startTimedDemo()">
-            ${escapeHtml(i18n.t("demo_call"))}
-          </button>
-
-          <button class="modal-btn justify-center text-center ${canSatisfied ? "" : "disabled"}"
-            type="button" onclick="pressSatisfied()">
-            ${escapeHtml(i18n.t("satisfied"))}
-          </button>
-        </div>
-
-        <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
-          Tip: Make at least one demo call before SATISFIED.
-        </div>
-      `;
-    }
-
-    async function startTimedDemo(){
-      if(demoCallsUsed >= 2) return;
-
-      try{
-        const industry = getCurrentIndustryKey();
-        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
-
-        const companyName = (document.getElementById('v4')?.innerText || "YOUR COMPANY").trim() || "YOUR COMPANY";
-        const finalScript = applyVars(agentScript || "");
-
-        demoCallsUsed += 1;
-        demoCompletedOnce = true;
-        commitStepState();
-
-        await vapiStartCall(assistantId, {
-          voice: getSelectedVapiVoice(),
-          firstMessage: `Hi! Thank you for calling ${companyName}. How can I help you today?`,
-          model: { provider: "openai", model: "gpt-4o-mini", messages: [{ role: "system", content: finalScript }] }
-        });
-
-        // auto-stop at 30 seconds
-        clearTimeout(demoStopTimer);
-        demoStopTimer = setTimeout(() => {
-          try { vapiFallbackInstance?.stop?.(); } catch(e){}
-          // refresh UI to show used count / satisfied state
-          commitStepState();
-          if (document.getElementById("setupModal").style.display === "flex" && lastModalStep === 6) {
-            renderDemoModal();
-            i18n.applyTranslations(document.getElementById("setupModal"));
-          }
-        }, 30000);
-
-        // keep modal open (so user can press SATISFIED) but allow close
-        renderDemoModal();
-        i18n.applyTranslations(document.getElementById("setupModal"));
-      } catch(err){
-        console.error(err);
-        alert("Error starting demo call. Check console + /api/config.");
+    // quick pick from hero price cards
+    function quickPickPlan(planId){
+      selectedPlanId = planId;
+      // reflect selection visually
+      document.getElementById("priceCard_299")?.classList.toggle("border-orange-500/60", planId==="PLAN_299");
+      document.getElementById("priceCard_599")?.classList.toggle("border-orange-500/60", planId==="PLAN_599");
+      // if protocol is at/after step 5, update value
+      if (planSelected()){
+        setStepValue(5, formatPlanLabel(PLANS[selectedPlanId]).toUpperCase());
+        refreshProtocolUI();
       }
-    }
-
-    function pressSatisfied(){
-      if(!demoCompletedOnce) return;
-      activationUnlocked = true;
-      commitStepState();
-      closeModal();
-      // auto-open activate step
-      setTimeout(() => { handleStep(7); }, 250);
+      // if they click it early, keep it as preselected and let protocol proceed
     }
 
     // ============================
-    // Step 7 activate (checklist + ACTIVATE)
-    // ============================
-    function renderActivateModal(){
-      const c = document.getElementById("mContent");
-      const ok = canOpenStep(7);
-
-      const checks = [
-        { label: "Country selected", ok: marketSelected },
-        { label: "Industry selected", ok: industrySelected },
-        { label: "Agent configured", ok: agentConfigured },
-        { label: "Company name set", ok: companyNameSet },
-        { label: "Plan selected", ok: planSelected },
-        { label: "Demo completed", ok: demoCompletedOnce },
-        { label: "SATISFIED pressed", ok: activationUnlocked }
-      ];
-
-      const plan = getSelectedPlan();
-
-      c.innerHTML = `
-        <div class="pill mb-3">ACTIVATION</div>
-
-        <div class="grid lg:grid-cols-2 gap-4 text-left">
-          <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">Checklist</div>
-            <div class="grid gap-2">
-              ${checks.map(ch => `
-                <div class="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-3">
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-200">${escapeHtml(ch.label)}</div>
-                  <div class="text-[10px] font-black uppercase tracking-widest ${ch.ok ? "text-green-400" : "text-slate-500"}">
-                    ${ch.ok ? "OK" : "WAIT"}
-                  </div>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-
-          <div class="card-theme">
-            <div class="mini text-orange-500 mb-2">Selected Plan</div>
-            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-              <div class="text-white font-black text-3xl">$${plan.usd}<span class="text-[12px] font-black text-orange-500">/mo</span></div>
-              <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-200">Up to <span class="text-orange-500">${plan.minutes}</span> minutes</div>
-              <div class="mt-1 text-[9px] font-black uppercase tracking-widest text-slate-500">Overage: <span class="text-orange-500">$${plan.overage.toFixed(2)}/min</span> next invoice</div>
-              <div class="divider mt-4">What happens next</div>
-              <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-                Stripe checkout → provisioning flow (backend) → deployment.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <div class="grid sm:grid-cols-2 gap-2">
-            <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic ${ok ? "" : "opacity-40 pointer-events-none"}"
-              type="button" onclick="activateNow()">
-              ${escapeHtml(i18n.t("activate"))}
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    function activateNow(){
-      if(!canOpenStep(7)) return;
-
-      try { confetti(); } catch(e){}
-      setDeployed(true);
-      commitStepState();
-      closeModal();
-
-      const plan = getSelectedPlan();
-      setTimeout(() => { window.location.href = plan.stripeUrl; }, 900);
-    }
-
-    // ============================
-    // VAPI: Preview
+    // Step 6 Demo gate
     // ============================
     async function previewVoice(){
       try{
         const industry = getCurrentIndustryKey();
         const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
-
         await vapiStartCall(assistantId, {
           voice: getSelectedVapiVoice(),
           firstMessage: "Hi! This is a quick voice preview. How does this voice sound to you?"
         });
-
         closeModal();
       } catch(e){
         console.error(e);
@@ -2646,8 +2556,150 @@ Collect: address, issue description, contact info, urgency.`}
       }
     }
 
+    async function startDemoCall(){
+      // hard gates
+      if(demoInProgress) return;
+      if(demoCallsUsed >= 2) return;
+
+      // stable flow gates
+      if(!marketSelected() || !industrySelected() || !agentConfigured() || !companyNameSet() || !planSelected()){
+        alert("Complete steps 1–5 first.");
+        return;
+      }
+
+      demoInProgress = true;
+      refreshProtocolUI();
+      triggerModal(6); // update UI state immediately
+
+      try{
+        const industry = getCurrentIndustryKey();
+        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
+        const finalScript = applyVars(agentScript || "");
+        const firstMessage = `Hi! Thank you for calling ${companyName}. How can I help you today?`;
+
+        const instance = await vapiStartCall(assistantId, {
+          voice: getSelectedVapiVoice(),
+          firstMessage,
+          model: { provider: "openai", model: "gpt-4o-mini", messages: [{ role: "system", content: finalScript }] }
+        });
+
+        demoCallsUsed += 1;
+        setStepValue(6, `USED ${demoCallsUsed}/2`);
+
+        // ✅ stop at 30 seconds
+        setTimeout(() => {
+          try { instance?.stop?.(); } catch {}
+          onDemoEnded();
+        }, 30_000);
+
+        // also mark end if user closes / navigates away
+        // (best-effort; Vapi events are not guaranteed here)
+      } catch(err){
+        console.error(err);
+        demoInProgress = false;
+        refreshProtocolUI();
+        triggerModal(6);
+        alert("Error starting demo call. Check console + /api/config.");
+      }
+    }
+
+    function onDemoEnded(){
+      demoInProgress = false;
+      demoCompletedOnce = true;
+      setStepValue(6, activationUnlocked ? "UNLOCKED" : `DEMO OK • ${demoCallsUsed}/2`);
+      refreshProtocolUI();
+      // re-render demo modal if open
+      const modalOpen = document.getElementById("setupModal").style.display === "flex";
+      if(modalOpen && lastModalStep === 6) triggerModal(6);
+    }
+
+    function pressSatisfied(){
+      if(!demoCompletedOnce) return;
+      activationUnlocked = true;
+      setStepValue(6, "SATISFIED");
+      refreshProtocolUI();
+      closeModal();
+      setTimeout(() => handleStep(7), 150);
+    }
+
     // ============================
-    // Language menu
+    // Step 7 Activate
+    // ============================
+    function activateNow(){
+      const checklist = activationReadyChecklist();
+      const allOk = checklist.every(x => x.ok);
+      if(!allOk){
+        alert("Complete the checklist first.");
+        return;
+      }
+
+      confetti();
+      setDeployed(true);
+      setStepValue(7, "READY");
+      refreshProtocolUI();
+
+      const link = STRIPE_CHECKOUT_LINKS[selectedPlanId] || STRIPE_CHECKOUT_LINKS.PLAN_299;
+      setTimeout(() => { window.location.href = link; }, 900);
+    }
+
+    // ============================
+    // PROTOCOL UI: values + locks + blinking
+    // ============================
+    function setStepValue(step, value){
+      const el = document.getElementById(`v${step}`);
+      if(el) el.innerText = value;
+    }
+
+    function refreshProtocolUI(){
+      // active states
+      const activeSteps = {
+        1: marketSelected(),
+        2: industrySelected(),
+        3: agentConfigured(),
+        4: companyNameSet(),
+        5: planSelected(),
+        6: demoCompletedOnce && activationUnlocked,
+        7: isDeployed()
+      };
+
+      for(let i=1;i<=7;i++){
+        const card = document.getElementById(`s${i}`);
+        if(!card) continue;
+        card.classList.toggle("active", !!activeSteps[i]);
+        card.classList.toggle("locked", !stepUnlocked(i));
+        card.classList.remove("next-focus");
+      }
+
+      // only next required step blinks
+      const next = computeNextRequiredStep();
+      document.getElementById(`s${next}`)?.classList.add("next-focus");
+
+      // update step value placeholders when empty
+      if(!marketSelected()) setStepValue(1, i18n.t("select"));
+      if(!industrySelected()) setStepValue(2, i18n.t("select"));
+      if(!agentConfigured()) setStepValue(3, i18n.t("choose"));
+      if(!companyNameSet()) setStepValue(4, i18n.t("sync"));
+      if(!planSelected()) setStepValue(5, i18n.t("choose"));
+
+      // demo label
+      if(!demoCompletedOnce) setStepValue(6, `USED ${demoCallsUsed}/2`);
+      if(demoCompletedOnce && !activationUnlocked) setStepValue(6, "PRESS SATISFIED");
+      if(demoCompletedOnce && activationUnlocked) setStepValue(6, "UNLOCKED");
+
+      if(!isDeployed()) setStepValue(7, i18n.t("instant"));
+
+      // price card highlight if selected
+      document.getElementById("priceCard_299")?.classList.toggle("border-orange-500/60", selectedPlanId==="PLAN_299");
+      document.getElementById("priceCard_599")?.classList.toggle("border-orange-500/60", selectedPlanId==="PLAN_599");
+    }
+
+    function handleStep(step){
+      if(!stepUnlocked(step)) return;
+      triggerModal(step);
+    }
+
+    // ============================
+    // Language menu helpers
     // ============================
     function toggleLangMenu(force){
       const d = document.getElementById('langMenu');
@@ -2655,15 +2707,13 @@ Collect: address, issue description, contact info, urgency.`}
       else if(force === false) d.style.display = 'none';
       else d.style.display = (d.style.display === 'flex') ? 'none' : 'flex';
     }
-
     function setLang(cc, langCode){
       document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
       document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${langCode}`;
       i18n.setLanguage(langCode);
       toggleLangMenu(false);
-      commitStepState();
+      refreshProtocolUI();
     }
-
     function filterList(containerId, query){
       const q = (query || "").toUpperCase();
       document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
@@ -2671,7 +2721,6 @@ Collect: address, issue description, contact info, urgency.`}
         b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
       });
     }
-
     function initLangList(){
       const list = document.getElementById('langList');
       list.innerHTML = "";
@@ -2691,23 +2740,15 @@ Collect: address, issue description, contact info, urgency.`}
     }
 
     // ============================
-    // TIMER + COUNTER
+    // INIT templates
     // ============================
-    setInterval(() => {
-      const now = new Date();
-      const h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds();
-      document.getElementById('timer').textContent =
-        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-
-      if (Math.random() > 0.8) {
-        const el = document.getElementById('agentCount');
-        let count = parseInt(el.innerText.replace(',', ''), 10);
-        el.innerText = (count + 1).toLocaleString();
-      }
-    }, 1000);
+    selectedIndustryKey = "Electrical";
+    refreshTemplatesForCurrentSelection(true);
+    const initTemplates = getTemplatesFor(selectedRole).templates;
+    if(initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
 
     // ============================
-    // INIT + wiring
+    // INIT wiring
     // ============================
     function wireTopButtons(){
       document.getElementById("heroCta").addEventListener("click", () => handleStep(1));
@@ -2720,7 +2761,6 @@ Collect: address, issue description, contact info, urgency.`}
       document.getElementById("newsletterTopBtn").addEventListener("click", () => openCommunity("NEWSLETTER"));
       document.getElementById("newsletterBtn").addEventListener("click", () => openCommunity("NEWSLETTER"));
 
-      // steps
       document.getElementById("s1").addEventListener("click", () => handleStep(1));
       document.getElementById("s2").addEventListener("click", () => handleStep(2));
       document.getElementById("s3").addEventListener("click", () => handleStep(3));
@@ -2731,7 +2771,6 @@ Collect: address, issue description, contact info, urgency.`}
 
       document.getElementById("mClose").addEventListener("click", closeModal);
 
-      // Click outside modal closes
       document.getElementById("setupModal").addEventListener("click", (e) => {
         if (e.target && e.target.id === "setupModal") closeModal();
       });
@@ -2755,42 +2794,35 @@ Collect: address, issue description, contact info, urgency.`}
           toggleLangMenu(false);
         }
       });
-
-      // hero plan selects
-      document.getElementById("heroPlanA").addEventListener("click", () => setSelectedPlan("beta_299"));
-      document.getElementById("heroPlanB").addEventListener("click", () => setSelectedPlan("beta_599"));
     }
 
+    // ============================
+    // TIMER + COUNTER
+    // ============================
+    setInterval(() => {
+      const now = new Date();
+      const h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds();
+      document.getElementById('timer').textContent =
+        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+      if (Math.random() > 0.8) {
+        const el = document.getElementById('agentCount');
+        let count = parseInt(el.innerText.replace(',', ''), 10);
+        el.innerText = (count + 1).toLocaleString();
+      }
+    }, 1000);
+
+    // ============================
+    // BOOT
+    // ============================
     initLangList();
     wireTopButtons();
+    renderHeroAgentGrid();
 
-    // defaults
-    selectedIndustryKey = "Electrical";
-    refreshTemplatesForCurrentSelection(true);
-    const initTemplates = getTemplatesFor(selectedRole).templates;
-    if(initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
-
-    // plan default selected
-    setSelectedPlan("beta_299");
-
-    // pricing default market
-    updatePricingUIForMarket(selectedMarket);
-
-    // deployed state
+    // if deployed, show step 7
     if(isDeployed()){
-      // mark as fully activated visually
-      marketSelected = true;
-      industrySelected = true;
-      agentConfigured = true;
-      companyNameSet = true;
-      planSelected = true;
-      demoCompletedOnce = true;
-      activationUnlocked = true;
-      document.getElementById("v7").innerText = "READY";
+      setStepValue(7, "READY");
     }
-
-    commitStepState();
-    i18n.applyTranslations(document);
 
     // deep-link benefits
     const initialBenefit = readBenefitsIdxFromHash();
@@ -2798,6 +2830,11 @@ Collect: address, issue description, contact info, urgency.`}
       activeBenefitIdx = initialBenefit;
       triggerModal("benefits");
     }
+
+    // first paint
+    refreshProtocolUI();
+    i18n.applyTranslations(document);
+
   </script>
 </body>
 </html>
