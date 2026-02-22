@@ -8,7 +8,10 @@
   <!-- Tailwind (CDN OK for prototype) -->
   <script>
     window.tailwind = window.tailwind || {};
-    tailwind.config = { theme: { extend: {} }, corePlugins: { preflight: true } };
+    tailwind.config = {
+      theme: { extend: {} },
+      corePlugins: { preflight: true }
+    };
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -74,31 +77,33 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 10px;
       border-radius: 12px;
-      opacity: 0.28;
+      opacity: 0.35;
       transition: 0.3s;
+      cursor: pointer;
       user-select: none;
       pointer-events: auto;
     }
-    .step-card.unlocked { opacity: 0.65; cursor: pointer; }
-    .step-card.locked { opacity: 0.18; cursor: not-allowed; }
-    .step-card.locked:hover { border-color: rgba(255, 255, 255, 0.1); }
-
     .step-card.active {
       border-color: #f97316 !important;
       background: rgba(249, 115, 22, 0.1) !important;
       opacity: 1 !important;
     }
+    .next-focus { animation: border-glow 2s infinite ease-in-out !important; opacity: 1 !important; }
 
-    .next-focus {
-      animation: border-glow 2s infinite ease-in-out !important;
-      opacity: 1 !important;
-      border-color: rgba(249,115,22,0.6) !important;
-      background: rgba(249,115,22,0.08) !important;
-    }
+    /* ✅ LOCK REALLY MEANS LOCK (fix: future steps not clickable) */
+    .step-card.locked { opacity: 0.22; cursor: not-allowed; pointer-events: none; }
+    .step-card.locked:hover { border-color: rgba(255, 255, 255, 0.1); }
 
     @keyframes border-glow {
       0%, 100% { border-color: rgba(249, 115, 22, 0.3); }
-      50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.35); }
+      50% { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
+    }
+
+    /* ✅ blinking SMB benefits button (uses same glow feel) */
+    .benefits-blink {
+      animation: border-glow 2s infinite ease-in-out !important;
+      border-color: rgba(249, 115, 22, 0.55) !important;
+      background: rgba(249, 115, 22, 0.12) !important;
     }
 
     .floating-lang { position: fixed; top: 15px; right: 15px; z-index: 1000; }
@@ -136,7 +141,7 @@
       border-radius: 8px;
       padding: 8px;
       color: white;
-      font-size: 12px;
+      font-size: 11px;
       outline: none;
       width: 100%;
       margin-bottom: 8px;
@@ -169,7 +174,7 @@
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 24px;
       width: 100%;
-      max-width: 560px;
+      max-width: 520px;
       padding: 18px;
       text-align: center;
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
@@ -184,7 +189,8 @@
     .modal-shell.info-wide { max-width: 900px; }
     .modal-shell.community-wide { max-width: 1120px; }
     .modal-shell.script-wide { max-width: 1120px; }
-    .modal-shell.activate-wide { max-width: 860px; }
+    .modal-shell.benefits-wide { max-width: 1120px; }
+    .modal-shell.plan-wide { max-width: 900px; }
 
     .modal-content-wrap {
       overflow: hidden;
@@ -212,7 +218,7 @@
       border-radius: 12px;
       font-weight: 900;
       text-transform: uppercase;
-      font-size: 10px;
+      font-size: 9px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
       color: white;
@@ -263,7 +269,7 @@
       padding: 10px 12px;
       outline: none;
       font-weight: 900;
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.12em;
     }
@@ -363,66 +369,168 @@
       overflow: auto;
     }
 
-    /* HERO AGENTS LIST */
-    .agent-card {
-      background: rgba(255,255,255,0.035);
+    /* ✅ Benefits rows */
+    .benefit-row {
+      background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 16px;
-      padding: 14px 14px;
+      border-radius: 14px;
+      padding: 12px;
       cursor: pointer;
       user-select: none;
       transition: 0.18s;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
-    .agent-card:hover {
+    .benefit-row:hover {
+      border-color: rgba(249,115,22,0.55);
+      background: rgba(249,115,22,0.10);
+    }
+    .benefit-row.active {
+      border-color: rgba(249,115,22,0.8);
+      background: rgba(249,115,22,0.14);
+    }
+    .benefit-row:focus-visible{
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.35);
+      border-color: rgba(249,115,22,0.8);
+    }
+    .benefit-marker{
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(249,115,22,0.95);
+      opacity: 0;
+      transform: translateY(-1px);
+      transition: 0.15s;
+      flex: 0 0 auto;
+    }
+    .benefit-row.active .benefit-marker{ opacity: 1; }
+    .benefit-inline {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      margin-top: 10px;
+      padding: 10px 12px;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 260ms ease, opacity 220ms ease;
+      will-change: max-height, opacity;
+    }
+    .benefit-inline.open { max-height: 260px; opacity: 1; }
+    @media (max-width: 1023px){ .benefits-desktop-panel { display: none !important; } }
+    @media (min-width: 1024px){ .benefits-mobile-inline { display: none !important; } }
+
+    /* ✅ Agent tiles (hero list) */
+    .agent-tile{
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px;
+      padding: 12px;
+      cursor: pointer;
+      user-select: none;
+      transition: 0.18s;
+      outline: none;
+    }
+    .agent-tile:hover{
       border-color: rgba(249,115,22,0.55);
       background: rgba(249,115,22,0.08);
     }
-    .agent-card.active {
-      border-color: rgba(249,115,22,0.85);
+    .agent-tile.active{
+      border-color: rgba(249,115,22,0.8);
       background: rgba(249,115,22,0.12);
+      box-shadow: 0 0 22px rgba(249,115,22,0.18);
     }
-    .agent-title {
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgba(226,232,240,0.98);
-    }
-    .agent-desc {
+    .agent-desc{
       margin-top: 10px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 10px 12px;
       font-size: 13px;
-      line-height: 1.5;
-      font-weight: 650;
-      color: rgba(226,232,240,0.80);
+      line-height: 1.55;
+      color: rgba(226,232,240,0.9);
       display: none;
     }
-    .agent-card.active .agent-desc { display: block; }
+    .agent-tile.active .agent-desc{ display: block; }
 
-    /* DEMO BAR (always visible when unlocked) */
-    .demo-bar {
-      margin-top: 14px;
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,255,255,0.08);
+    /* ✅ Plan cards */
+    .plan-card{
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
       border-radius: 18px;
       padding: 14px;
-      display: none;
+      cursor: pointer;
+      user-select: none;
+      transition: 0.18s;
+      outline: none;
+    }
+    .plan-card:hover{
+      border-color: rgba(249,115,22,0.55);
+      background: rgba(249,115,22,0.08);
+    }
+    .plan-card.active{
+      border-color: rgba(249,115,22,0.85);
+      background: rgba(249,115,22,0.14);
+      box-shadow: 0 0 26px rgba(249,115,22,0.18);
     }
 
+    /* ✅ Reduced motion */
     @media (prefers-reduced-motion: reduce){
+      .benefit-inline { transition: none !important; }
+      .benefits-blink { animation: none !important; }
       .next-focus { animation: none !important; }
     }
   </style>
 
-  <!-- ✅ Language Engine (minimal, EN primary) -->
+  <!-- ✅ Language Engine (kept from your base code) -->
   <script>
     const LANG_STORAGE_KEY = "aicallport_lang";
-    const SUPPORTED_LANGS = ["EN","ES","FR","AR","HE","DE","PT","RU"];
+    const I18N_CACHE_KEY = "aicallport_i18n_cache_v1";
+    const SUPPORTED_LANGS = [
+      "EN","ZH","HI","ES","FR","AR","BN","PT","RU","UR",
+      "ID","DE","JA","PCM","MR","TE","TR","TA","YUE","VI",
+      "TL","WU","KO","FA","HA","SW","JV","IT","PA","KN","HE"
+    ];
     const RTL_LANGS = new Set(["AR","HE"]);
+
+    function mapBrowserLangToCode(browserLang) {
+      const b = (browserLang || "").toLowerCase();
+      if (b.startsWith("en")) return "EN";
+      if (b.startsWith("es")) return "ES";
+      if (b.startsWith("fr")) return "FR";
+      if (b.startsWith("de")) return "DE";
+      if (b.startsWith("pt")) return "PT";
+      if (b.startsWith("ru")) return "RU";
+      if (b.startsWith("ar")) return "AR";
+      if (b.startsWith("he") || b.startsWith("iw")) return "HE";
+      if (b.startsWith("hi")) return "HI";
+      if (b.startsWith("bn")) return "BN";
+      if (b.startsWith("ur")) return "UR";
+      if (b.startsWith("id")) return "ID";
+      if (b.startsWith("tr")) return "TR";
+      if (b.startsWith("it")) return "IT";
+      if (b.startsWith("fa")) return "FA";
+      if (b.startsWith("sw")) return "SW";
+      if (b.startsWith("ha")) return "HA";
+      if (b.startsWith("ja")) return "JA";
+      if (b.startsWith("ko")) return "KO";
+      if (b.startsWith("vi")) return "VI";
+      if (b.startsWith("tl") || b.startsWith("fil")) return "TL";
+      if (b.startsWith("zh")) return "ZH";
+      return "EN";
+    }
 
     window.APP_I18N = { current: "EN" };
 
     const translations = {
       EN: {
+        community: "Community",
+        newsletter: "Newsletter",
+        forum: "Forum",
+        ai_qa: "AI Q&A",
+        newsletter_no_deploy: "Join Newsletter (No Deploy)",
         activation_steps_info: "Activation Steps Info",
         close: "Close",
         next: "Next",
@@ -440,20 +548,36 @@
 
         setup: "Setup",
         dashboard: "Dashboard",
+        post: "Post",
+        reply: "Reply",
+        title: "Title",
+        email: "Email",
+        name_optional: "Name (Optional)",
+        tell_us_updates: "Tell us what you want updates about (optional)",
+        write_question: "Write your question or feedback...",
+        write_reply: "Write a reply...",
+        ask_question: "Ask a question...",
+        thinking: "Thinking...",
+        needs_backend: "This feature needs a backend endpoint.",
 
         hero_h1: "AI CALL PORT",
-        hero_p1: "Global Activation Platform for AI Call Agents.",
-        hero_p2: "Custom AI Agents automatically configured to your business workflow.",
-        hero_p3: "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. Fully Automated Worldwide Deployment. Multilingual. Make Demo Call Before Activation. No Humans.",
+        hero_p:
+          "Global Activation Platform for AI Receptionist, AI Booking Agent, AI Sales Agent, AI Customer Service, AI After-Hours Agent and more.<br>" +
+          "<span class='text-orange-500'>Custom AI Agents automatically configured to your business workflow.</span><br>" +
+          "Instant <span class='text-orange-500'>SMALL BUSINESS</span> Activation. " +
+          "<span class='text-orange-500'>Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>",
 
         beta_access: "BETA ACCESS - SMALL BUSINESS",
+        regular: "Regular",
+        global_live: "Global Live",
+        per_month: "/mo",
         per_month_usd: "/mo USD",
 
-        feat_1: "Secure Payment Via Stripe",
+        feat_1: "Unlimited Inbound Calling",
         feat_2: "Pay Monthly",
         feat_3: "No Contract",
 
-        step_01: "01 Country",
+        step_01: "01 Market",
         step_02: "02 Industry",
         step_03: "03 Agent",
         step_04: "04 Company",
@@ -462,8 +586,8 @@
         step_07: "07 Activate",
 
         select: "Select",
-        choose: "Choose",
         sync: "Sync",
+        choose: "Choose",
         sandbox: "Sandbox",
         instant: "Instant",
 
@@ -480,7 +604,7 @@
         reset_template: "Reset Template",
         preview_voice: "Preview Voice",
         voice: "Voice",
-        confirm_role_template_voice: "CONFIRM AGENT SETUP",
+        confirm_role_template_voice: "CONFIRM ROLE + TEMPLATE + VOICE",
 
         receptionist: "Receptionist",
         sales_agent: "Sales Agent",
@@ -490,33 +614,84 @@
         role_help_sales: "Qualifies leads fast, captures contact details, and books consultations.",
         role_help_support: "Collects issue details, prioritizes urgency, and escalates when needed.",
 
-        business_name: "Company Name",
-
         demo_call: "START DEMO CALL",
-        satisfied: "SATISFIED",
-        demos_used: "Demo calls used",
-        demo_rules: "2 demos • 30 seconds each",
-        demo_note: "SATISFIED unlocks activation after at least one demo.",
+        deploy_get_number: "ACTIVATE NOW",
 
-        plan_pick: "Pick a Plan",
-        plan_selected: "Selected",
-
-        activate_checklist: "Activation Checklist",
-        activate_ready: "ACTIVATE",
-
-        community: "Community",
-        newsletter: "Newsletter",
-        forum: "Forum",
-        ai_qa: "AI Q&A",
+        community_portal: "Community Portal",
+        join_list: "Join List",
+        ask_ai: "Ask AI",
 
         privacy: "Privacy",
         terms: "Terms",
         support: "Support",
-        active_agents: "ACTIVE AGENTS"
-      }
+        active_agents: "ACTIVE AGENTS",
+
+        business_name: "Business Name",
+
+        open_ai_qa: "AI Q&A",
+        open_forum: "Forum",
+        open_newsletter: "Newsletter",
+        subscribed: "Subscribed",
+        no_signups: "No signups yet",
+        no_posts: "No posts yet",
+        forum_threads: "Forum Threads",
+        deployed_yes: "Deployed: YES",
+        deployed_no: "Deployed: NO",
+
+        smb_benefits: "SMB Benefits",
+        smb_benefits_title: "Small Business Benefits",
+        hover_to_learn: "Click a benefit to see details",
+
+        /* plan labels */
+        pick_plan: "Pick a Plan (Step 5)",
+        beta_special: "Beta Special",
+        overages: "Overages: $0.30/min (next invoice)",
+        up_to: "UP TO",
+        minutes: "MIN",
+        choose_plan: "Choose Plan",
+      },
+
+      ES: { community:"Comunidad", newsletter:"Boletín", forum:"Foro", ai_qa:"Preguntas IA", close:"Cerrar", start_activation:"Iniciar Activación", confirm:"Confirmar", smb_benefits:"Beneficios SMB" },
+      FR: { community:"Communauté", newsletter:"Newsletter", forum:"Forum", ai_qa:"Q&R IA", close:"Fermer", start_activation:"Démarrer", confirm:"Confirmer", smb_benefits:"Avantages PME" },
+      AR: { community:"المجتمع", newsletter:"النشرة", forum:"المنتدى", ai_qa:"سؤال وجواب", close:"إغلاق", start_activation:"بدء التفعيل", confirm:"تأكيد", smb_benefits:"مزايا الأعمال" },
+      HE: { community:"קהילה", newsletter:"ניוזלטר", forum:"פורום", ai_qa:"שאלות ותשובות", close:"סגור", start_activation:"התחל הפעלה", confirm:"אישור", smb_benefits:"יתרונות לעסקים" }
     };
 
     SUPPORTED_LANGS.forEach(code => { if (!translations[code]) translations[code] = {}; });
+
+    function loadI18nCache(){ try { return JSON.parse(localStorage.getItem(I18N_CACHE_KEY) || "{}"); } catch { return {}; } }
+    function saveI18nCache(cache){ try { localStorage.setItem(I18N_CACHE_KEY, JSON.stringify(cache || {})); } catch {} }
+    const dynamicCache = loadI18nCache();
+
+    function dynGet(lang, namespace, key){ return dynamicCache?.[lang]?.[namespace]?.[key] || null; }
+    function dynSet(lang, namespace, map){
+      dynamicCache[lang] ||= {};
+      dynamicCache[lang][namespace] ||= {};
+      Object.entries(map || {}).forEach(([k,v]) => {
+        if (v != null && String(v).trim().length) dynamicCache[lang][namespace][k] = v;
+      });
+      saveI18nCache(dynamicCache);
+    }
+
+    async function ensureDynamicTranslations(lang, namespace, items){
+      const code = (lang || "EN").toUpperCase();
+      if (code === "EN") return;
+      const missing = (items || []).filter(x => !dynGet(code, namespace, x));
+      if (!missing.length) return;
+
+      try{
+        const res = await fetch("/api/i18n-batch", {
+          method: "POST",
+          headers: { "content-type":"application/json" },
+          body: JSON.stringify({ lang: code, namespace, items: missing })
+        });
+        if (!res.ok) throw new Error("no backend");
+        const data = await res.json();
+        if (data && data.map) dynSet(code, namespace, data.map);
+      } catch(e){
+        // EN fallback
+      }
+    }
 
     function getDict(lang) { return translations[lang] || translations.EN; }
     function t(key) {
@@ -530,9 +705,26 @@
       html.lang = (window.APP_I18N.current || "EN").toLowerCase();
       html.dir = RTL_LANGS.has(window.APP_I18N.current) ? "rtl" : "ltr";
 
-      root.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.getAttribute("data-i18n")));
-      root.querySelectorAll("[data-i18n-html]").forEach(el => el.innerHTML = t(el.getAttribute("data-i18n-html")));
-      root.querySelectorAll("[data-i18n-placeholder]").forEach(el => el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder"))));
+      root.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        el.textContent = t(key);
+      });
+      root.querySelectorAll("[data-i18n-html]").forEach(el => {
+        const key = el.getAttribute("data-i18n-html");
+        el.innerHTML = t(key);
+      });
+      root.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        el.setAttribute("placeholder", t(key));
+      });
+      root.querySelectorAll("[data-i18n-title]").forEach(el => {
+        const key = el.getAttribute("data-i18n-title");
+        el.setAttribute("title", t(key));
+      });
+      root.querySelectorAll("[data-i18n-aria]").forEach(el => {
+        const key = el.getAttribute("data-i18n-aria");
+        el.setAttribute("aria-label", t(key));
+      });
     }
 
     function setLanguage(langCode) {
@@ -545,18 +737,17 @@
 
     (function initLanguageEngine() {
       let stored = localStorage.getItem(LANG_STORAGE_KEY);
-      if (!stored) stored = "EN";
+      if (!stored) stored = mapBrowserLangToCode(navigator.language || navigator.userLanguage || "en");
       setLanguage(stored);
     })();
 
-    window.i18n = { t, setLanguage, applyTranslations, translations };
+    window.i18n = { t, setLanguage, applyTranslations, translations, ensureDynamicTranslations, dynGet };
   </script>
 </head>
 
 <body onmousemove="updateParallax(event)">
   <div class="bg-glow"></div>
 
-  <!-- Language -->
   <div class="floating-lang" id="langWrap">
     <button id="langTrigger" class="lang-trigger" type="button">
       <img id="curFlag" src="https://flagcdn.com/us.svg" class="w-4" alt="Flag" />
@@ -569,177 +760,192 @@
   </div>
 
   <div class="console-container">
+    <!-- Top bar -->
     <div class="flex justify-between items-center mb-6 lg:mb-10">
       <div class="flex items-center gap-2">
         <span class="font-black italic text-base lg:text-xl uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
         <div class="ml-2 px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase leading-none">BETA</div>
       </div>
 
+      <!-- ✅ RESTORED: AI Q&A / FORUM / NEWSLETTER (top) -->
       <div class="flex items-center gap-2 flex-wrap justify-end">
+        <button id="qaBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="open_ai_qa" type="button">AI Q&A</button>
+        <button id="forumBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="open_forum" type="button">Forum</button>
+        <button id="newsletterTopBtn" class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="open_newsletter" type="button">Newsletter</button>
+
         <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
           <div class="dot-blink"></div>
-          <span class="text-[7px] font-black text-orange-500 uppercase tracking-widest text-nowrap">GLOBAL LIVE</span>
+          <span id="live-label" class="text-[7px] font-black text-orange-500 uppercase tracking-widest text-nowrap" data-i18n="global_live">Global Live</span>
         </div>
       </div>
     </div>
 
+    <!-- Hero + Pricing -->
     <div class="grid lg:grid-cols-5 gap-6 lg:gap-12 items-start">
-      <!-- HERO LEFT -->
-      <div class="lg:col-span-3 text-left">
-        <h1 class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-3 hero-title" data-i18n="hero_h1">AI CALL PORT</h1>
+      <div class="lg:col-span-3 text-center lg:text-left">
+        <h1 id="hero-h1" class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-4 hero-title" data-i18n="hero_h1">
+          AI CALL PORT
+        </h1>
 
-        <div class="text-slate-300 text-[13px] lg:text-[14px] font-semibold leading-relaxed">
-          <div data-i18n="hero_p1">Global Activation Platform for AI Call Agents.</div>
-          <div class="text-orange-500 font-black mt-1" data-i18n="hero_p2">Custom AI Agents automatically configured to your business workflow.</div>
-          <div class="mt-2" data-i18n-html="hero_p3">
-            Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation. Fully Automated Worldwide Deployment. Multilingual. Make Demo Call before activation. No Humans.
-          </div>
+        <p id="hero-p" class="text-slate-400 text-[12px] lg:text-sm mb-5 max-w-xl mx-auto lg:mx-0 font-bold uppercase tracking-wider leading-relaxed" data-i18n-html="hero_p">
+          Global Activation Platform for AI Call Agents.<br />
+          <span class="text-orange-500">Custom AI Agents automatically configured to your business workflow.</span><br />
+          Instant <span class="text-orange-500">SMALL BUSINESS</span> Activation.
+          <span class="text-orange-500">Fully Automated Worldwide Deployment. Multilingual. No Humans.</span>
+        </p>
+
+        <!-- ✅ RESTORED: AI Agents list (2 columns, clickable descriptions) -->
+        <div class="card-theme text-left mb-6">
+          <div class="mini text-orange-500 mb-2">AI CALL AGENTS</div>
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">CLICK AN AGENT TO VIEW DESCRIPTION</div>
+          <div id="agentsGrid" class="grid sm:grid-cols-2 gap-3"></div>
         </div>
 
-        <!-- AI CALL AGENTS -->
-        <div class="mt-6 bg-black/30 border border-white/10 rounded-3xl p-5">
-          <div class="text-[11px] font-black uppercase tracking-[0.22em] text-orange-500">AI Call Agents</div>
-          <div class="mt-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-            Click an agent to view description
-          </div>
-          <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3" id="agentGrid"></div>
-        </div>
-
-        <div class="grid gap-2 sm:flex sm:gap-3 sm:items-center mt-6">
-          <button id="heroCta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[11px] font-black uppercase tracking-widest italic" data-i18n="start_activation" type="button">
+        <div class="grid gap-2 sm:flex sm:gap-3 sm:items-center">
+          <button id="heroCta" class="orange-btn w-full lg:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic" data-i18n="start_activation" type="button">
             Start Activation
           </button>
-          <button id="activationInfoBtn" class="w-full sm:w-auto px-8 py-4 rounded-xl text-[11px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="activation_steps_info" type="button">
+          <button id="activationInfoBtn" class="w-full sm:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" data-i18n="activation_steps_info" type="button">
             Activation Steps Info
           </button>
+
+          <!-- ✅ RESTORED EXACTLY: SMB BENEFITS button (same class/behavior) -->
+          <button id="smbBenefitsBtn"
+            class="w-full sm:w-auto px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition benefits-blink"
+            data-i18n="smb_benefits"
+            type="button">
+            SMB Benefits
+          </button>
+        </div>
+
+        <!-- ✅ FIX: Demo Call button is NOT hidden. It lives right under the main console area. -->
+        <div id="demoBar" class="mt-5 hidden">
+          <div class="card-theme">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <div class="mini text-orange-500">DEMO CALL</div>
+                <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+                  Use your selected Agent + Company + Role/Template/Voice to test a real call.
+                </div>
+              </div>
+              <button id="demoCallBtnTop" class="orange-btn px-6 py-3 rounded-xl text-[10px] font-black uppercase italic" type="button">
+                START DEMO CALL
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- HERO RIGHT (Pricing) -->
+      <!-- Pricing (two price cards) -->
       <div class="lg:col-span-2">
-        <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-6 text-left">
-          <h3 class="text-[10px] uppercase mb-2 font-black text-orange-500 tracking-[0.2em]" data-i18n="beta_access">
+        <div class="bg-black/50 border border-orange-500/30 rounded-3xl p-6 text-center">
+          <h3 id="beta-txt" class="text-[10px] uppercase mb-1 font-black text-orange-500 tracking-[0.2em]" data-i18n="beta_access">
             BETA ACCESS - SMALL BUSINESS
           </h3>
-
-          <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-3">
-            Pick a plan during Step 5
+          <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-4" data-i18n="pick_plan">
+            Pick a Plan (Step 5)
           </div>
 
-          <!-- Plan Card 299 -->
-          <div class="border border-white/10 bg-white/5 rounded-2xl p-4 mb-3" id="priceCardP1">
-            <div class="flex items-center justify-between">
-              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA SPECIAL</div>
-              <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 line-through">REG $499</div>
-            </div>
-            <div class="flex items-baseline justify-between mt-2">
-              <div class="text-white font-black text-4xl">$299 <span class="text-[12px] font-black text-orange-500">/mo</span></div>
-              <div class="text-right">
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">UP TO</div>
-                <div class="text-[11px] font-black uppercase tracking-widest text-orange-500">1000 MIN</div>
+          <div class="grid gap-3 text-left">
+            <div id="priceCard_299" class="plan-card" onclick="selectPlan('P299',{from:'pricing'})">
+              <div class="flex items-center justify-between">
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400" data-i18n="beta_special">Beta Special</div>
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 line-through">
+                  <span>$499</span> <span data-i18n="regular">Regular</span>
+                </div>
               </div>
-            </div>
-            <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Overages: <span class="text-white">$0.30/min</span> (next invoice)
-            </div>
-          </div>
-
-          <!-- Plan Card 599 -->
-          <div class="border border-white/10 bg-white/5 rounded-2xl p-4" id="priceCardP2">
-            <div class="flex items-center justify-between">
-              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA SPECIAL</div>
-              <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 line-through">REG $999</div>
-            </div>
-            <div class="flex items-baseline justify-between mt-2">
-              <div class="text-white font-black text-4xl">$599 <span class="text-[12px] font-black text-orange-500">/mo</span></div>
-              <div class="text-right">
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">UP TO</div>
-                <div class="text-[11px] font-black uppercase tracking-widest text-orange-500">2500 MIN</div>
+              <div class="flex items-baseline justify-between mt-2">
+                <div class="text-white font-black text-4xl">
+                  $299<span class="text-orange-500 text-base font-bold">/mo</span>
+                </div>
+                <div class="text-orange-500 font-black text-[11px] uppercase tracking-widest">
+                  <span data-i18n="up_to">UP TO</span> 1000 <span data-i18n="minutes">MIN</span>
+                </div>
               </div>
+              <div class="mt-2 text-[10px] font-bold text-slate-400" data-i18n="overages">Overages: $0.30/min (next invoice)</div>
             </div>
-            <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Overages: <span class="text-white">$0.30/min</span> (next invoice)
+
+            <div id="priceCard_599" class="plan-card" onclick="selectPlan('P599',{from:'pricing'})">
+              <div class="flex items-center justify-between">
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400" data-i18n="beta_special">Beta Special</div>
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 line-through">
+                  <span>$999</span> <span data-i18n="regular">Regular</span>
+                </div>
+              </div>
+              <div class="flex items-baseline justify-between mt-2">
+                <div class="text-white font-black text-4xl">
+                  $599<span class="text-orange-500 text-base font-bold">/mo</span>
+                </div>
+                <div class="text-orange-500 font-black text-[11px] uppercase tracking-widest">
+                  <span data-i18n="up_to">UP TO</span> 2500 <span data-i18n="minutes">MIN</span>
+                </div>
+              </div>
+              <div class="mt-2 text-[10px] font-bold text-slate-400" data-i18n="overages">Overages: $0.30/min (next invoice)</div>
             </div>
           </div>
 
-          <div class="space-y-2 my-6 text-left max-w-[240px] border-y border-white/5 py-4">
+          <div class="space-y-2 mt-5 mb-6 text-left max-w-[260px] mx-auto border-y border-white/5 py-4">
             <div class="flex items-center gap-2">
               <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-              <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter" data-i18n="feat_1">Secure Payments Via Stripe</span>
+              <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter feat-txt" data-i18n="feat_1">Unlimited Inbound Calling</span>
             </div>
             <div class="flex items-center gap-2">
               <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-              <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter" data-i18n="feat_2">Pay Monthly</span>
+              <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter feat-txt" data-i18n="feat_2">Pay Monthly</span>
             </div>
             <div class="flex items-center gap-2">
               <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-              <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter" data-i18n="feat_3">No Contract</span>
+              <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter feat-txt" data-i18n="feat_3">No Contract</span>
             </div>
           </div>
 
-          <div id="timer" class="text-xs font-mono text-white/30 mb-4 text-center">00:00:00</div>
-          <button id="sideCta" class="orange-btn w-full py-3 rounded-xl text-[11px] font-black uppercase italic" data-i18n="start_activation" type="button">
+          <div id="timer" class="text-xs font-mono text-white/30 mb-4">00:00:00</div>
+
+          <button id="sideCta" class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic" data-i18n="start_activation" type="button">
             Start Activation
+          </button>
+
+          <!-- ✅ RESTORED: Join Newsletter (No Deploy) button (right card) -->
+          <button id="newsletterBtn" class="mt-2 w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 bg-white/5 hover:bg-white/10 transition" data-i18n="newsletter_no_deploy" type="button">
+            Join Newsletter (No Deploy)
           </button>
         </div>
       </div>
     </div>
 
-    <!-- PROTOCOL -->
+    <!-- Activation Protocol -->
     <div class="mt-10 lg:mt-14">
       <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
-        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">AI Call Agent Activation Protocol</span>
+        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">AI CALL AGENT ACTIVATION PROTOCOL</span>
       </div>
-
       <div class="grid grid-cols-2 lg:grid-cols-7 gap-3">
-        <div id="s1" class="step-card">
-          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_01">01 Country</p>
-          <p id="v1" class="text-[10px] text-white/40 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
+        <div id="s1" class="step-card unlocked next-focus">
+          <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_01">01 Market</p>
+          <p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
         </div>
-        <div id="s2" class="step-card">
+        <div id="s2" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_02">02 Industry</p>
-          <p id="v2" class="text-[10px] text-white/40 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
+          <p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="select">Select</p>
         </div>
-        <div id="s3" class="step-card">
+        <div id="s3" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_03">03 Agent</p>
-          <p id="v3" class="text-[10px] text-white/40 font-bold uppercase truncate val-label" data-i18n="choose">Choose</p>
+          <p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="choose">Choose</p>
         </div>
-        <div id="s4" class="step-card">
+        <div id="s4" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_04">04 Company</p>
-          <p id="v4" class="text-[10px] text-white/40 font-bold uppercase truncate val-label" data-i18n="sync">Sync</p>
+          <p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate val-label" data-i18n="sync">Sync</p>
         </div>
-        <div id="s5" class="step-card">
+        <div id="s5" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_05">05 Plan</p>
-          <p id="v5" class="text-[10px] text-white/40 font-bold uppercase truncate italic val-label" data-i18n="choose">Choose</p>
+          <p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="choose">Choose</p>
         </div>
-        <div id="s6" class="step-card">
+        <div id="s6" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_06">06 Demo</p>
-          <p id="v6" class="text-[10px] text-white/40 font-bold uppercase truncate italic val-label" data-i18n="sandbox">Sandbox</p>
+          <p id="v6" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="sandbox">Sandbox</p>
         </div>
-        <div id="s7" class="step-card">
+        <div id="s7" class="step-card locked">
           <p class="text-[7px] font-black text-orange-500 uppercase step-label" data-i18n="step_07">07 Activate</p>
-          <p id="v7" class="text-[10px] text-white/40 font-bold uppercase truncate italic val-label" data-i18n="instant">Instant</p>
-        </div>
-      </div>
-
-      <!-- DEMO BAR (always visible when step 6 is unlocked) -->
-      <div class="demo-bar" id="demoBar">
-        <div class="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <div class="text-[10px] font-black uppercase tracking-widest text-orange-500">Demo Console</div>
-            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              <span data-i18n="demo_rules">2 demos • 30 seconds each</span> •
-              <span data-i18n="demos_used">Demo calls used</span>: <span id="demoUsedLabel" class="text-white">0/2</span>
-            </div>
-          </div>
-          <div class="flex gap-2 flex-wrap">
-            <button id="demoStartBtn" class="orange-btn px-5 py-3 rounded-xl text-[11px] font-black uppercase italic" type="button">Start Demo Call</button>
-            <button id="demoStopBtn" class="px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-white/10 bg-white/5 hover:bg-white/10 transition" type="button" style="display:none;">Stop</button>
-            <button id="demoSatisfiedBtn" class="px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition" type="button">Satisfied</button>
-          </div>
-        </div>
-        <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500" id="demoStatusLine">
-          Ready.
+          <p id="v7" class="text-[9px] text-white/30 font-bold uppercase truncate italic val-label" data-i18n="instant">Instant</p>
         </div>
       </div>
     </div>
@@ -765,7 +971,7 @@
     <div class="max-w-xs mx-auto opacity-40 hover:opacity-100 transition-opacity duration-500">
       <div class="flex items-center justify-center gap-2 mb-4">
         <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-        <span class="text-[8px] font-black text-white uppercase tracking-widest"><span id="agentCount">14,202</span> <span data-i18n="active_agents">ACTIVE AGENTS</span></span>
+        <span class="text-[8px] font-black text-white uppercase tracking-widest"><span id="agentCount">14,205</span> <span data-i18n="active_agents">ACTIVE AGENTS</span></span>
       </div>
       <div class="flex justify-center gap-6 text-[9px] font-black uppercase tracking-widest text-slate-500 mb-4">
         <a href="#" class="hover:text-orange-500" data-i18n="privacy">Privacy</a>
@@ -777,51 +983,6 @@
   </footer>
 
   <script>
-    function escapeHtml(str){
-      return String(str || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;");
-    }
-
-    // ============================
-    // HERO AGENTS LIST (Clickable)
-    // ============================
-    const heroAgents = [
-      { name: "AI Receptionist", desc: "Answers inbound calls, greets callers, captures details, routes requests, and books appointments." },
-      { name: "AI Booking Agent", desc: "Books appointments fast, confirms availability, collects contact info, and sends confirmations." },
-      { name: "AI Sales Agent", desc: "Qualifies leads, captures requirements, handles objections, and books consultations." },
-      { name: "AI Customer Service", desc: "Handles FAQs, resolves common issues, collects ticket details, and escalates when needed." },
-      { name: "AI After-Hours Agent", desc: "Covers nights/weekends, captures urgent issues, and routes emergencies based on your rules." },
-      { name: "AI Dispatch Agent", desc: "Collects job details, assigns priority, and routes to the correct team or technician." },
-      { name: "AI Lead Capture Agent", desc: "Captures name, phone, service needed, location, and timing — then books next steps." },
-      { name: "AI Appointment Reminder", desc: "Confirms appointments, reduces no-shows, handles reschedules, and updates your workflow." },
-      { name: "AI Quote Intake Agent", desc: "Collects project details, scope, timing, and contact info — then creates a quote request." },
-      { name: "AI Support Triage", desc: "Asks structured questions to triage issues, sets urgency, and routes correctly." },
-      { name: "AI Multilingual Agent", desc: "Handles callers in multiple languages for a global customer experience." },
-      { name: "AI Overflow Agent", desc: "Answers calls when your team is busy, captures details, and prevents missed opportunities." }
-    ];
-    let activeHeroAgentIdx = 0;
-
-    function renderHeroAgents(){
-      const grid = document.getElementById("agentGrid");
-      if(!grid) return;
-      grid.innerHTML = heroAgents.map((a, idx) => {
-        const active = idx === activeHeroAgentIdx;
-        return `
-          <div class="agent-card ${active ? "active" : ""}" onclick="selectHeroAgent(${idx})" role="button" tabindex="0">
-            <div class="agent-title">${escapeHtml(a.name)}</div>
-            <div class="agent-desc">${escapeHtml(a.desc)}</div>
-          </div>
-        `;
-      }).join("");
-    }
-    function selectHeroAgent(idx){
-      const i = Math.max(0, Math.min(heroAgents.length - 1, Number(idx)));
-      activeHeroAgentIdx = i;
-      renderHeroAgents();
-    }
-
     // ============================
     // CONFIG (Vapi key)
     // ============================
@@ -837,9 +998,10 @@
     }
 
     // ============================
-    // VAPI LOADER
+    // VAPI LOADER (browser-safe)
     // ============================
     let vapiFallbackInstance = null;
+
     function loadScriptOnce(src) {
       return new Promise((resolve, reject) => {
         const existing = [...document.scripts].find(s => s.src === src);
@@ -885,44 +1047,42 @@
     };
 
     // ============================
-    // STATE (explicit readiness)
+    // STATE (7-step protocol)
     // ============================
-    const state = {
-      marketSelected: false,
-      industrySelected: false,
-      agentConfigured: false,
-      companyNameSet: false,
-      planSelected: false,
-      demoCompletedOnce: false,
-      activationUnlocked: false,
+    let completedSteps = 0;
 
-      selectedMarket: "",
-      selectedIndustryKey: "",
-      selectedRole: "Receptionist",
-      selectedTemplateKey: null,
-      agentScript: "",
-      selectedVoiceId: "Mia",
-      companyName: "",
+    let selectedMarket = "United States";
+    let selectedIndustryKey = "Electrical";
 
-      selectedPlanId: null, // "P1" or "P2"
-      demoCallsUsed: 0,
+    // Step 3: Agent type (hero list)
+    let selectedAgentType = "AI Receptionist";
 
-      deployed: false
+    // Step 4: Company (business name)
+    let businessName = "";
+
+    // Step 5: Plan
+    const PLANS = {
+      P299: { key:"P299", price:299, minutes:1000, reg:499 },
+      P599: { key:"P599", price:599, minutes:2500, reg:999 }
     };
+    let selectedPlanKey = "P299";
+
+    // Step 4b: Role/Template/Voice (kept from your original base version)
+    let selectedRole = "Receptionist";
+    let selectedTemplateKey = null;
+    let agentScript = "";
+
+    let templateCategoryFilter = "ALL";
+    let templateSearchQuery = "";
 
     const LS_DEPLOYED = "aicallport_deployed";
     function setDeployed(v) { localStorage.setItem(LS_DEPLOYED, v ? "1" : "0"); }
     function isDeployed() { return localStorage.getItem(LS_DEPLOYED) === "1"; }
 
-    // Stripe placeholders (replace with your real checkout links)
-    const STRIPE_CHECKOUT = {
-      P1: "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01",
-      P2: "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01"
-    };
+    // ✅ Stripe links (set these to your real links)
+    const STRIPE_LINK_P299 = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
+    const STRIPE_LINK_P599 = "https://buy.stripe.com/8x24gA9TB9Vab160h43ks01";
 
-    // ============================
-    // VOICES
-    // ============================
     const vapiVoices = [
       { id: "Mia", label: "Mia (Professional / Articulate)" },
       { id: "Leah", label: "Leah (Warm / Gentle)" },
@@ -935,22 +1095,298 @@
       { id: "Rohan", label: "Rohan (Bright / Energetic)" },
       { id: "Elliot", label: "Elliot (Canadian / Soothing)" }
     ];
-    function getSelectedVapiVoice() { return { provider: "vapi", voiceId: state.selectedVoiceId }; }
+    let selectedVoiceId = "Mia";
+    let selectedVoiceSettings = { stability: 0.5, similarityBoost: 0.8, style: 0.2, useSpeakerBoost: false };
+    function getSelectedVapiVoice() { return { provider: "vapi", voiceId: selectedVoiceId }; }
 
     // ============================
-    // INDUSTRIES
+    // HERO AGENTS LIST (two columns, clickable descriptions)
+    // ============================
+    const HERO_AGENTS = [
+      { name: "AI Receptionist", desc: "Answers inbound calls, greets callers, captures details, routes requests, and books appointments." },
+      { name: "AI Booking Agent", desc: "Books appointments, confirms availability, collects contact details, and sends reminders." },
+      { name: "AI Sales Agent", desc: "Qualifies leads, handles objections, captures contact info, and books consultations." },
+      { name: "AI Customer Service", desc: "Handles common questions, resolves basic issues, creates tickets, and escalates when needed." },
+      { name: "AI After-Hours Agent", desc: "Covers nights/weekends, captures urgent requests, and schedules next-day follow-ups." },
+      { name: "AI Dispatch Agent", desc: "Triages urgency, assigns jobs, collects location details, and sets priority for the team." },
+      { name: "AI Lead Capture Agent", desc: "Captures new leads, validates phone/email, tags intent, and routes to your CRM/workflow." },
+      { name: "AI Appointment Reminder", desc: "Automates confirmations and reminders, reduces no-shows, and reschedules fast." },
+      { name: "AI Quote Intake Agent", desc: "Collects scope, photos/notes (where applicable), timeline and budget, then triggers quote workflow." },
+      { name: "AI Support Triage", desc: "Collects issue details, urgency, account/order info, and routes to the right support lane." },
+      { name: "AI Multilingual Agent", desc: "Serves callers in multiple languages and keeps your workflow consistent across markets." },
+      { name: "AI Overflow Agent", desc: "Handles peak call volume to prevent missed calls and lost customers." }
+    ];
+
+    let activeHeroAgent = "AI Receptionist";
+
+    function renderHeroAgents(){
+      const wrap = document.getElementById("agentsGrid");
+      if(!wrap) return;
+
+      wrap.innerHTML = HERO_AGENTS.map(a => {
+        const isActive = a.name === activeHeroAgent;
+        return `
+          <div class="agent-tile ${isActive ? "active" : ""}" onclick="toggleHeroAgent('${escapeHtml(a.name).replaceAll("'", "\\'")}')">
+            <div class="text-[11px] font-black uppercase tracking-widest text-white">${escapeHtml(a.name)}</div>
+            <div class="agent-desc">${escapeHtml(a.desc)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function toggleHeroAgent(name){
+      // toggle open/close behavior
+      activeHeroAgent = (activeHeroAgent === name) ? "" : name;
+      if(name && !activeHeroAgent) {
+        // if closed, keep last selection for step 3
+      }
+      renderHeroAgents();
+    }
+
+    // ============================
+    // SMB BENEFITS (EXACT content + behavior from your base code)
+    // ============================
+    const smbBenefits = [
+      { title: "High Quality AI Call Agents", desc: "Reliable inbound call handling built for real small businesses. No call-center scripts. Professional tone and fast capture of details." },
+      { title: "Multiple Roles (Receptionist, Booking, Sales, Support, After-Hours)", desc: "Choose the agent role you need today — and switch anytime. Use different roles for business hours vs after-hours/weekends." },
+      { title: "Full Control Before + After Deployment", desc: "Select role, template, and voice before deployment. After deployment, you keep control via your client dashboard (role/voice/script/hours)." },
+      { title: "Deploy in Minutes (6-Step Protocol)", desc: "A simple activation protocol — Market → Industry → Business → Role/Template/Voice → Demo → Deploy. No meetings. No onboarding calls." },
+      { title: "Worldwide + Multilingual", desc: "Global routing + multilingual experience for your customers. Your business can answer calls in the language your customer speaks." },
+      { title: "Unlimited Inbound Calls", desc: "No per-minute surprises. Handle inbound calls at scale." },
+      { title: "Pay Monthly • No Contract", desc: "Fair and transparent: monthly billing, cancel anytime." },
+      { title: "Secure Payments via Stripe", desc: "Secure payment processing through Stripe." },
+      { title: "No Salesman • No Human Layer", desc: "This is a self-serve operational console. No human gatekeepers. Turn ON your AI call agent when you are ready." },
+      { title: "Referral Discount (Up to $0/mo)", desc: "After activation you get a referral link. Each referral reduces your monthly payment by $10. More referrals = lower monthly cost (down to $0/mo)." }
+    ];
+    let activeBenefitIdx = 0;
+
+    const BENEFITS_SEL_KEY = "aicallport_benefits_selected_idx";
+    const BENEFITS_HASH_PREFIX = "benefits=";
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+    function getSavedBenefitIdx(){
+      const v = Number(sessionStorage.getItem(BENEFITS_SEL_KEY));
+      return Number.isFinite(v) ? clamp(v, 0, smbBenefits.length - 1) : null;
+    }
+    function saveBenefitIdx(idx){ try { sessionStorage.setItem(BENEFITS_SEL_KEY, String(idx)); } catch {} }
+    function readBenefitsIdxFromHash(){
+      const h = (location.hash || "").replace("#", "").trim();
+      if(!h.startsWith(BENEFITS_HASH_PREFIX)) return null;
+      const raw = h.slice(BENEFITS_HASH_PREFIX.length);
+      const n = Number(raw);
+      return Number.isFinite(n) ? clamp(n, 0, smbBenefits.length - 1) : null;
+    }
+    function writeBenefitsIdxToHash(idx){
+      try{
+        const next = `#${BENEFITS_HASH_PREFIX}${idx}`;
+        if(location.hash === next) return;
+        history.replaceState(null, "", next);
+      } catch {}
+    }
+
+    function openBenefits(){
+      const fromHash = readBenefitsIdxFromHash();
+      const fromSaved = getSavedBenefitIdx();
+      if(fromHash != null) activeBenefitIdx = fromHash;
+      else if(fromSaved != null) activeBenefitIdx = fromSaved;
+      else activeBenefitIdx = 0;
+      triggerModal("benefits");
+    }
+
+    function renderBenefits(){
+      const c = document.getElementById("mContent");
+      const current = smbBenefits[activeBenefitIdx] || smbBenefits[0];
+
+      c.innerHTML = `
+        <div class="pill mb-3">${escapeHtml(i18n.t("smb_benefits_title"))}</div>
+        <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">${escapeHtml(i18n.t("hover_to_learn"))}</div>
+
+        <div class="grid lg:grid-cols-2 gap-4 text-left">
+          <div class="card-theme">
+            <div class="mini text-orange-500 mb-2">Benefits</div>
+            <div id="benefitsListWrap"
+                 role="listbox"
+                 aria-label="SMB Benefits"
+                 aria-activedescendant="benefit_opt_${activeBenefitIdx}"
+                 tabindex="0"
+                 class="grid gap-2"></div>
+          </div>
+
+          <div class="card-theme benefits-desktop-panel">
+            <div class="mini text-orange-500 mb-2">Explanation</div>
+            <div id="benefitExplain" class="text-[14px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap"></div>
+            <div class="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              Tip: This content can also be reused later inside the client dashboard.
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="grid sm:grid-cols-2 gap-2">
+            <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="handleStep(1)">
+              ${escapeHtml(i18n.t("start_activation"))}
+            </button>
+          </div>
+        </div>
+      `;
+
+      const listWrap = document.getElementById("benefitsListWrap");
+      listWrap.innerHTML = smbBenefits.map((b, idx) => {
+        const isActive = idx === activeBenefitIdx;
+        const inlineOpen = isActive ? "open" : "";
+        const inlineId = `benefit_inline_${idx}`;
+
+        return `
+          <div>
+            <div id="benefit_opt_${idx}"
+                 class="benefit-row ${isActive ? "active" : ""}"
+                 role="option"
+                 aria-selected="${isActive ? "true" : "false"}"
+                 tabindex="-1"
+                 data-idx="${idx}"
+                 onclick="selectBenefit(${idx}, { scroll:true, focusList:false })">
+              <div class="text-[10px] font-black uppercase tracking-widest text-white">
+                ${escapeHtml(b.title)}
+              </div>
+              <span class="benefit-marker" aria-hidden="true">✓</span>
+            </div>
+
+            <div id="${inlineId}" class="benefit-inline benefits-mobile-inline ${inlineOpen}">
+              <div class="text-[14px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap">
+                ${escapeHtml(b.desc)}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      const explain = document.getElementById("benefitExplain");
+      if (explain) explain.textContent = current?.desc || "";
+
+      bindBenefitsKeyboard();
+      i18n.applyTranslations(document.getElementById("setupModal"));
+    }
+
+    function selectBenefit(idx, opts){
+      const options = opts || {};
+      const clamped = Math.max(0, Math.min(smbBenefits.length - 1, Number(idx)));
+      if (!Number.isFinite(clamped)) return;
+
+      activeBenefitIdx = clamped;
+      saveBenefitIdx(activeBenefitIdx);
+      writeBenefitsIdxToHash(activeBenefitIdx);
+
+      const wrap = document.getElementById("benefitsListWrap");
+      if (wrap) wrap.setAttribute("aria-activedescendant", `benefit_opt_${activeBenefitIdx}`);
+
+      document.querySelectorAll(".benefit-row").forEach((el) => {
+        const i = Number(el.getAttribute("data-idx"));
+        const isActive = i === activeBenefitIdx;
+        el.classList.toggle("active", isActive);
+        el.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+
+      const explain = document.getElementById("benefitExplain");
+      const current = smbBenefits[activeBenefitIdx];
+      if (explain && current) explain.textContent = current.desc;
+
+      for(let i=0;i<smbBenefits.length;i++){
+        const inline = document.getElementById(`benefit_inline_${i}`);
+        if (!inline) continue;
+        inline.classList.toggle("open", i === activeBenefitIdx);
+      }
+
+      if (options.scroll){
+        const activeEl = document.getElementById(`benefit_opt_${activeBenefitIdx}`);
+        if (activeEl && typeof activeEl.scrollIntoView === "function"){
+          activeEl.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+        }
+      }
+
+      if (options.focusList){
+        document.getElementById("benefitsListWrap")?.focus();
+      }
+    }
+
+    let __benefitsTypeahead = { buf: "", t: null };
+    function bindBenefitsKeyboard(){
+      const wrap = document.getElementById("benefitsListWrap");
+      if(!wrap) return;
+      if (wrap.dataset.bound === "1") return;
+      wrap.dataset.bound = "1";
+
+      wrap.addEventListener("keydown", (e) => {
+        const key = e.key;
+
+        const handled =
+          key === "ArrowDown" || key === "ArrowUp" ||
+          key === "Home" || key === "End" ||
+          key === "Enter" || key === " ";
+
+        const isTypeKey = key.length === 1 && /[a-z0-9]/i.test(key);
+
+        if (!handled && !isTypeKey) return;
+
+        if (isTypeKey){
+          e.preventDefault();
+          e.stopPropagation();
+
+          clearTimeout(__benefitsTypeahead.t);
+          __benefitsTypeahead.buf += key.toLowerCase();
+          __benefitsTypeahead.t = setTimeout(() => { __benefitsTypeahead.buf = ""; }, 700);
+
+          const q = __benefitsTypeahead.buf;
+          const found = smbBenefits.findIndex(b => (b.title || "").toLowerCase().startsWith(q));
+          if(found >= 0) selectBenefit(found, { scroll:true, focusList:false });
+          return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (key === "Home") { selectBenefit(0, { scroll:true, focusList:false }); return; }
+        if (key === "End")  { selectBenefit(smbBenefits.length - 1, { scroll:true, focusList:false }); return; }
+
+        if (key === "ArrowDown") {
+          const next = (activeBenefitIdx + 1) % smbBenefits.length;
+          selectBenefit(next, { scroll:true, focusList:false });
+          return;
+        }
+        if (key === "ArrowUp") {
+          const prev = (activeBenefitIdx - 1 + smbBenefits.length) % smbBenefits.length;
+          selectBenefit(prev, { scroll:true, focusList:false });
+          return;
+        }
+
+        if (key === "Enter" || key === " ") {
+          selectBenefit(activeBenefitIdx, { scroll:true, focusList:false });
+          return;
+        }
+      });
+    }
+
+    // ============================
+    // INDUSTRIES (kept)
     // ============================
     const industryKeys = ["Plumbing","Electrical","HVAC","Roofing","Real Estate","After Hours"];
     const industryCategories = { "Home Services":["Plumbing","Electrical","HVAC","Roofing"], "Business":["Real Estate","After Hours"] };
+
     function buildCategorizedIndustryList(){
       const out = [];
       Object.keys(industryCategories).forEach(cat => out.push({cat, items: industryCategories[cat]}));
       return out;
     }
 
+    function dt(namespace, key, fallback){
+      const lang = (window.APP_I18N.current || "EN").toUpperCase();
+      const v = i18n.dynGet(lang, namespace, key);
+      return v != null ? v : (fallback != null ? fallback : key);
+    }
+
     // ============================
-    // TEMPLATES (simple)
+    // TEMPLATES (kept)
     // ============================
+    const templateCategories = ["ALL","Popular","Recommended","Appointments","After Hours","Sales","Support"];
     const industryPacks = {
       GLOBAL: {
         Receptionist: [
@@ -975,160 +1411,491 @@ Ask: service needed, location, timeline, budget range (optional), contact info.`
 Collect: name, phone, account/order (if applicable), issue description, urgency.
 Provide a short helpful step, then create a ticket and confirm callback.`}
         ]
+      },
+      Electrical: {
+        Receptionist: [
+          { key:"el_rec_safety", title:"Recommended: Electrical Safety First", category:"Recommended",
+            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electrical).
+Ask: sparking/burning smell/smoke? If yes, advise to turn off breaker if safe and call emergency services if needed.
+Collect: address, issue description, contact info, urgency.`}
+        ]
       }
     };
 
-    function getCurrentIndustryKey(){ return state.selectedIndustryKey || "GLOBAL"; }
+    function getCurrentIndustryKey(){ return selectedIndustryKey || "GLOBAL"; }
     function getPackFor(industryKey){ return industryPacks[industryKey] || industryPacks.GLOBAL; }
     function getTemplatesFor(roleName){
-      const pack = getPackFor(getCurrentIndustryKey());
+      const industryKey = getCurrentIndustryKey();
+      const pack = getPackFor(industryKey);
       const roleList = pack[roleName] || [];
-      const globalRoleList = industryPacks.GLOBAL[roleName] || [];
-      return roleList.length ? roleList : globalRoleList;
+      if(!roleList.length){
+        const globalRoleList = industryPacks.GLOBAL[roleName] || [];
+        return { templates: globalRoleList, packName: "GLOBAL" };
+      }
+      return { templates: roleList, packName: industryKey };
     }
 
     function applyVars(text){
-      const bn = (state.companyName || "YOUR COMPANY");
-      const mk = (state.selectedMarket || "YOUR MARKET");
-      return String(text || "")
+      const bn = (businessName && businessName.trim().length) ? businessName.trim() : "YOUR BUSINESS";
+      return (text || "")
         .replaceAll("{{BUSINESS_NAME}}", bn)
-        .replaceAll("{{MARKET}}", mk);
+        .replaceAll("{{MARKET}}", selectedMarket || "YOUR MARKET");
     }
 
-    function refreshTemplatesForCurrentSelection(forceReset){
-      const templates = getTemplatesFor(state.selectedRole);
-      if(!templates.length) return;
-      if(!state.selectedTemplateKey || !templates.find(t => t.key === state.selectedTemplateKey)) {
-        state.selectedTemplateKey = templates[0].key;
+    function refreshTemplatesForCurrentSelection(forceResetScript){
+      const { templates } = getTemplatesFor(selectedRole);
+      if(!templates.length){
+        selectedTemplateKey = null;
+        if(forceResetScript) agentScript = "";
+        return;
       }
-      const chosen = templates.find(t => t.key === state.selectedTemplateKey) || templates[0];
-      if(forceReset) state.agentScript = applyVars(chosen.script);
-      else state.agentScript = applyVars(state.agentScript);
+      if(!selectedTemplateKey || !templates.find(t => t.key === selectedTemplateKey)){
+        selectedTemplateKey = templates[0].key;
+      }
+      if(forceResetScript){
+        const chosen = templates.find(t => t.key === selectedTemplateKey) || templates[0];
+        agentScript = applyVars(chosen.script);
+      } else {
+        agentScript = applyVars(agentScript);
+      }
     }
 
-    // ============================
-    // MARKETS (API only)
-    // ============================
-    let _marketsByContinentCache = null;
+    function initTemplateCategoryDropdown(){
+      const dd = document.getElementById('templateCategory');
+      dd.innerHTML = "";
+      templateCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat.toUpperCase();
+        dd.appendChild(opt);
+      });
+      dd.value = templateCategoryFilter || "ALL";
+      const search = document.getElementById('templateSearch');
+      search.value = templateSearchQuery || "";
+    }
 
-    async function getMarketsGroupedByContinent() {
-      if (_marketsByContinentCache) return _marketsByContinentCache;
+    function getFilteredTemplates(){
+      const { templates } = getTemplatesFor(selectedRole);
+      const cat = templateCategoryFilter || "ALL";
+      const q = (templateSearchQuery || "").trim().toUpperCase();
+      return templates.filter(tpl => {
+        const catOk = (cat === "ALL") ? true : (String(tpl.category || "").toUpperCase() === cat);
+        const text = `${tpl.title} ${tpl.category}`.toUpperCase();
+        const qOk = q ? text.includes(q) : true;
+        return catOk && qOk;
+      });
+    }
 
-      const res = await fetch("/api/markets", { cache: "no-store" });
-      if (!res.ok) {
-        console.error("Failed to load /api/markets:", res.status);
-        _marketsByContinentCache = {};
-        return _marketsByContinentCache;
+    async function initTemplateDropdown(){
+      const templateSelect = document.getElementById('templateSelect');
+      templateSelect.innerHTML = "";
+
+      const { packName } = getTemplatesFor(selectedRole);
+      const filtered = getFilteredTemplates();
+
+      const tplTitles = filtered.map(x => x.title);
+      const tplScripts = filtered.map(x => x.script);
+      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "template_titles", tplTitles);
+      await i18n.ensureDynamicTranslations(window.APP_I18N.current, "template_scripts", tplScripts);
+
+      if(!filtered.length){
+        const opt = document.createElement('option');
+        opt.value = "";
+        opt.textContent = i18n.t("no_matching");
+        templateSelect.appendChild(opt);
+        return;
       }
 
-      const rows = await res.json();
-      const grouped = {};
+      if(!selectedTemplateKey || !filtered.find(x => x.key === selectedTemplateKey)){
+        selectedTemplateKey = filtered[0].key;
+        agentScript = applyVars(filtered[0].script);
+      }
 
-      (rows || []).forEach((row) => {
-        const continent = row.region || "Other";
-        const name = row.name || "";
-        if (!name) return;
-        (grouped[continent] ||= []).push(name);
+      filtered.forEach(tpl => {
+        const opt = document.createElement('option');
+        opt.value = tpl.key;
+        const shownTitle = dt("template_titles", tpl.title, tpl.title);
+        opt.textContent = `${shownTitle} — ${tpl.category} — ${packName}`.toUpperCase();
+        templateSelect.appendChild(opt);
       });
 
-      Object.keys(grouped).forEach((k) => {
-        grouped[k].sort((a, b) => String(a).localeCompare(String(b)));
-      });
-
-      _marketsByContinentCache = grouped;
-      return grouped;
+      templateSelect.value = selectedTemplateKey;
     }
 
-    async function renderMarketByContinent(searchQuery){
-      const c = document.getElementById('mContent');
-      c.innerHTML = "";
-      const q = (searchQuery || "").trim().toUpperCase();
+    function onTemplateCategoryChange(cat){ templateCategoryFilter = cat; initTemplateDropdown(); }
+    function onTemplateSearchChange(q){ templateSearchQuery = q || ""; initTemplateDropdown(); }
+    function onTemplateChange(key){
+      const filtered = getFilteredTemplates();
+      const chosen = filtered.find(x => x.key === key);
+      if(!chosen) return;
+      selectedTemplateKey = key;
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      agentScript = applyVars(shownScript);
+    }
 
-      const marketsByContinent = await getMarketsGroupedByContinent();
-      const continents = Object.keys(marketsByContinent);
+    function resetTemplate(){
+      const filtered = getFilteredTemplates();
+      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
+      if(!chosen) return;
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      agentScript = applyVars(shownScript);
+    }
 
-      continents.forEach(continent => {
-        const list = (marketsByContinent[continent] || []);
-        const filtered = list.filter(name => name.toUpperCase().includes(q));
-        if(!filtered.length) return;
+    function initVoiceDropdown(){
+      const voiceSelect = document.getElementById('voiceSelect');
+      if(!voiceSelect) return;
+      voiceSelect.innerHTML = "";
+      vapiVoices.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.id;
+        opt.textContent = v.label.toUpperCase();
+        voiceSelect.appendChild(opt);
+      });
+      voiceSelect.value = selectedVoiceId;
+    }
+    function onVoiceChange(id){ selectedVoiceId = id; }
 
-        const div = document.createElement('div');
-        div.className = "divider";
-        div.innerText = continent.toUpperCase();
-        c.appendChild(div);
+    // ============================
+    // Community (kept from your base code)
+    // ============================
+    let communityTab = "NEWSLETTER";
 
-        filtered.forEach(name => {
-          const btn = createBtn(name, () => {
-            state.selectedMarket = name;
-            state.marketSelected = true;
-            finishStep(1, name);
-          });
-          btn.setAttribute('data-n', name);
-          btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${escapeHtml(name)}`;
-          c.appendChild(btn);
+    const LS_FORUM = "aicallport_forum_posts";
+    const LS_NEWSLETTER = "aicallport_newsletter_signups";
+    function loadForumPosts(){ try { return JSON.parse(localStorage.getItem(LS_FORUM) || "[]"); } catch { return []; } }
+    function saveForumPosts(posts){ localStorage.setItem(LS_FORUM, JSON.stringify(posts || [])); }
+    function loadNewsletter(){ try { return JSON.parse(localStorage.getItem(LS_NEWSLETTER) || "[]"); } catch { return []; } }
+    function saveNewsletter(list){ localStorage.setItem(LS_NEWSLETTER, JSON.stringify(list || [])); }
+
+    function cryptoRandomId(){
+      try {
+        const a = crypto.getRandomValues(new Uint8Array(10));
+        return Array.from(a).map(x => x.toString(16).padStart(2,"0")).join("");
+      } catch {
+        return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
+      }
+    }
+
+    function maskEmail(email){
+      return String(email || "").replace(/^(.)(.*)(@.*)$/, (_, a, b, c) => a + "*".repeat(Math.min(8, b.length)) + c);
+    }
+
+    async function submitNewsletter(){
+      const email = document.getElementById("nlEmail")?.value || "";
+      const name = document.getElementById("nlName")?.value || "";
+      const note = document.getElementById("nlNote")?.value || "";
+      if(!email.includes("@")){
+        document.getElementById("nlEmail").style.borderColor = "red";
+        return;
+      }
+      const payload = { email, name, note, market: selectedMarket, industryKey: selectedIndustryKey, deployed: isDeployed() };
+
+      const list = loadNewsletter();
+      list.unshift({ ...payload, email: maskEmail(email), ts: Date.now() });
+      saveNewsletter(list);
+
+      try {
+        await fetch("/api/newsletter", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload)
         });
-      });
+      } catch (e) {}
 
-      if(!c.children.length){
-        const hint = document.createElement('div');
-        hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
-        hint.innerText = "No markets returned.";
-        c.appendChild(hint);
-      }
+      const msg = document.getElementById("nlMsg");
+      if(msg) msg.innerHTML = `<div class="text-orange-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("subscribed"))}</div>`;
+      setTimeout(() => { renderCommunity(); }, 700);
     }
-    function filterMarket(query){ renderMarketByContinent(query); }
 
-    // Step 2 rendering
-    function renderIndustryCategoryList(searchQuery){
-      const c = document.getElementById('mContent');
-      c.innerHTML = "";
-      const q = (searchQuery || "").trim().toUpperCase();
+    function addForumPost(){
+      const title = (document.getElementById("fpTitle")?.value || "").trim();
+      const body = (document.getElementById("fpBody")?.value || "").trim();
+      if(title.length < 3 || body.length < 10) return;
 
-      const groups = buildCategorizedIndustryList();
-      groups.forEach(g => {
-        const filtered = g.items.filter(name => name.toUpperCase().includes(q));
-        if(!filtered.length) return;
+      const posts = loadForumPosts();
+      posts.unshift({ id: cryptoRandomId(), title, body, replies: [], ts: Date.now() });
+      saveForumPosts(posts);
+      renderCommunity();
+    }
 
-        const div = document.createElement('div');
-        div.className = "divider";
-        div.innerText = g.cat.toUpperCase();
-        c.appendChild(div);
+    function addForumReply(postId){
+      const input = document.getElementById("reply_" + postId);
+      const text = (input?.value || "").trim();
+      if(text.length < 3) return;
 
-        filtered.forEach(name => {
-          const btn = createBtn(name, () => {
-            state.selectedIndustryKey = name;
-            state.industrySelected = true;
-            refreshTemplatesForCurrentSelection(true);
-            finishStep(2, name);
-          });
-          btn.setAttribute('data-n', name);
-          c.appendChild(btn);
+      const posts = loadForumPosts();
+      const p = posts.find(x => x.id === postId);
+      if(!p) return;
+      p.replies.push({ text, ts: Date.now() });
+      saveForumPosts(posts);
+      renderCommunity();
+    }
+
+    async function askAiQuestion(){
+      const q = (document.getElementById("qaQuestion")?.value || "").trim();
+      if(q.length < 5) return;
+
+      const out = document.getElementById("qaAnswer");
+      out.innerHTML = `<div class="text-slate-500 font-black uppercase text-[10px] tracking-widest">${escapeHtml(i18n.t("thinking"))}</div>`;
+
+      try{
+        const res = await fetch("/api/ai-qa", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            question: q,
+            context: { market: selectedMarket, industryKey: selectedIndustryKey, role: selectedRole, deployed: isDeployed() }
+          })
         });
-      });
-
-      if(!c.children.length){
-        const hint = document.createElement('div');
-        hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
-        hint.innerText = i18n.t("no_matching");
-        c.appendChild(hint);
+        if(!res.ok) throw new Error("Bad response");
+        const data = await res.json();
+        const answer = data?.answer || data?.text || "No answer returned.";
+        out.innerHTML = `<div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
+          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed whitespace-pre-wrap">${escapeHtml(answer)}</div>`;
+      } catch(e){
+        out.innerHTML = `
+          <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
+          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+            ${escapeHtml(i18n.t("needs_backend"))}
+            <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 text-[11px] text-slate-300 font-semibold">
+              POST <span class="text-orange-500">/api/ai-qa</span> → { answer: "..." }
+            </div>
+          </div>`;
       }
     }
-    function filterIndustryCategories(query){ renderIndustryCategoryList(query); }
 
-    // ============================
-    // UI helpers
-    // ============================
-    function updateParallax(e){
-      if(!e) return;
-      document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
-      document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
+    function renderNewsletterListHtml(){
+      const list = loadNewsletter().slice(0, 8);
+      if(!list.length) return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-6">${escapeHtml(i18n.t("no_signups"))}</div>`;
+      return list.map(x => `
+        <div class="flex items-start justify-between gap-3 py-2 border-b border-white/5">
+          <div>
+            <div class="text-[10px] font-black uppercase tracking-wider text-white">${escapeHtml(x.email)}</div>
+            <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">${escapeHtml(x.name || "—")} • ${escapeHtml(x.market || "—")} • ${escapeHtml(x.industryKey || "—")}</div>
+          </div>
+          <div class="text-[9px] font-black uppercase tracking-widest ${x.deployed ? "text-green-400" : "text-slate-400"}">
+            ${x.deployed ? "DEPLOYED" : "NO DEPLOY"}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderForumHtml(){
+      const posts = loadForumPosts().slice(0, 20);
+      if(!posts.length) return `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10">${escapeHtml(i18n.t("no_posts"))}</div>`;
+      return posts.map(p => `
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 mb-3">
+          <div class="text-[10px] font-black uppercase tracking-wider text-orange-500">${escapeHtml(p.title)}</div>
+          <div class="text-[11px] text-slate-300 font-semibold leading-relaxed mt-1 whitespace-pre-wrap">${escapeHtml(p.body)}</div>
+          <div class="divider mt-3">Replies</div>
+          <div class="space-y-2">
+            ${(p.replies||[]).slice(-3).map(r => `
+              <div class="text-[11px] text-slate-300 font-semibold leading-relaxed bg-black/20 border border-white/5 rounded-xl p-2 whitespace-pre-wrap">${escapeHtml(r.text)}</div>
+            `).join("") || `<div class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-2">No replies yet</div>`}
+          </div>
+          <div class="grid grid-cols-4 gap-2 mt-3">
+            <input id="reply_${p.id}" class="select-theme col-span-3" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="write_reply" />
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="addForumReply('${p.id}')">${escapeHtml(i18n.t("reply"))}</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function setCommunityTab(tab){ communityTab = tab; renderCommunity(); }
+
+    function renderCommunity(){
+      const c = document.getElementById("mContent");
+      const deployedBadge = isDeployed()
+        ? `<span class="text-[9px] font-black uppercase tracking-widest text-green-400">${escapeHtml(i18n.t("deployed_yes"))}</span>`
+        : `<span class="text-[9px] font-black uppercase tracking-widest text-slate-400">${escapeHtml(i18n.t("deployed_no"))}</span>`;
+
+      c.innerHTML = `
+        <div class="pill mb-3">${escapeHtml(i18n.t("community_portal"))}</div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">${escapeHtml(i18n.t("newsletter"))} • ${escapeHtml(i18n.t("forum"))} • ${escapeHtml(i18n.t("ai_qa"))}</div>
+          ${deployedBadge}
+        </div>
+
+        <div class="tabbar">
+          <div class="tab ${communityTab==="NEWSLETTER"?"active":""}" onclick="setCommunityTab('NEWSLETTER')">${escapeHtml(i18n.t("newsletter"))}</div>
+          <div class="tab ${communityTab==="FORUM"?"active":""}" onclick="setCommunityTab('FORUM')">${escapeHtml(i18n.t("forum"))}</div>
+          <div class="tab ${communityTab==="QA"?"active":""}" onclick="setCommunityTab('QA')">${escapeHtml(i18n.t("ai_qa"))}</div>
+        </div>
+
+        <div id="communityBody"></div>
+      `;
+
+      const body = document.getElementById("communityBody");
+
+      if(communityTab === "NEWSLETTER"){
+        body.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("newsletter"))}</div>
+            <div class="grid sm:grid-cols-2 gap-2 mt-3">
+              <input id="nlName" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="name_optional" />
+              <input id="nlEmail" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="email" />
+            </div>
+            <textarea id="nlNote" class="textarea-theme mt-2" style="min-height:110px" data-i18n-placeholder="tell_us_updates"></textarea>
+            <div id="nlMsg" class="mt-2"></div>
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="submitNewsletter()">
+              ${escapeHtml(i18n.t("join_list"))}
+            </button>
+
+            <div class="divider mt-4">Recent Signups (Local)</div>
+            <div class="mt-2 bg-white/5 border border-white/10 rounded-2xl p-3 max-h-[160px] overflow-auto">
+              ${renderNewsletterListHtml()}
+            </div>
+          </div>
+        `;
+      }
+
+      if(communityTab === "FORUM"){
+        body.innerHTML = `
+          <div class="grid lg:grid-cols-2 gap-4 text-left">
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("forum"))}</div>
+              <input id="fpTitle" class="select-theme" style="text-transform:none;letter-spacing:.06em" data-i18n-placeholder="title" />
+              <textarea id="fpBody" class="textarea-theme mt-2" data-i18n-placeholder="write_question"></textarea>
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="addForumPost()">
+                ${escapeHtml(i18n.t("post"))}
+              </button>
+            </div>
+
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("forum_threads"))}</div>
+              <div class="max-h-[420px] overflow-auto pr-1">
+                ${renderForumHtml()}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if(communityTab === "QA"){
+        body.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("ai_qa"))}</div>
+            <textarea id="qaQuestion" class="textarea-theme mt-2" style="min-height:110px" data-i18n-placeholder="ask_question"></textarea>
+            <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic mt-3" type="button" onclick="askAiQuestion()">
+              ${escapeHtml(i18n.t("ask_ai"))}
+            </button>
+            <div id="qaAnswer" class="mt-4"></div>
+          </div>
+        `;
+      }
+
+      i18n.applyTranslations(document.getElementById("setupModal"));
+    }
+
+    function openCommunity(tab){
+      communityTab = tab || "NEWSLETTER";
+      triggerModal("community");
     }
 
     // ============================
-    // MODAL + Scroll lock
+    // Script Editor (kept)
+    // ============================
+    let scriptEditorDraft = null;
+
+    function getRoleHelpKey(roleValue){
+      if(roleValue === "Receptionist") return "role_help_receptionist";
+      if(roleValue === "Sales Agent") return "role_help_sales";
+      if(roleValue === "Support Agent") return "role_help_support";
+      return "role_help_receptionist";
+    }
+
+    function openScriptEditor(){
+      if(!agentScript || agentScript.trim().length < 10){
+        try { resetTemplate(); } catch(e) {}
+      }
+      scriptEditorDraft = agentScript || "";
+
+      const m = document.getElementById("setupModal");
+      const c = document.getElementById("mContent");
+      const s = document.getElementById("modalSearchContainer");
+      const tEl = document.getElementById("mTitle");
+      const shell = document.getElementById("modalShell");
+
+      shell.classList.remove("role-wide","info-wide","community-wide","benefits-wide","plan-wide");
+      shell.classList.add("script-wide");
+
+      m.style.display = "flex";
+      lockBodyScroll();
+
+      s.innerHTML = "";
+      tEl.innerText = i18n.t("script_editor_title");
+
+      const bn = (businessName || "YOUR BUSINESS").trim() || "YOUR BUSINESS";
+      const industry = (selectedIndustryKey || "GLOBAL");
+      const market = (selectedMarket || "YOUR MARKET");
+      const roleHelp = i18n.t(getRoleHelpKey(selectedRole));
+
+      c.innerHTML = `
+        <div class="script-editor-wrap">
+          <div class="script-editor-header">
+            <div class="text-left">
+              <div class="pill mb-2">${escapeHtml(i18n.t("script_editor_title"))}</div>
+              <div class="muted-hint">${escapeHtml(i18n.t("script_editor_help"))}</div>
+            </div>
+            <div class="script-badges">
+              <div class="badge">${escapeHtml(market)}</div>
+              <div class="badge">${escapeHtml(industry)}</div>
+              <div class="badge">${escapeHtml(bn)}</div>
+              <div class="badge">${escapeHtml(selectedRole)}</div>
+            </div>
+          </div>
+
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">Role Behavior</div>
+            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(roleHelp)}</div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">
+              Variables: <span class="text-orange-500">{{BUSINESS_NAME}}</span>, <span class="text-orange-500">{{MARKET}}</span>
+            </div>
+          </div>
+
+          <textarea id="scriptEditorBox" class="script-textarea" oninput="onScriptEditorInput()"></textarea>
+
+          <div class="modal-footer">
+            <div class="grid sm:grid-cols-3 gap-2">
+              <button class="modal-btn justify-center text-center" type="button" onclick="scriptEditorResetToTemplate()">${escapeHtml(i18n.t("reset_to_template"))}</button>
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="scriptEditorSave()">${escapeHtml(i18n.t("save_script"))}</button>
+              <button class="modal-btn justify-center text-center" type="button" onclick="scriptEditorBackToRoleModal()">${escapeHtml(i18n.t("close_editor"))}</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("scriptEditorBox").value = scriptEditorDraft;
+      i18n.applyTranslations(document.getElementById("setupModal"));
+    }
+
+    function onScriptEditorInput(){ scriptEditorDraft = document.getElementById("scriptEditorBox").value; }
+
+    function scriptEditorResetToTemplate(){
+      const filtered = getFilteredTemplates();
+      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
+      if(!chosen) return;
+      const shownScript = dt("template_scripts", chosen.script, chosen.script);
+      scriptEditorDraft = applyVars(shownScript);
+      document.getElementById("scriptEditorBox").value = scriptEditorDraft;
+    }
+
+    function scriptEditorSave(){
+      agentScript = applyVars(String(scriptEditorDraft || ""));
+      scriptEditorBackToRoleModal();
+    }
+
+    function scriptEditorBackToRoleModal(){
+      document.getElementById("modalShell").classList.remove("script-wide");
+      triggerModal(4);
+    }
+
+    // ============================
+    // MODAL FLOW + Accessibility helpers
     // ============================
     let lastModalStep = null;
     let lastFocusedEl = null;
+
     let __scrollY = 0;
     let __bodyLocked = false;
 
@@ -1142,6 +1909,7 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
       document.body.style.right = "0";
       document.body.style.width = "100%";
     }
+
     function unlockBodyScroll(){
       if (!__bodyLocked) return;
       __bodyLocked = false;
@@ -1164,26 +1932,77 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
       return b;
     }
 
+    function trapFocusInModal(){
+      const modal = document.getElementById("setupModal");
+      const shell = document.getElementById("modalShell");
+      if(!modal || !shell) return;
+
+      const selectors = [
+        'button:not([disabled])',
+        'a[href]',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        '[tabindex]:not([tabindex="-1"])'
+      ].join(',');
+
+      const focusables = () => Array.from(shell.querySelectorAll(selectors))
+        .filter(el => el.offsetParent !== null);
+
+      function onKeydown(e){
+        if(modal.style.display !== "flex") return;
+        if(e.key !== "Tab") return;
+
+        const items = focusables();
+        if(!items.length) return;
+
+        const first = items[0];
+        const last = items[items.length - 1];
+
+        if(e.shiftKey && document.activeElement === first){
+          e.preventDefault(); last.focus(); return;
+        }
+        if(!e.shiftKey && document.activeElement === last){
+          e.preventDefault(); first.focus(); return;
+        }
+      }
+
+      if(!window.__aicallport_modalTrapBound){
+        window.__aicallport_modalTrapBound = true;
+        document.addEventListener("keydown", onKeydown, true);
+      }
+    }
+
     function closeModal(){
       const modal = document.getElementById('setupModal');
-      if (modal.style.display !== "flex") { unlockBodyScroll(); return; }
+      if (modal.style.display !== "flex") {
+        unlockBodyScroll();
+        return;
+      }
       modal.style.display = 'none';
       unlockBodyScroll();
       try { lastFocusedEl?.focus?.(); } catch(e){}
       lastFocusedEl = null;
     }
 
+    function escapeHtml(str){
+      return String(str || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+    }
+
     // ============================
-    // Activation Info (7 slides)
+    // Activation Info (updated to 7-step wording)
     // ============================
     const activationInfoSlides = [
-      { t:"STEP 1 — COUNTRY", d:"Choose the country/market." },
-      { t:"STEP 2 — INDUSTRY", d:"Select your industry. This drives recommended templates." },
-      { t:"STEP 3 — AGENT", d:"Choose role, template, voice, and edit the script." },
-      { t:"STEP 4 — COMPANY", d:"Enter the company name used in greetings and script variables." },
-      { t:"STEP 5 — PLAN", d:"Select a plan: 1000 min or 2500 min. Overages billed next invoice." },
-      { t:"STEP 6 — DEMO", d:"Two demo calls max. Each demo runs 30 seconds." },
-      { t:"STEP 7 — ACTIVATE", d:"After SATISFIED, activate and proceed to checkout." }
+      { keyTitle:"STEP 1 — MARKET", keyText:"Choose the country/market. Routing and setup context adjust automatically based on your selection." },
+      { keyTitle:"STEP 2 — INDUSTRY", keyText:"Select your industry. Industry packs determine scripts/templates you start with." },
+      { keyTitle:"STEP 3 — AGENT", keyText:"Pick what AI Call Agent you want (Receptionist, Booking, Sales, Support, After-Hours, etc.)." },
+      { keyTitle:"STEP 4 — COMPANY", keyText:"Enter your business name. Used in greetings and scripts." },
+      { keyTitle:"STEP 5 — PLAN", keyText:"Select your beta special plan. You can change the plan anytime before activation." },
+      { keyTitle:"STEP 6 — DEMO", keyText:"Run a test call using your selected agent + script + voice." },
+      { keyTitle:"STEP 7 — ACTIVATE", keyText:"Activate and deploy. After payment, your agent deploys and you keep control via your client dashboard." }
     ];
     let infoIdx = 0;
 
@@ -1194,12 +2013,12 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
       c.innerHTML = `
         <div class="pill mb-4">${escapeHtml(i18n.t("activation_steps_info"))}</div>
         <div class="card-theme text-left">
-          <div class="mini text-orange-500 mb-2">${escapeHtml(slide.t)}</div>
-          <div class="text-[13px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(slide.d)}</div>
+          <div class="mini text-orange-500 mb-2">${escapeHtml(slide.keyTitle)}</div>
+          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(slide.keyText)}</div>
         </div>
         <div class="grid sm:grid-cols-3 gap-2 mt-4">
           <button class="modal-btn justify-center text-center" type="button" onclick="infoPrev()" ${infoIdx===0 ? 'style="opacity:.35;pointer-events:none"' : ''}>${escapeHtml(i18n.t("go_back"))}</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[11px] uppercase italic" type="button" onclick="infoNext()">
+          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="infoNext()">
             ${escapeHtml(infoIdx === activationInfoSlides.length - 1 ? i18n.t("start_activation") : i18n.t("next"))}
           </button>
           <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
@@ -1212,7 +2031,7 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
     function infoNext(){ if(infoIdx < activationInfoSlides.length-1){ infoIdx++; renderInfoSlide(); } else { closeModal(); handleStep(1); } }
 
     // ============================
-    // STEP MODALS (1–7)
+    // MODALS (7 steps)
     // ============================
     async function triggerModal(step){
       lastModalStep = step;
@@ -1224,11 +2043,13 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
       const tEl = document.getElementById('mTitle');
       const shell = document.getElementById('modalShell');
 
-      shell.classList.remove('role-wide','info-wide','community-wide','script-wide','activate-wide');
+      shell.classList.remove('role-wide','info-wide','community-wide','script-wide','benefits-wide','plan-wide');
       m.style.display = 'flex';
       lockBodyScroll();
+
       c.innerHTML = "";
       s.innerHTML = "";
+      trapFocusInModal();
 
       if(step === "info"){
         shell.classList.add('info-wide');
@@ -1237,199 +2058,58 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
         return;
       }
 
+      if(step === "community"){
+        shell.classList.add('community-wide');
+        tEl.innerText = i18n.t("community");
+        renderCommunity();
+        return;
+      }
+
+      if(step === "benefits"){
+        shell.classList.add('benefits-wide');
+        tEl.innerText = i18n.t("smb_benefits");
+        renderBenefits();
+        setTimeout(() => document.getElementById("benefitsListWrap")?.focus(), 30);
+        return;
+      }
+
+      // Step 1: Market
       if(step === 1){
         tEl.innerText = i18n.t("step_01");
         s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_countries" onkeyup="filterMarket(this.value)">`;
-        await renderMarketByContinent("");
+        renderMarketByContinent("");
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
 
+      // Step 2: Industry
       if(step === 2){
         tEl.innerText = i18n.t("step_02");
         s.innerHTML = `<input type="text" class="search-box" data-i18n-placeholder="search_industries" onkeyup="filterIndustryCategories(this.value)">`;
+        await i18n.ensureDynamicTranslations(window.APP_I18N.current, "industries", industryKeys);
         renderIndustryCategoryList("");
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
 
-      // STEP 3: Agent Setup (role/template/voice/script)
+      // Step 3: Agent
       if(step === 3){
-        shell.classList.add('role-wide');
         tEl.innerText = i18n.t("step_03");
-
         c.innerHTML = `
-          <div class="pill mb-4">${escapeHtml(i18n.t("role_templates_voice"))}</div>
-
-          <div class="grid lg:grid-cols-3 gap-4 text-left">
-            <div class="card-theme">
-              <div class="muted-hint mb-3">${escapeHtml(i18n.t("agent_role"))}</div>
-              <div id="roleList" class="grid gap-2"></div>
-
-              <div class="divider mt-4">Role Description</div>
-              <div id="roleDesc" class="text-[13px] text-slate-300 font-semibold leading-relaxed"></div>
-
-              <div class="mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
-                Industry: <span class="text-orange-500">${escapeHtml(getCurrentIndustryKey())}</span>
+          <div class="pill mb-3">CHOOSE AI CALL AGENT</div>
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">This determines the workflow focus for your deployment.</div>
+          <div class="grid sm:grid-cols-2 gap-3 text-left">
+            ${HERO_AGENTS.map(a => `
+              <div class="agent-tile ${a.name === selectedAgentType ? "active" : ""}" onclick="setAgentType('${escapeHtml(a.name).replaceAll("'", "\\'")}')">
+                <div class="text-[11px] font-black uppercase tracking-widest text-white">${escapeHtml(a.name)}</div>
+                <div class="agent-desc" style="display:block">${escapeHtml(a.desc)}</div>
               </div>
-            </div>
-
-            <div class="card-theme">
-              <div class="muted-hint mb-3">${escapeHtml(i18n.t("templates"))}</div>
-              <select id="templateSelect" class="select-theme"></select>
-
-              <div class="mt-3 muted-hint">${escapeHtml(i18n.t("editable_script"))}</div>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[11px] uppercase italic mt-2"
-                type="button" onclick="openScriptEditor()">
-                ${escapeHtml(i18n.t("editable_script_btn"))}
-              </button>
-
-              <div class="grid grid-cols-2 gap-2 mt-3">
-                <button class="modal-btn justify-center text-center" type="button" onclick="resetTemplate()">${escapeHtml(i18n.t("reset_template"))}</button>
-                <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-              </div>
-            </div>
-
-            <div class="card-theme">
-              <div class="muted-hint mb-3">${escapeHtml(i18n.t("voice"))}</div>
-              <select id="voiceSelect" class="select-theme"></select>
-              <div class="grid grid-cols-2 gap-2 mt-3">
-                <button class="orange-btn w-full py-3 rounded-xl font-black text-[11px] uppercase italic" type="button" onclick="previewVoice()">${escapeHtml(i18n.t("preview_voice"))}</button>
-                <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-              </div>
-            </div>
+            `).join("")}
           </div>
-
           <div class="modal-footer">
             <div class="grid sm:grid-cols-2 gap-2">
               <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[11px] uppercase italic" type="button" onclick="confirmAgentSetup()">
-                ${escapeHtml(i18n.t("confirm_role_template_voice"))}
-              </button>
-            </div>
-          </div>
-        `;
-
-        // roles
-        const roleList = document.getElementById('roleList');
-        roleList.innerHTML = "";
-        const roles = [
-          { label: i18n.t("receptionist"), value: "Receptionist" },
-          { label: i18n.t("sales_agent"), value: "Sales Agent" },
-          { label: i18n.t("support_agent"), value: "Support Agent" }
-        ];
-        roles.forEach(r => {
-          const b = createBtn(r.label, () => {
-            state.selectedRole = r.value;
-            refreshTemplatesForCurrentSelection(true);
-            triggerModal(3);
-          });
-          b.style.fontSize = "11px";
-          b.style.padding = "14px";
-          b.innerHTML = `${escapeHtml(r.label)}${state.selectedRole === r.value ? " ✓" : ""}`;
-          roleList.appendChild(b);
-        });
-
-        // role desc
-        document.getElementById("roleDesc").textContent =
-          state.selectedRole === "Sales Agent" ? i18n.t("role_help_sales") :
-          state.selectedRole === "Support Agent" ? i18n.t("role_help_support") :
-          i18n.t("role_help_receptionist");
-
-        // templates
-        refreshTemplatesForCurrentSelection(false);
-        const templateSelect = document.getElementById('templateSelect');
-        const templates = getTemplatesFor(state.selectedRole);
-        templateSelect.innerHTML = "";
-        templates.forEach(tpl => {
-          const opt = document.createElement('option');
-          opt.value = tpl.key;
-          opt.textContent = (tpl.title || tpl.key).toUpperCase();
-          templateSelect.appendChild(opt);
-        });
-        templateSelect.value = state.selectedTemplateKey || (templates[0] ? templates[0].key : "");
-        templateSelect.onchange = () => {
-          state.selectedTemplateKey = templateSelect.value;
-          const chosen = templates.find(x => x.key === state.selectedTemplateKey) || templates[0];
-          if(chosen) state.agentScript = applyVars(chosen.script);
-        };
-
-        // voices
-        const voiceSelect = document.getElementById('voiceSelect');
-        voiceSelect.innerHTML = "";
-        vapiVoices.forEach(v => {
-          const opt = document.createElement('option');
-          opt.value = v.id;
-          opt.textContent = v.label.toUpperCase();
-          voiceSelect.appendChild(opt);
-        });
-        voiceSelect.value = state.selectedVoiceId;
-        voiceSelect.onchange = () => state.selectedVoiceId = voiceSelect.value;
-
-        i18n.applyTranslations(document.getElementById("setupModal"));
-        return;
-      }
-
-      // STEP 4: Company name
-      if(step === 4){
-        tEl.innerText = i18n.t("step_04");
-        c.innerHTML = `
-          <div class="pill mb-4">${escapeHtml(i18n.t("step_04"))}</div>
-          <input id="companyNameInput"
-            data-i18n-placeholder="business_name"
-            class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-[13px] font-black outline-none"
-            style="text-transform:uppercase; letter-spacing:.12em"
-            value="${escapeHtml(state.companyName)}"
-          >
-          <button type="button" onclick="saveCompanyName()" class="orange-btn w-full py-3 rounded-xl font-black text-[11px] uppercase italic">${escapeHtml(i18n.t("save"))}</button>
-        `;
-        i18n.applyTranslations(document.getElementById("setupModal"));
-        return;
-      }
-
-      // STEP 5: Plan selection (FIXED: can change selection)
-      if(step === 5){
-        tEl.innerText = i18n.t("step_05");
-        c.innerHTML = `
-          <div class="pill mb-4">${escapeHtml(i18n.t("plan_pick"))}</div>
-
-          <div class="grid gap-3 text-left">
-            <button class="modal-btn" type="button" onclick="selectPlan('P1')">
-              <div class="flex items-center justify-between w-full">
-                <div>
-                  <div class="text-[11px] font-black uppercase tracking-widest text-white">$299 /mo</div>
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Up to 1000 min • Reg $499</div>
-                </div>
-                <div class="text-[11px] font-black uppercase tracking-widest ${state.selectedPlanId==='P1'?'text-orange-500':'text-slate-500'}">
-                  ${state.selectedPlanId==='P1' ? i18n.t("plan_selected") : ""}
-                </div>
-              </div>
-            </button>
-
-            <button class="modal-btn" type="button" onclick="selectPlan('P2')">
-              <div class="flex items-center justify-between w-full">
-                <div>
-                  <div class="text-[11px] font-black uppercase tracking-widest text-white">$599 /mo</div>
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Up to 2500 min • Reg $999</div>
-                </div>
-                <div class="text-[11px] font-black uppercase tracking-widest ${state.selectedPlanId==='P2'?'text-orange-500':'text-slate-500'}">
-                  ${state.selectedPlanId==='P2' ? i18n.t("plan_selected") : ""}
-                </div>
-              </div>
-            </button>
-
-            <div class="card-theme">
-              <div class="mini text-orange-500 mb-2">Overages</div>
-              <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-                $0.30 per minute billed on next invoice.
-              </div>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <div class="grid sm:grid-cols-2 gap-2">
-              <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[11px] uppercase italic" type="button" onclick="confirmPlan()">
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="confirmAgentType()">
                 ${escapeHtml(i18n.t("confirm"))}
               </button>
             </div>
@@ -1439,31 +2119,105 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
         return;
       }
 
-      // STEP 6: Demo info modal (demo actions are in demo bar)
-      if(step === 6){
-        tEl.innerText = i18n.t("step_06");
+      // Step 4: Company
+      if(step === 4){
+        tEl.innerText = i18n.t("step_04");
         c.innerHTML = `
-          <div class="pill mb-3">${escapeHtml(i18n.t("step_06"))}</div>
-          <div class="card-theme text-left">
-            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("demo_rules"))}</div>
-            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-              Run up to <span class="text-white font-black">2 demo calls</span>. Each demo runs <span class="text-white font-black">30 seconds</span>.
-            </div>
-            <div class="mt-2 text-[11px] font-black uppercase tracking-widest text-slate-400">
-              ${escapeHtml(i18n.t("demos_used"))}: <span class="text-white" id="demoUsedInline">${state.demoCallsUsed}/2</span>
-            </div>
-          </div>
+          <div class="pill mb-3">COMPANY SYNC</div>
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Your business name is used inside greetings and scripts.</div>
 
-          <div class="card-theme text-left mt-3">
-            <div class="mini text-orange-500 mb-2">${escapeHtml(i18n.t("satisfied"))}</div>
-            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(i18n.t("demo_note"))}</div>
+          <input id="bn" value="${escapeHtml(businessName)}" data-i18n-placeholder="business_name"
+            class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
+
+          <div class="grid sm:grid-cols-2 gap-2 mt-2">
+            <button type="button" onclick="closeModal()" class="modal-btn justify-center text-center">${escapeHtml(i18n.t("close"))}</button>
+            <button type="button" onclick="saveCompany()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic">${escapeHtml(i18n.t("save"))}</button>
+          </div>
+        `;
+        i18n.applyTranslations(document.getElementById("setupModal"));
+        return;
+      }
+
+      // Step 5: Plan (FIX: can change selection here, always selectable)
+      if(step === 5){
+        shell.classList.add("plan-wide");
+        tEl.innerText = i18n.t("step_05");
+
+        c.innerHTML = `
+          <div class="pill mb-3">${escapeHtml(i18n.t("choose_plan"))}</div>
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">${escapeHtml(i18n.t("pick_plan"))}</div>
+
+          <div class="grid sm:grid-cols-2 gap-3 text-left">
+            <div id="planModal_299" class="plan-card ${selectedPlanKey==="P299"?"active":""}" onclick="selectPlan('P299',{from:'modal'})">
+              <div class="flex items-center justify-between">
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">${escapeHtml(i18n.t("beta_special"))}</div>
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 line-through">$${PLANS.P299.reg} ${escapeHtml(i18n.t("regular"))}</div>
+              </div>
+              <div class="flex items-baseline justify-between mt-2">
+                <div class="text-white font-black text-4xl">$${PLANS.P299.price}<span class="text-orange-500 text-base font-bold">/mo</span></div>
+                <div class="text-orange-500 font-black text-[11px] uppercase tracking-widest">${escapeHtml(i18n.t("up_to"))} ${PLANS.P299.minutes} ${escapeHtml(i18n.t("minutes"))}</div>
+              </div>
+              <div class="mt-2 text-[10px] font-bold text-slate-400">${escapeHtml(i18n.t("overages"))}</div>
+            </div>
+
+            <div id="planModal_599" class="plan-card ${selectedPlanKey==="P599"?"active":""}" onclick="selectPlan('P599',{from:'modal'})">
+              <div class="flex items-center justify-between">
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">${escapeHtml(i18n.t("beta_special"))}</div>
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 line-through">$${PLANS.P599.reg} ${escapeHtml(i18n.t("regular"))}</div>
+              </div>
+              <div class="flex items-baseline justify-between mt-2">
+                <div class="text-white font-black text-4xl">$${PLANS.P599.price}<span class="text-orange-500 text-base font-bold">/mo</span></div>
+                <div class="text-orange-500 font-black text-[11px] uppercase tracking-widest">${escapeHtml(i18n.t("up_to"))} ${PLANS.P599.minutes} ${escapeHtml(i18n.t("minutes"))}</div>
+              </div>
+              <div class="mt-2 text-[10px] font-bold text-slate-400">${escapeHtml(i18n.t("overages"))}</div>
+            </div>
           </div>
 
           <div class="modal-footer">
             <div class="grid sm:grid-cols-2 gap-2">
               <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[11px] uppercase italic" type="button" onclick="scrollToDemoBar()">
-                OPEN DEMO CONSOLE
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="confirmPlan()">${escapeHtml(i18n.t("confirm"))}</button>
+            </div>
+          </div>
+        `;
+        i18n.applyTranslations(document.getElementById("setupModal"));
+        return;
+      }
+
+      // Step 6: Demo (kept, but also top demo button exists)
+      if(step === 6){
+        tEl.innerText = i18n.t("step_06");
+        c.innerHTML = `
+          <div class="pill mb-3">SANDBOX DEMO</div>
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">This will start a live demo call using your selected settings.</div>
+        `;
+        c.appendChild(createBtn(i18n.t("demo_call"), runVoice));
+        i18n.applyTranslations(document.getElementById("setupModal"));
+        return;
+      }
+
+      // Step 7: Activate
+      if(step === 7){
+        tEl.innerText = i18n.t("step_07");
+        const plan = PLANS[selectedPlanKey] || PLANS.P299;
+        c.innerHTML = `
+          <div class="pill mb-3">ACTIVATE • DEPLOY</div>
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">Summary</div>
+            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+              <div><span class="text-slate-400">Market:</span> <span class="text-white">${escapeHtml(selectedMarket)}</span></div>
+              <div><span class="text-slate-400">Industry:</span> <span class="text-white">${escapeHtml(selectedIndustryKey)}</span></div>
+              <div><span class="text-slate-400">Agent:</span> <span class="text-white">${escapeHtml(selectedAgentType)}</span></div>
+              <div><span class="text-slate-400">Company:</span> <span class="text-white">${escapeHtml(businessName || "—")}</span></div>
+              <div><span class="text-slate-400">Plan:</span> <span class="text-white">$${plan.price}/mo (up to ${plan.minutes} min)</span></div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <div class="grid sm:grid-cols-2 gap-2">
+              <button class="modal-btn justify-center text-center" type="button" onclick="handleStep(5)">Change Plan</button>
+              <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="activateNow()">
+                ${escapeHtml(i18n.t("activate_now"))}
               </button>
             </div>
           </div>
@@ -1471,350 +2225,240 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
         i18n.applyTranslations(document.getElementById("setupModal"));
         return;
       }
-
-      // STEP 7: Activate checklist
-      if(step === 7){
-        shell.classList.add("activate-wide");
-        tEl.innerText = i18n.t("step_07");
-
-        const checklist = [
-          { ok: state.marketSelected, label: "Country selected" },
-          { ok: state.industrySelected, label: "Industry selected" },
-          { ok: state.agentConfigured, label: "Agent configured" },
-          { ok: state.companyNameSet, label: "Company name set" },
-          { ok: state.planSelected, label: "Plan selected" },
-          { ok: state.demoCompletedOnce, label: "At least one demo completed" },
-          { ok: state.activationUnlocked, label: "Satisfied confirmed" }
-        ];
-
-        const allOk = checklist.every(x => x.ok);
-
-        c.innerHTML = `
-          <div class="pill mb-3">${escapeHtml(i18n.t("activate_checklist"))}</div>
-
-          <div class="grid lg:grid-cols-2 gap-4 text-left">
-            <div class="card-theme">
-              <div class="mini text-orange-500 mb-2">Checklist</div>
-              <div class="grid gap-2">
-                ${checklist.map(x => `
-                  <div class="flex items-center justify-between gap-2 bg-white/5 border border-white/10 rounded-2xl p-3">
-                    <div class="text-[12px] font-black uppercase tracking-wider ${x.ok ? "text-white" : "text-slate-500"}">${escapeHtml(x.label)}</div>
-                    <div class="text-[12px] font-black uppercase tracking-widest ${x.ok ? "text-green-400" : "text-slate-600"}">${x.ok ? "OK" : "LOCKED"}</div>
-                  </div>
-                `).join("")}
-              </div>
-            </div>
-
-            <div class="card-theme">
-              <div class="mini text-orange-500 mb-2">Summary</div>
-              <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-                <div><span class="text-slate-500 font-black uppercase tracking-widest text-[10px]">Country:</span> <span class="text-white font-black">${escapeHtml(state.selectedMarket || "—")}</span></div>
-                <div class="mt-2"><span class="text-slate-500 font-black uppercase tracking-widest text-[10px]">Industry:</span> <span class="text-white font-black">${escapeHtml(state.selectedIndustryKey || "—")}</span></div>
-                <div class="mt-2"><span class="text-slate-500 font-black uppercase tracking-widest text-[10px]">Agent:</span> <span class="text-white font-black">${escapeHtml(getAgentSummary() || "—")}</span></div>
-                <div class="mt-2"><span class="text-slate-500 font-black uppercase tracking-widest text-[10px]">Company:</span> <span class="text-white font-black">${escapeHtml(state.companyName || "—")}</span></div>
-                <div class="mt-2"><span class="text-slate-500 font-black uppercase tracking-widest text-[10px]">Plan:</span> <span class="text-white font-black">${escapeHtml(getPlanLabel() || "—")}</span></div>
-              </div>
-
-              <div class="mt-4">
-                <button class="orange-btn w-full py-3 rounded-xl font-black text-[12px] uppercase italic ${allOk ? "" : "opacity-30 pointer-events-none"}"
-                  type="button" onclick="activateNow()">
-                  ${escapeHtml(i18n.t("activate_ready"))}
-                </button>
-                <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                  Activation proceeds to checkout.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">${escapeHtml(i18n.t("close"))}</button>
-          </div>
-        `;
-
-        i18n.applyTranslations(document.getElementById("setupModal"));
-        return;
-      }
     }
 
     // ============================
-    // Script Editor (kept)
+    // Step 1 rendering (markets)
     // ============================
-    let scriptEditorDraft = null;
+    let _marketsByContinentCache = null;
 
-    function openScriptEditor(){
-      if(!state.agentScript || state.agentScript.trim().length < 10){
-        try { resetTemplate(); } catch(e) {}
+    async function getMarketsGroupedByContinent() {
+      if (_marketsByContinentCache) return _marketsByContinentCache;
+
+      const res = await fetch("/api/markets", { cache: "no-store" });
+      if (!res.ok) {
+        console.error("Failed to load /api/markets:", res.status);
+        _marketsByContinentCache = {};
+        return _marketsByContinentCache;
       }
-      scriptEditorDraft = state.agentScript || "";
 
-      const m = document.getElementById("setupModal");
-      const c = document.getElementById("mContent");
-      const s = document.getElementById("modalSearchContainer");
-      const tEl = document.getElementById("mTitle");
-      const shell = document.getElementById("modalShell");
+      const rows = await res.json();
+      const grouped = {};
 
-      shell.classList.remove("role-wide","info-wide","community-wide","activate-wide");
-      shell.classList.add("script-wide");
+      (rows || []).forEach((row) => {
+        const continent = row.region || "Other";
+        const name = row.name || "";
+        if (!name) return;
+        grouped[continent] ||= [];
+        grouped[continent].push(name);
+      });
 
-      m.style.display = "flex";
-      lockBodyScroll();
+      Object.keys(grouped).forEach((k) => {
+        grouped[k].sort((a, b) => String(a).localeCompare(String(b)));
+      });
 
-      s.innerHTML = "";
-      tEl.innerText = i18n.t("script_editor_title");
-
-      const businessName = (state.companyName || "YOUR COMPANY");
-      const industry = (state.selectedIndustryKey || "GLOBAL");
-      const market = (state.selectedMarket || "YOUR MARKET");
-      const roleHelp =
-        state.selectedRole === "Sales Agent" ? i18n.t("role_help_sales") :
-        state.selectedRole === "Support Agent" ? i18n.t("role_help_support") :
-        i18n.t("role_help_receptionist");
-
-      c.innerHTML = `
-        <div class="script-editor-wrap">
-          <div class="script-editor-header">
-            <div class="text-left">
-              <div class="pill mb-2">${escapeHtml(i18n.t("script_editor_title"))}</div>
-              <div class="muted-hint">${escapeHtml(i18n.t("script_editor_help"))}</div>
-            </div>
-            <div class="script-badges">
-              <div class="badge">${escapeHtml(market)}</div>
-              <div class="badge">${escapeHtml(industry)}</div>
-              <div class="badge">${escapeHtml(businessName)}</div>
-              <div class="badge">${escapeHtml(state.selectedRole)}</div>
-            </div>
-          </div>
-
-          <div class="card-theme text-left">
-            <div class="mini text-orange-500 mb-2">Role Behavior</div>
-            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">${escapeHtml(roleHelp)}</div>
-            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">
-              Variables: <span class="text-orange-500">{{BUSINESS_NAME}}</span>, <span class="text-orange-500">{{MARKET}}</span>
-            </div>
-          </div>
-
-          <textarea id="scriptEditorBox" class="script-textarea" oninput="onScriptEditorInput()"></textarea>
-
-          <div class="modal-footer">
-            <div class="grid sm:grid-cols-3 gap-2">
-              <button class="modal-btn justify-center text-center" type="button" onclick="scriptEditorResetToTemplate()">${escapeHtml(i18n.t("reset_to_template"))}</button>
-              <button class="orange-btn w-full py-3 rounded-xl font-black text-[11px] uppercase italic" type="button" onclick="scriptEditorSave()">${escapeHtml(i18n.t("save_script"))}</button>
-              <button class="modal-btn justify-center text-center" type="button" onclick="scriptEditorBackToAgentModal()">${escapeHtml(i18n.t("close_editor"))}</button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      document.getElementById("scriptEditorBox").value = scriptEditorDraft;
-      i18n.applyTranslations(document.getElementById("setupModal"));
+      _marketsByContinentCache = grouped;
+      return grouped;
     }
 
-    function onScriptEditorInput(){ scriptEditorDraft = document.getElementById("scriptEditorBox").value; }
+    async function renderMarketByContinent(searchQuery){
+      const c = document.getElementById('mContent');
+      c.innerHTML = "";
+      const q = (searchQuery || "").trim().toUpperCase();
 
-    function scriptEditorResetToTemplate(){
-      const templates = getTemplatesFor(state.selectedRole);
-      const chosen = templates.find(x => x.key === state.selectedTemplateKey) || templates[0];
-      if(!chosen) return;
-      scriptEditorDraft = applyVars(chosen.script);
-      document.getElementById("scriptEditorBox").value = scriptEditorDraft;
+      const marketsByContinent = await getMarketsGroupedByContinent();
+
+      Object.keys(marketsByContinent).forEach(continent => {
+        const list = (marketsByContinent[continent] || []).slice().sort((a,b) => a.localeCompare(b));
+        const filtered = list.filter(name => name.toUpperCase().includes(q));
+        if(!filtered.length) return;
+
+        const div = document.createElement('div');
+        div.className = "divider";
+        div.innerText = continent.toUpperCase();
+        c.appendChild(div);
+
+        filtered.forEach(name => {
+          const btn = createBtn(name, async () => {
+            selectedMarket = name;
+            finish(1, name);
+          });
+          btn.setAttribute('data-n', name);
+          btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${escapeHtml(name)}`;
+          c.appendChild(btn);
+        });
+      });
+
+      if(!c.children.length){
+        const hint = document.createElement('div');
+        hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
+        hint.innerText = "No markets available yet. (Backend countries endpoint not connected)";
+        c.appendChild(hint);
+      }
     }
+    function filterMarket(query){ renderMarketByContinent(query); }
 
-    function scriptEditorSave(){
-      state.agentScript = applyVars(String(scriptEditorDraft || ""));
-      scriptEditorBackToAgentModal();
+    // Step 2 rendering
+    function renderIndustryCategoryList(searchQuery){
+      const c = document.getElementById('mContent');
+      c.innerHTML = "";
+      const q = (searchQuery || "").trim().toUpperCase();
+
+      const groups = buildCategorizedIndustryList();
+      groups.forEach(g => {
+        const filtered = g.items.filter(name => {
+          const shown = dt("industries", name, name);
+          return shown.toUpperCase().includes(q) || name.toUpperCase().includes(q);
+        });
+        if(!filtered.length) return;
+
+        const div = document.createElement('div');
+        div.className = "divider";
+        div.innerText = g.cat.toUpperCase();
+        c.appendChild(div);
+
+        filtered.forEach(name => {
+          const shown = dt("industries", name, name);
+          const btn = createBtn(shown, () => {
+            selectedIndustryKey = name;
+            finish(2, shown);
+            refreshTemplatesForCurrentSelection(true);
+          });
+          btn.setAttribute('data-n', shown);
+          c.appendChild(btn);
+        });
+      });
+
+      if(!c.children.length){
+        const hint = document.createElement('div');
+        hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
+        hint.innerText = i18n.t("no_matching");
+        c.appendChild(hint);
+      }
     }
+    function filterIndustryCategories(query){ renderIndustryCategoryList(query); }
 
-    function scriptEditorBackToAgentModal(){
-      document.getElementById("modalShell").classList.remove("script-wide");
+    // ============================
+    // Step 3: Agent selection handlers
+    // ============================
+    function setAgentType(name){
+      selectedAgentType = name;
+      // re-render inside modal (quick approach)
       triggerModal(3);
     }
-
-    function resetTemplate(){
-      const templates = getTemplatesFor(state.selectedRole);
-      const chosen = templates.find(x => x.key === state.selectedTemplateKey) || templates[0];
-      if(!chosen) return;
-      state.agentScript = applyVars(chosen.script);
-    }
-
-    function getAgentSummary(){
-      const voice = state.selectedVoiceId || "—";
-      const role = state.selectedRole || "—";
-      const templates = getTemplatesFor(state.selectedRole);
-      const chosen = templates.find(x => x.key === state.selectedTemplateKey);
-      const tplTitle = chosen ? (chosen.title || "Template") : "Template";
-      // example: Receptionist • Popular: Standard • Mia
-      return `${role} • ${tplTitle} • ${voice}`;
+    function confirmAgentType(){
+      finish(3, selectedAgentType.toUpperCase());
     }
 
     // ============================
-    // Plan functions (FIX: changeable selection)
+    // Step 4: Company
     // ============================
-    function selectPlan(planId){
-      state.selectedPlanId = planId;
-      // keep modal open and re-render to show "Selected"
-      triggerModal(5);
-    }
-    function getPlanLabel(){
-      if(state.selectedPlanId === "P1") return "$299 /mo • 1000 min";
-      if(state.selectedPlanId === "P2") return "$599 /mo • 2500 min";
-      return "";
-    }
-    function confirmPlan(){
-      if(!state.selectedPlanId) return;
-      state.planSelected = true;
-      finishStep(5, state.selectedPlanId === "P1" ? "299 • 1000" : "599 • 2500");
-      closeModal();
-    }
-
-    // ============================
-    // Company name
-    // ============================
-    function saveCompanyName(){
-      const raw = (document.getElementById('companyNameInput')?.value || "");
+    function saveCompany(){
+      const raw = (document.getElementById('bn')?.value || "");
       const v = raw.trim().slice(0, 60);
       if(v.length >= 2){
-        state.companyName = v.toUpperCase();
-        state.companyNameSet = true;
-        state.agentScript = applyVars(state.agentScript);
-        finishStep(4, state.companyName);
-        closeModal();
+        businessName = v;
+        finish(4, v.toUpperCase());
+        agentScript = applyVars(agentScript);
+      } else {
+        document.getElementById("bn").style.borderColor = "red";
       }
     }
 
     // ============================
-    // Agent confirm
+    // Step 5: Plans (FIX: sync modal + pricing cards + step value)
     // ============================
-    function confirmAgentSetup(){
-      // ensure script exists
-      if(!state.agentScript || state.agentScript.trim().length < 10){
-        refreshTemplatesForCurrentSelection(true);
+    function selectPlan(key, opts){
+      if(!PLANS[key]) return;
+      selectedPlanKey = key;
+
+      // highlight pricing cards
+      document.getElementById("priceCard_299")?.classList.toggle("active", key === "P299");
+      document.getElementById("priceCard_599")?.classList.toggle("active", key === "P599");
+
+      // highlight modal cards if present
+      document.getElementById("planModal_299")?.classList.toggle("active", key === "P299");
+      document.getElementById("planModal_599")?.classList.toggle("active", key === "P599");
+
+      // DO NOT auto-finish from pricing click unless user is already on step 5 or opts says so
+      const from = opts?.from || "";
+      if(from === "pricing"){
+        // allow quick selection, but do not advance steps automatically
+        // the step 5 modal is still the "confirm" point
       }
-      state.agentConfigured = true;
-      finishStep(3, getAgentSummary());
+    }
+
+    function confirmPlan(){
+      const plan = PLANS[selectedPlanKey] || PLANS.P299;
+      finish(5, `$${plan.price}/MO`);
+    }
+
+    // ============================
+    // ACTIONS + LOCK STATE (FIXED + AUTO-ADVANCE)
+    // ============================
+    function refreshStepLocks(){
+      // Rule:
+      // - steps <= completedSteps : unlocked (reviewable)
+      // - step == completedSteps+1 : unlocked + blinking
+      // - steps > completedSteps+1 : locked + NOT clickable
+      const next = Math.min(7, completedSteps + 1);
+
+      for(let i=1;i<=7;i++){
+        const el = document.getElementById(`s${i}`);
+        if(!el) continue;
+
+        const locked = i > next;
+        el.classList.toggle("locked", locked);
+
+        // Active style for completed
+        if(i <= completedSteps) el.classList.add("active");
+
+        // Remove blinking from all, then apply only to next
+        el.classList.remove("next-focus");
+        if(i === next) el.classList.add("next-focus");
+      }
+
+      // Demo Bar visibility (FIX: never hidden after step 6 is available)
+      const demoBar = document.getElementById("demoBar");
+      if(demoBar){
+        demoBar.classList.toggle("hidden", !(completedSteps >= 5)); // once plan chosen, show demo bar
+      }
+    }
+
+    function handleStep(s){
+      // only allow open if step <= completedSteps+1
+      if (s <= Math.min(7, completedSteps + 1)) triggerModal(s);
+    }
+
+    function finish(s, v){
+      completedSteps = Math.max(completedSteps, s);
+
+      const valEl = document.getElementById(`v${s}`);
+      if(valEl) valEl.innerText = v;
+
+      document.getElementById(`s${s}`)?.classList.add('active');
       closeModal();
+
+      refreshStepLocks();
+      syncTopSelectionsToUI();
+
+      // ✅ AUTO-ADVANCE to next step menu after selection (your request)
+      const next = s + 1;
+      if(next <= 7){
+        setTimeout(() => {
+          // only auto-open if it's the next required step
+          if(next === Math.min(7, completedSteps + 1)) triggerModal(next);
+        }, 180);
+      }
+    }
+
+    function syncTopSelectionsToUI(){
+      // keep pricing highlight synced
+      selectPlan(selectedPlanKey, {from:"sync"});
     }
 
     // ============================
-    // DEMO GATE (2 calls, 30 seconds each)
-    // ============================
-    let demoTimer = null;
-    let demoHardStop = null;
-
-    function updateDemoBarUI(){
-      const bar = document.getElementById("demoBar");
-      const usedLabel = document.getElementById("demoUsedLabel");
-      const statusLine = document.getElementById("demoStatusLine");
-      const startBtn = document.getElementById("demoStartBtn");
-      const stopBtn = document.getElementById("demoStopBtn");
-      const satBtn = document.getElementById("demoSatisfiedBtn");
-
-      usedLabel.textContent = `${state.demoCallsUsed}/2`;
-
-      // enable/disable start
-      const canStart = canOpenStep(6) && state.demoCallsUsed < 2;
-      startBtn.disabled = !canStart;
-      startBtn.style.opacity = canStart ? "1" : "0.35";
-      startBtn.style.pointerEvents = canStart ? "auto" : "none";
-
-      // satisfied rules
-      const canSat = state.demoCompletedOnce;
-      satBtn.style.opacity = canSat ? "1" : "0.35";
-      satBtn.style.pointerEvents = canSat ? "auto" : "none";
-
-      if (bar.style.display !== "block" && canOpenStep(6)) {
-        bar.style.display = "block";
-      }
-      if (!canOpenStep(6)) {
-        bar.style.display = "none";
-      }
-
-      // status line
-      if(statusLine && !demoTimer) statusLine.textContent = "Ready.";
-      if(state.activationUnlocked) statusLine.textContent = "Satisfied confirmed. Activation unlocked.";
-    }
-
-    function scrollToDemoBar(){
-      closeModal();
-      setTimeout(() => {
-        document.getElementById("demoBar")?.scrollIntoView({ behavior:"smooth", block:"center" });
-      }, 50);
-    }
-
-    async function startDemoCall(){
-      if(state.demoCallsUsed >= 2) return;
-      if(!canOpenStep(6)) return;
-
-      const startBtn = document.getElementById("demoStartBtn");
-      const stopBtn = document.getElementById("demoStopBtn");
-      const statusLine = document.getElementById("demoStatusLine");
-
-      startBtn.style.display = "none";
-      stopBtn.style.display = "inline-block";
-      statusLine.textContent = "Demo running (30 seconds)…";
-
-      try{
-        const industry = getCurrentIndustryKey();
-        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
-
-        const businessName = state.companyName || "YOUR COMPANY";
-        const finalScript = applyVars(state.agentScript || "");
-
-        await vapiStartCall(assistantId, {
-          voice: getSelectedVapiVoice(),
-          firstMessage: `Hi! Thank you for calling ${businessName}. How can I help you today?`,
-          model: { provider: "openai", model: "gpt-4o-mini", messages: [{ role: "system", content: finalScript }] }
-        });
-
-        state.demoCallsUsed += 1;
-        state.demoCompletedOnce = true;
-        finishStep(6, `DEMO ${state.demoCallsUsed}/2`);
-
-        // 30s hard stop
-        clearTimeout(demoHardStop);
-        demoHardStop = setTimeout(() => {
-          stopDemoCall(true);
-        }, 30_000);
-
-        updateDemoBarUI();
-      } catch(e){
-        console.error(e);
-        statusLine.textContent = "Demo failed. Check console + /api/config.";
-        // restore buttons
-        startBtn.style.display = "inline-block";
-        stopBtn.style.display = "none";
-      }
-    }
-
-    function stopDemoCall(forced){
-      const startBtn = document.getElementById("demoStartBtn");
-      const stopBtn = document.getElementById("demoStopBtn");
-      const statusLine = document.getElementById("demoStatusLine");
-
-      clearTimeout(demoHardStop);
-      demoHardStop = null;
-
-      if (vapiFallbackInstance && vapiFallbackInstance.stop) {
-        try { vapiFallbackInstance.stop(); } catch {}
-      }
-
-      stopBtn.style.display = "none";
-      startBtn.style.display = "inline-block";
-
-      statusLine.textContent = forced ? "Demo ended (30s limit)." : "Demo stopped.";
-      updateDemoBarUI();
-    }
-
-    function satisfied(){
-      if(!state.demoCompletedOnce) return;
-      state.activationUnlocked = true;
-      updateDemoBarUI();
-      // auto-open step 7
-      handleStep(7);
-    }
-
-    // ============================
-    // Preview voice
+    // VAPI: Preview + Demo
     // ============================
     async function previewVoice(){
       try{
@@ -1833,94 +2477,44 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
       }
     }
 
-    // ============================
-    // Activate
-    // ============================
-    function canActivate(){
-      return (
-        state.marketSelected &&
-        state.industrySelected &&
-        state.agentConfigured &&
-        state.companyNameSet &&
-        state.planSelected &&
-        state.demoCompletedOnce &&
-        state.activationUnlocked
-      );
-    }
+    async function runVoice(){
+      try{
+        const industry = getCurrentIndustryKey();
+        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
 
-    function activateNow(){
-      if(!canActivate()) return;
-      confetti();
-      setDeployed(true);
-      state.deployed = true;
-      finishStep(7, "READY");
+        const bn = (businessName || "YOUR BUSINESS").trim() || "YOUR BUSINESS";
+        const finalScript = applyVars(agentScript || "");
 
-      const url = STRIPE_CHECKOUT[state.selectedPlanId] || STRIPE_CHECKOUT.P1;
-      setTimeout(() => window.location.href = url, 900);
-    }
+        await vapiStartCall(assistantId, {
+          voice: getSelectedVapiVoice(),
+          firstMessage: `Hi! Thank you for calling ${bn}. How can I help you today?`,
+          model: { provider: "openai", model: "gpt-4o-mini", messages: [{ role: "system", content: finalScript }] }
+        });
 
-    // ============================
-    // PROTOCOL LOCKS + BLINK LOGIC (FIX: only next step blinks; locked steps not clickable)
-    // ============================
-    function stepUnlocked(step){
-      // step numbers 1..7
-      if(step === 1) return true;
-      if(step === 2) return state.marketSelected;
-      if(step === 3) return state.marketSelected && state.industrySelected;
-      if(step === 4) return state.marketSelected && state.industrySelected && state.agentConfigured;
-      if(step === 5) return state.marketSelected && state.industrySelected && state.agentConfigured && state.companyNameSet;
-      if(step === 6) return state.marketSelected && state.industrySelected && state.agentConfigured && state.companyNameSet && state.planSelected;
-      if(step === 7) return state.marketSelected && state.industrySelected && state.agentConfigured && state.companyNameSet && state.planSelected && state.demoCompletedOnce && state.activationUnlocked;
-      return false;
-    }
-
-    function canOpenStep(step){
-      return stepUnlocked(step);
-    }
-
-    function currentNextStep(){
-      if(!state.marketSelected) return 1;
-      if(!state.industrySelected) return 2;
-      if(!state.agentConfigured) return 3;
-      if(!state.companyNameSet) return 4;
-      if(!state.planSelected) return 5;
-      if(!state.demoCompletedOnce || !state.activationUnlocked) return 6;
-      if(!state.deployed) return 7;
-      return 7;
-    }
-
-    function refreshStepLocks(){
-      const next = currentNextStep();
-
-      for(let i=1;i<=7;i++){
-        const el = document.getElementById(`s${i}`);
-        if(!el) continue;
-
-        const unlocked = (i === 1) ? true : stepUnlocked(i);
-        el.classList.toggle("locked", !unlocked);
-        el.classList.toggle("unlocked", unlocked);
-
-        el.classList.remove("next-focus");
-        if(i === next) el.classList.add("next-focus");
+        closeModal();
+        finish(6, "ACTIVE");
+      } catch(err){
+        console.error(err);
+        alert("Error starting demo call. Check console + /api/config.");
       }
-
-      // show/hide demo bar based on step 6 readiness
-      updateDemoBarUI();
     }
 
-    function handleStep(s){
-      // allow opening step 1 always, otherwise only if unlocked
-      if(s !== 1 && !stepUnlocked(s)) return;
-      triggerModal(s);
-    }
+    // ============================
+    // Step 7: Activate
+    // ============================
+    function activateNow(){
+      const plan = PLANS[selectedPlanKey] || PLANS.P299;
 
-    function finishStep(step, value){
-      const vEl = document.getElementById(`v${step}`);
-      if(vEl && value != null) vEl.textContent = value;
+      // mark deployed (local)
+      setDeployed(true);
+      finish(7, "READY");
 
-      document.getElementById(`s${step}`)?.classList.add("active");
-
-      refreshStepLocks();
+      // confetti + redirect
+      try { confetti(); } catch(e){}
+      setTimeout(() => {
+        const link = (selectedPlanKey === "P599") ? STRIPE_LINK_P599 : STRIPE_LINK_P299;
+        window.location.href = link;
+      }, 900);
     }
 
     // ============================
@@ -1936,6 +2530,14 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
       { id:"PT", n:"Portuguese", f:"pt" },
       { id:"RU", n:"Russian", f:"ru" }
     ];
+
+    window.onLanguageChanged = async () => {
+      const curModalOpen = document.getElementById("setupModal").style.display === "flex";
+      if (curModalOpen && lastModalStep != null) {
+        await triggerModal(lastModalStep);
+      }
+      i18n.applyTranslations(document);
+    };
 
     function toggleLangMenu(force){
       const d = document.getElementById('langMenu');
@@ -1971,17 +2573,35 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
       i18n.applyTranslations(document);
     }
 
+    function updateParallax(e){
+      if(!e) return;
+      document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
+      document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
+    }
+
     // ============================
-    // WIRE BUTTONS
+    // Top Buttons & Step Clicks (locked steps will ignore because pointer-events none)
     // ============================
     function wireTopButtons(){
       document.getElementById("heroCta").addEventListener("click", () => handleStep(1));
       document.getElementById("sideCta").addEventListener("click", () => handleStep(1));
       document.getElementById("activationInfoBtn").addEventListener("click", openActivationInfo);
+      document.getElementById("smbBenefitsBtn").addEventListener("click", openBenefits);
 
-      for(let i=1;i<=7;i++){
-        document.getElementById(`s${i}`)?.addEventListener("click", () => handleStep(i));
-      }
+      document.getElementById("qaBtn").addEventListener("click", () => openCommunity("QA"));
+      document.getElementById("forumBtn").addEventListener("click", () => openCommunity("FORUM"));
+      document.getElementById("newsletterTopBtn").addEventListener("click", () => openCommunity("NEWSLETTER"));
+      document.getElementById("newsletterBtn").addEventListener("click", () => openCommunity("NEWSLETTER"));
+
+      document.getElementById("demoCallBtnTop").addEventListener("click", () => runVoice());
+
+      document.getElementById("s1").addEventListener("click", () => handleStep(1));
+      document.getElementById("s2").addEventListener("click", () => handleStep(2));
+      document.getElementById("s3").addEventListener("click", () => handleStep(3));
+      document.getElementById("s4").addEventListener("click", () => handleStep(4));
+      document.getElementById("s5").addEventListener("click", () => handleStep(5));
+      document.getElementById("s6").addEventListener("click", () => handleStep(6));
+      document.getElementById("s7").addEventListener("click", () => handleStep(7));
 
       document.getElementById("mClose").addEventListener("click", closeModal);
 
@@ -2008,37 +2628,11 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
           toggleLangMenu(false);
         }
       });
-
-      // Demo bar buttons
-      document.getElementById("demoStartBtn").addEventListener("click", startDemoCall);
-      document.getElementById("demoStopBtn").addEventListener("click", () => stopDemoCall(false));
-      document.getElementById("demoSatisfiedBtn").addEventListener("click", satisfied);
     }
 
     // ============================
-    // INIT
-    // ============================
-    initLangList();
-    wireTopButtons();
-    renderHeroAgents();
-
-    // defaults
-    state.selectedIndustryKey = "Electrical";
-    state.selectedMarket = "";
-    refreshTemplatesForCurrentSelection(true);
-
-    // deployed restore
-    if(isDeployed()){
-      state.deployed = true;
-      state.activationUnlocked = true;
-      state.demoCompletedOnce = true;
-      finishStep(7, "READY");
-    }
-
-    refreshStepLocks();
-    i18n.applyTranslations(document);
-
     // TIMER + COUNTER
+    // ============================
     setInterval(() => {
       const now = new Date();
       const h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds();
@@ -2051,6 +2645,38 @@ Provide a short helpful step, then create a ticket and confirm callback.`}
         el.innerText = (count + 1).toLocaleString();
       }
     }, 1000);
+
+    // ============================
+    // INIT
+    // ============================
+    initLangList();
+    wireTopButtons();
+    renderHeroAgents();
+
+    // init templates
+    refreshTemplatesForCurrentSelection(true);
+    const initTemplates = getTemplatesFor(selectedRole).templates;
+    if(initTemplates[0]) selectedTemplateKey = initTemplates[0].key;
+
+    // default plan highlight
+    selectPlan(selectedPlanKey, {from:"init"});
+
+    // deployed state
+    if(isDeployed()){
+      document.getElementById('v7').innerText = "READY";
+      document.getElementById('s7').classList.add('active');
+      completedSteps = Math.max(completedSteps, 7);
+    }
+
+    refreshStepLocks();
+    i18n.applyTranslations(document);
+
+    // deep-link benefits
+    const initialBenefit = readBenefitsIdxFromHash();
+    if (initialBenefit != null){
+      activeBenefitIdx = initialBenefit;
+      triggerModal("benefits");
+    }
   </script>
 </body>
 </html>
