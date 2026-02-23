@@ -33,14 +33,51 @@
     body { padding: 14px; }
     @media (min-width: 1024px) { body { padding: 26px; } }
 
+    /* =========================================================
+       PREMIUM GLOW PACK (Option B)
+       - Ambient breathing background layer
+       - Stronger cursor-following glow
+       - Console "light sweep" (cursor spotlight)
+       - Subtle card edge glow + hover response
+       ========================================================= */
+
+    /* 1) Ambient breathing layer (VERY subtle) */
+    .bg-ambient {
+      position: fixed;
+      inset: -20%;
+      z-index: -3;
+      pointer-events: none;
+      background:
+        radial-gradient(800px 520px at 20% 20%, rgba(249,115,22,0.10), transparent 60%),
+        radial-gradient(900px 600px at 80% 30%, rgba(99,102,241,0.08), transparent 62%),
+        radial-gradient(820px 540px at 60% 80%, rgba(249,115,22,0.08), transparent 62%),
+        radial-gradient(900px 600px at 30% 85%, rgba(59,130,246,0.06), transparent 64%);
+      filter: blur(18px);
+      opacity: 0.85;
+      animation: ambientShift 12s ease-in-out infinite alternate;
+      transform: translateZ(0);
+    }
+    @keyframes ambientShift {
+      0%   { transform: translate3d(0,0,0) scale(1.02); opacity: 0.78; }
+      50%  { transform: translate3d(-1.2%, 0.8%,0) scale(1.05); opacity: 0.90; }
+      100% { transform: translate3d(1.4%, -0.9%,0) scale(1.03); opacity: 0.82; }
+    }
+
+    /* 2) Cursor glow layer (you already had it; upgraded) */
     .bg-glow {
       position: fixed;
       inset: 0;
-      z-index: -1;
-      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.14) 0%, transparent 52%);
+      z-index: -2;
       pointer-events: none;
+      background:
+        radial-gradient(560px 420px at var(--mx, 50%) var(--my, 50%), rgba(249,115,22,0.18) 0%, transparent 60%),
+        radial-gradient(820px 620px at calc(var(--mx, 50%) + 6%) calc(var(--my, 50%) + 4%), rgba(99,102,241,0.08) 0%, transparent 66%);
+      filter: blur(0px);
+      opacity: 1;
+      transform: translateZ(0);
     }
 
+    /* 3) Console base */
     .console-container {
       width: 100%;
       max-width: 1180px;
@@ -53,11 +90,58 @@
       z-index: 10;
       margin: 0 auto 40px auto;
       box-shadow: 0 30px 90px rgba(0,0,0,0.55);
+      overflow: hidden; /* for sweep overlay */
     }
     @media (min-width: 1024px){
       .console-container{ padding: 26px; }
     }
 
+    /* 4) Console light sweep overlay (cursor spotlight) */
+    .console-container::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius: 28px;
+      pointer-events:none;
+      background:
+        radial-gradient(520px 380px at var(--sx, 50%) var(--sy, 30%), rgba(255,255,255,0.08), transparent 62%),
+        radial-gradient(760px 520px at var(--sx, 50%) var(--sy, 30%), rgba(249,115,22,0.10), transparent 68%);
+      mix-blend-mode: screen;
+      opacity: 0.9;
+      transition: opacity 180ms ease;
+    }
+    .console-container::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius: 28px;
+      pointer-events:none;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.10), transparent 24%),
+        radial-gradient(1200px 800px at 50% 0%, rgba(249,115,22,0.08), transparent 55%);
+      opacity: 0.35;
+    }
+    /* Slightly dim sweep when user isn't moving */
+    body.idle .console-container::before { opacity: 0.55; }
+
+    /* 5) Card/Panel subtle edge glow + hover */
+    .panel-glow {
+      position: relative;
+      border-radius: 24px;
+    }
+    .panel-glow::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius: 24px;
+      pointer-events:none;
+      background: radial-gradient(420px 260px at var(--sx, 50%) var(--sy, 30%), rgba(249,115,22,0.14), transparent 60%);
+      opacity: 0.0;
+      transition: opacity 220ms ease;
+    }
+    .panel-glow:hover::before { opacity: 1; }
+
+    /* keep your existing gradient text */
     .hero-title {
       background: linear-gradient(180deg, #FFFFFF 28%, #f97316 110%);
       -webkit-background-clip: text;
@@ -300,7 +384,7 @@
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 18px;
       padding: 14px;
-      min-height: 156px; /* ~50% taller feel */
+      min-height: 156px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -373,7 +457,7 @@
       pointer-events: auto;
     }
 
-    /* Vapi dock area under hero slogans (green button must appear here) */
+    /* Vapi dock area under hero slogans */
     #vapiDock{
       width: 100%;
       min-height: 64px;
@@ -404,15 +488,17 @@
     }
 
     @media (prefers-reduced-motion: reduce){
+      .bg-ambient { animation: none !important; }
       .next-focus, .action-next-focus { animation: none !important; }
       .agent-expand { transition: none !important; }
+      .console-container::before { transition: none !important; }
+      .panel-glow::before { transition: none !important; }
     }
   </style>
 
   <!-- ✅ Language Engine (kept) -->
   <script>
     const LANG_STORAGE_KEY = "aicallport_lang";
-    const I18N_CACHE_KEY = "aicallport_i18n_cache_v1";
     const SUPPORTED_LANGS = ["EN","ES","FR","DE","PT","RU","AR","HE"];
     const RTL_LANGS = new Set(["AR","HE"]);
 
@@ -483,6 +569,8 @@
 </head>
 
 <body onmousemove="updateParallax(event)">
+  <!-- Premium background layers -->
+  <div class="bg-ambient"></div>
   <div class="bg-glow"></div>
 
   <!-- Language switch -->
@@ -536,7 +624,7 @@
           <span class="text-orange-500">BUILT FOR SMALL AND MEDIUM-SIZED BUSINESSES</span>
         </div>
 
-        <!-- Empty area where the small green Vapi call UI must appear -->
+        <!-- Vapi dock area -->
         <div class="mt-4">
           <div id="vapiDock">
             <div class="dock-hint">
@@ -555,7 +643,7 @@
       <!-- RIGHT: ecosystem + pricing -->
       <div class="lg:col-span-3">
         <!-- Ecosystem -->
-        <div class="bg-black/25 border border-white/10 rounded-3xl p-5">
+        <div class="panel-glow bg-black/25 border border-white/10 rounded-3xl p-5">
           <div class="text-center mb-3">
             <div class="text-[10px] font-black uppercase tracking-[0.2em] text-white">
               SELECT ANY AI AGENT. SWITCH AGENTS ANYTIME AFTER ACTIVATION.
@@ -571,7 +659,7 @@
         </div>
 
         <!-- Pricing -->
-        <div class="mt-4 bg-black/25 border border-white/10 rounded-3xl p-5">
+        <div class="panel-glow mt-4 bg-black/25 border border-white/10 rounded-3xl p-5">
           <div class="text-center">
             <div class="text-[10px] font-black uppercase tracking-[0.22em] text-orange-500">BETA SPECIAL (LIMITED TIME OFFER)</div>
           </div>
@@ -739,19 +827,43 @@
         .replaceAll("<","&lt;")
         .replaceAll(">","&gt;");
     }
+
+    /* Premium Pack: smooth mouse tracking + idle dim */
+    let __idleTimer = null;
+    function markActive(){
+      document.body.classList.remove("idle");
+      clearTimeout(__idleTimer);
+      __idleTimer = setTimeout(() => document.body.classList.add("idle"), 1400);
+    }
+
     function updateParallax(e){
       if(!e) return;
-      document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
-      document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
+      markActive();
+
+      const mx = (e.clientX / window.innerWidth) * 100;
+      const my = (e.clientY / window.innerHeight) * 100;
+
+      // For background glow
+      document.documentElement.style.setProperty('--mx', mx + '%');
+      document.documentElement.style.setProperty('--my', my + '%');
+
+      // For console/panel sweep (slightly biased upward so it "lights" headers nicely)
+      const sy = Math.max(0, my - 8);
+      document.documentElement.style.setProperty('--sx', mx + '%');
+      document.documentElement.style.setProperty('--sy', sy + '%');
     }
+
+    // Initialize idle state after load
+    document.body.classList.add("idle");
+    window.addEventListener("mousemove", markActive, { passive: true });
+    window.addEventListener("scroll", markActive, { passive: true });
 
     // ============================
     // STATE
     // ============================
-    const TOTAL_SETUP_STEPS = 5; // Country, Industry, Agent, Company, Plan
+    const TOTAL_SETUP_STEPS = 5;
     let completedSteps = 0;
 
-    // Setup selections
     let selectedMarket = "United States";
     let selectedIndustryKey = "Electrical";
     let selectedAgentKey = "AI Receptionist";
@@ -762,7 +874,6 @@
     };
     let selectedPlanId = "P299";
 
-    // Demo gating
     const LS_DEMO_COUNT = "aicallport_demo_count_v1";
     const LS_DEMO_DID_ONCE = "aicallport_demo_did_once_v1";
     const DEMO_MAX_CALLS = 2;
@@ -785,7 +896,7 @@
     }
 
     // ============================
-    // AI Agent ecosystem (expand-in-button + select)
+    // AI Agent ecosystem
     // ============================
     const AGENTS = [
       { key:"AI Receptionist", bullets:["Greets callers professionally and captures intent","Routes calls or takes structured messages","Books appointments when needed","Handles FAQs and basic business info"], tagline:"Best for: inbound calls, routing, first impression" },
@@ -850,10 +961,8 @@
 
     function selectAgent(key){
       selectedAgentKey = String(key || "AI Receptionist");
-      expandedAgentKey = null; // closes after select (your requirement)
+      expandedAgentKey = null;
       renderEcosystem();
-
-      // If step 3 already completed, keep protocol label updated
       if(completedSteps >= 3){
         document.getElementById("v3").innerText = selectedAgentKey.toUpperCase();
       }
@@ -874,7 +983,7 @@
     }
 
     // ============================
-    // Modal framework (scroll lock + focus)
+    // Modal framework
     // ============================
     let lastFocusedEl = null;
     let __scrollY = 0;
@@ -943,18 +1052,15 @@
     });
 
     // ============================
-    // Activation pipeline: 5 setup steps + 3 actions = 8 logical buttons
-    // Only next required action blinks. Others disabled.
-    // Auto-advance opens next modal.
+    // Activation pipeline
     // ============================
     function refreshStepLocks(){
-      // Setup steps 1..5
       for(let i=1;i<=TOTAL_SETUP_STEPS;i++){
         const el = document.getElementById(`s${i}`);
         if(!el) continue;
         const unlocked = completedSteps >= i-1;
         el.classList.toggle("locked", !unlocked);
-        el.classList.remove("next-focus"); // clear
+        el.classList.remove("next-focus");
         el.classList.toggle("active", completedSteps >= i);
       }
       const next = Math.min(completedSteps + 1, TOTAL_SETUP_STEPS);
@@ -972,7 +1078,7 @@
     }
 
     function openStep(stepNumber){
-      if(stepNumber > completedSteps + 1) return; // prevent future steps
+      if(stepNumber > completedSteps + 1) return;
       if(stepNumber === 1) return openCountry();
       if(stepNumber === 2) return openIndustry();
       if(stepNumber === 3) return openAgentConfirm();
@@ -1008,7 +1114,6 @@
         _marketsByContinentCache = grouped;
         return grouped;
       } catch(e){
-        // fallback
         _marketsByContinentCache = { "North America": ["United States", "Canada"], "Europe": ["United Kingdom", "Germany", "France"] };
         return _marketsByContinentCache;
       }
@@ -1079,7 +1184,7 @@
     }
 
     // ============================
-    // Agent confirm (uses selectedAgentKey from ecosystem)
+    // Agent confirm
     // ============================
     function openAgentConfirm(){
       const html = `
@@ -1131,7 +1236,7 @@
     }
 
     // ============================
-    // Plan confirm (locks step 5)
+    // Plan confirm
     // ============================
     function openPlanConfirm(){
       const plan = PLANS[selectedPlanId];
@@ -1158,12 +1263,11 @@
       const plan = PLANS[selectedPlanId];
       closeModal();
       finishStep(5, `$${plan.price} /MO`);
-      // IMPORTANT: stop plan blinking by moving focus to next (actions)
       refreshActionLocks(true);
     }
 
     // ============================
-    // Actions (Demo -> Satisfied -> Activate)
+    // Actions
     // ============================
     function refreshActionLocks(fromPlanJustConfirmed){
       const hasPlan = (completedSteps >= 5);
@@ -1179,25 +1283,20 @@
       const satBtn = document.getElementById("satisfiedBtn");
       const actBtn = document.getElementById("activateBtn");
 
-      // enable containers
       aDemo.classList.toggle("enabled", demoEnabled);
       aSat.classList.toggle("enabled", satEnabled);
       aAct.classList.toggle("enabled", actEnabled);
 
-      // enable buttons
       demoBtn.classList.toggle("disabled", !demoEnabled);
       satBtn.classList.toggle("disabled", !satEnabled);
       actBtn.classList.toggle("disabled", !actEnabled);
 
-      // Blink only next required action:
       demoBtn.classList.remove("action-next-focus");
       satBtn.classList.remove("action-next-focus");
       actBtn.classList.remove("action-next-focus");
 
-      if(!hasPlan){
-        // nothing blinks here yet
-        return;
-      }
+      if(!hasPlan) return;
+
       if(demoEnabled && !didDemoOnce()){
         demoBtn.classList.add("action-next-focus");
         return;
@@ -1211,7 +1310,6 @@
         return;
       }
 
-      // If plan confirmed and demo already done but demo count reached, blink satisfied/activate accordingly above.
       if(fromPlanJustConfirmed){
         if(demoEnabled) demoBtn.classList.add("action-next-focus");
       }
@@ -1246,7 +1344,7 @@
     }
 
     // ============================
-    // DEMO gate modal (2 calls total, 30s each) then start call
+    // DEMO gate modal then start call
     // ============================
     function openDemoGate(){
       const count = getDemoCount();
@@ -1323,12 +1421,10 @@
 
     let vapiFallbackInstance = null;
 
-    // Best-effort: move any injected Vapi widget into #vapiDock
     function ensureVapiWidgetDocking(){
       const dock = document.getElementById("vapiDock");
       if(!dock) return;
 
-      // Clean placeholder hint once widget arrives
       const removeHint = () => {
         const hint = dock.querySelector(".dock-hint");
         if(hint) hint.remove();
@@ -1348,7 +1444,6 @@
 
         if(!looksLikeVapi) return false;
 
-        // Make it non-fixed so it sits inside dock
         el.style.position = "static";
         el.style.right = "auto";
         el.style.bottom = "auto";
@@ -1361,17 +1456,14 @@
         return true;
       };
 
-      // Try current DOM first
       const existing = document.querySelector("#vapi-widget, .vapi-widget, .vapi-widget-container, [data-vapi-widget]");
       if(existing) tryMove(existing);
 
-      // Observe for new nodes
       if(window.__vapiDockObserver) return;
       window.__vapiDockObserver = new MutationObserver((muts) => {
         for(const m of muts){
           for(const n of (m.addedNodes || [])){
             if(tryMove(n)) return;
-            // Sometimes widget is nested; scan a bit
             if(n && n.querySelector){
               const inner = n.querySelector("#vapi-widget, .vapi-widget, .vapi-widget-container, [data-vapi-widget]");
               if(inner && tryMove(inner)) return;
@@ -1382,7 +1474,6 @@
       window.__vapiDockObserver.observe(document.body, { childList:true, subtree:true });
     }
 
-    // Assistants mapping (example, kept from your older build)
     const assistants = {
       "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
       "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
@@ -1412,18 +1503,15 @@
         assistantOverrides: assistantOverrides || {}
       });
 
-      // In case widget is injected slightly later:
       setTimeout(ensureVapiWidgetDocking, 150);
       setTimeout(ensureVapiWidgetDocking, 450);
 
       return vapiFallbackInstance;
     }
 
-    // Demo start (30s auto-stop)
     async function startDemoCallFromGate(){
       closeModal();
 
-      // enforce setup readiness
       if(completedSteps < 5){
         alert("Complete steps 1–5 before running a demo.");
         return;
@@ -1435,8 +1523,7 @@
         return;
       }
 
-      // increment immediately (prevents spam-click)
-      const after = incDemoCount();
+      incDemoCount();
 
       try{
         const industry = selectedIndustryKey || "Electrical";
@@ -1446,24 +1533,19 @@
         await vapiStartCall(assistantId, {
           voice: getSelectedVapiVoice(),
           firstMessage: `Hi! Thank you for calling ${bn}. How can I help you today?`
-          // If you want to inject a system script later, add model.messages here.
         });
 
-        // Mark demo done
         setDidDemoOnce();
 
-        // Auto-stop after 30 seconds
         setTimeout(() => {
           try { vapiFallbackInstance?.stop?.(); } catch {}
         }, DEMO_SECONDS * 1000);
 
-        // Update UI gating
         refreshActionLocks();
 
       } catch(err){
         console.error(err);
         alert("Error starting demo call. Check console + /api/config (Vapi key) and ensure the SDK loads.");
-        // rollback count if needed (optional). Keeping it strict per your limits.
       }
     }
 
@@ -1480,21 +1562,17 @@
     // Wire UI
     // ============================
     function wire(){
-      // Setup step cards
       document.getElementById("s1").addEventListener("click", () => openStep(1));
       document.getElementById("s2").addEventListener("click", () => openStep(2));
       document.getElementById("s3").addEventListener("click", () => openStep(3));
       document.getElementById("s4").addEventListener("click", () => openStep(4));
       document.getElementById("s5").addEventListener("click", () => openStep(5));
 
-      // Global Start Activation
       document.getElementById("startActivationBtn").addEventListener("click", () => openStep(1));
       document.getElementById("activateHeroBtn").addEventListener("click", () => openStep(1));
 
-      // SMB Benefits
       document.getElementById("smbBenefitsBtn").addEventListener("click", openBenefits);
 
-      // Actions
       document.getElementById("demoBtn").addEventListener("click", () => {
         if(document.getElementById("demoBtn").classList.contains("disabled")) return;
         openDemoGate();
@@ -1512,16 +1590,13 @@
         activateNow();
       });
 
-      // Top strip demo placeholders
       document.getElementById("qaBtn").addEventListener("click", () => openModal("AI Q&A", `<div class="pill mb-3">AI Q&A</div><div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left"><div class="text-[12px] text-slate-300 font-semibold leading-relaxed">Connect this to your backend endpoint: <span class="text-orange-500 font-black">POST /api/ai-qa</span>.</div></div>`, false));
       document.getElementById("forumBtn").addEventListener("click", () => openModal("Forum", `<div class="pill mb-3">Forum</div><div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left"><div class="text-[12px] text-slate-300 font-semibold leading-relaxed">Forum UI is ready to connect. Add backend later.</div></div>`, false));
       document.getElementById("newsletterBtnTop").addEventListener("click", () => openModal("Newsletter", `<div class="pill mb-3">Newsletter</div><div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left"><div class="text-[12px] text-slate-300 font-semibold leading-relaxed">Connect this to your backend endpoint: <span class="text-orange-500 font-black">POST /api/newsletter</span>.</div></div>`, false));
       document.getElementById("dashBtn").addEventListener("click", () => {
-        // change as needed
         window.location.href = "/dashboard";
       });
 
-      // Language
       document.getElementById("langTrigger").addEventListener("click", (e) => { e.stopPropagation(); toggleLangMenu(); });
       document.addEventListener("click", (e) => {
         const menu = document.getElementById("langMenu");
@@ -1604,39 +1679,28 @@
     // ============================
     initLangList();
 
-    // defaults in protocol labels
     document.getElementById("v1").innerText = "SELECT";
     document.getElementById("v2").innerText = "SELECT";
     document.getElementById("v3").innerText = "CHOOSE";
     document.getElementById("v4").innerText = "SYNC";
     document.getElementById("v5").innerText = "CHOOSE";
 
-    // ecosystem render + default selection
     expandedAgentKey = null;
     selectedAgentKey = "AI Receptionist";
     renderEcosystem();
 
-    // plan visuals
     selectPlanUI(selectedPlanId);
 
-    // wire events
     wire();
 
-    // protocol gating init
     completedSteps = 0;
     refreshStepLocks();
     refreshActionLocks();
 
-    // Ensure docking observer ready early (fix invisible call UI)
     ensureVapiWidgetDocking();
 
-    // Only for safety: keep protocol step 3 in sync if user selects agent before confirming
-    // (step 3 confirm locks it)
     window.onLanguageChanged = () => i18n.applyTranslations(document);
     i18n.applyTranslations(document);
-
-    // Click plan step should open confirm modal when available
-    // Keep Plan from blinking after confirm: confirmPlanStep calls refreshActionLocks(true)
   </script>
 </body>
 </html>
