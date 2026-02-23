@@ -13,7 +13,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800;900&display=swap" rel="stylesheet" />
 
   <style>
     * { box-sizing: border-box; }
@@ -30,41 +30,35 @@
       display: flex;
       flex-direction: column;
     }
-    body { padding: 14px; }
-    @media (min-width: 1024px) { body { padding: 26px; } }
+    body { padding: 12px; }
+    @media (min-width: 1024px) { body { padding: 24px; } }
 
     .bg-glow {
       position: fixed;
       inset: 0;
       z-index: -1;
-      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.14) 0%, transparent 52%);
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(249, 115, 22, 0.15) 0%, transparent 50%);
       pointer-events: none;
     }
 
     .console-container {
       width: 100%;
       max-width: 1180px;
-      background: rgba(10, 12, 18, 0.86);
+      background: rgba(10, 12, 18, 0.85);
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 26px;
       padding: 18px;
       position: relative;
       z-index: 10;
-      margin: 0 auto 40px auto;
-      box-shadow: 0 30px 90px rgba(0,0,0,0.55);
+      margin: 0 auto 34px auto;
     }
     @media (min-width: 1024px){
-      .console-container{ padding: 26px; }
+      .console-container{ padding: 22px; }
     }
 
     .hero-title {
-      background: linear-gradient(180deg, #FFFFFF 28%, #f97316 110%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .kicker-title {
-      background: linear-gradient(180deg, #FFFFFF 40%, rgba(249,115,22,0.85) 120%);
+      background: linear-gradient(180deg, #FFFFFF 30%, #f97316 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -73,21 +67,93 @@
       background: linear-gradient(90deg, #f97316, #ea580c);
       border: 1px solid rgba(255, 255, 255, 0.18);
       cursor: pointer;
-      transition: 0.18s;
+      transition: 0.2s;
       color: white;
     }
-    .orange-btn:hover { filter: brightness(1.03); }
-    .orange-btn:active { transform: scale(0.985); }
+    .orange-btn:hover { filter: brightness(1.05); }
+    .orange-btn:active { transform: scale(0.98); }
 
-    .ghost-btn {
-      background: rgba(255,255,255,0.04);
+    .outline-orange-btn{
+      background: rgba(249, 115, 22, 0.10);
+      border: 1px solid rgba(249, 115, 22, 0.35);
+      cursor: pointer;
+      transition: 0.2s;
+      color: white;
+    }
+    .outline-orange-btn:hover { background: rgba(249, 115, 22, 0.16); border-color: rgba(249, 115, 22, 0.6); }
+    .outline-orange-btn:active { transform: scale(0.98); }
+    .disabled-ui{
+      opacity: 0.35 !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+      filter: none !important;
+    }
+
+    .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
+    @keyframes pulse-green {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    /* Protocol cards */
+    .step-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 12px;
+      border-radius: 14px;
+      opacity: 0.35;
+      transition: 0.25s;
+      user-select: none;
+      pointer-events: auto;
+      cursor: pointer;
+      min-height: 58px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .step-card.done{
+      opacity: 1;
+      border-color: rgba(249,115,22,0.70);
+      background: rgba(249, 115, 22, 0.08);
+    }
+    .step-card.locked { opacity: 0.22; cursor: not-allowed; pointer-events: none; }
+    .step-card.next-focus { opacity: 1; animation: border-glow 2s infinite ease-in-out; }
+    @keyframes border-glow {
+      0%, 100% { border-color: rgba(249, 115, 22, 0.30); }
+      50% { border-color: #f97316; box-shadow: 0 0 18px rgba(249, 115, 22, 0.35); }
+    }
+
+    /* Big action buttons */
+    .action-btn{
+      border-radius: 18px;
+      padding: 18px 18px; /* taller */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      user-select: none;
+      transition: 0.2s;
+      width: 100%;
+    }
+    .action-btn .k{ font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.18em; opacity: 0.95; }
+    .action-btn .s{ font-size: 12px; font-weight: 700; color: rgba(226,232,240,0.88); line-height: 1.35; }
+    .action-btn .r{
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 6px 10px;
+      border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.10);
-      transition: 0.18s;
-      color: white;
+      background: rgba(255,255,255,0.04);
+      white-space: nowrap;
     }
-    .ghost-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(249,115,22,0.35); }
+    .action-primary{ background: linear-gradient(90deg, #f97316, #ea580c); border: 1px solid rgba(255,255,255,0.18); }
+    .action-outline{ background: rgba(249,115,22,0.10); border: 1px solid rgba(249,115,22,0.35); }
+    .action-next-focus{ animation: border-glow 2s infinite ease-in-out; }
 
-    /* Soft orange glow for modal */
+    /* Modal */
     #setupModal {
       position: fixed;
       inset: 0;
@@ -96,28 +162,28 @@
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 18px;
-      pointer-events: auto;
+      padding: 20px;
     }
     .modal-shell {
-      background: rgba(10, 12, 18, 0.94);
-      border: 1px solid rgba(249,115,22,0.25);
-      border-radius: 26px;
+      background: rgba(10, 12, 18, 0.92);
+      border: 1px solid rgba(249,115,22,0.24);
+      border-radius: 24px;
       width: 100%;
-      max-width: 720px;
+      max-width: 980px;
       padding: 18px;
       box-shadow:
-        0 18px 60px rgba(0,0,0,0.65),
-        0 0 40px rgba(249,115,22,0.12);
+        0 0 0 1px rgba(249,115,22,0.06),
+        0 0 35px rgba(249,115,22,0.15),
+        0 20px 60px rgba(0,0,0,0.6);
       backdrop-filter: blur(10px);
       max-height: 90vh;
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
-    .modal-shell.wide { max-width: 980px; }
-    .modal-content-wrap { overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 0; }
-    .modal-titlebar { display: flex; flex-direction: column; gap: 8px; }
+    .modal-shell.narrow{ max-width: 560px; }
+    .modal-titlebar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .modal-content-wrap { overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 0; margin-top: 10px; }
     .modal-body { flex: 1; min-height: 0; overflow: auto; padding-right: 2px; }
     .modal-footer {
       position: sticky;
@@ -125,43 +191,28 @@
       background: rgba(10, 12, 18, 0.92);
       border-top: 1px solid rgba(255,255,255,0.06);
       padding-top: 12px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
-
     .modal-btn {
       width: 100%;
       padding: 12px 12px;
-      border-radius: 14px;
+      border-radius: 12px;
       font-weight: 900;
       text-transform: uppercase;
-      font-size: 9px;
+      font-size: 10px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.10);
       color: white;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       cursor: pointer;
       text-align: left;
       letter-spacing: 0.14em;
       line-height: 1.1;
-      pointer-events: auto;
+      transition: 0.18s;
     }
-    .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.10); border-color: rgba(249,115,22,0.55); }
-    .modal-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
-
-    .search-box {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 10px 10px;
-      color: white;
-      font-size: 12px;
-      outline: none;
-      width: 100%;
-      margin-bottom: 8px;
-    }
-
+    .modal-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(249,115,22,0.55); }
     .pill {
       display: inline-flex;
       align-items: center;
@@ -169,22 +220,27 @@
       gap: 8px;
       padding: 8px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(249,115,22,0.22);
+      border: 1px solid rgba(249,115,22,0.25);
       background: rgba(249,115,22,0.08);
       color: white;
       font-weight: 900;
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.18em;
-      width: 100%;
+      width: fit-content;
     }
-
+    .card-theme {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 20px;
+      padding: 16px;
+    }
     .mini {
       font-size: 10px;
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.18em;
-      color: rgba(148,163,184,0.9);
+      color: rgba(148,163,184,0.90);
     }
     .divider {
       font-size: 9px;
@@ -197,518 +253,398 @@
       border-bottom: 1px solid rgba(255,255,255,0.06);
       padding-bottom: 6px;
     }
-
-    /* Top strip buttons */
-    .top-btn{
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size: 9px;
+    .search-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 10px;
+      padding: 10px 10px;
+      color: white;
+      font-size: 12px;
+      outline: none;
+      width: 100%;
+    }
+    .select-theme {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: white;
+      border-radius: 12px;
+      padding: 10px 12px;
+      outline: none;
       font-weight: 900;
-      letter-spacing: 0.16em;
+      font-size: 11px;
       text-transform: uppercase;
-      border: 1px solid rgba(255,255,255,0.10);
+      letter-spacing: 0.12em;
+    }
+    .select-theme option { background: #0b1224; color: white; }
+    .textarea-theme {
+      width: 100%;
+      min-height: 190px;
+      resize: vertical;
       background: rgba(255,255,255,0.04);
-      transition: 0.18s;
-    }
-    .top-btn:hover{ border-color: rgba(249,115,22,0.35); background: rgba(249,115,22,0.10); }
-    .live-pill{
-      border: 1px solid rgba(249,115,22,0.18);
-      background: rgba(249,115,22,0.08);
-      padding: 6px 10px;
-      border-radius: 999px;
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
-    @keyframes pulse-green {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      padding: 12px;
+      color: white;
+      outline: none;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
     }
 
-    /* Agent ecosystem expandable buttons */
-    .agent-btn{
+    /* Ecosystem agent buttons (expand inline) */
+    .eco-btn{
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px;
+      padding: 12px 12px;
+      cursor: pointer;
+      transition: 0.18s;
+      user-select: none;
+      outline: none;
+      text-align: left;
+    }
+    .eco-btn:hover{ border-color: rgba(249,115,22,0.45); background: rgba(249,115,22,0.08); }
+    .eco-btn.selected{ border-color: rgba(249,115,22,0.85); background: rgba(249,115,22,0.12); box-shadow: 0 0 18px rgba(249,115,22,0.12); }
+    .eco-expand{
+      margin-top: 10px;
+      background: rgba(0,0,0,0.30);
+      border: 1px solid rgba(255,255,255,0.06);
       border-radius: 14px;
       padding: 10px 12px;
-      cursor: pointer;
-      user-select: none;
+      display: none;
+    }
+    .eco-btn.open .eco-expand{ display: block; }
+    .eco-btn .eco-top{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .eco-btn .eco-name{
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.95);
+    }
+    .eco-btn .eco-tag{
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: rgba(226,232,240,0.90);
+      white-space: nowrap;
+    }
+    .eco-select-row{
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+    .eco-select{
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(249,115,22,0.10);
       transition: 0.18s;
-      outline: none;
-      position: relative;
-      overflow: hidden;
+      cursor: pointer;
     }
-    .agent-btn:hover { border-color: rgba(249,115,22,0.35); background: rgba(249,115,22,0.08); }
-    .agent-btn.selected { border-color: rgba(249,115,22,0.70); background: rgba(249,115,22,0.12); }
-    .agent-btn.expanded { border-color: rgba(249,115,22,0.80); background: rgba(249,115,22,0.14); box-shadow: 0 0 22px rgba(249,115,22,0.14); }
+    .eco-select:hover{ border-color: rgba(249,115,22,0.70); background: rgba(249,115,22,0.16); }
 
-    .agent-expand{
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: max-height 240ms ease, opacity 200ms ease;
-      margin-top: 8px;
-    }
-    .agent-btn.expanded .agent-expand{
-      max-height: 260px;
-      opacity: 1;
-    }
-
-    /* Plan cards */
-    .plan-card{
+    /* Pricing cards */
+    .plan-card {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 18px;
       padding: 14px;
+      text-align: left;
       cursor: pointer;
       user-select: none;
       transition: 0.18s;
     }
-    .plan-card:hover{ border-color: rgba(249,115,22,0.45); background: rgba(249,115,22,0.08); }
-    .plan-card.selected{ border-color: rgba(249,115,22,0.85); background: rgba(249,115,22,0.14); box-shadow: 0 0 22px rgba(249,115,22,0.16); }
+    .plan-card:hover { border-color: rgba(249,115,22,0.55); background: rgba(249,115,22,0.08); }
+    .plan-card.selected { border-color: rgba(249,115,22,0.85); background: rgba(249,115,22,0.14); box-shadow: 0 0 22px rgba(249,115,22,0.18); }
+    .strike{ text-decoration: line-through; opacity: 0.55; }
 
-    /* Protocol steps */
-    .step-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.10);
-      padding: 10px;
-      border-radius: 14px;
-      opacity: 0.35;
-      transition: 0.22s;
-      cursor: pointer;
-      user-select: none;
-      pointer-events: auto;
-      min-height: 54px;
-    }
-    .step-card.active {
-      border-color: rgba(249,115,22,0.80) !important;
-      background: rgba(249,115,22,0.12) !important;
-      opacity: 1 !important;
-    }
-    .step-card.locked { opacity: 0.22; cursor: not-allowed; pointer-events: none; }
-    .next-focus { animation: border-glow 1.9s infinite ease-in-out !important; opacity: 1 !important; }
-    @keyframes border-glow {
-      0%, 100% { border-color: rgba(249, 115, 22, 0.28); }
-      50% { border-color: rgba(249, 115, 22, 0.95); box-shadow: 0 0 18px rgba(249, 115, 22, 0.35); }
-    }
-
-    /* Big action buttons (Demo/Satisfied/Activate) */
-    .action-card{
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 18px;
-      padding: 14px;
-      min-height: 156px; /* ~50% taller feel */
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 12px;
-      opacity: 0.35;
-      pointer-events: none;
-      transition: 0.2s;
-    }
-    .action-card.enabled{
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .action-btn{
-      width: 100%;
-      border-radius: 16px;
-      padding: 16px 14px;
-      font-weight: 900;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      transition: 0.18s;
-    }
-    .action-btn.outline{
-      background: rgba(249,115,22,0.08);
-      border: 1px solid rgba(249,115,22,0.45);
-      color: white;
-    }
-    .action-btn.solid{
-      background: linear-gradient(90deg, #f97316, #ea580c);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: white;
-    }
-    .action-btn:active{ transform: scale(0.985); }
-    .action-btn.disabled{
-      opacity: 0.35;
-      pointer-events: none;
-      cursor: not-allowed;
-    }
-    .action-next-focus{
-      animation: border-glow 1.9s infinite ease-in-out !important;
-    }
-
-    /* Language switch */
-    .floating-lang { position: fixed; top: 15px; right: 15px; z-index: 1000; }
-    .lang-trigger {
-      background: rgba(10, 12, 18, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 8px 12px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      backdrop-filter: blur(5px);
-      pointer-events: auto;
-    }
-    #langMenu {
-      position: absolute;
-      top: 50px;
-      right: 0;
-      background: #0f172a;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 12px;
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-      width: 280px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-      pointer-events: auto;
-    }
-
-    /* Vapi dock area under hero slogans (green button must appear here) */
-    #vapiDock{
-      width: 100%;
-      min-height: 64px;
+    /* Vapi mount zone */
+    #vapiMount{
+      position: relative;
+      min-height: 74px;
       border-radius: 18px;
       border: 1px dashed rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: rgba(0,0,0,0.22);
       padding: 12px;
       overflow: hidden;
-      position: relative;
     }
-    #vapiDock .dock-hint{
+    #vapiMount .hint{
       font-size: 10px;
       font-weight: 900;
-      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: rgba(148,163,184,0.70);
-      text-align: center;
-      line-height: 1.35;
+      letter-spacing: 0.18em;
+      color: rgba(148,163,184,0.75);
     }
+    #vapiMount .hint strong{ color: rgba(249,115,22,0.9); }
+    /* Make anything injected visible and contained */
+    #vapiMount *{ max-width: 100%; }
+    #vapiMount iframe{ width: 100% !important; }
 
-    /* Try to neutralize default Vapi bottom-right placement if present */
-    .vapi-widget, .vapi-widget-container, #vapi-widget, [data-vapi-widget]{
-      right: auto !important;
-      bottom: auto !important;
-    }
-
+    /* Reduced motion */
     @media (prefers-reduced-motion: reduce){
-      .next-focus, .action-next-focus { animation: none !important; }
-      .agent-expand { transition: none !important; }
+      .step-card.next-focus,
+      .action-next-focus{ animation: none !important; }
     }
   </style>
-
-  <!-- ✅ Language Engine (kept) -->
-  <script>
-    const LANG_STORAGE_KEY = "aicallport_lang";
-    const I18N_CACHE_KEY = "aicallport_i18n_cache_v1";
-    const SUPPORTED_LANGS = ["EN","ES","FR","DE","PT","RU","AR","HE"];
-    const RTL_LANGS = new Set(["AR","HE"]);
-
-    function mapBrowserLangToCode(browserLang) {
-      const b = (browserLang || "").toLowerCase();
-      if (b.startsWith("en")) return "EN";
-      if (b.startsWith("es")) return "ES";
-      if (b.startsWith("fr")) return "FR";
-      if (b.startsWith("de")) return "DE";
-      if (b.startsWith("pt")) return "PT";
-      if (b.startsWith("ru")) return "RU";
-      if (b.startsWith("ar")) return "AR";
-      if (b.startsWith("he") || b.startsWith("iw")) return "HE";
-      return "EN";
-    }
-
-    window.APP_I18N = { current: "EN" };
-    const translations = {
-      EN: {
-        dashboard: "Dashboard",
-        forum: "Forum",
-        newsletter: "Newsletter",
-        ai_qa: "AI Q&A",
-        global_live: "Global Live",
-        close: "Close",
-        next: "Next",
-        confirm: "Confirm",
-        save: "Save",
-        start_activation: "Start Activation",
-        activate: "Activate",
-        smb_benefits: "SMB Benefits",
-        demo: "Demo",
-        satisfied: "Satisfied",
-        search_languages: "SEARCH LANGUAGES...",
-        search_countries: "SEARCH COUNTRIES...",
-        search_industries: "SEARCH INDUSTRIES...",
-        business_name: "Business Name",
-      }
-    };
-
-    function getDict(lang) { return translations[lang] || translations.EN; }
-    function t(key) {
-      const lang = window.APP_I18N.current || "EN";
-      const dict = getDict(lang);
-      return (dict[key] != null ? dict[key] : (translations.EN[key] != null ? translations.EN[key] : key));
-    }
-    function applyTranslations(root = document) {
-      const html = document.documentElement;
-      html.lang = (window.APP_I18N.current || "EN").toLowerCase();
-      html.dir = RTL_LANGS.has(window.APP_I18N.current) ? "rtl" : "ltr";
-      root.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.getAttribute("data-i18n")));
-      root.querySelectorAll("[data-i18n-placeholder]").forEach(el => el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder"))));
-    }
-    function setLanguage(langCode) {
-      const code = (langCode || "EN").toUpperCase();
-      window.APP_I18N.current = SUPPORTED_LANGS.includes(code) ? code : "EN";
-      localStorage.setItem(LANG_STORAGE_KEY, window.APP_I18N.current);
-      applyTranslations(document);
-      if (typeof window.onLanguageChanged === "function") window.onLanguageChanged(window.APP_I18N.current);
-    }
-    (function initLanguageEngine() {
-      let stored = localStorage.getItem(LANG_STORAGE_KEY);
-      if (!stored) stored = mapBrowserLangToCode(navigator.language || navigator.userLanguage || "en");
-      setLanguage(stored);
-    })();
-    window.i18n = { t, setLanguage, applyTranslations };
-  </script>
 </head>
 
 <body onmousemove="updateParallax(event)">
   <div class="bg-glow"></div>
 
-  <!-- Language switch -->
-  <div class="floating-lang" id="langWrap">
-    <button id="langTrigger" class="lang-trigger" type="button">
-      <img id="curFlag" src="https://flagcdn.com/us.svg" class="w-4" alt="Flag" />
-      <span id="curLangText" class="text-[9px] font-black text-white uppercase">US | EN</span>
-    </button>
-    <div id="langMenu">
-      <input type="text" id="langSearch" class="search-box" data-i18n-placeholder="search_languages"
-             onkeyup="filterList('langList', this.value)" />
-      <div class="flex flex-col gap-2 max-h-[520px] overflow-auto pr-1" id="langList"></div>
-    </div>
-  </div>
-
   <div class="console-container">
-    <!-- TOP STRIP -->
-    <div class="flex items-center justify-between gap-3 mb-6">
-      <div class="flex items-center gap-2">
-        <span class="font-black italic text-base lg:text-lg uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
+
+    <!-- TOP BAR: brand + BETA + dashboard + utilities -->
+    <div class="flex justify-between items-center mb-5 lg:mb-8 gap-3">
+      <div class="flex items-center gap-2 min-w-[180px]">
+        <span class="font-black italic text-base lg:text-xl uppercase text-white">
+          AI CALL <span class="text-orange-500">PORT</span>
+        </span>
         <div class="ml-2 px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase leading-none">BETA</div>
       </div>
 
       <div class="flex items-center gap-2 flex-wrap justify-end">
-        <button id="dashBtn" class="top-btn" type="button" data-i18n="dashboard">Dashboard</button>
-        <button id="qaBtn" class="top-btn" type="button" data-i18n="ai_qa">AI Q&A</button>
-        <button id="forumBtn" class="top-btn" type="button" data-i18n="forum">Forum</button>
-        <button id="newsletterBtnTop" class="top-btn" type="button" data-i18n="newsletter">Newsletter</button>
+        <button id="dashboardBtn"
+          class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition"
+          type="button">Dashboard</button>
 
-        <div class="live-pill">
+        <button id="qaBtn"
+          class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition"
+          type="button">AI Q&amp;A</button>
+        <button id="forumBtn"
+          class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition"
+          type="button">Forum</button>
+        <button id="newsletterTopBtn"
+          class="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition"
+          type="button">Newsletter</button>
+
+        <div class="bg-orange-500/10 border border-orange-500/20 px-2 py-1 rounded-full flex items-center gap-1.5">
           <div class="dot-blink"></div>
-          <span class="text-[8px] font-black text-orange-500 uppercase tracking-widest text-nowrap" data-i18n="global_live">Global Live</span>
+          <span class="text-[7px] font-black text-orange-500 uppercase tracking-widest text-nowrap">Global Live</span>
         </div>
       </div>
     </div>
 
-    <!-- HERO GRID -->
-    <div class="grid lg:grid-cols-5 gap-6 lg:gap-10 items-start">
-      <!-- LEFT: identity -->
-      <div class="lg:col-span-2 text-left">
-        <h1 class="text-4xl lg:text-5xl font-black italic uppercase leading-tight mb-3 hero-title">AI CALL PORT</h1>
+    <!-- HERO -->
+    <div class="grid lg:grid-cols-5 gap-6 lg:gap-10 items-stretch">
+      <!-- Left (identity) -->
+      <div class="lg:col-span-2 flex flex-col">
+        <div>
+          <h1 class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-2 hero-title">AI CALL PORT</h1>
 
-        <!-- Slogan (2x bigger, same palette) -->
-        <div class="text-2xl lg:text-3xl font-black uppercase leading-tight mb-3 kicker-title">
-          GLOBAL ACTIVATION PLATFORM<br>FOR AI CALL AGENTS
-        </div>
+          <!-- Slogan: bigger + palette like title -->
+          <div class="text-xl lg:text-2xl font-black italic uppercase leading-snug hero-title mb-2">
+            Global Activation Platform for AI Call Agents
+          </div>
 
-        <div class="text-slate-300/90 text-[12px] lg:text-sm font-bold uppercase tracking-wider leading-relaxed max-w-md">
-          DEPLOY STRUCTURED AI CALL AGENTS FOR YOUR BUSINESS.<br>
-          FULLY AUTOMATED ACTIVATION. MULTILINGUAL-READY.<br>
-          <span class="text-orange-500">BUILT FOR SMALL AND MEDIUM-SIZED BUSINESSES</span>
-        </div>
+          <p class="text-slate-300/90 text-[12px] lg:text-sm mb-5 font-bold uppercase tracking-wider leading-relaxed max-w-md">
+            Deploy structured AI call agents for your business.<br>
+            Fully automated activation. Multilingual-ready.<br>
+            <span class="text-orange-500 font-black">Built for small and medium-sized businesses</span>
+          </p>
 
-        <!-- Empty area where the small green Vapi call UI must appear -->
-        <div class="mt-4">
-          <div id="vapiDock">
-            <div class="dock-hint">
-              DEMO CALL UI WILL APPEAR HERE WHEN A DEMO STARTS
+          <!-- Vapi mount zone (green widget should live here) -->
+          <div class="mb-5">
+            <div id="vapiMount">
+              <div class="hint">
+                Demo call controls will appear here after you start a demo.
+                <span class="opacity-90">(<strong>2 demos</strong>, <strong>30 seconds</strong> each.)</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Buttons (same size) aligned with pricing row on the right -->
-        <div class="mt-6 flex gap-3 items-center">
-          <button id="activateHeroBtn" class="orange-btn px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic w-[160px]" type="button" data-i18n="activate">Activate</button>
-          <button id="smbBenefitsBtn" class="ghost-btn px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest w-[160px]" type="button" data-i18n="smb_benefits">SMB Benefits</button>
+        <!-- Bottom row (left): ACTIVATE + SMB BENEFITS same size -->
+        <div class="mt-auto flex gap-3">
+          <button id="activateHeroBtn" class="orange-btn w-full px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic" type="button">
+            ACTIVATE
+          </button>
+          <button id="smbBenefitsBtn" class="outline-orange-btn w-full px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest" type="button">
+            SMB BENEFITS
+          </button>
         </div>
       </div>
 
-      <!-- RIGHT: ecosystem + pricing -->
+      <!-- Right (ecosystem + pricing anchor) -->
       <div class="lg:col-span-3">
-        <!-- Ecosystem -->
-        <div class="bg-black/25 border border-white/10 rounded-3xl p-5">
-          <div class="text-center mb-3">
-            <div class="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+        <div class="bg-black/30 border border-white/10 rounded-3xl p-5 lg:p-6 h-full flex flex-col">
+
+          <!-- Move reassurance line to top (per request) -->
+          <div class="text-center">
+            <div class="text-white font-black uppercase tracking-[0.18em] text-[12px] lg:text-[13px]">
               SELECT ANY AI AGENT. SWITCH AGENTS ANYTIME AFTER ACTIVATION.
             </div>
-            <div class="text-[10px] font-black uppercase tracking-[0.2em] text-white mt-1" style="opacity:0.98;">
+            <div class="mt-2 text-white font-black uppercase tracking-[0.16em] text-[10px] lg:text-[11px] opacity-95">
               CLICK AN AGENT TO VIEW DETAILS
             </div>
           </div>
 
-          <div class="divider" style="margin-top:10px;">AI AGENT ECOSYSTEM</div>
+          <!-- Ecosystem grid -->
+          <div class="mt-4 grid sm:grid-cols-2 gap-2" id="ecosystemGrid"></div>
 
-          <div class="grid sm:grid-cols-2 gap-2" id="ecosystemGrid"></div>
-        </div>
+          <!-- Pricing -->
+          <div class="mt-6 bg-black/35 border border-orange-500/22 rounded-3xl p-5">
+            <div class="text-center mb-4">
+              <div class="text-[10px] uppercase font-black text-orange-500 tracking-[0.2em]">
+                BETA SPECIAL (LIMITED TIME OFFER)
+              </div>
+              <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mt-1">
+                PICK A PLAN (STEP 05)
+              </div>
+            </div>
 
-        <!-- Pricing -->
-        <div class="mt-4 bg-black/25 border border-white/10 rounded-3xl p-5">
-          <div class="text-center">
-            <div class="text-[10px] font-black uppercase tracking-[0.22em] text-orange-500">BETA SPECIAL (LIMITED TIME OFFER)</div>
+            <div class="grid md:grid-cols-2 gap-3">
+              <div id="planCard_299" class="plan-card" role="button" tabindex="0">
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA SPECIAL</div>
+                <div class="flex items-end justify-between mt-2 gap-3">
+                  <div class="text-white font-black text-4xl leading-none">
+                    $299<span class="text-orange-500 text-base font-bold">/mo</span>
+                  </div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">
+                    <span class="strike">$499</span> REG
+                  </div>
+                </div>
+                <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-orange-500">UP TO 1,000 MIN</div>
+                <div class="mt-1 text-[10px] font-semibold text-slate-300">Overage: $0.30/min billed next invoice.</div>
+
+                <div class="mt-3 space-y-1.5">
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Secure payment via Stripe</div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Pay monthly</div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• No contracts. Cancel anytime</div>
+                </div>
+              </div>
+
+              <div id="planCard_599" class="plan-card" role="button" tabindex="0">
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA SPECIAL</div>
+                <div class="flex items-end justify-between mt-2 gap-3">
+                  <div class="text-white font-black text-4xl leading-none">
+                    $599<span class="text-orange-500 text-base font-bold">/mo</span>
+                  </div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">
+                    <span class="strike">$999</span> REG
+                  </div>
+                </div>
+                <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-orange-500">UP TO 2,500 MIN</div>
+                <div class="mt-1 text-[10px] font-semibold text-slate-300">Overage: $0.30/min billed next invoice.</div>
+
+                <div class="mt-3 space-y-1.5">
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Secure payment via Stripe</div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Pay monthly</div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• No contracts. Cancel anytime</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <button id="startActivationRightBtn" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase italic tracking-widest" type="button">
+                START ACTIVATION
+              </button>
+            </div>
           </div>
 
-          <div class="grid sm:grid-cols-2 gap-3 mt-4">
-            <div id="planCard_299" class="plan-card" role="button" tabindex="0" onclick="selectPlanUI('P299')">
-              <div class="flex items-center justify-between">
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA</div>
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">
-                  <span class="opacity-70 line-through">$499</span> <span class="opacity-70">REG</span>
-                </div>
-              </div>
-              <div class="flex items-baseline justify-between mt-2">
-                <div class="text-white font-black text-4xl">
-                  $299<span class="text-orange-500 text-base font-bold">/mo</span>
-                </div>
-                <div class="text-[10px] font-black uppercase tracking-widest text-orange-500">UP TO 1,000 MIN</div>
-              </div>
-              <div class="mt-2 text-[10px] font-semibold text-slate-300">$0.30/min overage billed next invoice.</div>
-            </div>
-
-            <div id="planCard_599" class="plan-card" role="button" tabindex="0" onclick="selectPlanUI('P599')">
-              <div class="flex items-center justify-between">
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA</div>
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">
-                  <span class="opacity-70 line-through">$999</span> <span class="opacity-70">REG</span>
-                </div>
-              </div>
-              <div class="flex items-baseline justify-between mt-2">
-                <div class="text-white font-black text-4xl">
-                  $599<span class="text-orange-500 text-base font-bold">/mo</span>
-                </div>
-                <div class="text-[10px] font-black uppercase tracking-widest text-orange-500">UP TO 2,500 MIN</div>
-              </div>
-              <div class="mt-2 text-[10px] font-semibold text-slate-300">$0.30/min overage billed next invoice.</div>
-            </div>
-          </div>
-
-          <button id="startActivationBtn" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase italic tracking-widest mt-4" type="button" data-i18n="start_activation">
-            Start Activation
-          </button>
-
-          <div class="mt-4 grid gap-2 text-left max-w-[520px] mx-auto">
-            <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-orange-500">
-              <span class="text-white">✓</span> Secure payment via Stripe
-            </div>
-            <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-orange-500">
-              <span class="text-white">✓</span> Pay monthly
-            </div>
-            <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-orange-500">
-              <span class="text-white">✓</span> No contracts. Cancel anytime
-            </div>
-          </div>
-
-          <div id="timer" class="text-xs font-mono text-white/30 mt-4 text-center">00:00:00</div>
         </div>
       </div>
     </div>
 
-    <!-- ACTIVATION PROTOCOL -->
-    <div class="mt-8 lg:mt-10">
+    <!-- ACTIVATION PROTOCOL (5 + 3 = 8 pipeline) -->
+    <div class="mt-10 lg:mt-12">
       <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
         <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">ACTIVATION PROTOCOL</span>
-        <span class="text-[9px] font-black uppercase tracking-[0.22em] text-slate-500">STRUCTURED CONTROL PANEL</span>
+        <span class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Only the next required button blinks</span>
       </div>
 
-      <!-- Top row: 5 setup steps -->
-      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <div id="s1" class="step-card next-focus">
-          <p class="text-[7px] font-black text-orange-500 uppercase" >01 Country</p>
-          <p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p>
-        </div>
-        <div id="s2" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase" >02 Industry</p>
-          <p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p>
-        </div>
-        <div id="s3" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase" >03 Agent</p>
-          <p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate">Choose</p>
-        </div>
-        <div id="s4" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase" >04 Company</p>
-          <p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate">Sync</p>
-        </div>
-        <div id="s5" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase" >05 Plan</p>
-          <p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate">Choose</p>
-        </div>
-      </div>
-
-      <!-- Bottom row: actions -->
-      <div class="grid lg:grid-cols-3 gap-3 mt-4">
-        <div id="aDemo" class="action-card">
-          <div>
-            <div class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Demo</div>
-            <div class="text-[11px] text-slate-300 font-semibold mt-1">Test your configured AI agent</div>
+      <div class="bg-black/30 border border-white/10 rounded-3xl p-4 lg:p-6">
+        <!-- Top row: 5 setup steps -->
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+          <div id="s1" class="step-card">
+            <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">01 Country</p>
+            <p id="v1" class="text-[10px] text-white/30 font-bold uppercase truncate">Select</p>
           </div>
-          <button id="demoBtn" class="action-btn outline disabled" type="button">DEMO</button>
-          <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">Ready after Plan</div>
-        </div>
-
-        <div id="aSat" class="action-card">
-          <div>
-            <div class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Satisfied ✓</div>
-            <div class="text-[11px] text-slate-300 font-semibold mt-1">Confirm you are satisfied with the demo</div>
+          <div id="s2" class="step-card locked">
+            <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">02 Industry</p>
+            <p id="v2" class="text-[10px] text-white/30 font-bold uppercase truncate">Select</p>
           </div>
-          <button id="satisfiedBtn" class="action-btn outline disabled" type="button">SATISFIED ✓</button>
-          <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">Requires Demo</div>
-        </div>
-
-        <div id="aAct" class="action-card">
-          <div>
-            <div class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Activate</div>
-            <div class="text-[11px] text-slate-300 font-semibold mt-1">Deploy and receive your number</div>
+          <div id="s3" class="step-card locked">
+            <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">03 Agent</p>
+            <p id="v3" class="text-[10px] text-white/30 font-bold uppercase truncate">Choose</p>
           </div>
-          <button id="activateBtn" class="action-btn solid disabled" type="button">ACTIVATE</button>
-          <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">Requires Satisfied</div>
+          <div id="s4" class="step-card locked">
+            <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">04 Company</p>
+            <p id="v4" class="text-[10px] text-white/30 font-bold uppercase truncate">Sync</p>
+          </div>
+          <div id="s5" class="step-card locked">
+            <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">05 Plan</p>
+            <p id="v5" class="text-[10px] text-white/30 font-bold uppercase truncate">Choose</p>
+          </div>
         </div>
-      </div>
 
-      <div class="mt-3 text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">
-        RULE: EACH STEP UNLOCKS THE NEXT. ONLY THE NEXT REQUIRED ACTION BLINKS.
+        <!-- Bottom row: DEMO / SATISFIED / ACTIVATE -->
+        <div class="grid lg:grid-cols-3 gap-3 mt-4">
+          <button id="s6" class="action-btn action-outline disabled-ui" type="button">
+            <div>
+              <div class="k">DEMO</div>
+              <div class="s">Test your configured AI agent</div>
+            </div>
+            <span class="r">Step 06</span>
+          </button>
+
+          <button id="s7" class="action-btn action-outline disabled-ui" type="button">
+            <div>
+              <div class="k">SATISFIED</div>
+              <div class="s">Confirm demo quality once</div>
+            </div>
+            <span class="r">Step 07</span>
+          </button>
+
+          <button id="s8" class="action-btn action-primary disabled-ui" type="button">
+            <div>
+              <div class="k">ACTIVATE</div>
+              <div class="s">Deploy and receive your number</div>
+            </div>
+            <span class="r">Step 08</span>
+          </button>
+        </div>
       </div>
     </div>
+
   </div>
 
-  <!-- Modal -->
-  <div id="setupModal">
+  <!-- MODAL -->
+  <div id="setupModal" aria-hidden="true">
     <div id="modalShell" class="modal-shell">
-      <div class="modal-content-wrap">
-        <div class="modal-titlebar">
-          <h2 id="mTitle" class="text-lg font-black uppercase text-white">Setup</h2>
-          <div id="modalSearchContainer"></div>
+      <div class="modal-titlebar">
+        <div>
+          <div class="pill" id="mPill">SETUP</div>
+          <h2 id="mTitle" class="text-lg font-black uppercase text-white mt-2">Setup</h2>
         </div>
-        <div id="mContent" class="modal-body"></div>
+        <button id="mCloseX" class="outline-orange-btn px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest" type="button">
+          Close
+        </button>
+      </div>
+
+      <div class="modal-content-wrap">
+        <div id="modalSearchContainer" class="mt-2"></div>
+        <div id="mContent" class="modal-body mt-3"></div>
+
         <div class="modal-footer">
-          <button id="mClose" class="mt-0 text-[10px] text-slate-500 uppercase font-black hover:text-white" type="button" data-i18n="close">Close</button>
+          <button id="mClose" class="mt-0 text-[10px] text-slate-500 uppercase font-black hover:text-white w-full" type="button">
+            Close
+          </button>
         </div>
       </div>
     </div>
@@ -718,7 +654,7 @@
     <div class="max-w-xs mx-auto opacity-40 hover:opacity-100 transition-opacity duration-500">
       <div class="flex items-center justify-center gap-2 mb-4">
         <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-        <span class="text-[8px] font-black text-white uppercase tracking-widest"><span id="agentCount">14,249</span> ACTIVE AGENTS</span>
+        <span class="text-[8px] font-black text-white uppercase tracking-widest"><span id="agentCount">14,214</span> ACTIVE AGENTS</span>
       </div>
       <div class="flex justify-center gap-6 text-[9px] font-black uppercase tracking-widest text-slate-500 mb-4">
         <a href="#" class="hover:text-orange-500">Privacy</a>
@@ -744,96 +680,326 @@
       document.documentElement.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
       document.documentElement.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
     }
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
 
     // ============================
-    // STATE
+    // CONFIG (Vapi key)
     // ============================
-    const TOTAL_SETUP_STEPS = 5; // Country, Industry, Agent, Company, Plan
-    let completedSteps = 0;
+    let vapiApiKey = null;
+    async function loadVapiKey() {
+      if (vapiApiKey) return vapiApiKey;
+      const res = await fetch("/api/config", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to load /api/config");
+      const data = await res.json();
+      if (!data || !data.vapiPublicKey) throw new Error("Missing vapiPublicKey in /api/config response");
+      vapiApiKey = data.vapiPublicKey;
+      return vapiApiKey;
+    }
 
-    // Setup selections
-    let selectedMarket = "United States";
-    let selectedIndustryKey = "Electrical";
-    let selectedAgentKey = "AI Receptionist";
-    let businessName = "";
+    // ============================
+    // VAPI LOADER (browser-safe)
+    // ============================
+    let vapiInstance = null;
+
+    function loadScriptOnce(src) {
+      return new Promise((resolve, reject) => {
+        const existing = [...document.scripts].find(s => s.src === src);
+        if (existing) return resolve();
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.defer = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("Failed to load: " + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    // Attempt to relocate the Vapi UI into #vapiMount (robust DOM hunt)
+    async function moveVapiUiToMount(){
+      const mount = document.getElementById("vapiMount");
+      if(!mount) return false;
+
+      const selectors = [
+        "#vapi-widget",
+        "[data-vapi-widget]",
+        ".vapi-widget",
+        ".vapi-call-widget",
+        "iframe[src*='vapi']",
+        "iframe[title*='Vapi']",
+        "button[aria-label*='Vapi']",
+        "button[id*='vapi']",
+        "div[id*='vapi']"
+      ];
+
+      const start = Date.now();
+      while(Date.now() - start < 2500){
+        for(const sel of selectors){
+          const el = document.querySelector(sel);
+          if(el){
+            // If it's inside body and not in mount, move it
+            try{
+              mount.innerHTML = ""; // replace hint with actual widget
+              mount.appendChild(el);
+              // Ensure visibility
+              el.style.display = el.style.display || "block";
+              el.style.position = "relative";
+              el.style.zIndex = "50";
+              return true;
+            } catch(e){}
+          }
+        }
+        await new Promise(r => setTimeout(r, 80));
+      }
+      return false;
+    }
+
+    async function vapiStartCall(assistantId, assistantOverrides) {
+      const apiKey = await loadVapiKey();
+      await loadScriptOnce("https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js");
+
+      if (!window.vapiSDK || typeof window.vapiSDK.run !== "function") {
+        throw new Error("Vapi SDK did not initialize");
+      }
+
+      // stop existing
+      if (vapiInstance && vapiInstance.stop) {
+        try { vapiInstance.stop(); } catch {}
+      }
+
+      vapiInstance = window.vapiSDK.run({
+        apiKey,
+        assistant: assistantId,
+        assistantOverrides: assistantOverrides || {}
+      });
+
+      // ensure UI shows where we want
+      moveVapiUiToMount();
+
+      return vapiInstance;
+    }
+
+    // ============================
+    // DATA
+    // ============================
+    const HERO_AGENTS = [
+      { key:"AI Receptionist", desc:"Answers inbound calls, greets callers, captures details, routes requests, and books appointments." },
+      { key:"AI Booking Agent", desc:"Books appointments, confirms availability, collects customer details, and sends confirmations." },
+      { key:"AI Sales Agent", desc:"Qualifies leads, handles objections, captures contact details, and books consultations." },
+      { key:"AI Customer Service", desc:"Answers questions, handles order/service status, and resolves common issues quickly." },
+      { key:"AI After-Hours Agent", desc:"Covers nights/weekends, captures urgent calls, routes emergencies, and schedules callbacks." },
+      { key:"AI Dispatch Agent", desc:"Collects job details, prioritizes urgency, and dispatches to the right team." },
+      { key:"AI Lead Capture Agent", desc:"Captures lead details from any caller, validates phone/email, and logs outcomes." },
+      { key:"AI Intake Agent", desc:"Structured intake: asks the right questions, logs details, and routes next steps." },
+      { key:"AI Support Triage", desc:"Gathers issue details, asks clarifying questions, and escalates critical cases." },
+      { key:"AI Overflow Agent", desc:"Handles peak volume overflow so your business never misses a call." },
+      { key:"AI Multilingual Agent", desc:"Answers calls in multiple languages and switches instantly based on the caller." },
+      { key:"Custom AI Agents", desc:"Need something unique? Configure custom behavior, flows, and routing after activation." }
+    ];
+
+    const industryKeys = ["Plumbing","Electrical","HVAC","Roofing","Real Estate","After Hours"];
+    const industryCategories = { "Home Services":["Plumbing","Electrical","HVAC","Roofing"], "Business":["Real Estate","After Hours"] };
+    function buildCategorizedIndustryList(){
+      const out = [];
+      Object.keys(industryCategories).forEach(cat => out.push({cat, items: industryCategories[cat]}));
+      return out;
+    }
+
+    // Assistants mapping (example)
+    const assistants = {
+      "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+      "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
+      "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65",
+      "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f",
+      "HVAC": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+      "Roofing": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
+      "Real Estate": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f",
+      "After Hours": "e6dec738-840f-4932-85b4-421b2a7bdb0c"
+    };
+
+    // Voices (kept)
+    const vapiVoices = [
+      { id: "Mia", label: "Mia (Professional / Articulate)" },
+      { id: "Leah", label: "Leah (Warm / Gentle)" },
+      { id: "Dan", label: "Dan (Friendly / Casual)" },
+      { id: "Zac", label: "Zac (Enthusiastic / Dynamic)" },
+      { id: "Jess", label: "Jess (Energetic / Youthful)" },
+      { id: "Zoe", label: "Zoe (Calm / Soothing)" },
+      { id: "Leo", label: "Leo (Authoritative / Deep)" },
+      { id: "Savannah", label: "Savannah (American / Southern)" },
+      { id: "Rohan", label: "Rohan (Bright / Energetic)" },
+      { id: "Elliot", label: "Elliot (Canadian / Soothing)" }
+    ];
+
+    // Templates (minimal but functional)
+    const templateCategories = ["ALL","Popular","Recommended","Appointments","After Hours","Sales","Support"];
+    const industryPacks = {
+      GLOBAL: {
+        Receptionist: [
+          { key:"pop_rec_standard", title:"Popular: Standard Receptionist + Booking", category:"Popular",
+            script:`You are the AI receptionist for {{BUSINESS_NAME}} in {{MARKET}}.
+Primary goals:
+- Answer calls politely
+- Provide basic info
+- Book appointments or take messages
+Collect: name, phone, reason, preferred date/time, email (optional)
+Always confirm details before ending the call.`}
+        ],
+        "Sales Agent": [
+          { key:"pop_sales_qual", title:"Popular: Sales Lead Qualifier + Booking", category:"Popular",
+            script:`You are the AI sales agent for {{BUSINESS_NAME}}.
+Qualify leads quickly and book appointments.
+Ask: service needed, location, timeline, budget range (optional), contact info.`}
+        ],
+        "Support Agent": [
+          { key:"rec_support_helpdesk", title:"Recommended: Helpdesk + Escalation", category:"Recommended",
+            script:`You are the AI support agent for {{BUSINESS_NAME}}.
+Collect: name, phone, account/order (if applicable), issue description, urgency.
+Provide a short helpful step, then create a ticket and confirm callback.`}
+        ]
+      },
+      Electrical: {
+        Receptionist: [
+          { key:"el_rec_safety", title:"Recommended: Electrical Safety First", category:"Recommended",
+            script:`You are the AI receptionist for {{BUSINESS_NAME}} (Electrical).
+Ask: sparking/burning smell/smoke? If yes, advise to turn off breaker if safe and call emergency services if needed.
+Collect: address, issue description, contact info, urgency.`}
+        ]
+      }
+    };
+
+    // Plans
     const PLANS = {
       P299: { id:"P299", price:299, min:1000, reg:499, stripe:"https://buy.stripe.com/8x24gA9TB9Vab160h43ks01" },
       P599: { id:"P599", price:599, min:2500, reg:999, stripe:"https://buy.stripe.com/8x24gA9TB9Vab160h43ks01" }
     };
-    let selectedPlanId = "P299";
 
-    // Demo gating
-    const LS_DEMO_COUNT = "aicallport_demo_count_v1";
-    const LS_DEMO_DID_ONCE = "aicallport_demo_did_once_v1";
-    const DEMO_MAX_CALLS = 2;
-    const DEMO_SECONDS = 30;
-
-    function getDemoCount(){
-      const n = Number(localStorage.getItem(LS_DEMO_COUNT) || "0");
-      return Number.isFinite(n) ? Math.max(0, n) : 0;
-    }
-    function incDemoCount(){
-      const n = getDemoCount() + 1;
-      localStorage.setItem(LS_DEMO_COUNT, String(n));
-      return n;
-    }
-    function setDidDemoOnce(){
-      localStorage.setItem(LS_DEMO_DID_ONCE, "1");
-    }
-    function didDemoOnce(){
-      return localStorage.getItem(LS_DEMO_DID_ONCE) === "1";
-    }
-
-    // ============================
-    // AI Agent ecosystem (expand-in-button + select)
-    // ============================
-    const AGENTS = [
-      { key:"AI Receptionist", bullets:["Greets callers professionally and captures intent","Routes calls or takes structured messages","Books appointments when needed","Handles FAQs and basic business info"], tagline:"Best for: inbound calls, routing, first impression" },
-      { key:"AI Booking Agent", bullets:["Books appointments and confirms availability","Collects customer details and preferences","Sends confirmations and reminders"], tagline:"Best for: scheduling and confirmations" },
-      { key:"AI Sales Agent", bullets:["Qualifies leads quickly","Handles objections and captures contact details","Books consultations"], tagline:"Best for: new leads and sales intake" },
-      { key:"AI Customer Service", bullets:["Answers questions and checks order/service status","Resolves common issues quickly","Escalates when needed"], tagline:"Best for: support and customer experience" },
-      { key:"AI After-Hours Agent", bullets:["Covers nights/weekends","Captures urgent calls","Schedules callbacks"], tagline:"Best for: 24/7 coverage" },
-      { key:"AI Dispatch Agent", bullets:["Collects job details","Prioritizes urgency","Routes to the right team"], tagline:"Best for: dispatch and triage" },
-      { key:"AI Lead Capture Agent", bullets:["Captures lead details from any caller","Validates phone/email","Logs outcomes"], tagline:"Best for: never miss a lead" },
-      { key:"AI Intake Agent", bullets:["Collects structured intake details","Asks clarifying questions","Prepares for estimates/visits"], tagline:"Best for: structured intake" },
-      { key:"AI Support Triage", bullets:["Gathers issue details","Determines urgency","Escalates critical cases"], tagline:"Best for: support prioritization" },
-      { key:"AI Overflow Agent", bullets:["Handles peak-volume overflow","Prevents missed calls","Smooths busy hours"], tagline:"Best for: high call volume" },
-      { key:"AI Multilingual Agent", bullets:["Answers calls in multiple languages","Switches instantly based on caller","Maintains consistent tone"], tagline:"Best for: multilingual markets" },
-      { key:"Custom AI Agents", bullets:["Custom workflows & routing","Custom scripts, hours, escalation paths","Tailored for your business"], tagline:"Best for: custom needs" }
+    // SMB benefits
+    const smbBenefits = [
+      { title:"Never miss calls", desc:"Your business answers every inbound call, even during peak times." },
+      { title:"Capture every lead", desc:"Structured intake captures name, phone, needs, urgency, and next step." },
+      { title:"Reduce staffing costs", desc:"Automate repetitive inbound workflows without hiring or training." },
+      { title:"24/7 availability", desc:"After-hours coverage with escalation options when needed." },
+      { title:"Structured intake", desc:"Consistent questions and confirmations for clean handoffs." },
+      { title:"Professional experience", desc:"Clear tone, fast responses, and confident call flow." },
+      { title:"Scalable without hiring", desc:"Handle more calls as you grow with no staffing bottleneck." }
     ];
 
-    let expandedAgentKey = null;
+    // ============================
+    // STATE (8-step pipeline)
+    // 1 Country, 2 Industry, 3 Agent+Config, 4 Company, 5 Plan, 6 Demo, 7 Satisfied, 8 Activate
+    // ============================
+    const TOTAL_PIPELINE = 8;
+    let completed = 0;
+
+    let selectedMarket = "";
+    let selectedIndustryKey = "";
+    let selectedAgentKey = "AI Receptionist";
+
+    let businessName = "";
+    let selectedPlanId = "P299";
+
+    // Config inside step 3
+    let selectedRole = "Receptionist";
+    let selectedTemplateKey = null;
+    let agentScript = "";
+    let templateCategoryFilter = "ALL";
+    let templateSearchQuery = "";
+    let selectedVoiceId = "Mia";
+
+    // Demo gating
+    const LS_DEMO_COUNT = "aicallport_demo_count";
+    const LS_DEMO_USED = "aicallport_demo_used_once";
+    function getDemoCount(){ return Number(localStorage.getItem(LS_DEMO_COUNT) || "0") || 0; }
+    function setDemoCount(n){ localStorage.setItem(LS_DEMO_COUNT, String(n)); }
+    function hasDemoUsedOnce(){ return localStorage.getItem(LS_DEMO_USED) === "1"; }
+    function setDemoUsedOnce(v){ localStorage.setItem(LS_DEMO_USED, v ? "1" : "0"); }
+
+    // Deployed flag
+    const LS_DEPLOYED = "aicallport_deployed";
+    function setDeployed(v) { localStorage.setItem(LS_DEPLOYED, v ? "1" : "0"); }
+    function isDeployed() { return localStorage.getItem(LS_DEPLOYED) === "1"; }
+
+    // Ecosystem UI state
+    let ecoOpenKey = null;
+
+    function applyVars(text){
+      const bn = (businessName && businessName.trim().length) ? businessName.trim() : "YOUR BUSINESS";
+      const mk = (selectedMarket && selectedMarket.trim().length) ? selectedMarket.trim() : "YOUR MARKET";
+      return (text || "")
+        .replaceAll("{{BUSINESS_NAME}}", bn)
+        .replaceAll("{{MARKET}}", mk);
+    }
+
+    function getCurrentIndustryKey(){ return selectedIndustryKey || "GLOBAL"; }
+    function getPackFor(industryKey){ return industryPacks[industryKey] || industryPacks.GLOBAL; }
+    function getTemplatesFor(roleName){
+      const industryKey = getCurrentIndustryKey();
+      const pack = getPackFor(industryKey);
+      const roleList = pack[roleName] || [];
+      if(!roleList.length){
+        const globalRoleList = industryPacks.GLOBAL[roleName] || [];
+        return { templates: globalRoleList, packName: "GLOBAL" };
+      }
+      return { templates: roleList, packName: industryKey };
+    }
+    function refreshTemplatesForCurrentSelection(forceResetScript){
+      const { templates } = getTemplatesFor(selectedRole);
+      if(!templates.length){
+        selectedTemplateKey = null;
+        if(forceResetScript) agentScript = "";
+        return;
+      }
+      if(!selectedTemplateKey || !templates.find(t => t.key === selectedTemplateKey)){
+        selectedTemplateKey = templates[0].key;
+      }
+      if(forceResetScript){
+        const chosen = templates.find(t => t.key === selectedTemplateKey) || templates[0];
+        agentScript = applyVars(chosen.script);
+      } else {
+        agentScript = applyVars(agentScript);
+      }
+    }
+    function getFilteredTemplates(){
+      const { templates } = getTemplatesFor(selectedRole);
+      const cat = (templateCategoryFilter || "ALL").toUpperCase();
+      const q = (templateSearchQuery || "").trim().toUpperCase();
+      return templates.filter(tpl => {
+        const catOk = (cat === "ALL") ? true : (String(tpl.category || "").toUpperCase() === cat);
+        const text = `${tpl.title} ${tpl.category}`.toUpperCase();
+        const qOk = q ? text.includes(q) : true;
+        return catOk && qOk;
+      });
+    }
+
+    // ============================
+    // RENDER: Ecosystem (expand inline + select)
+    // ============================
     function renderEcosystem(){
       const grid = document.getElementById("ecosystemGrid");
-      grid.innerHTML = AGENTS.map(a => {
+      if(!grid) return;
+
+      grid.innerHTML = HERO_AGENTS.map(a => {
         const isSelected = a.key === selectedAgentKey;
-        const isExpanded = a.key === expandedAgentKey;
+        const isOpen = ecoOpenKey === a.key;
         return `
-          <div class="agent-btn ${isSelected ? "selected" : ""} ${isExpanded ? "expanded" : ""}"
-               role="button" tabindex="0"
-               onclick="toggleAgentExpand('${escapeHtml(a.key)}')"
-               onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); toggleAgentExpand('${escapeHtml(a.key)}')}">
-            <div class="flex items-center justify-between gap-2">
-              <div class="text-[10px] font-black uppercase tracking-widest text-white">${escapeHtml(a.key)}</div>
-              <div class="text-[9px] font-black uppercase tracking-widest ${isSelected ? "text-orange-500" : "text-slate-500"}">
-                ${isSelected ? "SELECTED" : ""}
-              </div>
+          <div class="eco-btn ${isSelected ? "selected" : ""} ${isOpen ? "open" : ""}" tabindex="0" role="button"
+               onclick="toggleEcoOpen('${escapeHtml(a.key)}')"
+               onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); toggleEcoOpen('${escapeHtml(a.key)}');}">
+            <div class="eco-top">
+              <div class="eco-name">${escapeHtml(a.key)}</div>
+              <div class="eco-tag">${isSelected ? "SELECTED" : (isOpen ? "OPEN" : "VIEW")}</div>
             </div>
 
-            <div class="agent-expand">
-              <div class="mt-2 bg-black/20 border border-white/5 rounded-xl p-3">
-                <ul class="list-disc pl-5 text-[12px] text-slate-300 font-semibold leading-relaxed space-y-1">
-                  ${a.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join("")}
-                </ul>
-                <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">${escapeHtml(a.tagline)}</div>
-
-                <div class="mt-3 flex justify-end">
-                  <button class="orange-btn px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest italic"
-                          type="button"
-                          onclick="event.stopPropagation(); selectAgent('${escapeHtml(a.key)}')">
-                    SELECT THIS AGENT
-                  </button>
-                </div>
+            <div class="eco-expand">
+              <div class="text-[13px] text-slate-200 font-semibold leading-relaxed">
+                ${escapeHtml(a.desc)}
+              </div>
+              <div class="eco-select-row">
+                ${isSelected
+                  ? `<button class="eco-select disabled-ui" type="button">SELECTED</button>`
+                  : `<button class="eco-select" type="button" onclick="event.stopPropagation(); selectAgentGlobal('${escapeHtml(a.key)}', true);">SELECT THIS AGENT</button>`
+                }
               </div>
             </div>
           </div>
@@ -841,45 +1007,168 @@
       }).join("");
     }
 
-    function toggleAgentExpand(key){
-      const k = String(key || "");
-      if(expandedAgentKey === k) expandedAgentKey = null;
-      else expandedAgentKey = k;
+    function toggleEcoOpen(agentKey){
+      const key = String(agentKey || "");
+      if(!key) return;
+      // If clicking same open -> close
+      ecoOpenKey = (ecoOpenKey === key) ? null : key;
       renderEcosystem();
     }
 
-    function selectAgent(key){
-      selectedAgentKey = String(key || "AI Receptionist");
-      expandedAgentKey = null; // closes after select (your requirement)
-      renderEcosystem();
+    // Global agent selection (sync ecosystem + protocol)
+    function selectAgentGlobal(agentKey, closeEco){
+      const key = String(agentKey || "");
+      if(!HERO_AGENTS.find(x => x.key === key)) return;
 
-      // If step 3 already completed, keep protocol label updated
-      if(completedSteps >= 3){
+      selectedAgentKey = key;
+
+      // If requested, close ecosystem open state and show selected
+      if(closeEco) ecoOpenKey = null;
+
+      // Update protocol label if already at/after step 3
+      if(completed >= 3){
         document.getElementById("v3").innerText = selectedAgentKey.toUpperCase();
       }
+
+      renderEcosystem();
+      refreshProtocolUi();
     }
 
     // ============================
-    // PLAN selection UI
+    // RENDER: Plan selection (sync hero + protocol)
     // ============================
-    function selectPlanUI(planId){
+    function selectPlanGlobal(planId){
       if(!PLANS[planId]) return;
       selectedPlanId = planId;
+
       document.getElementById("planCard_299")?.classList.toggle("selected", planId === "P299");
       document.getElementById("planCard_599")?.classList.toggle("selected", planId === "P599");
-      if(completedSteps >= 5){
-        const plan = PLANS[selectedPlanId];
-        document.getElementById("v5").innerText = `$${plan.price} /MO`.toUpperCase();
+
+      if(completed >= 5){
+        document.getElementById("v5").innerText = `$${PLANS[selectedPlanId].price} /MO`;
+      }
+      refreshProtocolUi();
+    }
+
+    // ============================
+    // PROTOCOL: gating + blinking
+    // ============================
+    function setNextBlink(el, on){
+      if(!el) return;
+      el.classList.toggle("next-focus", !!on);
+      el.classList.toggle("action-next-focus", !!on);
+    }
+
+    function refreshProtocolUi(){
+      // Lock/unlock setup steps (1..5)
+      for(let i=1;i<=5;i++){
+        const el = document.getElementById(`s${i}`);
+        if(!el) continue;
+
+        const unlocked = (i <= completed + 1);
+        el.classList.toggle("locked", !unlocked);
+
+        // mark done
+        el.classList.toggle("done", i <= completed);
+
+        // clear next focus first
+        el.classList.remove("next-focus");
+      }
+
+      // Action buttons gating:
+      const b6 = document.getElementById("s6");
+      const b7 = document.getElementById("s7");
+      const b8 = document.getElementById("s8");
+
+      const demoEnabled = (completed >= 5);               // after plan confirmed (step 5)
+      const satisfiedEnabled = hasDemoUsedOnce();         // after demo used once
+      const activateEnabled = (completed >= 7);            // after satisfied pressed
+
+      b6?.classList.toggle("disabled-ui", !demoEnabled);
+      b7?.classList.toggle("disabled-ui", !satisfiedEnabled);
+      b8?.classList.toggle("disabled-ui", !activateEnabled);
+
+      // Remove focus animations from action buttons
+      b6?.classList.remove("action-next-focus");
+      b7?.classList.remove("action-next-focus");
+      b8?.classList.remove("action-next-focus");
+
+      // Determine the next required pipeline item
+      let next = completed + 1; // default for setup steps
+      if(next <= 5){
+        document.getElementById(`s${next}`)?.classList.add("next-focus");
+        return;
+      }
+
+      // After step 5 done, next is step 6 Demo until demo used once AND marked step6 done
+      // We'll track step6 done by completed >= 6 (set when demo actually starts)
+      if(completed < 6){
+        if(demoEnabled) b6?.classList.add("action-next-focus");
+        return;
+      }
+      if(completed < 7){
+        if(satisfiedEnabled) b7?.classList.add("action-next-focus");
+        return;
+      }
+      if(completed < 8){
+        if(activateEnabled) b8?.classList.add("action-next-focus");
+        return;
+      }
+    }
+
+    function finishStep(stepNumber, valueText, autoAdvance){
+      completed = Math.max(completed, stepNumber);
+      const vEl = document.getElementById(`v${stepNumber}`);
+      if(vEl && valueText != null) vEl.innerText = String(valueText);
+
+      closeModal();
+
+      refreshProtocolUi();
+
+      if(autoAdvance){
+        const next = stepNumber + 1;
+        // auto-advance for all 8 pipeline items
+        setTimeout(() => {
+          openByStep(next);
+        }, 160);
+      }
+    }
+
+    function openByStep(n){
+      const step = Number(n);
+      if(!Number.isFinite(step)) return;
+
+      // all buttons unresponsive until previous complete
+      if(step <= 5){
+        if(step > completed + 1) return;
+        triggerModal(step);
+        return;
+      }
+
+      if(step === 6){
+        if(completed < 5) return; // must pick plan
+        triggerModal("demoGate");
+        return;
+      }
+      if(step === 7){
+        if(!hasDemoUsedOnce()) return;
+        triggerModal("satisfied");
+        return;
+      }
+      if(step === 8){
+        if(completed < 7) return;
+        triggerModal("activate");
+        return;
       }
     }
 
     // ============================
-    // Modal framework (scroll lock + focus)
+    // MODAL plumbing
     // ============================
     let lastFocusedEl = null;
+
     let __scrollY = 0;
     let __bodyLocked = false;
-
     function lockBodyScroll(){
       if (__bodyLocked) return;
       __bodyLocked = true;
@@ -903,740 +1192,757 @@
       window.scrollTo(0, y || 0);
     }
 
-    function openModal(title, html, wide){
-      lastFocusedEl = document.activeElement;
-      const modal = document.getElementById("setupModal");
-      const shell = document.getElementById("modalShell");
-      const t = document.getElementById("mTitle");
-      const c = document.getElementById("mContent");
-      const s = document.getElementById("modalSearchContainer");
-      t.textContent = title || "Setup";
-      s.innerHTML = "";
-      c.innerHTML = html || "";
-      shell.classList.toggle("wide", !!wide);
-      modal.style.display = "flex";
-      lockBodyScroll();
-      i18n.applyTranslations(modal);
-      setTimeout(() => {
-        const first = shell.querySelector("button, input, select, textarea, [tabindex]:not([tabindex='-1'])");
-        first?.focus?.();
-      }, 30);
-    }
-
     function closeModal(){
       const modal = document.getElementById("setupModal");
+      if(modal.style.display !== "flex"){ unlockBodyScroll(); return; }
       modal.style.display = "none";
+      modal.setAttribute("aria-hidden","true");
       unlockBodyScroll();
       try { lastFocusedEl?.focus?.(); } catch(e){}
       lastFocusedEl = null;
     }
 
     document.getElementById("mClose").addEventListener("click", closeModal);
+    document.getElementById("mCloseX").addEventListener("click", closeModal);
     document.getElementById("setupModal").addEventListener("click", (e) => {
       if(e.target && e.target.id === "setupModal") closeModal();
     });
     document.addEventListener("keydown", (e) => {
-      if(e.key === "Escape"){
-        closeModal();
-        toggleLangMenu(false);
-      }
+      if(e.key === "Escape") closeModal();
     });
 
     // ============================
-    // Activation pipeline: 5 setup steps + 3 actions = 8 logical buttons
-    // Only next required action blinks. Others disabled.
-    // Auto-advance opens next modal.
-    // ============================
-    function refreshStepLocks(){
-      // Setup steps 1..5
-      for(let i=1;i<=TOTAL_SETUP_STEPS;i++){
-        const el = document.getElementById(`s${i}`);
-        if(!el) continue;
-        const unlocked = completedSteps >= i-1;
-        el.classList.toggle("locked", !unlocked);
-        el.classList.remove("next-focus"); // clear
-        el.classList.toggle("active", completedSteps >= i);
-      }
-      const next = Math.min(completedSteps + 1, TOTAL_SETUP_STEPS);
-      if(completedSteps < TOTAL_SETUP_STEPS){
-        document.getElementById(`s${next}`)?.classList.add("next-focus");
-      }
-    }
-
-    function finishStep(stepNumber, valueText){
-      completedSteps = Math.max(completedSteps, stepNumber);
-      const valEl = document.getElementById(`v${stepNumber}`);
-      if(valEl) valEl.innerText = String(valueText || "").toUpperCase();
-      refreshStepLocks();
-      refreshActionLocks();
-    }
-
-    function openStep(stepNumber){
-      if(stepNumber > completedSteps + 1) return; // prevent future steps
-      if(stepNumber === 1) return openCountry();
-      if(stepNumber === 2) return openIndustry();
-      if(stepNumber === 3) return openAgentConfirm();
-      if(stepNumber === 4) return openCompany();
-      if(stepNumber === 5) return openPlanConfirm();
-    }
-
-    function autoAdvanceFromStep(stepNumber){
-      if(stepNumber < TOTAL_SETUP_STEPS){
-        setTimeout(() => openStep(stepNumber + 1), 130);
-      }
-    }
-
-    // ============================
-    // Country / Markets
+    // Markets endpoint (kept)
     // ============================
     let _marketsByContinentCache = null;
     async function getMarketsGroupedByContinent() {
       if (_marketsByContinentCache) return _marketsByContinentCache;
-      try{
-        const res = await fetch("/api/markets", { cache: "no-store" });
-        if (!res.ok) throw new Error("bad");
-        const rows = await res.json();
-        const grouped = {};
-        (rows || []).forEach((row) => {
-          const continent = row.region || "Other";
-          const name = row.name || "";
-          if (!name) return;
-          grouped[continent] ||= [];
-          grouped[continent].push(name);
-        });
-        Object.keys(grouped).forEach((k) => grouped[k].sort((a, b) => String(a).localeCompare(String(b))));
-        _marketsByContinentCache = grouped;
-        return grouped;
-      } catch(e){
-        // fallback
-        _marketsByContinentCache = { "North America": ["United States", "Canada"], "Europe": ["United Kingdom", "Germany", "France"] };
+
+      const res = await fetch("/api/markets", { cache: "no-store" });
+      if (!res.ok) {
+        _marketsByContinentCache = {};
         return _marketsByContinentCache;
       }
-    }
 
-    async function openCountry(){
-      const grouped = await getMarketsGroupedByContinent();
-      const render = (qRaw) => {
-        const q = String(qRaw||"").trim().toUpperCase();
-        let html = `<div class="pill mb-3">01 Country</div>`;
-        Object.keys(grouped).forEach(cont => {
-          const list = (grouped[cont]||[]).filter(n => n.toUpperCase().includes(q));
-          if(!list.length) return;
-          html += `<div class="divider">${escapeHtml(cont)}</div>`;
-          list.forEach(name => {
-            html += `<button class="modal-btn" type="button" onclick="selectCountry('${escapeHtml(name)}')">
-              <span class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.55)]"></span>
-              ${escapeHtml(name)}
-            </button>`;
-          });
-        });
-        if(!html.includes("modal-btn")) html += `<div class="text-center text-slate-500 font-black uppercase tracking-widest text-[10px] py-10">No matching results</div>`;
-        openModal("01 Country", html, true);
-        document.getElementById("modalSearchContainer").innerHTML =
-          `<input class="search-box" data-i18n-placeholder="search_countries" placeholder="SEARCH COUNTRIES..." oninput="window.__countrySearch=this.value; window.__rerenderCountry && window.__rerenderCountry()">`;
-        window.__countrySearch = qRaw || "";
-        window.__rerenderCountry = () => render(window.__countrySearch);
-      };
-      render("");
-    }
-
-    function selectCountry(name){
-      selectedMarket = String(name||"");
-      closeModal();
-      finishStep(1, selectedMarket);
-      autoAdvanceFromStep(1);
-    }
-
-    // ============================
-    // Industry
-    // ============================
-    const industryKeys = ["Plumbing","Electrical","HVAC","Roofing","Real Estate","After Hours"];
-    function openIndustry(){
-      const render = (qRaw) => {
-        const q = String(qRaw||"").trim().toUpperCase();
-        const list = industryKeys.filter(n => n.toUpperCase().includes(q));
-        let html = `<div class="pill mb-3">02 Industry</div>`;
-        html += `<div class="grid gap-2">`;
-        list.forEach(name => {
-          html += `<button class="modal-btn" type="button" onclick="selectIndustry('${escapeHtml(name)}')">${escapeHtml(name)}</button>`;
-        });
-        html += `</div>`;
-        if(!list.length) html += `<div class="text-center text-slate-500 font-black uppercase tracking-widest text-[10px] py-10">No matching results</div>`;
-        openModal("02 Industry", html, false);
-        document.getElementById("modalSearchContainer").innerHTML =
-          `<input class="search-box" data-i18n-placeholder="search_industries" placeholder="SEARCH INDUSTRIES..." oninput="window.__industrySearch=this.value; window.__rerenderIndustry && window.__rerenderIndustry()">`;
-        window.__industrySearch = qRaw || "";
-        window.__rerenderIndustry = () => render(window.__industrySearch);
-      };
-      render("");
-    }
-
-    function selectIndustry(name){
-      selectedIndustryKey = String(name||"");
-      closeModal();
-      finishStep(2, selectedIndustryKey);
-      autoAdvanceFromStep(2);
-    }
-
-    // ============================
-    // Agent confirm (uses selectedAgentKey from ecosystem)
-    // ============================
-    function openAgentConfirm(){
-      const html = `
-        <div class="pill mb-3">03 Agent</div>
-        <div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left">
-          <div class="mini text-orange-500 mb-2">Selected agent</div>
-          <div class="text-[14px] font-black uppercase tracking-widest text-white">${escapeHtml(selectedAgentKey)}</div>
-          <div class="text-[11px] text-slate-300 font-semibold leading-relaxed mt-2">
-            Confirm to lock this selection into the activation protocol. You can switch agents anytime after activation.
-          </div>
-        </div>
-        <div class="grid sm:grid-cols-2 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">Back</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="confirmAgentStep()">Confirm</button>
-        </div>
-      `;
-      openModal("03 Agent", html, false);
-    }
-
-    function confirmAgentStep(){
-      closeModal();
-      finishStep(3, selectedAgentKey);
-      autoAdvanceFromStep(3);
-    }
-
-    // ============================
-    // Company
-    // ============================
-    function openCompany(){
-      const html = `
-        <div class="pill mb-3">04 Company</div>
-        <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Enter your business name</div>
-        <input id="bn" data-i18n-placeholder="business_name" placeholder="Business Name"
-               class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
-        <button type="button" onclick="saveCompany()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic">Save</button>
-      `;
-      openModal("04 Company", html, false);
-      setTimeout(() => document.getElementById("bn")?.focus(), 40);
-    }
-
-    function saveCompany(){
-      const raw = (document.getElementById("bn")?.value || "");
-      const v = raw.trim().slice(0,60);
-      if(v.length < 2) return;
-      businessName = v;
-      closeModal();
-      finishStep(4, businessName);
-      autoAdvanceFromStep(4);
-    }
-
-    // ============================
-    // Plan confirm (locks step 5)
-    // ============================
-    function openPlanConfirm(){
-      const plan = PLANS[selectedPlanId];
-      const html = `
-        <div class="pill mb-3">05 Plan</div>
-        <div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left">
-          <div class="mini text-orange-500 mb-2">Current selection</div>
-          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-            <span class="text-orange-500 font-black">$${plan.price}/mo</span> — up to <span class="text-orange-500 font-black">${plan.min}</span> min.
-          </div>
-          <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-2">
-            Confirm plan to unlock Demo.
-          </div>
-        </div>
-        <div class="grid sm:grid-cols-2 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">Back</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="confirmPlanStep()">Confirm</button>
-        </div>
-      `;
-      openModal("05 Plan", html, false);
-    }
-
-    function confirmPlanStep(){
-      const plan = PLANS[selectedPlanId];
-      closeModal();
-      finishStep(5, `$${plan.price} /MO`);
-      // IMPORTANT: stop plan blinking by moving focus to next (actions)
-      refreshActionLocks(true);
-    }
-
-    // ============================
-    // Actions (Demo -> Satisfied -> Activate)
-    // ============================
-    function refreshActionLocks(fromPlanJustConfirmed){
-      const hasPlan = (completedSteps >= 5);
-      const demoEnabled = hasPlan && (getDemoCount() < DEMO_MAX_CALLS);
-      const satEnabled = hasPlan && didDemoOnce();
-      const actEnabled = hasPlan && didDemoOnce() && window.__satisfiedPressed === true;
-
-      const aDemo = document.getElementById("aDemo");
-      const aSat = document.getElementById("aSat");
-      const aAct = document.getElementById("aAct");
-
-      const demoBtn = document.getElementById("demoBtn");
-      const satBtn = document.getElementById("satisfiedBtn");
-      const actBtn = document.getElementById("activateBtn");
-
-      // enable containers
-      aDemo.classList.toggle("enabled", demoEnabled);
-      aSat.classList.toggle("enabled", satEnabled);
-      aAct.classList.toggle("enabled", actEnabled);
-
-      // enable buttons
-      demoBtn.classList.toggle("disabled", !demoEnabled);
-      satBtn.classList.toggle("disabled", !satEnabled);
-      actBtn.classList.toggle("disabled", !actEnabled);
-
-      // Blink only next required action:
-      demoBtn.classList.remove("action-next-focus");
-      satBtn.classList.remove("action-next-focus");
-      actBtn.classList.remove("action-next-focus");
-
-      if(!hasPlan){
-        // nothing blinks here yet
-        return;
-      }
-      if(demoEnabled && !didDemoOnce()){
-        demoBtn.classList.add("action-next-focus");
-        return;
-      }
-      if(satEnabled && window.__satisfiedPressed !== true){
-        satBtn.classList.add("action-next-focus");
-        return;
-      }
-      if(actEnabled){
-        actBtn.classList.add("action-next-focus");
-        return;
-      }
-
-      // If plan confirmed and demo already done but demo count reached, blink satisfied/activate accordingly above.
-      if(fromPlanJustConfirmed){
-        if(demoEnabled) demoBtn.classList.add("action-next-focus");
-      }
-    }
-
-    // ============================
-    // SMB Benefits modal
-    // ============================
-    const SMB_BENEFITS = [
-      "Never miss calls",
-      "Capture every lead",
-      "Reduce staffing costs",
-      "24/7 availability",
-      "Structured intake",
-      "Professional experience",
-      "Scalable without hiring"
-    ];
-    function openBenefits(){
-      const html = `
-        <div class="pill mb-3">SMB Benefits</div>
-        <div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left">
-          <div class="mini text-orange-500 mb-3">Clean benefits</div>
-          <ul class="list-disc pl-5 text-[13px] text-slate-300 font-semibold leading-relaxed space-y-1">
-            ${SMB_BENEFITS.map(x => `<li>${escapeHtml(x)}</li>`).join("")}
-          </ul>
-        </div>
-        <div class="grid sm:grid-cols-1 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">Close</button>
-        </div>
-      `;
-      openModal("SMB Benefits", html, false);
-    }
-
-    // ============================
-    // DEMO gate modal (2 calls total, 30s each) then start call
-    // ============================
-    function openDemoGate(){
-      const count = getDemoCount();
-      if(count >= DEMO_MAX_CALLS){
-        const html = `
-          <div class="pill mb-3">Demo Access</div>
-          <div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left">
-            <div class="mini text-orange-500 mb-2">Limit reached</div>
-            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-              You have used <span class="text-orange-500 font-black">${count}</span> demo calls.
-              Demo limit is <span class="text-orange-500 font-black">${DEMO_MAX_CALLS}</span> calls.
-            </div>
-          </div>
-          <div class="grid gap-2 mt-4">
-            <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">Close</button>
-          </div>
-        `;
-        openModal("Demo", html, false);
-        return;
-      }
-
-      const remaining = DEMO_MAX_CALLS - count;
-      const html = `
-        <div class="pill mb-3">Demo Access</div>
-        <div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left">
-          <div class="mini text-orange-500 mb-2">Demo limits</div>
-          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-            • <span class="text-orange-500 font-black">${DEMO_MAX_CALLS}</span> demo calls total<br>
-            • <span class="text-orange-500 font-black">${DEMO_SECONDS}</span> seconds per call
-          </div>
-          <div class="divider mt-4">Talk to your company agent</div>
-          <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
-            This demo will call your configured AI agent using the selected market, industry, company name, and voice.
-          </div>
-          <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
-            Remaining demos: <span class="text-orange-500">${remaining}</span>
-          </div>
-        </div>
-        <div class="grid sm:grid-cols-2 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">Cancel</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="startDemoCallFromGate()">Make Demo Call</button>
-        </div>
-      `;
-      openModal("Demo", html, false);
-    }
-
-    // ============================
-    // VAPI
-    // ============================
-    let vapiApiKey = null;
-    async function loadVapiKey() {
-      if (vapiApiKey) return vapiApiKey;
-      const res = await fetch("/api/config", { cache: "no-store" });
-      if (!res.ok) throw new Error("Failed to load /api/config");
-      const data = await res.json();
-      if (!data || !data.vapiPublicKey) throw new Error("Missing vapiPublicKey in /api/config response");
-      vapiApiKey = data.vapiPublicKey;
-      return vapiApiKey;
-    }
-
-    function loadScriptOnce(src) {
-      return new Promise((resolve, reject) => {
-        const existing = [...document.scripts].find(s => s.src === src);
-        if (existing) return resolve();
-        const s = document.createElement("script");
-        s.src = src;
-        s.async = true;
-        s.defer = true;
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error("Failed to load: " + src));
-        document.head.appendChild(s);
-      });
-    }
-
-    let vapiFallbackInstance = null;
-
-    // Best-effort: move any injected Vapi widget into #vapiDock
-    function ensureVapiWidgetDocking(){
-      const dock = document.getElementById("vapiDock");
-      if(!dock) return;
-
-      // Clean placeholder hint once widget arrives
-      const removeHint = () => {
-        const hint = dock.querySelector(".dock-hint");
-        if(hint) hint.remove();
-      };
-
-      const tryMove = (node) => {
-        if(!node || node.nodeType !== 1) return false;
-        const el = node;
-
-        const id = (el.id || "").toLowerCase();
-        const cls = (el.className || "").toString().toLowerCase();
-
-        const looksLikeVapi =
-          id.includes("vapi") ||
-          cls.includes("vapi") ||
-          el.getAttribute("data-vapi-widget") != null;
-
-        if(!looksLikeVapi) return false;
-
-        // Make it non-fixed so it sits inside dock
-        el.style.position = "static";
-        el.style.right = "auto";
-        el.style.bottom = "auto";
-        el.style.zIndex = "50";
-        el.style.margin = "0";
-        el.style.transform = "none";
-
-        removeHint();
-        dock.appendChild(el);
-        return true;
-      };
-
-      // Try current DOM first
-      const existing = document.querySelector("#vapi-widget, .vapi-widget, .vapi-widget-container, [data-vapi-widget]");
-      if(existing) tryMove(existing);
-
-      // Observe for new nodes
-      if(window.__vapiDockObserver) return;
-      window.__vapiDockObserver = new MutationObserver((muts) => {
-        for(const m of muts){
-          for(const n of (m.addedNodes || [])){
-            if(tryMove(n)) return;
-            // Sometimes widget is nested; scan a bit
-            if(n && n.querySelector){
-              const inner = n.querySelector("#vapi-widget, .vapi-widget, .vapi-widget-container, [data-vapi-widget]");
-              if(inner && tryMove(inner)) return;
-            }
-          }
-        }
-      });
-      window.__vapiDockObserver.observe(document.body, { childList:true, subtree:true });
-    }
-
-    // Assistants mapping (example, kept from your older build)
-    const assistants = {
-      "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
-      "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
-      "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65",
-      "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f"
-    };
-
-    let selectedVoiceId = "Mia";
-    function getSelectedVapiVoice(){ return { provider: "vapi", voiceId: selectedVoiceId }; }
-
-    async function vapiStartCall(assistantId, assistantOverrides) {
-      const apiKey = await loadVapiKey();
-      await loadScriptOnce("https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js");
-      if (!window.vapiSDK || typeof window.vapiSDK.run !== "function") {
-        throw new Error("Vapi SDK did not initialize");
-      }
-
-      if (vapiFallbackInstance && vapiFallbackInstance.stop) {
-        try { vapiFallbackInstance.stop(); } catch {}
-      }
-
-      ensureVapiWidgetDocking();
-
-      vapiFallbackInstance = window.vapiSDK.run({
-        apiKey,
-        assistant: assistantId,
-        assistantOverrides: assistantOverrides || {}
+      const rows = await res.json();
+      const grouped = {};
+      (rows || []).forEach((row) => {
+        const continent = row.region || "Other";
+        const name = row.name || "";
+        if (!name) return;
+        grouped[continent] ||= [];
+        grouped[continent].push(name);
       });
 
-      // In case widget is injected slightly later:
-      setTimeout(ensureVapiWidgetDocking, 150);
-      setTimeout(ensureVapiWidgetDocking, 450);
-
-      return vapiFallbackInstance;
+      Object.keys(grouped).forEach((k) => grouped[k].sort((a,b) => String(a).localeCompare(String(b))));
+      _marketsByContinentCache = grouped;
+      return grouped;
     }
 
-    // Demo start (30s auto-stop)
-    async function startDemoCallFromGate(){
-      closeModal();
-
-      // enforce setup readiness
-      if(completedSteps < 5){
-        alert("Complete steps 1–5 before running a demo.");
-        return;
-      }
-
-      const countBefore = getDemoCount();
-      if(countBefore >= DEMO_MAX_CALLS){
-        refreshActionLocks();
-        return;
-      }
-
-      // increment immediately (prevents spam-click)
-      const after = incDemoCount();
-
-      try{
-        const industry = selectedIndustryKey || "Electrical";
-        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
-
-        const bn = businessName || "YOUR BUSINESS";
-        await vapiStartCall(assistantId, {
-          voice: getSelectedVapiVoice(),
-          firstMessage: `Hi! Thank you for calling ${bn}. How can I help you today?`
-          // If you want to inject a system script later, add model.messages here.
-        });
-
-        // Mark demo done
-        setDidDemoOnce();
-
-        // Auto-stop after 30 seconds
-        setTimeout(() => {
-          try { vapiFallbackInstance?.stop?.(); } catch {}
-        }, DEMO_SECONDS * 1000);
-
-        // Update UI gating
-        refreshActionLocks();
-
-      } catch(err){
-        console.error(err);
-        alert("Error starting demo call. Check console + /api/config (Vapi key) and ensure the SDK loads.");
-        // rollback count if needed (optional). Keeping it strict per your limits.
-      }
-    }
-
-    // ============================
-    // Activation (Stripe redirect)
-    // ============================
-    function activateNow(){
-      try { confetti(); } catch(e){}
-      const plan = PLANS[selectedPlanId];
-      setTimeout(() => { window.location.href = plan.stripe; }, 650);
-    }
-
-    // ============================
-    // Wire UI
-    // ============================
-    function wire(){
-      // Setup step cards
-      document.getElementById("s1").addEventListener("click", () => openStep(1));
-      document.getElementById("s2").addEventListener("click", () => openStep(2));
-      document.getElementById("s3").addEventListener("click", () => openStep(3));
-      document.getElementById("s4").addEventListener("click", () => openStep(4));
-      document.getElementById("s5").addEventListener("click", () => openStep(5));
-
-      // Global Start Activation
-      document.getElementById("startActivationBtn").addEventListener("click", () => openStep(1));
-      document.getElementById("activateHeroBtn").addEventListener("click", () => openStep(1));
-
-      // SMB Benefits
-      document.getElementById("smbBenefitsBtn").addEventListener("click", openBenefits);
-
-      // Actions
-      document.getElementById("demoBtn").addEventListener("click", () => {
-        if(document.getElementById("demoBtn").classList.contains("disabled")) return;
-        openDemoGate();
-      });
-
-      window.__satisfiedPressed = false;
-      document.getElementById("satisfiedBtn").addEventListener("click", () => {
-        if(document.getElementById("satisfiedBtn").classList.contains("disabled")) return;
-        window.__satisfiedPressed = true;
-        refreshActionLocks();
-      });
-
-      document.getElementById("activateBtn").addEventListener("click", () => {
-        if(document.getElementById("activateBtn").classList.contains("disabled")) return;
-        activateNow();
-      });
-
-      // Top strip demo placeholders
-      document.getElementById("qaBtn").addEventListener("click", () => openModal("AI Q&A", `<div class="pill mb-3">AI Q&A</div><div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left"><div class="text-[12px] text-slate-300 font-semibold leading-relaxed">Connect this to your backend endpoint: <span class="text-orange-500 font-black">POST /api/ai-qa</span>.</div></div>`, false));
-      document.getElementById("forumBtn").addEventListener("click", () => openModal("Forum", `<div class="pill mb-3">Forum</div><div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left"><div class="text-[12px] text-slate-300 font-semibold leading-relaxed">Forum UI is ready to connect. Add backend later.</div></div>`, false));
-      document.getElementById("newsletterBtnTop").addEventListener("click", () => openModal("Newsletter", `<div class="pill mb-3">Newsletter</div><div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left"><div class="text-[12px] text-slate-300 font-semibold leading-relaxed">Connect this to your backend endpoint: <span class="text-orange-500 font-black">POST /api/newsletter</span>.</div></div>`, false));
-      document.getElementById("dashBtn").addEventListener("click", () => {
-        // change as needed
-        window.location.href = "/dashboard";
-      });
-
-      // Language
-      document.getElementById("langTrigger").addEventListener("click", (e) => { e.stopPropagation(); toggleLangMenu(); });
-      document.addEventListener("click", (e) => {
-        const menu = document.getElementById("langMenu");
-        const wrap = document.getElementById("langWrap");
-        if(menu.style.display === "flex" && !wrap.contains(e.target)) toggleLangMenu(false);
-      });
-    }
-
-    // ============================
-    // Language menu
-    // ============================
-    const languageList = [
-      { id:"EN", n:"English", f:"us" },
-      { id:"ES", n:"Spanish", f:"mx" },
-      { id:"FR", n:"French", f:"fr" },
-      { id:"AR", n:"Arabic", f:"sa" },
-      { id:"HE", n:"Hebrew", f:"il" },
-      { id:"DE", n:"German", f:"de" },
-      { id:"PT", n:"Portuguese", f:"pt" },
-      { id:"RU", n:"Russian", f:"ru" }
-    ];
-
-    function toggleLangMenu(force){
-      const d = document.getElementById('langMenu');
-      if(force === true) d.style.display = 'flex';
-      else if(force === false) d.style.display = 'none';
-      else d.style.display = (d.style.display === 'flex') ? 'none' : 'flex';
-    }
-    function setLang(cc, langCode){
-      document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
-      document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${langCode}`;
-      i18n.setLanguage(langCode);
-      toggleLangMenu(false);
-    }
-    function filterList(containerId, query){
-      const q = (query || "").toUpperCase();
-      document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
-        const name = b.getAttribute('data-n') || b.innerText;
-        b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
-      });
-    }
     function createBtn(txt, fn){
-      const b = document.createElement('button');
+      const b = document.createElement("button");
       b.type = "button";
       b.className = "modal-btn";
-      b.innerText = txt;
+      b.textContent = txt;
       b.onclick = fn;
       return b;
     }
-    function initLangList(){
-      const list = document.getElementById('langList');
-      list.innerHTML = "";
-      languageList.forEach(l => {
-        const b = createBtn(l.n, () => setLang(l.f, l.id));
-        b.setAttribute('data-n', l.n);
-        b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3" alt=""> <span>${escapeHtml(l.n)}</span>`;
-        list.appendChild(b);
+
+    async function renderMarketByContinent(searchQuery){
+      const c = document.getElementById("mContent");
+      c.innerHTML = "";
+      const q = (searchQuery || "").trim().toUpperCase();
+      const grouped = await getMarketsGroupedByContinent();
+
+      Object.keys(grouped).forEach(cont => {
+        const list = (grouped[cont] || []).slice().sort((a,b)=>a.localeCompare(b));
+        const filtered = list.filter(n => n.toUpperCase().includes(q));
+        if(!filtered.length) return;
+
+        const div = document.createElement("div");
+        div.className = "divider";
+        div.textContent = cont.toUpperCase();
+        c.appendChild(div);
+
+        filtered.forEach(name => {
+          const btn = createBtn(name, () => {
+            selectedMarket = name;
+            finishStep(1, name.toUpperCase(), true);
+          });
+          btn.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> ${escapeHtml(name)}`;
+          c.appendChild(btn);
+        });
       });
-      i18n.applyTranslations(document);
+
+      if(!c.children.length){
+        const hint = document.createElement("div");
+        hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
+        hint.textContent = "No markets found.";
+        c.appendChild(hint);
+      }
+    }
+
+    function renderIndustryCategoryList(searchQuery){
+      const c = document.getElementById("mContent");
+      c.innerHTML = "";
+      const q = (searchQuery || "").trim().toUpperCase();
+
+      const groups = buildCategorizedIndustryList();
+      groups.forEach(g => {
+        const filtered = g.items.filter(name => name.toUpperCase().includes(q));
+        if(!filtered.length) return;
+
+        const div = document.createElement("div");
+        div.className = "divider";
+        div.textContent = g.cat.toUpperCase();
+        c.appendChild(div);
+
+        filtered.forEach(name => {
+          const btn = createBtn(name, () => {
+            selectedIndustryKey = name;
+            refreshTemplatesForCurrentSelection(true);
+            finishStep(2, name.toUpperCase(), true);
+          });
+          c.appendChild(btn);
+        });
+      });
+
+      if(!c.children.length){
+        const hint = document.createElement("div");
+        hint.className = "text-[10px] font-black uppercase tracking-widest text-slate-500 text-center py-10";
+        hint.textContent = "No matching results";
+        c.appendChild(hint);
+      }
     }
 
     // ============================
-    // Timer + counter
+    // Modal router
     // ============================
-    setInterval(() => {
-      const now = new Date();
-      const h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds();
-      document.getElementById('timer').textContent =
-        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    async function triggerModal(step){
+      lastFocusedEl = document.activeElement;
 
-      if (Math.random() > 0.82) {
+      const modal = document.getElementById("setupModal");
+      const shell = document.getElementById("modalShell");
+      const pill = document.getElementById("mPill");
+      const title = document.getElementById("mTitle");
+      const searchWrap = document.getElementById("modalSearchContainer");
+      const content = document.getElementById("mContent");
+
+      // reset
+      shell.classList.remove("narrow");
+      searchWrap.innerHTML = "";
+      content.innerHTML = "";
+
+      modal.style.display = "flex";
+      modal.setAttribute("aria-hidden","false");
+      lockBodyScroll();
+
+      // Step 1
+      if(step === 1){
+        pill.textContent = "STEP 01";
+        title.textContent = "Country / Market";
+        searchWrap.innerHTML = `<input class="search-box" placeholder="SEARCH COUNTRIES..." onkeyup="renderMarketByContinent(this.value)">`;
+        await renderMarketByContinent("");
+        return;
+      }
+
+      // Step 2
+      if(step === 2){
+        pill.textContent = "STEP 02";
+        title.textContent = "Industry";
+        searchWrap.innerHTML = `<input class="search-box" placeholder="SEARCH INDUSTRIES..." onkeyup="renderIndustryCategoryList(this.value)">`;
+        renderIndustryCategoryList("");
+        return;
+      }
+
+      // Step 3 (Agent + Role + Template + Voice + Script)
+      if(step === 3){
+        pill.textContent = "STEP 03";
+        title.textContent = "Agent + Role + Templates + Voice";
+
+        // Ensure template defaults exist
+        refreshTemplatesForCurrentSelection(false);
+        if(!selectedTemplateKey){
+          const { templates } = getTemplatesFor(selectedRole);
+          if(templates[0]) selectedTemplateKey = templates[0].key;
+          refreshTemplatesForCurrentSelection(true);
+        }
+
+        const roleOptions = ["Receptionist", "Sales Agent", "Support Agent"];
+        const filteredTemplates = getFilteredTemplates();
+        const { templates, packName } = getTemplatesFor(selectedRole);
+
+        // Build UI
+        content.innerHTML = `
+          <div class="grid lg:grid-cols-2 gap-4 text-left">
+
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">Agent</div>
+              <div class="text-[11px] text-slate-300 font-semibold mb-3">
+                Choose your AI agent (syncs with the ecosystem selection).
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-2">
+                ${HERO_AGENTS.map(a => `
+                  <button class="modal-btn" type="button"
+                    onclick="selectAgentGlobal('${escapeHtml(a.key)}', false); rerenderStep3AgentDesc();"
+                    style="${a.key === selectedAgentKey ? 'border-color: rgba(249,115,22,0.75); background: rgba(249,115,22,0.12);' : ''}">
+                    ${escapeHtml(a.key)}${a.key === selectedAgentKey ? " ✓" : ""}
+                  </button>
+                `).join("")}
+              </div>
+
+              <div class="divider mt-4">Description</div>
+              <div id="step3AgentDesc" class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+                ${escapeHtml(HERO_AGENTS.find(x => x.key === selectedAgentKey)?.desc || "")}
+              </div>
+            </div>
+
+            <div class="card-theme">
+              <div class="mini text-orange-500 mb-2">Behavior</div>
+
+              <div class="grid gap-2">
+                <div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Role</div>
+                  <select id="roleSelect" class="select-theme" onchange="onRoleChange(this.value)">
+                    ${roleOptions.map(r => `<option value="${escapeHtml(r)}" ${r===selectedRole ? "selected" : ""}>${escapeHtml(r)}</option>`).join("")}
+                  </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Template Category</div>
+                    <select id="templateCategory" class="select-theme" onchange="onTemplateCategoryChange(this.value)">
+                      ${templateCategories.map(cat => `<option value="${escapeHtml(cat)}" ${cat===templateCategoryFilter ? "selected" : ""}>${escapeHtml(cat)}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div>
+                    <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Search Templates</div>
+                    <input id="templateSearch" class="search-box" placeholder="SEARCH..." value="${escapeHtml(templateSearchQuery)}"
+                      oninput="onTemplateSearchChange(this.value)" />
+                  </div>
+                </div>
+
+                <div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Template (${escapeHtml(packName)})</div>
+                  <select id="templateSelect" class="select-theme" onchange="onTemplateChange(this.value)">
+                    ${
+                      filteredTemplates.length
+                        ? filteredTemplates.map(t => `<option value="${escapeHtml(t.key)}" ${t.key===selectedTemplateKey ? "selected" : ""}>${escapeHtml(t.title)} — ${escapeHtml(t.category)}</option>`).join("")
+                        : `<option value="">NO MATCHING RESULTS</option>`
+                    }
+                  </select>
+                </div>
+
+                <div class="grid gap-2">
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Editable Script</div>
+                  <textarea id="scriptBox" class="textarea-theme" style="min-height:160px" oninput="agentScript=this.value;">${escapeHtml(agentScript || "")}</textarea>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button class="outline-orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest" type="button" onclick="resetScriptToTemplate()">
+                      Reset to Template
+                    </button>
+                    <button class="outline-orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest" type="button" onclick="agentScript=applyVars(agentScript||''); document.getElementById('scriptBox').value=agentScript;">
+                      Apply Variables
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Voice</div>
+                  <select id="voiceSelect" class="select-theme" onchange="selectedVoiceId=this.value;">
+                    ${vapiVoices.map(v => `<option value="${escapeHtml(v.id)}" ${v.id===selectedVoiceId ? "selected" : ""}>${escapeHtml(v.label)}</option>`).join("")}
+                  </select>
+                  <button class="outline-orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest mt-2" type="button" onclick="previewVoice()">
+                    Preview Voice
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <div class="grid sm:grid-cols-2 gap-2">
+              <button class="outline-orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest" type="button" onclick="closeModal()">
+                Close
+              </button>
+              <button class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic tracking-widest" type="button" onclick="confirmStep3AndNext()">
+                Confirm
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Step 4 Company
+      if(step === 4){
+        pill.textContent = "STEP 04";
+        title.textContent = "Company";
+        shell.classList.add("narrow");
+
+        content.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">Business Name</div>
+            <div class="text-[12px] text-slate-300 font-semibold mb-3">This name is used in greetings and scripts.</div>
+            <input id="bn" class="search-box" placeholder="BUSINESS NAME..." value="${escapeHtml(businessName)}"
+              style="text-transform:uppercase; font-weight:900; letter-spacing:0.12em;" />
+            <button class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic tracking-widest mt-3" type="button" onclick="saveCompanyAndNext()">
+              Save
+            </button>
+          </div>
+        `;
+        setTimeout(()=>document.getElementById("bn")?.focus(), 60);
+        return;
+      }
+
+      // Step 5 Plan (must be selectable here too)
+      if(step === 5){
+        pill.textContent = "STEP 05";
+        title.textContent = "Plan";
+        shell.classList.add("narrow");
+
+        const p = PLANS[selectedPlanId];
+
+        content.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">BETA SPECIAL (LIMITED TIME OFFER)</div>
+            <div class="text-[12px] text-slate-300 font-semibold mb-3">Select a plan. This also syncs with the hero pricing cards.</div>
+
+            <div class="grid gap-2">
+              <button class="modal-btn" type="button" onclick="selectPlanGlobal('P299'); renderPlanModalInline();"
+                style="${selectedPlanId==='P299' ? 'border-color: rgba(249,115,22,0.75); background: rgba(249,115,22,0.12);' : ''}">
+                $299 /mo — up to 1,000 min — <span class="strike">$499</span> reg ${selectedPlanId==='P299' ? ' ✓' : ''}
+              </button>
+              <button class="modal-btn" type="button" onclick="selectPlanGlobal('P599'); renderPlanModalInline();"
+                style="${selectedPlanId==='P599' ? 'border-color: rgba(249,115,22,0.75); background: rgba(249,115,22,0.12);' : ''}">
+                $599 /mo — up to 2,500 min — <span class="strike">$999</span> reg ${selectedPlanId==='P599' ? ' ✓' : ''}
+              </button>
+            </div>
+
+            <div class="divider mt-4">Selected</div>
+            <div id="planInlineSummary" class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+              Current selection: <span class="text-orange-500 font-black">$${escapeHtml(String(p.price))}/mo</span> — up to <span class="text-orange-500 font-black">${escapeHtml(String(p.min))} min</span>.
+            </div>
+
+            <button class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic tracking-widest mt-4" type="button" onclick="confirmPlanAndNext()">
+              Confirm Plan
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      // Demo gate (Step 6)
+      if(step === "demoGate"){
+        pill.textContent = "STEP 06";
+        title.textContent = "Demo Call";
+        shell.classList.add("narrow");
+
+        const count = getDemoCount();
+        const remaining = Math.max(0, 2 - count);
+
+        content.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">Demo Limits</div>
+            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+              You have <span class="text-orange-500 font-black">${remaining}</span> demo call(s) remaining.<br>
+              Each demo is limited to <span class="text-orange-500 font-black">30 seconds</span>.
+            </div>
+
+            <div class="divider mt-4">Choose</div>
+
+            <button class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic tracking-widest mt-2"
+              type="button" onclick="startDemo('DEMO')">
+              Make Demo Call
+            </button>
+
+            <button class="outline-orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest mt-2"
+              type="button" onclick="startDemo('COMPANY')">
+              Talk to Your Company Agent
+            </button>
+
+            <div class="divider mt-4">Current config</div>
+            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
+              Market: <span class="text-orange-500 font-black">${escapeHtml(selectedMarket || "—")}</span><br>
+              Industry: <span class="text-orange-500 font-black">${escapeHtml(selectedIndustryKey || "—")}</span><br>
+              Agent: <span class="text-orange-500 font-black">${escapeHtml(selectedAgentKey)}</span><br>
+              Company: <span class="text-orange-500 font-black">${escapeHtml(businessName || "—")}</span><br>
+              Plan: <span class="text-orange-500 font-black">$${escapeHtml(String(PLANS[selectedPlanId].price))}/mo</span><br>
+              Voice: <span class="text-orange-500 font-black">${escapeHtml(selectedVoiceId)}</span>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Satisfied (Step 7)
+      if(step === "satisfied"){
+        pill.textContent = "STEP 07";
+        title.textContent = "Satisfied";
+        shell.classList.add("narrow");
+
+        content.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">Confirm</div>
+            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+              Confirm that the demo call quality is acceptable.
+            </div>
+
+            <button class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic tracking-widest mt-4"
+              type="button" onclick="finishSatisfiedAndNext()">
+              Yes — I’m Satisfied
+            </button>
+
+            <button class="outline-orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest mt-2"
+              type="button" onclick="openByStep(6)">
+              Run Another Demo
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      // Activate (Step 8)
+      if(step === "activate"){
+        pill.textContent = "STEP 08";
+        title.textContent = "Activate";
+        shell.classList.add("narrow");
+
+        const plan = PLANS[selectedPlanId];
+
+        content.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">Ready to Deploy</div>
+            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+              Proceed to payment. After payment, your agent deploys.
+            </div>
+
+            <div class="divider mt-4">Summary</div>
+            <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
+              Market: <span class="text-orange-500 font-black">${escapeHtml(selectedMarket || "—")}</span><br>
+              Industry: <span class="text-orange-500 font-black">${escapeHtml(selectedIndustryKey || "—")}</span><br>
+              Agent: <span class="text-orange-500 font-black">${escapeHtml(selectedAgentKey)}</span><br>
+              Company: <span class="text-orange-500 font-black">${escapeHtml(businessName || "—")}</span><br>
+              Plan: <span class="text-orange-500 font-black">$${escapeHtml(String(plan.price))}/mo</span> (up to ${escapeHtml(String(plan.min))} min)<br>
+              Voice: <span class="text-orange-500 font-black">${escapeHtml(selectedVoiceId)}</span>
+            </div>
+
+            <button class="orange-btn w-full py-3 rounded-xl text-[10px] font-black uppercase italic tracking-widest mt-4"
+              type="button" onclick="activateNow()">
+              Activate Now
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      // SMB Benefits
+      if(step === "benefits"){
+        pill.textContent = "SMB";
+        title.textContent = "SMB Benefits";
+        shell.classList.add("narrow");
+
+        content.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">Small Business Benefits</div>
+            <div class="grid gap-2 mt-3">
+              ${smbBenefits.map(b => `
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
+                  <div class="text-[10px] font-black uppercase tracking-widest text-white">${escapeHtml(b.title)}</div>
+                  <div class="text-[12px] text-slate-300 font-semibold leading-relaxed mt-1">${escapeHtml(b.desc)}</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Dashboard placeholder
+      if(step === "dashboard"){
+        pill.textContent = "DASH";
+        title.textContent = "Dashboard";
+        shell.classList.add("narrow");
+        content.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">Client Dashboard</div>
+            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+              This button is wired for your future dashboard route.<br>
+              Connect it to your deployed client dashboard when ready.
+            </div>
+            <div class="mt-3 bg-white/5 border border-white/10 rounded-2xl p-3 text-[11px] text-slate-300 font-semibold">
+              Suggested: <span class="text-orange-500 font-black">/dashboard</span>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Community placeholders
+      if(step === "qa" || step === "forum" || step === "newsletter"){
+        pill.textContent = "COMM";
+        title.textContent = step.toUpperCase();
+        shell.classList.add("narrow");
+        content.innerHTML = `
+          <div class="card-theme text-left">
+            <div class="mini text-orange-500 mb-2">${escapeHtml(step.toUpperCase())}</div>
+            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
+              Hook this to your backend endpoints when you’re ready.
+            </div>
+          </div>
+        `;
+        return;
+      }
+    }
+
+    // Step 3 handlers (must re-render desc)
+    function rerenderStep3AgentDesc(){
+      const el = document.getElementById("step3AgentDesc");
+      if(!el) return;
+      el.textContent = HERO_AGENTS.find(x => x.key === selectedAgentKey)?.desc || "";
+    }
+
+    function onRoleChange(role){
+      selectedRole = role;
+      templateCategoryFilter = "ALL";
+      templateSearchQuery = "";
+      refreshTemplatesForCurrentSelection(true);
+      triggerModal(3);
+    }
+    function onTemplateCategoryChange(cat){
+      templateCategoryFilter = cat;
+      triggerModal(3);
+    }
+    function onTemplateSearchChange(q){
+      templateSearchQuery = q || "";
+      triggerModal(3);
+    }
+    function onTemplateChange(key){
+      const filtered = getFilteredTemplates();
+      const chosen = filtered.find(x => x.key === key);
+      if(!chosen) return;
+      selectedTemplateKey = key;
+      agentScript = applyVars(chosen.script);
+      // keep textarea in sync
+      const box = document.getElementById("scriptBox");
+      if(box) box.value = agentScript;
+    }
+    function resetScriptToTemplate(){
+      const filtered = getFilteredTemplates();
+      const chosen = filtered.find(x => x.key === selectedTemplateKey) || filtered[0];
+      if(!chosen) return;
+      agentScript = applyVars(chosen.script);
+      const box = document.getElementById("scriptBox");
+      if(box) box.value = agentScript;
+    }
+    function confirmStep3AndNext(){
+      agentScript = applyVars(agentScript || "");
+      // Mark step 3 completed and advance
+      finishStep(3, selectedAgentKey.toUpperCase(), true);
+    }
+
+    // Step 4 save
+    function saveCompanyAndNext(){
+      const raw = (document.getElementById("bn")?.value || "");
+      const v = raw.trim().slice(0, 60);
+      if(v.length >= 2){
+        businessName = v;
+        agentScript = applyVars(agentScript || "");
+        finishStep(4, businessName.toUpperCase(), true);
+      }
+    }
+
+    // Step 5 confirm
+    function renderPlanModalInline(){
+      const el = document.getElementById("planInlineSummary");
+      if(!el) return;
+      const p = PLANS[selectedPlanId];
+      el.innerHTML = `Current selection: <span class="text-orange-500 font-black">$${escapeHtml(String(p.price))}/mo</span> — up to <span class="text-orange-500 font-black">${escapeHtml(String(p.min))} min</span>.`;
+    }
+    function confirmPlanAndNext(){
+      const p = PLANS[selectedPlanId];
+      finishStep(5, `$${p.price} /MO`, true); // IMPORTANT: after this, PLAN must stop blinking (refreshProtocolUi handles it)
+    }
+
+    // ============================
+    // Vapi: Voice + Demo
+    // ============================
+    function getSelectedVapiVoice() { return { provider: "vapi", voiceId: selectedVoiceId }; }
+
+    async function previewVoice(){
+      try{
+        const industry = getCurrentIndustryKey();
+        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
+        await vapiStartCall(assistantId, {
+          voice: getSelectedVapiVoice(),
+          firstMessage: "Hi! This is a quick voice preview. How does this voice sound to you?"
+        });
+        closeModal();
+      } catch(e){
+        console.error(e);
+        alert("Preview failed. Check console + /api/config.");
+      }
+    }
+
+    async function startDemo(mode){
+      const count = getDemoCount();
+      if(count >= 2){
+        alert("Demo limit reached (2 demos max).");
+        return;
+      }
+
+      try{
+        const industry = getCurrentIndustryKey();
+        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
+
+        const bn = businessName || "YOUR BUSINESS";
+        const finalScript = applyVars(agentScript || "");
+
+        const firstMessage =
+          (mode === "COMPANY")
+            ? `Hi! You reached ${bn}. This is your configured company agent. How can I help you today?`
+            : `Hi! Thanks for calling ${bn}. This is a demo call. How can I help you today?`;
+
+        // increment count
+        setDemoCount(count + 1);
+        setDemoUsedOnce(true);
+
+        await vapiStartCall(assistantId, {
+          voice: getSelectedVapiVoice(),
+          firstMessage,
+          model: { provider: "openai", model: "gpt-4o-mini", messages: [{ role: "system", content: finalScript }] }
+        });
+
+        // Move UI to mount again (in case it injects late)
+        moveVapiUiToMount();
+
+        // 30 second limit: stop call
+        setTimeout(() => {
+          try { vapiInstance?.stop?.(); } catch {}
+        }, 30_000);
+
+        closeModal();
+
+        // Mark step 6 done and auto-open satisfied
+        finishStep(6, "DONE", true);
+
+      } catch(err){
+        console.error(err);
+        alert("Error starting demo call. Check console + /api/config.");
+      } finally {
+        // ensure protocol buttons update (satisfied enabled)
+        refreshProtocolUi();
+      }
+    }
+
+    // Step 7 satisfied
+    function finishSatisfiedAndNext(){
+      // mark step 7 done
+      finishStep(7, "YES", true);
+      refreshProtocolUi();
+    }
+
+    // Activate
+    function activateNow(){
+      try { confetti(); } catch(e){}
+      setDeployed(true);
+      completed = Math.max(completed, 8);
+      refreshProtocolUi();
+      closeModal();
+
+      const plan = PLANS[selectedPlanId];
+      setTimeout(() => {
+        window.location.href = plan.stripe;
+      }, 650);
+    }
+
+    // ============================
+    // Wiring
+    // ============================
+    function wireUi(){
+      // Hero buttons
+      document.getElementById("activateHeroBtn").addEventListener("click", () => openByStep(1));
+      document.getElementById("startActivationRightBtn").addEventListener("click", () => openByStep(1));
+      document.getElementById("smbBenefitsBtn").addEventListener("click", () => triggerModal("benefits"));
+
+      // Top bar buttons
+      document.getElementById("dashboardBtn").addEventListener("click", () => triggerModal("dashboard"));
+      document.getElementById("qaBtn").addEventListener("click", () => triggerModal("qa"));
+      document.getElementById("forumBtn").addEventListener("click", () => triggerModal("forum"));
+      document.getElementById("newsletterTopBtn").addEventListener("click", () => triggerModal("newsletter"));
+
+      // Protocol step cards
+      document.getElementById("s1").addEventListener("click", () => openByStep(1));
+      document.getElementById("s2").addEventListener("click", () => openByStep(2));
+      document.getElementById("s3").addEventListener("click", () => openByStep(3));
+      document.getElementById("s4").addEventListener("click", () => openByStep(4));
+      document.getElementById("s5").addEventListener("click", () => openByStep(5));
+
+      // Action buttons
+      document.getElementById("s6").addEventListener("click", () => openByStep(6));
+      document.getElementById("s7").addEventListener("click", () => openByStep(7));
+      document.getElementById("s8").addEventListener("click", () => openByStep(8));
+
+      // Pricing cards (hero) selection
+      document.getElementById("planCard_299").addEventListener("click", () => selectPlanGlobal("P299"));
+      document.getElementById("planCard_599").addEventListener("click", () => selectPlanGlobal("P599"));
+      document.getElementById("planCard_299").addEventListener("keydown", (e) => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); selectPlanGlobal("P299"); } });
+      document.getElementById("planCard_599").addEventListener("keydown", (e) => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); selectPlanGlobal("P599"); } });
+    }
+
+    // ============================
+    // INIT defaults
+    // ============================
+    // Ensure script has a starter
+    refreshTemplatesForCurrentSelection(true);
+
+    // If no market/industry yet, keep blank until user selects
+    selectedMarket = selectedMarket || "United States";
+    selectedIndustryKey = selectedIndustryKey || "Electrical";
+
+    // Render UI
+    renderEcosystem();
+    selectPlanGlobal(selectedPlanId);
+
+    // Initialize protocol labels
+    document.getElementById("v1").innerText = (selectedMarket ? selectedMarket.toUpperCase() : "SELECT");
+    document.getElementById("v2").innerText = (selectedIndustryKey ? selectedIndustryKey.toUpperCase() : "SELECT");
+    document.getElementById("v3").innerText = selectedAgentKey.toUpperCase();
+    document.getElementById("v4").innerText = businessName ? businessName.toUpperCase() : "SYNC";
+    document.getElementById("v5").innerText = `$${PLANS[selectedPlanId].price} /MO`;
+
+    // Demo gating based on stored usage
+    if(hasDemoUsedOnce()){
+      completed = Math.max(completed, 6);
+    }
+
+    // If deployed, mark all
+    if(isDeployed()){
+      completed = 8;
+    } else {
+      // start as step 0, but unlock step 1
+      completed = 0;
+      // Do not auto-complete any setup steps
+    }
+
+    // Wire UI + apply initial locks/blink
+    wireUi();
+    refreshProtocolUi();
+
+    // Timer + counter (kept)
+    setInterval(() => {
+      if (Math.random() > 0.8) {
         const el = document.getElementById('agentCount');
         let count = parseInt(el.innerText.replace(',', ''), 10);
         el.innerText = (count + 1).toLocaleString();
       }
     }, 1000);
 
-    // ============================
-    // INIT
-    // ============================
-    initLangList();
+    // Optional: keep Vapi UI move attempt (in case SDK injected earlier)
+    moveVapiUiToMount();
 
-    // defaults in protocol labels
-    document.getElementById("v1").innerText = "SELECT";
-    document.getElementById("v2").innerText = "SELECT";
-    document.getElementById("v3").innerText = "CHOOSE";
-    document.getElementById("v4").innerText = "SYNC";
-    document.getElementById("v5").innerText = "CHOOSE";
-
-    // ecosystem render + default selection
-    expandedAgentKey = null;
-    selectedAgentKey = "AI Receptionist";
-    renderEcosystem();
-
-    // plan visuals
-    selectPlanUI(selectedPlanId);
-
-    // wire events
-    wire();
-
-    // protocol gating init
-    completedSteps = 0;
-    refreshStepLocks();
-    refreshActionLocks();
-
-    // Ensure docking observer ready early (fix invisible call UI)
-    ensureVapiWidgetDocking();
-
-    // Only for safety: keep protocol step 3 in sync if user selects agent before confirming
-    // (step 3 confirm locks it)
-    window.onLanguageChanged = () => i18n.applyTranslations(document);
-    i18n.applyTranslations(document);
-
-    // Click plan step should open confirm modal when available
-    // Keep Plan from blinking after confirm: confirmPlanStep calls refreshActionLocks(true)
   </script>
 </body>
 </html>
