@@ -1,812 +1,572 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-  <title>AI CALL PORT | Global SMALL BUSINESS Activation</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI CALL PORT — Landing</title>
 
-  <!-- Tailwind (CDN OK for prototype) -->
-  <script>
-    window.tailwind = window.tailwind || {};
-    tailwind.config = { theme: { extend: {} }, corePlugins: { preflight: true } };
-  </script>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800;900&display=swap" rel="stylesheet" />
 
   <style>
-    * { box-sizing: border-box; }
-    html, body {
-      width: 100%;
-      min-height: 100vh;
-      position: relative;
-      background: #06080f;
-      color: #e2e8f0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    body { padding: 14px; }
-    @media (min-width: 1024px) { body { padding: 26px; } }
-
-    /* =========================================================
-       PREMIUM GLOW PACK (Option B)
-       - Ambient breathing background layer
-       - Stronger cursor-following glow
-       - Console "light sweep" (cursor spotlight)
-       - Subtle card edge glow + hover response
-       ========================================================= */
-
-    /* 1) Ambient breathing layer (VERY subtle) */
-    .bg-ambient {
-      position: fixed;
-      inset: -20%;
-      z-index: -3;
-      pointer-events: none;
-      background:
-        radial-gradient(800px 520px at 20% 20%, rgba(249,115,22,0.10), transparent 60%),
-        radial-gradient(900px 600px at 80% 30%, rgba(99,102,241,0.08), transparent 62%),
-        radial-gradient(820px 540px at 60% 80%, rgba(249,115,22,0.08), transparent 62%),
-        radial-gradient(900px 600px at 30% 85%, rgba(59,130,246,0.06), transparent 64%);
-      filter: blur(18px);
-      opacity: 0.85;
-      animation: ambientShift 12s ease-in-out infinite alternate;
-      transform: translateZ(0);
-    }
-    @keyframes ambientShift {
-      0%   { transform: translate3d(0,0,0) scale(1.02); opacity: 0.78; }
-      50%  { transform: translate3d(-1.2%, 0.8%,0) scale(1.05); opacity: 0.90; }
-      100% { transform: translate3d(1.4%, -0.9%,0) scale(1.03); opacity: 0.82; }
+    :root{
+      --bg:#06080f;
+      --panel: rgba(10,12,18,.85);
+      --panel2: rgba(0,0,0,.35);
+      --border: rgba(255,255,255,.10);
+      --muted: rgba(148,163,184,.85);
+      --muted2: rgba(148,163,184,.55);
+      --white: rgba(255,255,255,.95);
+      --orange:#f97316;
+      --orange2:#ea580c;
+      --green:#22c55e;
     }
 
-    /* 2) Cursor glow layer (you already had it; upgraded) */
-    .bg-glow {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      pointer-events: none;
-      background:
-        radial-gradient(560px 420px at var(--mx, 50%) var(--my, 50%), rgba(249,115,22,0.18) 0%, transparent 60%),
-        radial-gradient(820px 620px at calc(var(--mx, 50%) + 6%) calc(var(--my, 50%) + 4%), rgba(99,102,241,0.08) 0%, transparent 66%);
-      filter: blur(0px);
-      opacity: 1;
-      transform: translateZ(0);
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: var(--bg);
+      color:#e2e8f0;
+      font-family:"Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overflow-x:hidden;
     }
 
-    /* 3) Console base */
-    .console-container {
-      width: 100%;
+    .bg-glow{
+      position:fixed; inset:0; z-index:-1;
+      background: radial-gradient(circle at var(--mx,50%) var(--my,35%), rgba(249,115,22,.14) 0%, transparent 55%);
+      pointer-events:none;
+    }
+
+    .console{
+      width:100%;
       max-width: 1180px;
-      background: rgba(10, 12, 18, 0.86);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 28px;
+      margin: 18px auto 28px auto;
       padding: 18px;
-      position: relative;
-      z-index: 10;
-      margin: 0 auto 40px auto;
-      box-shadow: 0 30px 90px rgba(0,0,0,0.55);
-      overflow: hidden; /* for sweep overlay */
-    }
-    @media (min-width: 1024px){
-      .console-container{ padding: 26px; }
-    }
-
-    /* 4) Console light sweep overlay (cursor spotlight) */
-    .console-container::before{
-      content:"";
-      position:absolute;
-      inset:-1px;
-      border-radius: 28px;
-      pointer-events:none;
-      background:
-        radial-gradient(520px 380px at var(--sx, 50%) var(--sy, 30%), rgba(255,255,255,0.08), transparent 62%),
-        radial-gradient(760px 520px at var(--sx, 50%) var(--sy, 30%), rgba(249,115,22,0.10), transparent 68%);
-      mix-blend-mode: screen;
-      opacity: 0.9;
-      transition: opacity 180ms ease;
-    }
-    .console-container::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius: 28px;
-      pointer-events:none;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.10), transparent 24%),
-        radial-gradient(1200px 800px at 50% 0%, rgba(249,115,22,0.08), transparent 55%);
-      opacity: 0.35;
-    }
-    /* Slightly dim sweep when user isn't moving */
-    body.idle .console-container::before { opacity: 0.55; }
-
-    /* 5) Card/Panel subtle edge glow + hover */
-    .panel-glow {
-      position: relative;
-      border-radius: 24px;
-    }
-    .panel-glow::before{
-      content:"";
-      position:absolute;
-      inset:-1px;
-      border-radius: 24px;
-      pointer-events:none;
-      background: radial-gradient(420px 260px at var(--sx, 50%) var(--sy, 30%), rgba(249,115,22,0.14), transparent 60%);
-      opacity: 0.0;
-      transition: opacity 220ms ease;
-    }
-    .panel-glow:hover::before { opacity: 1; }
-
-    /* keep your existing gradient text */
-    .hero-title {
-      background: linear-gradient(180deg, #FFFFFF 28%, #f97316 110%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .kicker-title {
-      background: linear-gradient(180deg, #FFFFFF 40%, rgba(249,115,22,0.85) 120%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .orange-btn {
-      background: linear-gradient(90deg, #f97316, #ea580c);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      cursor: pointer;
-      transition: 0.18s;
-      color: white;
-    }
-    .orange-btn:hover { filter: brightness(1.03); }
-    .orange-btn:active { transform: scale(0.985); }
-
-    .ghost-btn {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
-      transition: 0.18s;
-      color: white;
-    }
-    .ghost-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(249,115,22,0.35); }
-
-    /* Soft orange glow for modal */
-    #setupModal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.92);
-      z-index: 10000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      pointer-events: auto;
-    }
-    .modal-shell {
-      background: rgba(10, 12, 18, 0.94);
-      border: 1px solid rgba(249,115,22,0.25);
       border-radius: 26px;
-      width: 100%;
-      max-width: 720px;
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+    }
+    @media (min-width:1024px){
+      .console{ padding:22px; margin-top:24px; }
+    }
+
+    .hero-title{
+      background: linear-gradient(180deg, #ffffff 30%, var(--orange) 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+
+    .btn-orange{
+      background: linear-gradient(90deg, var(--orange), var(--orange2));
+      border: 1px solid rgba(255,255,255,.18);
+      color:white;
+      transition:.15s;
+    }
+    .btn-orange:hover{ filter:brightness(1.05); }
+    .btn-orange:active{ transform:scale(.985); }
+
+    .btn-outline{
+      background: rgba(249,115,22,.10);
+      border:1px solid rgba(249,115,22,.35);
+      color:white;
+      transition:.15s;
+    }
+    .btn-outline:hover{ background: rgba(249,115,22,.16); border-color: rgba(249,115,22,.6); }
+    .btn-outline:active{ transform:scale(.985); }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.25);
+      background: rgba(249,115,22,.08);
+      font-weight:900;
+      font-size:10px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:white;
+      width:fit-content;
+    }
+
+    .top-chip{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(249,115,22,.30);
+      background: rgba(249,115,22,.10);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: white;
+      transition: .15s;
+    }
+    .top-chip:hover{ background: rgba(249,115,22,.18); border-color: rgba(249,115,22,.55); }
+
+    .dot-live{
+      width:6px;height:6px;border-radius:50%;
+      background:var(--green);
+      animation:pulse 2s infinite;
+    }
+    @keyframes pulse{
+      0%{ transform:scale(.95); box-shadow:0 0 0 0 rgba(34,197,94,.7); }
+      70%{ transform:scale(1); box-shadow:0 0 0 6px rgba(34,197,94,0); }
+      100%{ transform:scale(.95); box-shadow:0 0 0 0 rgba(34,197,94,0); }
+    }
+
+    /* Ecosystem buttons */
+    .eco-btn{
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: 12px 12px;
+      cursor:pointer;
+      transition:.15s;
+      user-select:none;
+      text-align:left;
+    }
+    .eco-btn:hover{ border-color: rgba(249,115,22,.45); background: rgba(249,115,22,.08); }
+    .eco-btn.selected{ border-color: rgba(249,115,22,.85); background: rgba(249,115,22,.12); box-shadow:0 0 18px rgba(249,115,22,.12); }
+    .eco-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .eco-name{
+      font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,.95);
+    }
+    .eco-tag{
+      font-size:9px; font-weight:900; text-transform:uppercase; letter-spacing:.16em;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: rgba(226,232,240,.90);
+      white-space:nowrap;
+    }
+    .eco-expand{
+      display:none;
+      margin-top:10px;
+      border-radius:14px;
+      padding:10px 12px;
+      background: rgba(0,0,0,.30);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .eco-btn.open .eco-expand{ display:block; }
+    .eco-desc{
+      font-size:12px; font-weight:700; line-height:1.45;
+      color: rgba(226,232,240,.88);
+    }
+    .eco-select-row{
+      display:flex; justify-content:flex-end; margin-top:10px;
+    }
+    .eco-select{
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:10px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(249,115,22,.10);
+      cursor:pointer;
+      transition:.15s;
+    }
+    .eco-select:hover{ background: rgba(249,115,22,.16); border-color: rgba(249,115,22,.70); }
+
+    /* Pricing cards */
+    .plan-card{
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      padding:14px;
+      cursor:pointer;
+      transition:.15s;
+      user-select:none;
+    }
+    .plan-card:hover{ border-color: rgba(249,115,22,.55); background: rgba(249,115,22,.08); }
+    .plan-card.selected{ border-color: rgba(249,115,22,.85); background: rgba(249,115,22,.14); box-shadow: 0 0 22px rgba(249,115,22,.18); }
+    .strike{ text-decoration:line-through; opacity:.55; }
+
+    /* Steps */
+    .step-card{
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      padding:12px;
+      min-height:58px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      user-select:none;
+      transition:.2s;
+      cursor:pointer;
+    }
+    .step-card.locked{
+      opacity:.22;
+      cursor:not-allowed;
+      pointer-events:none;
+    }
+    .step-card.done{
+      opacity:1;
+      border-color: rgba(249,115,22,.70);
+      background: rgba(249,115,22,.08);
+    }
+    .step-card.next{
+      opacity:1;
+      animation: glow 2s infinite ease-in-out;
+    }
+    @keyframes glow{
+      0%,100%{ border-color: rgba(249,115,22,.30); }
+      50%{ border-color: var(--orange); box-shadow: 0 0 18px rgba(249,115,22,.35); }
+    }
+
+    /* Big action buttons */
+    .action-btn{
+      border-radius:18px;
+      padding:18px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      user-select:none;
+      transition:.15s;
+      width:100%;
+      min-height:84px; /* taller / more important */
+    }
+    .action-outline{
+      background: rgba(249,115,22,.10);
+      border: 1px solid rgba(249,115,22,.35);
+      color:white;
+      cursor:pointer;
+    }
+    .action-primary{
+      background: linear-gradient(90deg, var(--orange), var(--orange2));
+      border: 1px solid rgba(255,255,255,.18);
+      color:white;
+      cursor:pointer;
+    }
+    .action-disabled{
+      opacity:.35;
+      cursor:not-allowed;
+      pointer-events:none;
+      filter:none;
+    }
+    .action-next{
+      animation: glow 2s infinite ease-in-out;
+    }
+    .k{ font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.18em; }
+    .s{ font-size:12px; font-weight:700; color: rgba(226,232,240,.88); line-height:1.35; }
+    .r{
+      font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.16em;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      white-space:nowrap;
+    }
+
+    /* Vapi mount zone */
+    #vapiMount{
+      border-radius: 18px;
+      border: 1px dashed rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      padding: 12px;
+      min-height: 190px;
+
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end; /* pin widget bottom */
+      align-items:flex-start;
+      gap:10px;
+      overflow:hidden;
+    }
+    #vapiHint{
+      font-size:10px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      color: rgba(148,163,184,.75);
+      margin-bottom:auto; /* keep hint up, push widget down */
+    }
+    #vapiHint strong{ color: rgba(249,115,22,.9); }
+    .vapi-green{
+      align-self:flex-start;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      background: rgba(34,197,94,.18);
+      border: 1px solid rgba(34,197,94,.55);
+      color: white;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: 10px;
+      cursor:pointer;
+      user-select:none;
+      box-shadow: 0 0 24px rgba(34,197,94,.18);
+    }
+    .vapi-green .gdot{
+      width:10px;height:10px;border-radius:50%;
+      background: var(--green);
+      box-shadow: 0 0 18px rgba(34,197,94,.55);
+    }
+    .vapi-green:active{ transform: scale(.985); }
+
+    /* Modal */
+    #modal{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.92);
+      z-index:9999;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 20px;
+    }
+    .modal-shell{
+      width:100%;
+      max-width: 980px;
+      max-height: 90vh;
+      overflow:hidden;
+      background: rgba(10,12,18,.92);
+      border: 1px solid rgba(249,115,22,.24);
+      border-radius: 24px;
       padding: 18px;
       box-shadow:
-        0 18px 60px rgba(0,0,0,0.65),
-        0 0 40px rgba(249,115,22,0.12);
+        0 0 0 1px rgba(249,115,22,.06),
+        0 0 35px rgba(249,115,22,.15),
+        0 20px 60px rgba(0,0,0,.60);
       backdrop-filter: blur(10px);
-      max-height: 90vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      display:flex;
+      flex-direction:column;
     }
-    .modal-shell.wide { max-width: 980px; }
-    .modal-content-wrap { overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 0; }
-    .modal-titlebar { display: flex; flex-direction: column; gap: 8px; }
-    .modal-body { flex: 1; min-height: 0; overflow: auto; padding-right: 2px; }
-    .modal-footer {
-      position: sticky;
-      bottom: 0;
-      background: rgba(10, 12, 18, 0.92);
-      border-top: 1px solid rgba(255,255,255,0.06);
-      padding-top: 12px;
-      margin-top: 10px;
-    }
-
-    .modal-btn {
-      width: 100%;
+    .modal-shell.narrow{ max-width: 560px; }
+    .modal-titlebar{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .modal-body{ margin-top: 12px; overflow:auto; padding-right:2px; flex:1; min-height:0; }
+    .modal-footer{ margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.06); }
+    .modal-item{
+      width:100%;
       padding: 12px 12px;
-      border-radius: 14px;
-      font-weight: 900;
-      text-transform: uppercase;
-      font-size: 9px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.10);
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      text-align: left;
-      letter-spacing: 0.14em;
-      line-height: 1.1;
-      pointer-events: auto;
-    }
-    .modal-btn:hover:not(.disabled) { background: rgba(255,255,255,0.10); border-color: rgba(249,115,22,0.55); }
-    .modal-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
-
-    .search-box {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 10px 10px;
-      color: white;
-      font-size: 12px;
-      outline: none;
-      width: 100%;
-      margin-bottom: 8px;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(249,115,22,0.22);
-      background: rgba(249,115,22,0.08);
-      color: white;
-      font-weight: 900;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      width: 100%;
-    }
-
-    .mini {
-      font-size: 10px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: rgba(148,163,184,0.9);
-    }
-    .divider {
-      font-size: 9px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-      color: rgba(148,163,184,0.55);
-      text-align: center;
-      margin: 10px 0 6px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      padding-bottom: 6px;
-    }
-
-    /* Top strip buttons */
-    .top-btn{
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size: 9px;
-      font-weight: 900;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.04);
-      transition: 0.18s;
-    }
-    .top-btn:hover{ border-color: rgba(249,115,22,0.35); background: rgba(249,115,22,0.10); }
-    .live-pill{
-      border: 1px solid rgba(249,115,22,0.18);
-      background: rgba(249,115,22,0.08);
-      padding: 6px 10px;
-      border-radius: 999px;
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .dot-blink { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
-    @keyframes pulse-green {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-    }
-
-    /* Agent ecosystem expandable buttons */
-    .agent-btn{
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 14px;
-      padding: 10px 12px;
-      cursor: pointer;
-      user-select: none;
-      transition: 0.18s;
-      outline: none;
-      position: relative;
-      overflow: hidden;
-    }
-    .agent-btn:hover { border-color: rgba(249,115,22,0.35); background: rgba(249,115,22,0.08); }
-    .agent-btn.selected { border-color: rgba(249,115,22,0.70); background: rgba(249,115,22,0.12); }
-    .agent-btn.expanded { border-color: rgba(249,115,22,0.80); background: rgba(249,115,22,0.14); box-shadow: 0 0 22px rgba(249,115,22,0.14); }
-
-    .agent-expand{
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: max-height 240ms ease, opacity 200ms ease;
-      margin-top: 8px;
-    }
-    .agent-btn.expanded .agent-expand{
-      max-height: 260px;
-      opacity: 1;
-    }
-
-    /* Plan cards */
-    .plan-card{
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 18px;
-      padding: 14px;
-      cursor: pointer;
-      user-select: none;
-      transition: 0.18s;
-    }
-    .plan-card:hover{ border-color: rgba(249,115,22,0.45); background: rgba(249,115,22,0.08); }
-    .plan-card.selected{ border-color: rgba(249,115,22,0.85); background: rgba(249,115,22,0.14); box-shadow: 0 0 22px rgba(249,115,22,0.16); }
-
-    /* Protocol steps */
-    .step-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.10);
-      padding: 10px;
-      border-radius: 14px;
-      opacity: 0.35;
-      transition: 0.22s;
-      cursor: pointer;
-      user-select: none;
-      pointer-events: auto;
-      min-height: 54px;
-    }
-    .step-card.active {
-      border-color: rgba(249,115,22,0.80) !important;
-      background: rgba(249,115,22,0.12) !important;
-      opacity: 1 !important;
-    }
-    .step-card.locked { opacity: 0.22; cursor: not-allowed; pointer-events: none; }
-    .next-focus { animation: border-glow 1.9s infinite ease-in-out !important; opacity: 1 !important; }
-    @keyframes border-glow {
-      0%, 100% { border-color: rgba(249, 115, 22, 0.28); }
-      50% { border-color: rgba(249, 115, 22, 0.95); box-shadow: 0 0 18px rgba(249, 115, 22, 0.35); }
-    }
-
-    /* Big action buttons (Demo/Satisfied/Activate) */
-    .action-card{
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 18px;
-      padding: 14px;
-      min-height: 156px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 12px;
-      opacity: 0.35;
-      pointer-events: none;
-      transition: 0.2s;
-    }
-    .action-card.enabled{
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .action-btn{
-      width: 100%;
-      border-radius: 16px;
-      padding: 16px 14px;
-      font-weight: 900;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      transition: 0.18s;
-    }
-    .action-btn.outline{
-      background: rgba(249,115,22,0.08);
-      border: 1px solid rgba(249,115,22,0.45);
-      color: white;
-    }
-    .action-btn.solid{
-      background: linear-gradient(90deg, #f97316, #ea580c);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: white;
-    }
-    .action-btn:active{ transform: scale(0.985); }
-    .action-btn.disabled{
-      opacity: 0.35;
-      pointer-events: none;
-      cursor: not-allowed;
-    }
-    .action-next-focus{
-      animation: border-glow 1.9s infinite ease-in-out !important;
-    }
-
-    /* Language switch */
-    .floating-lang { position: fixed; top: 15px; right: 15px; z-index: 1000; }
-    .lang-trigger {
-      background: rgba(10, 12, 18, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 8px 12px;
       border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      backdrop-filter: blur(5px);
-      pointer-events: auto;
-    }
-    #langMenu {
-      position: absolute;
-      top: 50px;
-      right: 0;
-      background: #0f172a;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 12px;
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-      width: 280px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-      pointer-events: auto;
-    }
-
-    /* Vapi dock area under hero slogans */
-    #vapiDock{
-      width: 100%;
-      min-height: 64px;
-      border-radius: 18px;
-      border: 1px dashed rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      overflow: hidden;
-      position: relative;
-    }
-    #vapiDock .dock-hint{
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      cursor:pointer;
+      transition:.15s;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.14em;
       font-size: 10px;
-      font-weight: 900;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(148,163,184,0.70);
-      text-align: center;
-      line-height: 1.35;
     }
-
-    /* Try to neutralize default Vapi bottom-right placement if present */
-    .vapi-widget, .vapi-widget-container, #vapi-widget, [data-vapi-widget]{
-      right: auto !important;
-      bottom: auto !important;
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .bg-ambient { animation: none !important; }
-      .next-focus, .action-next-focus { animation: none !important; }
-      .agent-expand { transition: none !important; }
-      .console-container::before { transition: none !important; }
-      .panel-glow::before { transition: none !important; }
-    }
+    .modal-item:hover{ background: rgba(255,255,255,.08); border-color: rgba(249,115,22,.55); }
+    .small{ font-size:12px; font-weight:700; color: rgba(226,232,240,.85); line-height:1.5; }
   </style>
-
-  <!-- ✅ Language Engine (kept) -->
-  <script>
-    const LANG_STORAGE_KEY = "aicallport_lang";
-    const SUPPORTED_LANGS = ["EN","ES","FR","DE","PT","RU","AR","HE"];
-    const RTL_LANGS = new Set(["AR","HE"]);
-
-    function mapBrowserLangToCode(browserLang) {
-      const b = (browserLang || "").toLowerCase();
-      if (b.startsWith("en")) return "EN";
-      if (b.startsWith("es")) return "ES";
-      if (b.startsWith("fr")) return "FR";
-      if (b.startsWith("de")) return "DE";
-      if (b.startsWith("pt")) return "PT";
-      if (b.startsWith("ru")) return "RU";
-      if (b.startsWith("ar")) return "AR";
-      if (b.startsWith("he") || b.startsWith("iw")) return "HE";
-      return "EN";
-    }
-
-    window.APP_I18N = { current: "EN" };
-    const translations = {
-      EN: {
-        dashboard: "Dashboard",
-        forum: "Forum",
-        newsletter: "Newsletter",
-        ai_qa: "AI Q&A",
-        global_live: "Global Live",
-        close: "Close",
-        next: "Next",
-        confirm: "Confirm",
-        save: "Save",
-        start_activation: "Start Activation",
-        activate: "Activate",
-        smb_benefits: "SMB Benefits",
-        demo: "Demo",
-        satisfied: "Satisfied",
-        search_languages: "SEARCH LANGUAGES...",
-        search_countries: "SEARCH COUNTRIES...",
-        search_industries: "SEARCH INDUSTRIES...",
-        business_name: "Business Name",
-      }
-    };
-
-    function getDict(lang) { return translations[lang] || translations.EN; }
-    function t(key) {
-      const lang = window.APP_I18N.current || "EN";
-      const dict = getDict(lang);
-      return (dict[key] != null ? dict[key] : (translations.EN[key] != null ? translations.EN[key] : key));
-    }
-    function applyTranslations(root = document) {
-      const html = document.documentElement;
-      html.lang = (window.APP_I18N.current || "EN").toLowerCase();
-      html.dir = RTL_LANGS.has(window.APP_I18N.current) ? "rtl" : "ltr";
-      root.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.getAttribute("data-i18n")));
-      root.querySelectorAll("[data-i18n-placeholder]").forEach(el => el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder"))));
-    }
-    function setLanguage(langCode) {
-      const code = (langCode || "EN").toUpperCase();
-      window.APP_I18N.current = SUPPORTED_LANGS.includes(code) ? code : "EN";
-      localStorage.setItem(LANG_STORAGE_KEY, window.APP_I18N.current);
-      applyTranslations(document);
-      if (typeof window.onLanguageChanged === "function") window.onLanguageChanged(window.APP_I18N.current);
-    }
-    (function initLanguageEngine() {
-      let stored = localStorage.getItem(LANG_STORAGE_KEY);
-      if (!stored) stored = mapBrowserLangToCode(navigator.language || navigator.userLanguage || "en");
-      setLanguage(stored);
-    })();
-    window.i18n = { t, setLanguage, applyTranslations };
-  </script>
 </head>
 
-<body onmousemove="updateParallax(event)">
-  <!-- Premium background layers -->
-  <div class="bg-ambient"></div>
+<body onmousemove="parallax(event)">
   <div class="bg-glow"></div>
 
-  <!-- Language switch -->
-  <div class="floating-lang" id="langWrap">
-    <button id="langTrigger" class="lang-trigger" type="button">
-      <img id="curFlag" src="https://flagcdn.com/us.svg" class="w-4" alt="Flag" />
-      <span id="curLangText" class="text-[9px] font-black text-white uppercase">US | EN</span>
-    </button>
-    <div id="langMenu">
-      <input type="text" id="langSearch" class="search-box" data-i18n-placeholder="search_languages"
-             onkeyup="filterList('langList', this.value)" />
-      <div class="flex flex-col gap-2 max-h-[520px] overflow-auto pr-1" id="langList"></div>
-    </div>
-  </div>
-
-  <div class="console-container">
-    <!-- TOP STRIP -->
-    <div class="flex items-center justify-between gap-3 mb-6">
-      <div class="flex items-center gap-2">
-        <span class="font-black italic text-base lg:text-lg uppercase text-white">AI CALL <span class="text-orange-500">PORT</span></span>
-        <div class="ml-2 px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase leading-none">BETA</div>
+  <div class="console">
+    <!-- TOP BAR -->
+    <div class="flex items-center justify-between gap-3 mb-5 lg:mb-8">
+      <div class="flex items-center gap-2 min-w-[180px]">
+        <span class="font-black italic text-base lg:text-xl uppercase text-white">
+          AI CALL <span class="text-orange-500">PORT</span>
+        </span>
+        <span class="ml-2 px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase leading-none">BETA</span>
       </div>
 
       <div class="flex items-center gap-2 flex-wrap justify-end">
-        <button id="dashBtn" class="top-btn" type="button" data-i18n="dashboard">Dashboard</button>
-        <button id="qaBtn" class="top-btn" type="button" data-i18n="ai_qa">AI Q&A</button>
-        <button id="forumBtn" class="top-btn" type="button" data-i18n="forum">Forum</button>
-        <button id="newsletterBtnTop" class="top-btn" type="button" data-i18n="newsletter">Newsletter</button>
-
-        <div class="live-pill">
-          <div class="dot-blink"></div>
-          <span class="text-[8px] font-black text-orange-500 uppercase tracking-widest text-nowrap" data-i18n="global_live">Global Live</span>
+        <button class="top-chip" id="btnDashboard" type="button">Dashboard</button>
+        <button class="top-chip" id="btnQA" type="button">AI Q&amp;A</button>
+        <button class="top-chip" id="btnForum" type="button">Forum</button>
+        <button class="top-chip" id="btnNews" type="button">Newsletter</button>
+        <div class="px-3 py-2 rounded-full border border-orange-500/20 bg-orange-500/10 flex items-center gap-2">
+          <div class="dot-live"></div>
+          <span class="text-[8px] font-black uppercase tracking-widest text-orange-500">Global Live</span>
         </div>
       </div>
     </div>
 
-    <!-- HERO GRID -->
-    <div class="grid lg:grid-cols-5 gap-6 lg:gap-10 items-start">
-      <!-- LEFT: identity -->
-      <div class="lg:col-span-2 text-left">
-        <h1 class="text-4xl lg:text-5xl font-black italic uppercase leading-tight mb-3 hero-title">AI CALL PORT</h1>
+    <!-- HERO -->
+    <div class="grid lg:grid-cols-5 gap-6 lg:gap-10 items-stretch">
+      <!-- Left -->
+      <div class="lg:col-span-2 flex flex-col min-h-[610px]">
+        <div>
+          <h1 class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-2 hero-title">AI CALL PORT</h1>
 
-        <!-- Slogan (2x bigger, same palette) -->
-        <div class="text-2xl lg:text-3xl font-black uppercase leading-tight mb-3 kicker-title">
-          GLOBAL ACTIVATION PLATFORM<br>FOR AI CALL AGENTS
+          <div class="text-xl lg:text-2xl font-black italic uppercase leading-snug hero-title mb-2">
+            Global Activation Platform for AI Call Agents
+          </div>
+
+          <p class="text-slate-300/90 text-[12px] lg:text-sm mb-5 font-bold uppercase tracking-wider leading-relaxed max-w-md">
+            Deploy structured AI call agents for your business.<br>
+            Fully automated activation. Multilingual-ready.<br>
+            <span class="text-orange-500 font-black">Built for small and medium-sized businesses</span>
+          </p>
         </div>
 
-        <div class="text-slate-300/90 text-[12px] lg:text-sm font-bold uppercase tracking-wider leading-relaxed max-w-md">
-          DEPLOY STRUCTURED AI CALL AGENTS FOR YOUR BUSINESS.<br>
-          FULLY AUTOMATED ACTIVATION. MULTILINGUAL-READY.<br>
-          <span class="text-orange-500">BUILT FOR SMALL AND MEDIUM-SIZED BUSINESSES</span>
-        </div>
-
-        <!-- Vapi dock area -->
-        <div class="mt-4">
-          <div id="vapiDock">
-            <div class="dock-hint">
-              DEMO CALL UI WILL APPEAR HERE WHEN A DEMO STARTS
+        <!-- Empty area + Vapi widget pinned bottom -->
+        <div class="flex-1 flex flex-col">
+          <div id="vapiMount" class="mt-1 w-full">
+            <div id="vapiHint">
+              Demo call controls will appear here after you start a demo.
+              (<strong>2 demos</strong>, <strong>30 seconds</strong> each.)
             </div>
+            <!-- Vapi green button injected here -->
           </div>
         </div>
 
-        <!-- Buttons (same size) aligned with pricing row on the right -->
-        <div class="mt-6 flex gap-3 items-center">
-          <button id="activateHeroBtn" class="orange-btn px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic w-[160px]" type="button" data-i18n="activate">Activate</button>
-          <button id="smbBenefitsBtn" class="ghost-btn px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest w-[160px]" type="button" data-i18n="smb_benefits">SMB Benefits</button>
+        <!-- Bottom buttons (same size, one row) -->
+        <div class="mt-5 flex gap-3">
+          <button id="btnActivateHero" class="btn-orange w-full px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic" type="button">
+            ACTIVATE
+          </button>
+          <button id="btnSMB" class="btn-outline w-full px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest" type="button">
+            SMB BENEFITS
+          </button>
         </div>
       </div>
 
-      <!-- RIGHT: ecosystem + pricing -->
+      <!-- Right -->
       <div class="lg:col-span-3">
-        <!-- Ecosystem -->
-        <div class="panel-glow bg-black/25 border border-white/10 rounded-3xl p-5">
-          <div class="text-center mb-3">
-            <div class="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+        <div class="bg-black/30 border border-white/10 rounded-3xl p-5 lg:p-6 h-full flex flex-col">
+
+          <div class="text-center">
+            <div class="text-white font-black uppercase tracking-[0.18em] text-[12px] lg:text-[13px]">
               SELECT ANY AI AGENT. SWITCH AGENTS ANYTIME AFTER ACTIVATION.
             </div>
-            <div class="text-[10px] font-black uppercase tracking-[0.2em] text-white mt-1" style="opacity:0.98;">
+            <div class="mt-2 text-white font-black uppercase tracking-[0.16em] text-[10px] lg:text-[11px] opacity-95">
               CLICK AN AGENT TO VIEW DETAILS
             </div>
           </div>
 
-          <div class="divider" style="margin-top:10px;">AI AGENT ECOSYSTEM</div>
+          <!-- ECOSYSTEM GRID (RESTORED) -->
+          <div class="mt-4 grid sm:grid-cols-2 gap-2" id="ecosystemGrid"></div>
 
-          <div class="grid sm:grid-cols-2 gap-2" id="ecosystemGrid"></div>
-        </div>
+          <!-- PRICING -->
+          <div class="mt-6 bg-black/35 border border-orange-500/22 rounded-3xl p-5">
+            <div class="text-center mb-4">
+              <div class="text-[10px] uppercase font-black text-orange-500 tracking-[0.2em]">
+                BETA SPECIAL (LIMITED TIME OFFER)
+              </div>
+              <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mt-1">
+                PICK A PLAN (STEP 05)
+              </div>
+            </div>
 
-        <!-- Pricing -->
-        <div class="panel-glow mt-4 bg-black/25 border border-white/10 rounded-3xl p-5">
-          <div class="text-center">
-            <div class="text-[10px] font-black uppercase tracking-[0.22em] text-orange-500">BETA SPECIAL (LIMITED TIME OFFER)</div>
+            <div class="grid md:grid-cols-2 gap-3">
+              <div id="planCard299" class="plan-card" role="button" tabindex="0">
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA SPECIAL</div>
+                <div class="flex items-end justify-between mt-2 gap-3">
+                  <div class="text-white font-black text-4xl leading-none">
+                    $299<span class="text-orange-500 text-base font-bold">/mo</span>
+                  </div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">
+                    <span class="strike">$499</span> REG
+                  </div>
+                </div>
+                <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-orange-500">UP TO 1,000 MIN</div>
+                <div class="mt-1 text-[10px] font-semibold text-slate-300">Overage: $0.30/min billed next invoice.</div>
+                <div class="mt-3 space-y-1.5">
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Secure payment via Stripe</div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Pay monthly</div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• No contracts. Cancel anytime</div>
+                </div>
+              </div>
+
+              <div id="planCard599" class="plan-card" role="button" tabindex="0">
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA SPECIAL</div>
+                <div class="flex items-end justify-between mt-2 gap-3">
+                  <div class="text-white font-black text-4xl leading-none">
+                    $599<span class="text-orange-500 text-base font-bold">/mo</span>
+                  </div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">
+                    <span class="strike">$999</span> REG
+                  </div>
+                </div>
+                <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-orange-500">UP TO 2,500 MIN</div>
+                <div class="mt-1 text-[10px] font-semibold text-slate-300">Overage: $0.30/min billed next invoice.</div>
+                <div class="mt-3 space-y-1.5">
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Secure payment via Stripe</div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Pay monthly</div>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• No contracts. Cancel anytime</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <button id="btnStartActivation" class="btn-orange w-full py-4 rounded-xl text-[10px] font-black uppercase italic tracking-widest" type="button">
+                START ACTIVATION
+              </button>
+            </div>
           </div>
 
-          <div class="grid sm:grid-cols-2 gap-3 mt-4">
-            <div id="planCard_299" class="plan-card" role="button" tabindex="0" onclick="selectPlanUI('P299')">
-              <div class="flex items-center justify-between">
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA</div>
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">
-                  <span class="opacity-70 line-through">$499</span> <span class="opacity-70">REG</span>
-                </div>
-              </div>
-              <div class="flex items-baseline justify-between mt-2">
-                <div class="text-white font-black text-4xl">
-                  $299<span class="text-orange-500 text-base font-bold">/mo</span>
-                </div>
-                <div class="text-[10px] font-black uppercase tracking-widest text-orange-500">UP TO 1,000 MIN</div>
-              </div>
-              <div class="mt-2 text-[10px] font-semibold text-slate-300">$0.30/min overage billed next invoice.</div>
-            </div>
-
-            <div id="planCard_599" class="plan-card" role="button" tabindex="0" onclick="selectPlanUI('P599')">
-              <div class="flex items-center justify-between">
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA</div>
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">
-                  <span class="opacity-70 line-through">$999</span> <span class="opacity-70">REG</span>
-                </div>
-              </div>
-              <div class="flex items-baseline justify-between mt-2">
-                <div class="text-white font-black text-4xl">
-                  $599<span class="text-orange-500 text-base font-bold">/mo</span>
-                </div>
-                <div class="text-[10px] font-black uppercase tracking-widest text-orange-500">UP TO 2,500 MIN</div>
-              </div>
-              <div class="mt-2 text-[10px] font-semibold text-slate-300">$0.30/min overage billed next invoice.</div>
-            </div>
-          </div>
-
-          <button id="startActivationBtn" class="orange-btn w-full py-4 rounded-xl text-[10px] font-black uppercase italic tracking-widest mt-4" type="button" data-i18n="start_activation">
-            Start Activation
-          </button>
-
-          <div class="mt-4 grid gap-2 text-left max-w-[520px] mx-auto">
-            <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-orange-500">
-              <span class="text-white">✓</span> Secure payment via Stripe
-            </div>
-            <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-orange-500">
-              <span class="text-white">✓</span> Pay monthly
-            </div>
-            <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-orange-500">
-              <span class="text-white">✓</span> No contracts. Cancel anytime
-            </div>
-          </div>
-
-          <div id="timer" class="text-xs font-mono text-white/30 mt-4 text-center">00:00:00</div>
         </div>
       </div>
     </div>
 
     <!-- ACTIVATION PROTOCOL -->
-    <div class="mt-8 lg:mt-10">
+    <div class="mt-10 lg:mt-12">
       <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
         <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">ACTIVATION PROTOCOL</span>
-        <span class="text-[9px] font-black uppercase tracking-[0.22em] text-slate-500">STRUCTURED CONTROL PANEL</span>
+        <span class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Only the next required button blinks</span>
       </div>
 
-      <!-- Top row: 5 setup steps -->
-      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <div id="s1" class="step-card next-focus">
-          <p class="text-[7px] font-black text-orange-500 uppercase" >01 Country</p>
-          <p id="v1" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p>
-        </div>
-        <div id="s2" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase" >02 Industry</p>
-          <p id="v2" class="text-[9px] text-white/30 font-bold uppercase truncate">Select</p>
-        </div>
-        <div id="s3" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase" >03 Agent</p>
-          <p id="v3" class="text-[9px] text-white/30 font-bold uppercase truncate">Choose</p>
-        </div>
-        <div id="s4" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase" >04 Company</p>
-          <p id="v4" class="text-[9px] text-white/30 font-bold uppercase truncate">Sync</p>
-        </div>
-        <div id="s5" class="step-card locked">
-          <p class="text-[7px] font-black text-orange-500 uppercase" >05 Plan</p>
-          <p id="v5" class="text-[9px] text-white/30 font-bold uppercase truncate">Choose</p>
-        </div>
-      </div>
-
-      <!-- Bottom row: actions -->
-      <div class="grid lg:grid-cols-3 gap-3 mt-4">
-        <div id="aDemo" class="action-card">
-          <div>
-            <div class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Demo</div>
-            <div class="text-[11px] text-slate-300 font-semibold mt-1">Test your configured AI agent</div>
-          </div>
-          <button id="demoBtn" class="action-btn outline disabled" type="button">DEMO</button>
-          <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">Ready after Plan</div>
+      <div class="bg-black/30 border border-white/10 rounded-3xl p-4 lg:p-6">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+          <div id="s1" class="step-card"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">01 Country</p><p id="v1" class="text-[10px] text-white/30 font-bold uppercase truncate">Select</p></div>
+          <div id="s2" class="step-card locked"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">02 Industry</p><p id="v2" class="text-[10px] text-white/30 font-bold uppercase truncate">Select</p></div>
+          <div id="s3" class="step-card locked"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">03 Agent</p><p id="v3" class="text-[10px] text-white/30 font-bold uppercase truncate">Choose</p></div>
+          <div id="s4" class="step-card locked"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">04 Company</p><p id="v4" class="text-[10px] text-white/30 font-bold uppercase truncate">Sync</p></div>
+          <div id="s5" class="step-card locked"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">05 Plan</p><p id="v5" class="text-[10px] text-white/30 font-bold uppercase truncate">Choose</p></div>
         </div>
 
-        <div id="aSat" class="action-card">
-          <div>
-            <div class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Satisfied ✓</div>
-            <div class="text-[11px] text-slate-300 font-semibold mt-1">Confirm you are satisfied with the demo</div>
-          </div>
-          <button id="satisfiedBtn" class="action-btn outline disabled" type="button">SATISFIED ✓</button>
-          <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">Requires Demo</div>
+        <div class="grid lg:grid-cols-3 gap-3 mt-4">
+          <button id="s6" class="action-btn action-outline action-disabled" type="button">
+            <div><div class="k">DEMO</div><div class="s">Test your configured AI agent</div></div>
+            <span class="r">STEP 06</span>
+          </button>
+
+          <button id="s7" class="action-btn action-outline action-disabled" type="button">
+            <div><div class="k">SATISFIED</div><div class="s">Confirm demo quality once</div></div>
+            <span class="r">STEP 07</span>
+          </button>
+
+          <button id="s8" class="action-btn action-primary action-disabled" type="button">
+            <div><div class="k">ACTIVATE</div><div class="s">Deploy and receive your number</div></div>
+            <span class="r">STEP 08</span>
+          </button>
         </div>
 
-        <div id="aAct" class="action-card">
-          <div>
-            <div class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">Activate</div>
-            <div class="text-[11px] text-slate-300 font-semibold mt-1">Deploy and receive your number</div>
-          </div>
-          <button id="activateBtn" class="action-btn solid disabled" type="button">ACTIVATE</button>
-          <div class="text-[9px] font-black uppercase tracking-widest text-slate-500">Requires Satisfied</div>
+        <div class="mt-3 text-[9px] font-black uppercase tracking-widest text-slate-500">
+          Rules: each step unlocks the next. Only the next required button blinks.
         </div>
-      </div>
-
-      <div class="mt-3 text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">
-        RULE: EACH STEP UNLOCKS THE NEXT. ONLY THE NEXT REQUIRED ACTION BLINKS.
       </div>
     </div>
   </div>
 
-  <!-- Modal -->
-  <div id="setupModal">
+  <!-- MODAL -->
+  <div id="modal" aria-hidden="true">
     <div id="modalShell" class="modal-shell">
-      <div class="modal-content-wrap">
-        <div class="modal-titlebar">
-          <h2 id="mTitle" class="text-lg font-black uppercase text-white">Setup</h2>
-          <div id="modalSearchContainer"></div>
+      <div class="modal-titlebar">
+        <div>
+          <div class="pill" id="modalPill">SETUP</div>
+          <h2 id="modalTitle" class="text-lg font-black uppercase text-white mt-2">Setup</h2>
         </div>
-        <div id="mContent" class="modal-body"></div>
-        <div class="modal-footer">
-          <button id="mClose" class="mt-0 text-[10px] text-slate-500 uppercase font-black hover:text-white" type="button" data-i18n="close">Close</button>
-        </div>
+        <button id="modalCloseX" class="btn-outline px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest" type="button">Close</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button id="modalClose" class="w-full text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white" type="button">Close</button>
       </div>
     </div>
   </div>
 
-  <footer class="mt-auto py-10 w-full text-center border-t border-white/5 bg-black/20">
+  <footer class="py-10 w-full text-center border-t border-white/5 bg-black/20">
     <div class="max-w-xs mx-auto opacity-40 hover:opacity-100 transition-opacity duration-500">
       <div class="flex items-center justify-center gap-2 mb-4">
         <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-        <span class="text-[8px] font-black text-white uppercase tracking-widest"><span id="agentCount">14,249</span> ACTIVE AGENTS</span>
+        <span class="text-[8px] font-black text-white uppercase tracking-widest"><span id="agentCount">14,214</span> ACTIVE AGENTS</span>
       </div>
       <div class="flex justify-center gap-6 text-[9px] font-black uppercase tracking-widest text-slate-500 mb-4">
         <a href="#" class="hover:text-orange-500">Privacy</a>
@@ -818,889 +578,601 @@
   </footer>
 
   <script>
-    // ============================
-    // Helpers
-    // ============================
-    function escapeHtml(str){
-      return String(str || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;");
+    function parallax(e){
+      document.documentElement.style.setProperty('--mx', (e.clientX / innerWidth * 100) + '%');
+      document.documentElement.style.setProperty('--my', (e.clientY / innerHeight * 100) + '%');
     }
 
-    /* Premium Pack: smooth mouse tracking + idle dim */
-    let __idleTimer = null;
-    function markActive(){
-      document.body.classList.remove("idle");
-      clearTimeout(__idleTimer);
-      __idleTimer = setTimeout(() => document.body.classList.add("idle"), 1400);
-    }
-
-    function updateParallax(e){
-      if(!e) return;
-      markActive();
-
-      const mx = (e.clientX / window.innerWidth) * 100;
-      const my = (e.clientY / window.innerHeight) * 100;
-
-      // For background glow
-      document.documentElement.style.setProperty('--mx', mx + '%');
-      document.documentElement.style.setProperty('--my', my + '%');
-
-      // For console/panel sweep (slightly biased upward so it "lights" headers nicely)
-      const sy = Math.max(0, my - 8);
-      document.documentElement.style.setProperty('--sx', mx + '%');
-      document.documentElement.style.setProperty('--sy', sy + '%');
-    }
-
-    // Initialize idle state after load
-    document.body.classList.add("idle");
-    window.addEventListener("mousemove", markActive, { passive: true });
-    window.addEventListener("scroll", markActive, { passive: true });
-
-    // ============================
-    // STATE
-    // ============================
-    const TOTAL_SETUP_STEPS = 5;
-    let completedSteps = 0;
-
-    let selectedMarket = "United States";
-    let selectedIndustryKey = "Electrical";
-    let selectedAgentKey = "AI Receptionist";
-    let businessName = "";
-    const PLANS = {
-      P299: { id:"P299", price:299, min:1000, reg:499, stripe:"https://buy.stripe.com/8x24gA9TB9Vab160h43ks01" },
-      P599: { id:"P599", price:599, min:2500, reg:999, stripe:"https://buy.stripe.com/8x24gA9TB9Vab160h43ks01" }
-    };
-    let selectedPlanId = "P299";
-
-    const LS_DEMO_COUNT = "aicallport_demo_count_v1";
-    const LS_DEMO_DID_ONCE = "aicallport_demo_did_once_v1";
-    const DEMO_MAX_CALLS = 2;
-    const DEMO_SECONDS = 30;
-
-    function getDemoCount(){
-      const n = Number(localStorage.getItem(LS_DEMO_COUNT) || "0");
-      return Number.isFinite(n) ? Math.max(0, n) : 0;
-    }
-    function incDemoCount(){
-      const n = getDemoCount() + 1;
-      localStorage.setItem(LS_DEMO_COUNT, String(n));
-      return n;
-    }
-    function setDidDemoOnce(){
-      localStorage.setItem(LS_DEMO_DID_ONCE, "1");
-    }
-    function didDemoOnce(){
-      return localStorage.getItem(LS_DEMO_DID_ONCE) === "1";
-    }
-
-    // ============================
-    // AI Agent ecosystem
-    // ============================
+    // -----------------------------
+    // DATA
+    // -----------------------------
     const AGENTS = [
-      { key:"AI Receptionist", bullets:["Greets callers professionally and captures intent","Routes calls or takes structured messages","Books appointments when needed","Handles FAQs and basic business info"], tagline:"Best for: inbound calls, routing, first impression" },
-      { key:"AI Booking Agent", bullets:["Books appointments and confirms availability","Collects customer details and preferences","Sends confirmations and reminders"], tagline:"Best for: scheduling and confirmations" },
-      { key:"AI Sales Agent", bullets:["Qualifies leads quickly","Handles objections and captures contact details","Books consultations"], tagline:"Best for: new leads and sales intake" },
-      { key:"AI Customer Service", bullets:["Answers questions and checks order/service status","Resolves common issues quickly","Escalates when needed"], tagline:"Best for: support and customer experience" },
-      { key:"AI After-Hours Agent", bullets:["Covers nights/weekends","Captures urgent calls","Schedules callbacks"], tagline:"Best for: 24/7 coverage" },
-      { key:"AI Dispatch Agent", bullets:["Collects job details","Prioritizes urgency","Routes to the right team"], tagline:"Best for: dispatch and triage" },
-      { key:"AI Lead Capture Agent", bullets:["Captures lead details from any caller","Validates phone/email","Logs outcomes"], tagline:"Best for: never miss a lead" },
-      { key:"AI Intake Agent", bullets:["Collects structured intake details","Asks clarifying questions","Prepares for estimates/visits"], tagline:"Best for: structured intake" },
-      { key:"AI Support Triage", bullets:["Gathers issue details","Determines urgency","Escalates critical cases"], tagline:"Best for: support prioritization" },
-      { key:"AI Overflow Agent", bullets:["Handles peak-volume overflow","Prevents missed calls","Smooths busy hours"], tagline:"Best for: high call volume" },
-      { key:"AI Multilingual Agent", bullets:["Answers calls in multiple languages","Switches instantly based on caller","Maintains consistent tone"], tagline:"Best for: multilingual markets" },
-      { key:"Custom AI Agents", bullets:["Custom workflows & routing","Custom scripts, hours, escalation paths","Tailored for your business"], tagline:"Best for: custom needs" }
+      { id:"receptionist", name:"AI Receptionist", desc:"Greets callers, captures intent, routes calls, and collects structured details for follow-up." },
+      { id:"booking", name:"AI Booking Agent", desc:"Books appointments, confirms availability, reschedules, and sends reminders to reduce no-shows." },
+      { id:"sales", name:"AI Sales Agent", desc:"Qualifies leads, answers objections, and routes hot prospects to the right sales path." },
+      { id:"customer_service", name:"AI Customer Service", desc:"Handles FAQs, order/service status, and resolves common issues quickly and consistently." },
+      { id:"after_hours", name:"AI After-Hours Agent", desc:"Captures urgent requests after-hours, provides next steps, and escalates when needed." },
+      { id:"dispatch", name:"AI Dispatch Agent", desc:"Collects critical job details, dispatches crews, and keeps calls structured under pressure." },
+      { id:"lead_capture", name:"AI Lead Capture Agent", desc:"Never misses a lead: captures contact info, need, location, urgency, and preferred follow-up." },
+      { id:"intake", name:"AI Intake Agent", desc:"Runs structured intake: gathers requirements, documents context, and routes to the correct workflow." },
+      { id:"triage", name:"AI Support Triage", desc:"Identifies issue type, urgency, and next action; routes to the right support lane." },
+      { id:"overflow", name:"AI Overflow Agent", desc:"Acts as overflow during peaks: answers instantly, collects info, and reduces missed calls." },
+      { id:"multilingual", name:"AI Multilingual Agent", desc:"Serves callers in multiple languages with consistent, structured intake and routing." },
+      { id:"custom", name:"Custom AI Agents", desc:"We build custom agents for your exact process, scripts, intake fields, and escalation rules." }
     ];
 
-    let expandedAgentKey = null;
-    function renderEcosystem(){
-      const grid = document.getElementById("ecosystemGrid");
-      grid.innerHTML = AGENTS.map(a => {
-        const isSelected = a.key === selectedAgentKey;
-        const isExpanded = a.key === expandedAgentKey;
-        return `
-          <div class="agent-btn ${isSelected ? "selected" : ""} ${isExpanded ? "expanded" : ""}"
-               role="button" tabindex="0"
-               onclick="toggleAgentExpand('${escapeHtml(a.key)}')"
-               onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); toggleAgentExpand('${escapeHtml(a.key)}')}">
-            <div class="flex items-center justify-between gap-2">
-              <div class="text-[10px] font-black uppercase tracking-widest text-white">${escapeHtml(a.key)}</div>
-              <div class="text-[9px] font-black uppercase tracking-widest ${isSelected ? "text-orange-500" : "text-slate-500"}">
-                ${isSelected ? "SELECTED" : ""}
-              </div>
-            </div>
+    const COUNTRIES = ["United States","Canada","United Kingdom","Australia","UAE","Germany","France"];
+    const INDUSTRIES = ["Security","Roofing","Windows & Doors","Medical Clinic","Dental","Legal","Home Services","Real Estate"];
+    const VOICES = ["Calm Professional","Confident Sales","Warm Reception","Crisp Dispatch","Minimal Neutral"];
+    const TEMPLATES = ["Standard Intake","High-Converting Sales","Service Triage","After-Hours Emergency","Booking Focused"];
 
-            <div class="agent-expand">
-              <div class="mt-2 bg-black/20 border border-white/5 rounded-xl p-3">
-                <ul class="list-disc pl-5 text-[12px] text-slate-300 font-semibold leading-relaxed space-y-1">
-                  ${a.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join("")}
-                </ul>
-                <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">${escapeHtml(a.tagline)}</div>
+    // -----------------------------
+    // STATE
+    // -----------------------------
+    const state = {
+      country:null,
+      industry:null,
+      agentId:null,
+      agentName:null,
+      voice:null,
+      template:null,
+      company:null,
+      plan:null, // "299" | "599"
+      demoDone:false,
+      satisfied:false,
+      activated:false,
+      ecoOpenId:null
+    };
 
-                <div class="mt-3 flex justify-end">
-                  <button class="orange-btn px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest italic"
-                          type="button"
-                          onclick="event.stopPropagation(); selectAgent('${escapeHtml(a.key)}')">
-                    SELECT THIS AGENT
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
+    // -----------------------------
+    // ELEMENTS
+    // -----------------------------
+    const $ = (id)=>document.getElementById(id);
 
-    function toggleAgentExpand(key){
-      const k = String(key || "");
-      if(expandedAgentKey === k) expandedAgentKey = null;
-      else expandedAgentKey = k;
-      renderEcosystem();
-    }
+    const ecosystemGrid = $("ecosystemGrid");
+    const plan299 = $("planCard299");
+    const plan599 = $("planCard599");
 
-    function selectAgent(key){
-      selectedAgentKey = String(key || "AI Receptionist");
-      expandedAgentKey = null;
-      renderEcosystem();
-      if(completedSteps >= 3){
-        document.getElementById("v3").innerText = selectedAgentKey.toUpperCase();
-      }
-    }
+    const steps = {
+      s1:$("s1"), s2:$("s2"), s3:$("s3"), s4:$("s4"), s5:$("s5"),
+      v1:$("v1"), v2:$("v2"), v3:$("v3"), v4:$("v4"), v5:$("v5"),
+      demo:$("s6"), sat:$("s7"), act:$("s8")
+    };
 
-    // ============================
-    // PLAN selection UI
-    // ============================
-    function selectPlanUI(planId){
-      if(!PLANS[planId]) return;
-      selectedPlanId = planId;
-      document.getElementById("planCard_299")?.classList.toggle("selected", planId === "P299");
-      document.getElementById("planCard_599")?.classList.toggle("selected", planId === "P599");
-      if(completedSteps >= 5){
-        const plan = PLANS[selectedPlanId];
-        document.getElementById("v5").innerText = `$${plan.price} /MO`.toUpperCase();
-      }
-    }
+    const modal = $("modal");
+    const modalShell = $("modalShell");
+    const modalTitle = $("modalTitle");
+    const modalPill = $("modalPill");
+    const modalBody = $("modalBody");
+    const modalClose = $("modalClose");
+    const modalCloseX = $("modalCloseX");
 
-    // ============================
-    // Modal framework
-    // ============================
-    let lastFocusedEl = null;
-    let __scrollY = 0;
-    let __bodyLocked = false;
+    const vapiMount = $("vapiMount");
 
-    function lockBodyScroll(){
-      if (__bodyLocked) return;
-      __bodyLocked = true;
-      __scrollY = window.scrollY || 0;
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${__scrollY}px`;
-      document.body.style.left = "0";
-      document.body.style.right = "0";
-      document.body.style.width = "100%";
-    }
-    function unlockBodyScroll(){
-      if (!__bodyLocked) return;
-      __bodyLocked = false;
-      const top = document.body.style.top;
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      document.body.style.width = "";
-      const y = top ? Math.abs(parseInt(top, 10)) : __scrollY;
-      window.scrollTo(0, y || 0);
-    }
-
-    function openModal(title, html, wide){
-      lastFocusedEl = document.activeElement;
-      const modal = document.getElementById("setupModal");
-      const shell = document.getElementById("modalShell");
-      const t = document.getElementById("mTitle");
-      const c = document.getElementById("mContent");
-      const s = document.getElementById("modalSearchContainer");
-      t.textContent = title || "Setup";
-      s.innerHTML = "";
-      c.innerHTML = html || "";
-      shell.classList.toggle("wide", !!wide);
+    // -----------------------------
+    // HELPERS
+    // -----------------------------
+    function openModal({title, pill="SETUP", narrow=false, html=""}){
+      modalTitle.textContent = title;
+      modalPill.textContent = pill;
+      modalBody.innerHTML = html;
+      modalShell.classList.toggle("narrow", !!narrow);
       modal.style.display = "flex";
-      lockBodyScroll();
-      i18n.applyTranslations(modal);
-      setTimeout(() => {
-        const first = shell.querySelector("button, input, select, textarea, [tabindex]:not([tabindex='-1'])");
-        first?.focus?.();
-      }, 30);
+      modal.setAttribute("aria-hidden","false");
     }
-
     function closeModal(){
-      const modal = document.getElementById("setupModal");
       modal.style.display = "none";
-      unlockBodyScroll();
-      try { lastFocusedEl?.focus?.(); } catch(e){}
-      lastFocusedEl = null;
+      modal.setAttribute("aria-hidden","true");
+      modalBody.innerHTML = "";
+      modalShell.classList.remove("narrow");
+    }
+    modalClose.addEventListener("click", closeModal);
+    modalCloseX.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e)=>{ if(e.target === modal) closeModal(); });
+    document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeModal(); });
+
+    function setNextBlink(){
+      // remove "next" from all
+      ["s1","s2","s3","s4","s5"].forEach(k=>steps[k].classList.remove("next"));
+      steps.demo.classList.remove("action-next");
+      steps.sat.classList.remove("action-next");
+      steps.act.classList.remove("action-next");
+
+      // lock/unlock step cards
+      steps.s2.classList.toggle("locked", !state.country);
+      steps.s3.classList.toggle("locked", !(state.country && state.industry));
+      steps.s4.classList.toggle("locked", !(state.country && state.industry && state.agentId && state.voice && state.template));
+      steps.s5.classList.toggle("locked", !(state.country && state.industry && state.agentId && state.voice && state.template && state.company));
+
+      // set done
+      steps.s1.classList.toggle("done", !!state.country);
+      steps.s2.classList.toggle("done", !!state.industry);
+      steps.s3.classList.toggle("done", !!(state.agentId && state.voice && state.template));
+      steps.s4.classList.toggle("done", !!state.company);
+      steps.s5.classList.toggle("done", !!state.plan);
+
+      // action buttons enable/disable
+      const canDemo = !!state.plan;           // demo requires plan selected
+      const canSatisfied = state.demoDone;    // satisfied requires demo done
+      const canActivate = state.satisfied;    // activate requires satisfied
+
+      steps.demo.classList.toggle("action-disabled", !canDemo);
+      steps.sat.classList.toggle("action-disabled", !canSatisfied);
+      steps.act.classList.toggle("action-disabled", !canActivate);
+
+      // Next required (STRICT)
+      if(!state.country) steps.s1.classList.add("next");
+      else if(!state.industry) steps.s2.classList.add("next");
+      else if(!(state.agentId && state.voice && state.template)) steps.s3.classList.add("next");
+      else if(!state.company) steps.s4.classList.add("next");
+      else if(!state.plan) steps.s5.classList.add("next");
+      else if(!state.demoDone) steps.demo.classList.add("action-next");
+      else if(!state.satisfied) steps.sat.classList.add("action-next");
+      else if(!state.activated) steps.act.classList.add("action-next");
     }
 
-    document.getElementById("mClose").addEventListener("click", closeModal);
-    document.getElementById("setupModal").addEventListener("click", (e) => {
-      if(e.target && e.target.id === "setupModal") closeModal();
-    });
-    document.addEventListener("keydown", (e) => {
-      if(e.key === "Escape"){
-        closeModal();
-        toggleLangMenu(false);
-      }
-    });
-
-    // ============================
-    // Activation pipeline
-    // ============================
-    function refreshStepLocks(){
-      for(let i=1;i<=TOTAL_SETUP_STEPS;i++){
-        const el = document.getElementById(`s${i}`);
-        if(!el) continue;
-        const unlocked = completedSteps >= i-1;
-        el.classList.toggle("locked", !unlocked);
-        el.classList.remove("next-focus");
-        el.classList.toggle("active", completedSteps >= i);
-      }
-      const next = Math.min(completedSteps + 1, TOTAL_SETUP_STEPS);
-      if(completedSteps < TOTAL_SETUP_STEPS){
-        document.getElementById(`s${next}`)?.classList.add("next-focus");
-      }
+    function autoOpenNext(){
+      // auto open next step modal after each selection
+      if(!state.country){ openCountry(); return; }
+      if(!state.industry){ openIndustry(); return; }
+      if(!(state.agentId && state.voice && state.template)){ openAgent(); return; }
+      if(!state.company){ openCompany(); return; }
+      if(!state.plan){ openPlan(); return; }
+      // then stop auto-open (actions handled by user)
     }
 
-    function finishStep(stepNumber, valueText){
-      completedSteps = Math.max(completedSteps, stepNumber);
-      const valEl = document.getElementById(`v${stepNumber}`);
-      if(valEl) valEl.innerText = String(valueText || "").toUpperCase();
-      refreshStepLocks();
-      refreshActionLocks();
+    function setStepLabels(){
+      steps.v1.textContent = state.country ? state.country : "Select";
+      steps.v2.textContent = state.industry ? state.industry : "Select";
+      steps.v3.textContent = (state.agentName && state.voice && state.template)
+        ? `${state.agentName} • ${state.voice} • ${state.template}`
+        : "Choose";
+      steps.v4.textContent = state.company ? state.company : "Sync";
+      steps.v5.textContent = state.plan ? (state.plan === "299" ? "$299/mo" : "$599/mo") : "Choose";
     }
 
-    function openStep(stepNumber){
-      if(stepNumber > completedSteps + 1) return;
-      if(stepNumber === 1) return openCountry();
-      if(stepNumber === 2) return openIndustry();
-      if(stepNumber === 3) return openAgentConfirm();
-      if(stepNumber === 4) return openCompany();
-      if(stepNumber === 5) return openPlanConfirm();
+    function renderPlanCards(){
+      plan299.classList.toggle("selected", state.plan === "299");
+      plan599.classList.toggle("selected", state.plan === "599");
     }
 
-    function autoAdvanceFromStep(stepNumber){
-      if(stepNumber < TOTAL_SETUP_STEPS){
-        setTimeout(() => openStep(stepNumber + 1), 130);
-      }
-    }
+    // -----------------------------
+    // ECOSYSTEM RENDER
+    // -----------------------------
+    function renderEcosystem(){
+      ecosystemGrid.innerHTML = "";
+      AGENTS.forEach(a=>{
+        const btn = document.createElement("div");
+        btn.className = "eco-btn";
+        btn.dataset.agentId = a.id;
 
-    // ============================
-    // Country / Markets
-    // ============================
-    let _marketsByContinentCache = null;
-    async function getMarketsGroupedByContinent() {
-      if (_marketsByContinentCache) return _marketsByContinentCache;
-      try{
-        const res = await fetch("/api/markets", { cache: "no-store" });
-        if (!res.ok) throw new Error("bad");
-        const rows = await res.json();
-        const grouped = {};
-        (rows || []).forEach((row) => {
-          const continent = row.region || "Other";
-          const name = row.name || "";
-          if (!name) return;
-          grouped[continent] ||= [];
-          grouped[continent].push(name);
-        });
-        Object.keys(grouped).forEach((k) => grouped[k].sort((a, b) => String(a).localeCompare(String(b))));
-        _marketsByContinentCache = grouped;
-        return grouped;
-      } catch(e){
-        _marketsByContinentCache = { "North America": ["United States", "Canada"], "Europe": ["United Kingdom", "Germany", "France"] };
-        return _marketsByContinentCache;
-      }
-    }
+        const isSelected = state.agentId === a.id;
+        const isOpen = state.ecoOpenId === a.id;
 
-    async function openCountry(){
-      const grouped = await getMarketsGroupedByContinent();
-      const render = (qRaw) => {
-        const q = String(qRaw||"").trim().toUpperCase();
-        let html = `<div class="pill mb-3">01 Country</div>`;
-        Object.keys(grouped).forEach(cont => {
-          const list = (grouped[cont]||[]).filter(n => n.toUpperCase().includes(q));
-          if(!list.length) return;
-          html += `<div class="divider">${escapeHtml(cont)}</div>`;
-          list.forEach(name => {
-            html += `<button class="modal-btn" type="button" onclick="selectCountry('${escapeHtml(name)}')">
-              <span class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.55)]"></span>
-              ${escapeHtml(name)}
-            </button>`;
-          });
-        });
-        if(!html.includes("modal-btn")) html += `<div class="text-center text-slate-500 font-black uppercase tracking-widest text-[10px] py-10">No matching results</div>`;
-        openModal("01 Country", html, true);
-        document.getElementById("modalSearchContainer").innerHTML =
-          `<input class="search-box" data-i18n-placeholder="search_countries" placeholder="SEARCH COUNTRIES..." oninput="window.__countrySearch=this.value; window.__rerenderCountry && window.__rerenderCountry()">`;
-        window.__countrySearch = qRaw || "";
-        window.__rerenderCountry = () => render(window.__countrySearch);
-      };
-      render("");
-    }
+        if(isSelected) btn.classList.add("selected");
+        if(isOpen) btn.classList.add("open");
 
-    function selectCountry(name){
-      selectedMarket = String(name||"");
-      closeModal();
-      finishStep(1, selectedMarket);
-      autoAdvanceFromStep(1);
-    }
-
-    // ============================
-    // Industry
-    // ============================
-    const industryKeys = ["Plumbing","Electrical","HVAC","Roofing","Real Estate","After Hours"];
-    function openIndustry(){
-      const render = (qRaw) => {
-        const q = String(qRaw||"").trim().toUpperCase();
-        const list = industryKeys.filter(n => n.toUpperCase().includes(q));
-        let html = `<div class="pill mb-3">02 Industry</div>`;
-        html += `<div class="grid gap-2">`;
-        list.forEach(name => {
-          html += `<button class="modal-btn" type="button" onclick="selectIndustry('${escapeHtml(name)}')">${escapeHtml(name)}</button>`;
-        });
-        html += `</div>`;
-        if(!list.length) html += `<div class="text-center text-slate-500 font-black uppercase tracking-widest text-[10px] py-10">No matching results</div>`;
-        openModal("02 Industry", html, false);
-        document.getElementById("modalSearchContainer").innerHTML =
-          `<input class="search-box" data-i18n-placeholder="search_industries" placeholder="SEARCH INDUSTRIES..." oninput="window.__industrySearch=this.value; window.__rerenderIndustry && window.__rerenderIndustry()">`;
-        window.__industrySearch = qRaw || "";
-        window.__rerenderIndustry = () => render(window.__industrySearch);
-      };
-      render("");
-    }
-
-    function selectIndustry(name){
-      selectedIndustryKey = String(name||"");
-      closeModal();
-      finishStep(2, selectedIndustryKey);
-      autoAdvanceFromStep(2);
-    }
-
-    // ============================
-    // Agent confirm
-    // ============================
-    function openAgentConfirm(){
-      const html = `
-        <div class="pill mb-3">03 Agent</div>
-        <div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left">
-          <div class="mini text-orange-500 mb-2">Selected agent</div>
-          <div class="text-[14px] font-black uppercase tracking-widest text-white">${escapeHtml(selectedAgentKey)}</div>
-          <div class="text-[11px] text-slate-300 font-semibold leading-relaxed mt-2">
-            Confirm to lock this selection into the activation protocol. You can switch agents anytime after activation.
+        btn.innerHTML = `
+          <div class="eco-top">
+            <div class="eco-name">${a.name}</div>
+            <div class="eco-tag">${isSelected ? "SELECTED" : (isOpen ? "CLOSE" : "VIEW")}</div>
           </div>
-        </div>
-        <div class="grid sm:grid-cols-2 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">Back</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="confirmAgentStep()">Confirm</button>
-        </div>
-      `;
-      openModal("03 Agent", html, false);
-    }
-
-    function confirmAgentStep(){
-      closeModal();
-      finishStep(3, selectedAgentKey);
-      autoAdvanceFromStep(3);
-    }
-
-    // ============================
-    // Company
-    // ============================
-    function openCompany(){
-      const html = `
-        <div class="pill mb-3">04 Company</div>
-        <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Enter your business name</div>
-        <input id="bn" data-i18n-placeholder="business_name" placeholder="Business Name"
-               class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white mb-2 text-center text-xs uppercase font-black outline-none">
-        <button type="button" onclick="saveCompany()" class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic">Save</button>
-      `;
-      openModal("04 Company", html, false);
-      setTimeout(() => document.getElementById("bn")?.focus(), 40);
-    }
-
-    function saveCompany(){
-      const raw = (document.getElementById("bn")?.value || "");
-      const v = raw.trim().slice(0,60);
-      if(v.length < 2) return;
-      businessName = v;
-      closeModal();
-      finishStep(4, businessName);
-      autoAdvanceFromStep(4);
-    }
-
-    // ============================
-    // Plan confirm
-    // ============================
-    function openPlanConfirm(){
-      const plan = PLANS[selectedPlanId];
-      const html = `
-        <div class="pill mb-3">05 Plan</div>
-        <div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left">
-          <div class="mini text-orange-500 mb-2">Current selection</div>
-          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-            <span class="text-orange-500 font-black">$${plan.price}/mo</span> — up to <span class="text-orange-500 font-black">${plan.min}</span> min.
-          </div>
-          <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-2">
-            Confirm plan to unlock Demo.
-          </div>
-        </div>
-        <div class="grid sm:grid-cols-2 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">Back</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="confirmPlanStep()">Confirm</button>
-        </div>
-      `;
-      openModal("05 Plan", html, false);
-    }
-
-    function confirmPlanStep(){
-      const plan = PLANS[selectedPlanId];
-      closeModal();
-      finishStep(5, `$${plan.price} /MO`);
-      refreshActionLocks(true);
-    }
-
-    // ============================
-    // Actions
-    // ============================
-    function refreshActionLocks(fromPlanJustConfirmed){
-      const hasPlan = (completedSteps >= 5);
-      const demoEnabled = hasPlan && (getDemoCount() < DEMO_MAX_CALLS);
-      const satEnabled = hasPlan && didDemoOnce();
-      const actEnabled = hasPlan && didDemoOnce() && window.__satisfiedPressed === true;
-
-      const aDemo = document.getElementById("aDemo");
-      const aSat = document.getElementById("aSat");
-      const aAct = document.getElementById("aAct");
-
-      const demoBtn = document.getElementById("demoBtn");
-      const satBtn = document.getElementById("satisfiedBtn");
-      const actBtn = document.getElementById("activateBtn");
-
-      aDemo.classList.toggle("enabled", demoEnabled);
-      aSat.classList.toggle("enabled", satEnabled);
-      aAct.classList.toggle("enabled", actEnabled);
-
-      demoBtn.classList.toggle("disabled", !demoEnabled);
-      satBtn.classList.toggle("disabled", !satEnabled);
-      actBtn.classList.toggle("disabled", !actEnabled);
-
-      demoBtn.classList.remove("action-next-focus");
-      satBtn.classList.remove("action-next-focus");
-      actBtn.classList.remove("action-next-focus");
-
-      if(!hasPlan) return;
-
-      if(demoEnabled && !didDemoOnce()){
-        demoBtn.classList.add("action-next-focus");
-        return;
-      }
-      if(satEnabled && window.__satisfiedPressed !== true){
-        satBtn.classList.add("action-next-focus");
-        return;
-      }
-      if(actEnabled){
-        actBtn.classList.add("action-next-focus");
-        return;
-      }
-
-      if(fromPlanJustConfirmed){
-        if(demoEnabled) demoBtn.classList.add("action-next-focus");
-      }
-    }
-
-    // ============================
-    // SMB Benefits modal
-    // ============================
-    const SMB_BENEFITS = [
-      "Never miss calls",
-      "Capture every lead",
-      "Reduce staffing costs",
-      "24/7 availability",
-      "Structured intake",
-      "Professional experience",
-      "Scalable without hiring"
-    ];
-    function openBenefits(){
-      const html = `
-        <div class="pill mb-3">SMB Benefits</div>
-        <div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left">
-          <div class="mini text-orange-500 mb-3">Clean benefits</div>
-          <ul class="list-disc pl-5 text-[13px] text-slate-300 font-semibold leading-relaxed space-y-1">
-            ${SMB_BENEFITS.map(x => `<li>${escapeHtml(x)}</li>`).join("")}
-          </ul>
-        </div>
-        <div class="grid sm:grid-cols-1 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">Close</button>
-        </div>
-      `;
-      openModal("SMB Benefits", html, false);
-    }
-
-    // ============================
-    // DEMO gate modal then start call
-    // ============================
-    function openDemoGate(){
-      const count = getDemoCount();
-      if(count >= DEMO_MAX_CALLS){
-        const html = `
-          <div class="pill mb-3">Demo Access</div>
-          <div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left">
-            <div class="mini text-orange-500 mb-2">Limit reached</div>
-            <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-              You have used <span class="text-orange-500 font-black">${count}</span> demo calls.
-              Demo limit is <span class="text-orange-500 font-black">${DEMO_MAX_CALLS}</span> calls.
+          <div class="eco-expand">
+            <div class="eco-desc">${a.desc}</div>
+            <div class="eco-select-row">
+              <button class="eco-select" type="button">SELECT THIS AGENT</button>
             </div>
           </div>
-          <div class="grid gap-2 mt-4">
-            <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">Close</button>
-          </div>
         `;
-        openModal("Demo", html, false);
-        return;
-      }
 
-      const remaining = DEMO_MAX_CALLS - count;
-      const html = `
-        <div class="pill mb-3">Demo Access</div>
-        <div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left">
-          <div class="mini text-orange-500 mb-2">Demo limits</div>
-          <div class="text-[12px] text-slate-300 font-semibold leading-relaxed">
-            • <span class="text-orange-500 font-black">${DEMO_MAX_CALLS}</span> demo calls total<br>
-            • <span class="text-orange-500 font-black">${DEMO_SECONDS}</span> seconds per call
-          </div>
-          <div class="divider mt-4">Talk to your company agent</div>
-          <div class="text-[11px] text-slate-300 font-semibold leading-relaxed">
-            This demo will call your configured AI agent using the selected market, industry, company name, and voice.
-          </div>
-          <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
-            Remaining demos: <span class="text-orange-500">${remaining}</span>
-          </div>
-        </div>
-        <div class="grid sm:grid-cols-2 gap-2 mt-4">
-          <button class="modal-btn justify-center text-center" type="button" onclick="closeModal()">Cancel</button>
-          <button class="orange-btn w-full py-3 rounded-xl font-black text-[10px] uppercase italic" type="button" onclick="startDemoCallFromGate()">Make Demo Call</button>
-        </div>
-      `;
-      openModal("Demo", html, false);
-    }
+        btn.addEventListener("click", (e)=>{
+          // prevent selecting when clicking inner select button is handled separately
+          const selectBtn = btn.querySelector(".eco-select");
+          if(e.target === selectBtn) return;
 
-    // ============================
-    // VAPI
-    // ============================
-    let vapiApiKey = null;
-    async function loadVapiKey() {
-      if (vapiApiKey) return vapiApiKey;
-      const res = await fetch("/api/config", { cache: "no-store" });
-      if (!res.ok) throw new Error("Failed to load /api/config");
-      const data = await res.json();
-      if (!data || !data.vapiPublicKey) throw new Error("Missing vapiPublicKey in /api/config response");
-      vapiApiKey = data.vapiPublicKey;
-      return vapiApiKey;
-    }
+          state.ecoOpenId = (state.ecoOpenId === a.id) ? null : a.id;
+          renderEcosystem();
+        });
 
-    function loadScriptOnce(src) {
-      return new Promise((resolve, reject) => {
-        const existing = [...document.scripts].find(s => s.src === src);
-        if (existing) return resolve();
-        const s = document.createElement("script");
-        s.src = src;
-        s.async = true;
-        s.defer = true;
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error("Failed to load: " + src));
-        document.head.appendChild(s);
+        btn.querySelector(".eco-select").addEventListener("click", (e)=>{
+          e.stopPropagation();
+          // selecting here should also populate Activation Protocol Agent step (agent only)
+          state.agentId = a.id;
+          state.agentName = a.name;
+          // keep voice/template if they already chose them, otherwise leave null (step 03 still incomplete)
+          state.ecoOpenId = null;
+          setStepLabels();
+          setNextBlink();
+          renderEcosystem();
+          // If step 03 incomplete, open step 03 to finish voice/template quickly
+          if(!(state.voice && state.template)) openAgent();
+        });
+
+        ecosystemGrid.appendChild(btn);
       });
     }
 
-    let vapiFallbackInstance = null;
+    // -----------------------------
+    // MODALS (STEPS)
+    // -----------------------------
+    function openCountry(){
+      const items = COUNTRIES.map(x=>`
+        <button class="modal-item" data-value="${x}">
+          <span>${x}</span><span class="text-[10px] font-black opacity-60">Select</span>
+        </button>
+      `).join("");
+      openModal({ title:"Select Country", pill:"01 COUNTRY", html: items });
+      modalBody.querySelectorAll(".modal-item").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          state.country = b.dataset.value;
 
-    function ensureVapiWidgetDocking(){
-      const dock = document.getElementById("vapiDock");
-      if(!dock) return;
+          // reset downstream
+          state.industry = null;
+          state.agentId = null; state.agentName = null;
+          state.voice = null; state.template = null;
+          state.company = null;
+          state.plan = null;
+          state.demoDone = false; state.satisfied = false; state.activated = false;
+          state.ecoOpenId = null;
 
-      const removeHint = () => {
-        const hint = dock.querySelector(".dock-hint");
-        if(hint) hint.remove();
-      };
+          setStepLabels();
+          renderPlanCards();
+          renderEcosystem();
+          closeModal();
+          setNextBlink();
+          setTimeout(autoOpenNext, 150);
+        });
+      });
+    }
 
-      const tryMove = (node) => {
-        if(!node || node.nodeType !== 1) return false;
-        const el = node;
+    function openIndustry(){
+      const items = INDUSTRIES.map(x=>`
+        <button class="modal-item" data-value="${x}">
+          <span>${x}</span><span class="text-[10px] font-black opacity-60">Select</span>
+        </button>
+      `).join("");
+      openModal({ title:"Select Industry", pill:"02 INDUSTRY", html: items });
+      modalBody.querySelectorAll(".modal-item").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          state.industry = b.dataset.value;
 
-        const id = (el.id || "").toLowerCase();
-        const cls = (el.className || "").toString().toLowerCase();
+          // reset downstream
+          state.agentId = null; state.agentName = null;
+          state.voice = null; state.template = null;
+          state.company = null;
+          state.plan = null;
+          state.demoDone = false; state.satisfied = false; state.activated = false;
+          state.ecoOpenId = null;
 
-        const looksLikeVapi =
-          id.includes("vapi") ||
-          cls.includes("vapi") ||
-          el.getAttribute("data-vapi-widget") != null;
+          setStepLabels();
+          renderPlanCards();
+          renderEcosystem();
+          closeModal();
+          setNextBlink();
+          setTimeout(autoOpenNext, 150);
+        });
+      });
+    }
 
-        if(!looksLikeVapi) return false;
+    function openAgent(){
+      // agent + voice + template (restored)
+      const agentOptions = AGENTS.map(a=>`
+        <button class="modal-item" data-agent="${a.id}">
+          <span>${a.name}</span><span class="text-[10px] font-black opacity-60">Pick</span>
+        </button>
+      `).join("");
 
-        el.style.position = "static";
-        el.style.right = "auto";
-        el.style.bottom = "auto";
-        el.style.zIndex = "50";
-        el.style.margin = "0";
-        el.style.transform = "none";
+      const voiceOptions = VOICES.map(v=>`
+        <button class="modal-item" data-voice="${v}">
+          <span>${v}</span><span class="text-[10px] font-black opacity-60">Pick</span>
+        </button>
+      `).join("");
 
-        removeHint();
-        dock.appendChild(el);
-        return true;
-      };
+      const templateOptions = TEMPLATES.map(t=>`
+        <button class="modal-item" data-template="${t}">
+          <span>${t}</span><span class="text-[10px] font-black opacity-60">Pick</span>
+        </button>
+      `).join("");
 
-      const existing = document.querySelector("#vapi-widget, .vapi-widget, .vapi-widget-container, [data-vapi-widget]");
-      if(existing) tryMove(existing);
+      openModal({
+        title:"Select Agent + Voice + Template",
+        pill:"03 AGENT",
+        html: `
+          <div class="small mb-3">
+            Choose an <b>agent</b>, then select a <b>voice</b> and <b>template</b>. This completes Step 03.
+          </div>
 
-      if(window.__vapiDockObserver) return;
-      window.__vapiDockObserver = new MutationObserver((muts) => {
-        for(const m of muts){
-          for(const n of (m.addedNodes || [])){
-            if(tryMove(n)) return;
-            if(n && n.querySelector){
-              const inner = n.querySelector("#vapi-widget, .vapi-widget, .vapi-widget-container, [data-vapi-widget]");
-              if(inner && tryMove(inner)) return;
-            }
+          <div class="text-[9px] font-black uppercase tracking-[0.22em] text-slate-500 mb-2 border-b border-white/5 pb-2">
+            AGENT
+          </div>
+          <div class="grid md:grid-cols-2 gap-2 mb-5">${agentOptions}</div>
+
+          <div class="text-[9px] font-black uppercase tracking-[0.22em] text-slate-500 mb-2 border-b border-white/5 pb-2">
+            VOICE
+          </div>
+          <div class="grid md:grid-cols-2 gap-2 mb-5">${voiceOptions}</div>
+
+          <div class="text-[9px] font-black uppercase tracking-[0.22em] text-slate-500 mb-2 border-b border-white/5 pb-2">
+            TEMPLATE
+          </div>
+          <div class="grid md:grid-cols-2 gap-2">${templateOptions}</div>
+
+          <div class="mt-4 small">
+            Current selection:
+            <b>${state.agentName || "—"}</b> • <b>${state.voice || "—"}</b> • <b>${state.template || "—"}</b>
+          </div>
+        `
+      });
+
+      modalBody.querySelectorAll("[data-agent]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          const id = b.dataset.agent;
+          const a = AGENTS.find(x=>x.id===id);
+          state.agentId = id;
+          state.agentName = a ? a.name : id;
+          renderEcosystem(); // sync selected tag in ecosystem
+          setStepLabels();
+          setNextBlink();
+          // keep modal open so they pick voice/template
+          openAgent(); // quick refresh to show "current selection" values
+        });
+      });
+
+      modalBody.querySelectorAll("[data-voice]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          state.voice = b.dataset.voice;
+          setStepLabels();
+          setNextBlink();
+          openAgent();
+        });
+      });
+
+      modalBody.querySelectorAll("[data-template]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          state.template = b.dataset.template;
+          setStepLabels();
+          setNextBlink();
+          // if step 03 now complete, close and auto-open next
+          if(state.agentId && state.voice && state.template){
+            closeModal();
+            setTimeout(()=>{ setNextBlink(); autoOpenNext(); }, 150);
+          } else {
+            openAgent();
           }
+        });
+      });
+    }
+
+    function openCompany(){
+      openModal({
+        title:"Company Sync",
+        pill:"04 COMPANY",
+        narrow:true,
+        html: `
+          <div class="small mb-3">
+            For prototype: pick a company profile. (Later this can pull from your dashboard / auth.)
+          </div>
+          <button class="modal-item" data-company="TTT">
+            <span>TTT</span><span class="text-[10px] font-black opacity-60">Select</span>
+          </button>
+          <div class="mt-2"></div>
+          <button class="modal-item" data-company="SecurePlus Services">
+            <span>SecurePlus Services</span><span class="text-[10px] font-black opacity-60">Select</span>
+          </button>
+          <div class="mt-2"></div>
+          <button class="modal-item" data-company="Windowbuilt">
+            <span>Windowbuilt</span><span class="text-[10px] font-black opacity-60">Select</span>
+          </button>
+        `
+      });
+
+      modalBody.querySelectorAll("[data-company]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          state.company = b.dataset.company;
+          // reset downstream
+          state.plan = null;
+          state.demoDone = false; state.satisfied = false; state.activated = false;
+          setStepLabels();
+          renderPlanCards();
+          closeModal();
+          setNextBlink();
+          setTimeout(autoOpenNext, 150);
+        });
+      });
+    }
+
+    function openPlan(){
+      openModal({
+        title:"Select Plan",
+        pill:"05 PLAN",
+        narrow:true,
+        html: `
+          <div class="small mb-3">
+            Choose your beta plan. (This will also sync with the pricing cards.)
+          </div>
+          <button class="modal-item" data-plan="299">
+            <span>$299/mo — up to 1,000 minutes</span><span class="text-[10px] font-black opacity-60">Select</span>
+          </button>
+          <div class="mt-2"></div>
+          <button class="modal-item" data-plan="599">
+            <span>$599/mo — up to 2,500 minutes</span><span class="text-[10px] font-black opacity-60">Select</span>
+          </button>
+        `
+      });
+
+      modalBody.querySelectorAll("[data-plan]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          state.plan = b.dataset.plan;
+          setStepLabels();
+          renderPlanCards();
+          closeModal();
+          setNextBlink();
+          // after selecting plan, next required becomes DEMO (blink there)
+        });
+      });
+    }
+
+    // -----------------------------
+    // DEMO FLOW (WORKING)
+    // -----------------------------
+    function showDemoInfoModal(){
+      openModal({
+        title:"Demo Call",
+        pill:"DEMO",
+        narrow:true,
+        html: `
+          <div class="small">
+            You can run <b>2 demo calls</b>, <b>30 seconds</b> each.
+            During the demo, you will talk to your configured company agent.
+          </div>
+          <div class="mt-4"></div>
+          <button id="btnStartDemoCall" class="btn-orange w-full py-4 rounded-xl text-[10px] font-black uppercase italic tracking-widest" type="button">
+            START DEMO CALL
+          </button>
+          <div class="mt-3 small opacity-80">
+            After starting, the green call control will appear in the hero area.
+          </div>
+        `
+      });
+
+      $("btnStartDemoCall").addEventListener("click", ()=>{
+        closeModal();
+        spawnVapiButton(); // show green widget in hero empty area
+        state.demoDone = true;
+        setNextBlink();
+        // make satisfied next
+      });
+    }
+
+    function spawnVapiButton(){
+      // if already exists, do nothing
+      if(vapiMount.querySelector(".vapi-green")) return;
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "vapi-green";
+      btn.innerHTML = `<span class="gdot"></span><span>VAPI CALL</span><span style="opacity:.8">• READY</span>`;
+      btn.addEventListener("click", ()=>{
+        // simulate call start/stop
+        const active = btn.dataset.active === "1";
+        if(!active){
+          btn.dataset.active = "1";
+          btn.innerHTML = `<span class="gdot"></span><span>CALL LIVE</span><span style="opacity:.8">• TAP TO END</span>`;
+        }else{
+          btn.dataset.active = "0";
+          btn.innerHTML = `<span class="gdot"></span><span>VAPI CALL</span><span style="opacity:.8">• READY</span>`;
         }
       });
-      window.__vapiDockObserver.observe(document.body, { childList:true, subtree:true });
+      vapiMount.appendChild(btn);
     }
 
-    const assistants = {
-      "Electrical": "7a2fbe45-b54b-4375-aa1f-111be3f1501a",
-      "Plumbing": "e6dec738-840f-4932-85b4-421b2a7bdb0c",
-      "Wellness": "e95dca20-93f2-46f0-b014-3a885586fa65",
-      "Legal": "e4ef966a-b6de-4e4f-b586-3dda4480fd0f"
-    };
-
-    let selectedVoiceId = "Mia";
-    function getSelectedVapiVoice(){ return { provider: "vapi", voiceId: selectedVoiceId }; }
-
-    async function vapiStartCall(assistantId, assistantOverrides) {
-      const apiKey = await loadVapiKey();
-      await loadScriptOnce("https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js");
-      if (!window.vapiSDK || typeof window.vapiSDK.run !== "function") {
-        throw new Error("Vapi SDK did not initialize");
-      }
-
-      if (vapiFallbackInstance && vapiFallbackInstance.stop) {
-        try { vapiFallbackInstance.stop(); } catch {}
-      }
-
-      ensureVapiWidgetDocking();
-
-      vapiFallbackInstance = window.vapiSDK.run({
-        apiKey,
-        assistant: assistantId,
-        assistantOverrides: assistantOverrides || {}
-      });
-
-      setTimeout(ensureVapiWidgetDocking, 150);
-      setTimeout(ensureVapiWidgetDocking, 450);
-
-      return vapiFallbackInstance;
+    // -----------------------------
+    // ACTIONS: SATISFIED + ACTIVATE
+    // -----------------------------
+    function doSatisfied(){
+      state.satisfied = true;
+      setNextBlink();
     }
-
-    async function startDemoCallFromGate(){
-      closeModal();
-
-      if(completedSteps < 5){
-        alert("Complete steps 1–5 before running a demo.");
-        return;
-      }
-
-      const countBefore = getDemoCount();
-      if(countBefore >= DEMO_MAX_CALLS){
-        refreshActionLocks();
-        return;
-      }
-
-      incDemoCount();
-
-      try{
-        const industry = selectedIndustryKey || "Electrical";
-        const assistantId = assistants[industry] || assistants["Electrical"] || Object.values(assistants)[0];
-
-        const bn = businessName || "YOUR BUSINESS";
-        await vapiStartCall(assistantId, {
-          voice: getSelectedVapiVoice(),
-          firstMessage: `Hi! Thank you for calling ${bn}. How can I help you today?`
-        });
-
-        setDidDemoOnce();
-
-        setTimeout(() => {
-          try { vapiFallbackInstance?.stop?.(); } catch {}
-        }, DEMO_SECONDS * 1000);
-
-        refreshActionLocks();
-
-      } catch(err){
-        console.error(err);
-        alert("Error starting demo call. Check console + /api/config (Vapi key) and ensure the SDK loads.");
-      }
-    }
-
-    // ============================
-    // Activation (Stripe redirect)
-    // ============================
-    function activateNow(){
-      try { confetti(); } catch(e){}
-      const plan = PLANS[selectedPlanId];
-      setTimeout(() => { window.location.href = plan.stripe; }, 650);
-    }
-
-    // ============================
-    // Wire UI
-    // ============================
-    function wire(){
-      document.getElementById("s1").addEventListener("click", () => openStep(1));
-      document.getElementById("s2").addEventListener("click", () => openStep(2));
-      document.getElementById("s3").addEventListener("click", () => openStep(3));
-      document.getElementById("s4").addEventListener("click", () => openStep(4));
-      document.getElementById("s5").addEventListener("click", () => openStep(5));
-
-      document.getElementById("startActivationBtn").addEventListener("click", () => openStep(1));
-      document.getElementById("activateHeroBtn").addEventListener("click", () => openStep(1));
-
-      document.getElementById("smbBenefitsBtn").addEventListener("click", openBenefits);
-
-      document.getElementById("demoBtn").addEventListener("click", () => {
-        if(document.getElementById("demoBtn").classList.contains("disabled")) return;
-        openDemoGate();
-      });
-
-      window.__satisfiedPressed = false;
-      document.getElementById("satisfiedBtn").addEventListener("click", () => {
-        if(document.getElementById("satisfiedBtn").classList.contains("disabled")) return;
-        window.__satisfiedPressed = true;
-        refreshActionLocks();
-      });
-
-      document.getElementById("activateBtn").addEventListener("click", () => {
-        if(document.getElementById("activateBtn").classList.contains("disabled")) return;
-        activateNow();
-      });
-
-      document.getElementById("qaBtn").addEventListener("click", () => openModal("AI Q&A", `<div class="pill mb-3">AI Q&A</div><div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left"><div class="text-[12px] text-slate-300 font-semibold leading-relaxed">Connect this to your backend endpoint: <span class="text-orange-500 font-black">POST /api/ai-qa</span>.</div></div>`, false));
-      document.getElementById("forumBtn").addEventListener("click", () => openModal("Forum", `<div class="pill mb-3">Forum</div><div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left"><div class="text-[12px] text-slate-300 font-semibold leading-relaxed">Forum UI is ready to connect. Add backend later.</div></div>`, false));
-      document.getElementById("newsletterBtnTop").addEventListener("click", () => openModal("Newsletter", `<div class="pill mb-3">Newsletter</div><div class="bg-black/20 border border-white/10 rounded-2xl p-4 text-left"><div class="text-[12px] text-slate-300 font-semibold leading-relaxed">Connect this to your backend endpoint: <span class="text-orange-500 font-black">POST /api/newsletter</span>.</div></div>`, false));
-      document.getElementById("dashBtn").addEventListener("click", () => {
-        window.location.href = "/dashboard";
-      });
-
-      document.getElementById("langTrigger").addEventListener("click", (e) => { e.stopPropagation(); toggleLangMenu(); });
-      document.addEventListener("click", (e) => {
-        const menu = document.getElementById("langMenu");
-        const wrap = document.getElementById("langWrap");
-        if(menu.style.display === "flex" && !wrap.contains(e.target)) toggleLangMenu(false);
+    function doActivate(){
+      state.activated = true;
+      setNextBlink();
+      openModal({
+        title:"Activation Started",
+        pill:"ACTIVATE",
+        narrow:true,
+        html: `
+          <div class="small">
+            Activation has been initiated for:
+            <div class="mt-3"></div>
+            <div class="small">
+              <b>${state.country}</b> • <b>${state.industry}</b><br>
+              <b>${state.agentName}</b> • <b>${state.voice}</b> • <b>${state.template}</b><br>
+              <b>${state.company}</b> • <b>${state.plan === "299" ? "$299/mo" : "$599/mo"}</b>
+            </div>
+            <div class="mt-4"></div>
+            <div class="small opacity-80">
+              (Prototype) Next step would be deploying and showing a provisioned phone number.
+            </div>
+          </div>
+        `
       });
     }
 
-    // ============================
-    // Language menu
-    // ============================
-    const languageList = [
-      { id:"EN", n:"English", f:"us" },
-      { id:"ES", n:"Spanish", f:"mx" },
-      { id:"FR", n:"French", f:"fr" },
-      { id:"AR", n:"Arabic", f:"sa" },
-      { id:"HE", n:"Hebrew", f:"il" },
-      { id:"DE", n:"German", f:"de" },
-      { id:"PT", n:"Portuguese", f:"pt" },
-      { id:"RU", n:"Russian", f:"ru" }
-    ];
+    // -----------------------------
+    // WIRING
+    // -----------------------------
+    // Step click handlers
+    steps.s1.addEventListener("click", openCountry);
+    steps.s2.addEventListener("click", openIndustry);
+    steps.s3.addEventListener("click", openAgent);
+    steps.s4.addEventListener("click", openCompany);
+    steps.s5.addEventListener("click", openPlan);
 
-    function toggleLangMenu(force){
-      const d = document.getElementById('langMenu');
-      if(force === true) d.style.display = 'flex';
-      else if(force === false) d.style.display = 'none';
-      else d.style.display = (d.style.display === 'flex') ? 'none' : 'flex';
+    // pricing cards click (syncs state.plan and Step05)
+    function selectPlan(p){
+      state.plan = p;
+      setStepLabels();
+      renderPlanCards();
+      setNextBlink();
     }
-    function setLang(cc, langCode){
-      document.getElementById('curFlag').src = `https://flagcdn.com/${cc}.svg`;
-      document.getElementById('curLangText').innerText = `${cc.toUpperCase()} | ${langCode}`;
-      i18n.setLanguage(langCode);
-      toggleLangMenu(false);
-    }
-    function filterList(containerId, query){
-      const q = (query || "").toUpperCase();
-      document.querySelectorAll(`#${containerId} .modal-btn`).forEach(b => {
-        const name = b.getAttribute('data-n') || b.innerText;
-        b.style.display = name.toUpperCase().includes(q) ? 'flex' : 'none';
+    plan299.addEventListener("click", ()=>selectPlan("299"));
+    plan599.addEventListener("click", ()=>selectPlan("599"));
+
+    // Right CTA just guides to protocol
+    $("btnStartActivation").addEventListener("click", ()=>{
+      // if no country yet, start pipeline
+      autoOpenNext();
+    });
+
+    // Hero ACTIVATE button: guide to pipeline
+    $("btnActivateHero").addEventListener("click", ()=>{
+      autoOpenNext();
+    });
+
+    // SMB benefits modal
+    $("btnSMB").addEventListener("click", ()=>{
+      openModal({
+        title:"SMB Benefits",
+        pill:"SMB",
+        narrow:true,
+        html: `
+          <div class="small">
+            • Never miss calls<br>
+            • Capture every lead<br>
+            • Reduce staffing costs<br>
+            • 24/7 availability<br>
+            • Structured intake<br>
+            • Professional experience<br>
+            • Scalable without hiring
+          </div>
+        `
       });
-    }
-    function createBtn(txt, fn){
-      const b = document.createElement('button');
-      b.type = "button";
-      b.className = "modal-btn";
-      b.innerText = txt;
-      b.onclick = fn;
-      return b;
-    }
-    function initLangList(){
-      const list = document.getElementById('langList');
-      list.innerHTML = "";
-      languageList.forEach(l => {
-        const b = createBtn(l.n, () => setLang(l.f, l.id));
-        b.setAttribute('data-n', l.n);
-        b.innerHTML = `<img src="https://flagcdn.com/${l.f}.svg" class="w-3" alt=""> <span>${escapeHtml(l.n)}</span>`;
-        list.appendChild(b);
-      });
-      i18n.applyTranslations(document);
-    }
+    });
 
-    // ============================
-    // Timer + counter
-    // ============================
-    setInterval(() => {
-      const now = new Date();
-      const h = 23 - now.getHours(), m = 59 - now.getMinutes(), s = 59 - now.getSeconds();
-      document.getElementById('timer').textContent =
-        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    // Actions
+    steps.demo.addEventListener("click", ()=>{
+      if(state.plan) showDemoInfoModal();
+    });
+    steps.sat.addEventListener("click", ()=>{
+      if(state.demoDone) doSatisfied();
+    });
+    steps.act.addEventListener("click", ()=>{
+      if(state.satisfied) doActivate();
+    });
 
-      if (Math.random() > 0.82) {
-        const el = document.getElementById('agentCount');
-        let count = parseInt(el.innerText.replace(',', ''), 10);
-        el.innerText = (count + 1).toLocaleString();
-      }
-    }, 1000);
+    // Top buttons (placeholder actions)
+    $("btnDashboard").addEventListener("click", ()=>alert("Dashboard (placeholder)"));
+    $("btnQA").addEventListener("click", ()=>alert("AI Q&A (placeholder)"));
+    $("btnForum").addEventListener("click", ()=>alert("Forum (placeholder)"));
+    $("btnNews").addEventListener("click", ()=>alert("Newsletter (placeholder)"));
 
-    // ============================
+    // -----------------------------
     // INIT
-    // ============================
-    initLangList();
-
-    document.getElementById("v1").innerText = "SELECT";
-    document.getElementById("v2").innerText = "SELECT";
-    document.getElementById("v3").innerText = "CHOOSE";
-    document.getElementById("v4").innerText = "SYNC";
-    document.getElementById("v5").innerText = "CHOOSE";
-
-    expandedAgentKey = null;
-    selectedAgentKey = "AI Receptionist";
+    // -----------------------------
     renderEcosystem();
-
-    selectPlanUI(selectedPlanId);
-
-    wire();
-
-    completedSteps = 0;
-    refreshStepLocks();
-    refreshActionLocks();
-
-    ensureVapiWidgetDocking();
-
-    window.onLanguageChanged = () => i18n.applyTranslations(document);
-    i18n.applyTranslations(document);
+    renderPlanCards();
+    setStepLabels();
+    setNextBlink();
   </script>
 </body>
 </html>
