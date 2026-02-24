@@ -2,1597 +2,260 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI CALL PORT — Landing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800;900&display=swap" rel="stylesheet" />
+  <title>AI CallPort — AI Phone Agents</title>
+  <meta name="description" content="Activate an AI phone agent in minutes. Live demo call, then activate instantly. English, Spanish, French." />
 
-  <style>
-    :root{
-      --bg:#06080f;
-      --panel: rgba(10,12,18,.85);
-      --panel2: rgba(0,0,0,.35);
-      --border: rgba(255,255,255,.10);
-      --muted: rgba(148,163,184,.85);
-      --muted2: rgba(148,163,184,.55);
-      --white: rgba(255,255,255,.95);
-      --orange:#f97316;
-      --orange2:#ea580c;
-      --green:#22c55e;
-    }
-
-    html,body{height:100%}
-    body{
-      margin:0;
-      background: var(--bg);
-      color:#e2e8f0;
-      font-family:"Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      overflow-x:hidden;
-    }
-
-    .bg-glow{
-      position:fixed; inset:0; z-index:-1;
-      background: radial-gradient(circle at var(--mx,50%) var(--my,35%), rgba(249,115,22,.14) 0%, transparent 55%);
-      pointer-events:none;
-    }
-
-    .console{
-      width:100%;
-      max-width: 1180px;
-      margin: 18px auto 28px auto;
-      padding: 18px;
-      border-radius: 26px;
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,.10);
-      backdrop-filter: blur(10px);
-    }
-    @media (min-width:1024px){
-      .console{ padding:22px; margin-top:24px; }
-    }
-
-    .hero-title{
-      background: linear-gradient(180deg, #ffffff 30%, var(--orange) 100%);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-    }
-
-    .btn-orange{
-      background: linear-gradient(90deg, var(--orange), var(--orange2));
-      border: 1px solid rgba(255,255,255,.18);
-      color:white;
-      transition:.15s;
-    }
-    .btn-orange:hover{ filter:brightness(1.05); }
-    .btn-orange:active{ transform:scale(.985); }
-
-    .btn-outline{
-      background: rgba(249,115,22,.10);
-      border:1px solid rgba(249,115,22,.35);
-      color:white;
-      transition:.15s;
-    }
-    .btn-outline:hover{ background: rgba(249,115,22,.16); border-color: rgba(249,115,22,.6); }
-    .btn-outline:active{ transform:scale(.985); }
-
-    .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid rgba(249,115,22,.25);
-      background: rgba(249,115,22,.08);
-      font-weight:900;
-      font-size:10px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:white;
-      width:fit-content;
-    }
-
-    .top-chip{
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(249,115,22,.30);
-      background: rgba(249,115,22,.10);
-      font-size: 9px;
-      font-weight: 900;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: white;
-      transition: .15s;
-    }
-    .top-chip:hover{ background: rgba(249,115,22,.18); border-color: rgba(249,115,22,.55); }
-
-    .dot-live{
-      width:6px;height:6px;border-radius:50%;
-      background:var(--green);
-      animation:pulse 2s infinite;
-    }
-    @keyframes pulse{
-      0%{ transform:scale(.95); box-shadow:0 0 0 0 rgba(34,197,94,.7); }
-      70%{ transform:scale(1); box-shadow:0 0 0 6px rgba(34,197,94,0); }
-      100%{ transform:scale(.95); box-shadow:0 0 0 0 rgba(34,197,94,0); }
-    }
-
-    /* Ecosystem buttons */
-    .eco-btn{
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 14px;
-      padding: 12px 12px;
-      cursor:pointer;
-      transition:.15s;
-      user-select:none;
-      text-align:left;
-    }
-    .eco-btn:hover{ border-color: rgba(249,115,22,.45); background: rgba(249,115,22,.08); }
-    .eco-btn.selected{ border-color: rgba(249,115,22,.85); background: rgba(249,115,22,.12); box-shadow:0 0 18px rgba(249,115,22,.12); }
-    .eco-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .eco-name{
-      font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,.95);
-    }
-    .eco-tag{
-      font-size:9px; font-weight:900; text-transform:uppercase; letter-spacing:.16em;
-      padding:6px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: rgba(226,232,240,.90);
-      white-space:nowrap;
-    }
-    .eco-expand{
-      display:none;
-      margin-top:10px;
-      border-radius:14px;
-      padding:10px 12px;
-      background: rgba(0,0,0,.30);
-      border: 1px solid rgba(255,255,255,.06);
-    }
-    .eco-btn.open .eco-expand{ display:block; }
-    .eco-desc{
-      font-size:12px; font-weight:700; line-height:1.45;
-      color: rgba(226,232,240,.88);
-    }
-    .eco-select-row{
-      display:flex; justify-content:flex-end; margin-top:10px;
-    }
-    .eco-select{
-      padding:10px 12px;
-      border-radius:12px;
-      font-size:10px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(249,115,22,.10);
-      cursor:pointer;
-      transition:.15s;
-    }
-    .eco-select:hover{ background: rgba(249,115,22,.16); border-color: rgba(249,115,22,.70); }
-
-    /* Pricing cards */
-    .plan-card{
-      background: rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;
-      padding:14px;
-      cursor:pointer;
-      transition:.15s;
-      user-select:none;
-    }
-    .plan-card:hover{ border-color: rgba(249,115,22,.55); background: rgba(249,115,22,.08); }
-    .plan-card.selected{ border-color: rgba(249,115,22,.85); background: rgba(249,115,22,.14); box-shadow: 0 0 22px rgba(249,115,22,.18); }
-    .strike{ text-decoration:line-through; opacity:.55; }
-
-    /* Steps */
-    .step-card{
-      background: rgba(255,255,255,.02);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius:14px;
-      padding:12px;
-      min-height:58px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      user-select:none;
-      transition:.2s;
-      cursor:pointer;
-    }
-    .step-card.locked{
-      opacity:.22;
-      cursor:not-allowed;
-      pointer-events:none;
-    }
-    .step-card.done{
-      opacity:1;
-      border-color: rgba(249,115,22,.70);
-      background: rgba(249,115,22,.08);
-    }
-    .step-card.next{
-      opacity:1;
-      animation: glow 2s infinite ease-in-out;
-    }
-    @keyframes glow{
-      0%,100%{ border-color: rgba(249,115,22,.30); }
-      50%{ border-color: var(--orange); box-shadow: 0 0 18px rgba(249,115,22,.35); }
-    }
-
-    /* Big action buttons */
-    .action-btn{
-      border-radius:18px;
-      padding:18px 18px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      user-select:none;
-      transition:.15s;
-      width:100%;
-      min-height:84px;
-    }
-    .action-outline{
-      background: rgba(249,115,22,.10);
-      border: 1px solid rgba(249,115,22,.35);
-      color:white;
-      cursor:pointer;
-    }
-    .action-primary{
-      background: linear-gradient(90deg, var(--orange), var(--orange2));
-      border: 1px solid rgba(255,255,255,.18);
-      color:white;
-      cursor:pointer;
-    }
-    .action-disabled{
-      opacity:.35;
-      cursor:not-allowed;
-      pointer-events:none;
-      filter:none;
-    }
-    .action-next{
-      animation: glow 2s infinite ease-in-out;
-    }
-    .k{ font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.18em; }
-    .s{ font-size:12px; font-weight:700; color: rgba(226,232,240,.88); line-height:1.35; }
-    .r{
-      font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.16em;
-      padding:6px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      white-space:nowrap;
-    }
-
-    /* Modal */
-    #modal{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,.92);
-      z-index:9999;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 20px;
-    }
-    .modal-shell{
-      width:100%;
-      max-width: 980px;
-      max-height: 90vh;
-      overflow:hidden;
-      background: rgba(10,12,18,.92);
-      border: 1px solid rgba(249,115,22,.24);
-      border-radius: 24px;
-      padding: 18px;
-      box-shadow:
-        0 0 0 1px rgba(249,115,22,.06),
-        0 0 35px rgba(249,115,22,.15),
-        0 20px 60px rgba(0,0,0,.60);
-      backdrop-filter: blur(10px);
-      display:flex;
-      flex-direction:column;
-    }
-    .modal-shell.narrow{ max-width: 560px; }
-    .modal-titlebar{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
-    .modal-body{ margin-top: 12px; overflow:auto; padding-right:2px; flex:1; min-height:0; }
-    .modal-footer{ margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.06); }
-    .modal-item{
-      width:100%;
-      padding: 12px 12px;
-      border-radius: 12px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.10);
-      color:white;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      cursor:pointer;
-      transition:.15s;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      font-size: 10px;
-    }
-    .modal-item:hover{ background: rgba(255,255,255,.08); border-color: rgba(249,115,22,.55); }
-    .small{ font-size:12px; font-weight:700; color: rgba(226,232,240,.85); line-height:1.5; }
-
-    /* Supportive lines */
-    .support-title{
-      font-size:10px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      color: rgba(249,115,22,.95);
-      margin-bottom:10px;
-      white-space:nowrap;
-    }
-    .support-list{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-    .support-line{
-      font-size:10px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      color: rgba(226,232,240,.78);
-      white-space:nowrap;       /* one row only */
-      overflow:hidden;
-      text-overflow:ellipsis;   /* safety */
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .support-line .dot{
-      width:4px;height:4px;border-radius:50%;
-      background: rgba(226,232,240,.55);
-      flex:0 0 auto;
-    }
-    .support-line.highlight{
-      color: rgba(249,115,22,.95);
-    }
-    .support-line.highlight .dot{
-      background: rgba(249,115,22,.85);
-      box-shadow: 0 0 14px rgba(249,115,22,.18);
-    }
-
-    /* Global System Status console (SaaS card) */
-    .gss-card{
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.22);
-      padding: 14px;
-    }
-    .gss-head{
-      font-size:10px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      color: rgba(148,163,184,.70);
-      margin-bottom: 10px;
-      white-space:nowrap;
-    }
-    .gss-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-bottom:12px;
-    }
-    .gss-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:7px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      font-size:9px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      color: rgba(226,232,240,.90);
-      white-space:nowrap;
-    }
-    .gss-pill strong{ color: rgba(255,255,255,.95); }
-    .gss-dot{
-      width:7px;height:7px;border-radius:50%;
-      display:inline-block;
-      flex:0 0 auto;
-    }
-    .gss-dot.green{ background: rgba(34,197,94,.95); box-shadow: 0 0 14px rgba(34,197,94,.18); }
-    .gss-dot.orange{ background: rgba(249,115,22,.95); box-shadow: 0 0 14px rgba(249,115,22,.16); }
-    .gss-dot.gray{ background: rgba(148,163,184,.70); }
-
-    .gss-grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap:10px;
-      margin-top: 8px;
-    }
-    .gss-metric{
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-      padding: 10px 10px;
-      min-height: 56px;
-    }
-    .gss-label{
-      font-size:8px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      color: rgba(148,163,184,.65);
-      margin-bottom: 6px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .gss-value{
-      font-size:14px;
-      font-weight:900;
-      color: rgba(255,255,255,.95);
-      line-height:1;
-      white-space:nowrap;
-    }
-
-    /* Platform Broadcast (in the empty box) */
-    .broadcast-wrap{
-      margin-top: 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.22);
-      padding: 12px;
-    }
-    .broadcast-pill{
-      display:inline-flex;
-      align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
-      background: rgba(249,115,22,.10);
-      border: 1px solid rgba(249,115,22,.35);
-      font-size:9px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.16em;
-      color: rgba(255,255,255,.95);
-      white-space:nowrap;
-      margin-bottom: 8px;
-    }
-    .broadcast-text{
-      font-size:11px;
-      font-weight:700;
-      line-height:1.55;
-      color: rgba(226,232,240,.82);
-    }
-
-    /* Currency converter */
-    .fx-card{
-      margin-top: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.22);
-      padding: 14px;
-    }
-    .fx-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom: 12px;
-    }
-    .fx-title{
-      font-size:9px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      color: rgba(148,163,184,.70);
-      white-space:nowrap;
-    }
-    .fx-select{
-      appearance:none;
-      -webkit-appearance:none;
-      -moz-appearance:none;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color: rgba(255,255,255,.92);
-      padding: 8px 34px 8px 12px;
-      font-size:9px;
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      cursor:pointer;
-      outline:none;
-      white-space:nowrap;
-    }
-    .fx-select:hover{ border-color: rgba(249,115,22,.55); }
-    .fx-select-wrap{
-      position:relative;
-      flex:0 0 auto;
-    }
-    .fx-caret{
-      position:absolute;
-      right: 12px;
-      top:50%;
-      transform:translateY(-50%);
-      width:0;height:0;
-      border-left:5px solid transparent;
-      border-right:5px solid transparent;
-      border-top:6px solid rgba(255,255,255,.65);
-      pointer-events:none;
-    }
-
-    .fx-grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap:10px;
-    }
-    .fx-box{
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-      padding: 10px;
-      min-height: 64px;
-    }
-    .fx-box .k{
-      font-size:8px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      color: rgba(148,163,184,.65);
-      margin-bottom:6px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .fx-box .v{
-      font-size:14px;
-      font-weight:900;
-      color: rgba(255,255,255,.95);
-      line-height:1;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .fx-box .s{
-      margin-top:6px;
-      font-size:9px;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      color: rgba(226,232,240,.70);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .fx-foot{
-      margin-top:10px;
-      font-size:8px;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      color: rgba(148,163,184,.55);
-      line-height:1.4;
-    }
-  </style>
+  <link rel="stylesheet" href="./style.css" />
 </head>
 
-<body onmousemove="parallax(event)">
-  <div class="bg-glow"></div>
+<body>
+  <!-- Topbar -->
+  <header class="topbar" role="banner">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="#top" aria-label="AI CallPort home">
+        <span class="brand-mark" aria-hidden="true">AI</span>
+        <span class="brand-name">AI CallPort</span>
+      </a>
 
-  <div class="console">
-    <!-- TOP BAR -->
-    <div class="flex items-center justify-between gap-3 mb-5 lg:mb-8">
-      <div class="flex items-center gap-2 min-w-[180px]">
-        <span class="font-black italic text-base lg:text-xl uppercase text-white">
-          AI CALL <span class="text-orange-500">PORT</span>
-        </span>
-        <span class="ml-2 px-1.5 py-0.5 bg-orange-500 rounded-sm text-[8px] font-black text-black uppercase leading-none">BETA</span>
-      </div>
+      <nav class="nav" aria-label="Primary">
+        <a href="#how-it-works">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#support">Support</a>
+      </nav>
 
-      <div class="flex items-center gap-2 flex-wrap justify-end">
-        <button class="top-chip" id="btnDashboard" type="button">Dashboard</button>
-        <button class="top-chip" id="btnQA" type="button">AI Q&amp;A</button>
-        <button class="top-chip" id="btnForum" type="button">Forum</button>
-        <button class="top-chip" id="btnNews" type="button">Newsletter</button>
-        <div class="px-3 py-2 rounded-full border border-orange-500/20 bg-orange-500/10 flex items-center gap-2">
-          <div class="dot-live"></div>
-          <span class="text-[8px] font-black uppercase tracking-widest text-orange-500">Global Live</span>
-        </div>
+      <div class="topbar-actions">
+        <a class="link" href="#login">Log in</a>
+        <a class="btn btn-small" href="#start">Get started</a>
       </div>
     </div>
+  </header>
 
-    <!-- HERO -->
-    <div class="grid lg:grid-cols-5 gap-6 lg:gap-10 items-stretch">
-      <!-- Left -->
-      <div class="lg:col-span-2 flex flex-col min-h-[610px]">
-        <div>
-          <h1 class="text-3xl lg:text-5xl font-black italic uppercase leading-tight mb-2 hero-title">AI CALL PORT</h1>
+  <!-- Hero -->
+  <main id="top">
+    <section class="hero" aria-label="Hero">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <h1>Instant AI phone agents<br/>for businesses worldwide.</h1>
 
-          <div class="text-xl lg:text-2xl font-black italic uppercase leading-snug hero-title mb-2">
-            Global Activation Platform for AI Call Agents
+          <p class="subhead">
+            Activate in minutes. Any industry. English • Spanish • French.
+            <br/>
+            Demo call → Activate → Go live.
+          </p>
+
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#start">Activate your AI Agent</a>
+            <a class="btn btn-secondary" href="#how-it-works">See how it works</a>
           </div>
 
-          <!-- EXTRA SPACE BETWEEN HERO + SUPPORTIVE LINES -->
-          <div class="h-10"></div>
-
-          <!-- SUPPORTIVE LINES (ONE ROW EACH) -->
-          <div>
-            <div class="support-title">BUILT FOR SMALL AND MEDIUM-SIZED BUSINESSES</div>
-
-            <div class="support-list">
-              <div class="support-line" title="DEPLOY STRUCTURED AI CALL AGENTS FOR YOUR BUSINESS">
-                <span class="dot"></span><span>DEPLOY STRUCTURED AI CALL AGENTS FOR YOUR BUSINESS</span>
-              </div>
-              <div class="support-line" title="FULLY AUTOMATED ACTIVATION">
-                <span class="dot"></span><span>FULLY AUTOMATED ACTIVATION</span>
-              </div>
-              <div class="support-line" title="MULTILINGUAL-READY">
-                <span class="dot"></span><span>MULTILINGUAL-READY</span>
-              </div>
-              <div class="support-line" title="SWITCH AGENTS ANYTIME AFTER ACTIVATION">
-                <span class="dot"></span><span>SWITCH AGENTS ANYTIME AFTER ACTIVATION</span>
-              </div>
-              <div class="support-line" title="GLOBAL READY — MULTI-REGION SUPPORT">
-                <span class="dot"></span><span>GLOBAL READY — MULTI-REGION SUPPORT</span>
-              </div>
-              <div class="support-line" title="SECURE PAYMENT VIA STRIPE">
-                <span class="dot"></span><span>SECURE PAYMENT VIA STRIPE</span>
-              </div>
-              <div class="support-line" title="CUSTOM AGENTS FOR ANY INDUSTRY">
-                <span class="dot"></span><span>CUSTOM AGENTS FOR ANY INDUSTRY</span>
-              </div>
-              <div class="support-line" title="24/7 CALL COVERAGE">
-                <span class="dot"></span><span>24/7 CALL COVERAGE</span>
-              </div>
-              <div class="support-line highlight" title="8 EASY STEPS ACTIVATION PROTOCOL">
-                <span class="dot"></span><span>8 EASY STEPS ACTIVATION PROTOCOL</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- EXTRA SPACE BETWEEN SUPPORTIVE LINES + GLOBAL SYSTEM STATUS -->
-          <div class="h-10"></div>
+          <p class="hero-note">
+            No sales calls. No setup fees. Cancel anytime.
+          </p>
         </div>
 
-        <!-- GLOBAL SYSTEM STATUS + PLATFORM BROADCAST -->
-        <div class="gss-card w-full">
-          <div class="gss-head">GLOBAL SYSTEM STATUS</div>
+        <div class="hero-card" aria-label="Beta Special pricing card">
+          <div class="card">
+            <div class="card-badge">Beta Special</div>
+            <div class="price">
+              <span class="price-main">$199</span><span class="price-unit">/month</span>
+            </div>
+            <div class="price-sub">Locked for 2 years</div>
 
-          <div class="gss-row" aria-label="Countries status">
-            <div class="gss-pill" title="Active countries">
-              <span class="gss-dot green"></span><strong>75 ACTIVE</strong>
-            </div>
-            <div class="gss-pill" title="Coming soon">
-              <span class="gss-dot orange"></span><span>36 COMING SOON</span>
-            </div>
-            <div class="gss-pill" title="Projected">
-              <span class="gss-dot gray"></span><span>18 PROJECTED</span>
-            </div>
+            <ul class="checks">
+              <li>Unlimited calls (fair use)</li>
+              <li>No setup fees</li>
+              <li>Cancel anytime</li>
+            </ul>
+
+            <a class="btn btn-primary btn-wide" href="#start">Activate your AI Agent</a>
+            <div class="small muted">Monthly billing starts on activation date.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Problem -->
+    <section class="section" aria-label="Problem">
+      <div class="wrap">
+        <h2 class="center">The problem AI CallPort solves</h2>
+
+        <div class="grid-3">
+          <div class="feature">
+            <div class="icon">📞</div>
+            <h3>Missed calls = lost revenue</h3>
+            <p>Customers call after hours or during peak times — and no one answers.</p>
           </div>
 
-          <div class="gss-grid">
-            <div class="gss-metric">
-              <div class="gss-label">AI AGENTS</div>
-              <div class="gss-value">12</div>
-            </div>
-            <div class="gss-metric">
-              <div class="gss-label">INDUSTRIES</div>
-              <div class="gss-value">154</div>
-            </div>
-            <div class="gss-metric">
-              <div class="gss-label">LANGUAGES</div>
-              <div class="gss-value">89+</div>
-            </div>
-            <div class="gss-metric">
-              <div class="gss-label">ACTIVE AGENTS</div>
-              <div class="gss-value">14,214</div>
-            </div>
+          <div class="feature">
+            <div class="icon">🧑‍💼</div>
+            <h3>Staffing phones is expensive</h3>
+            <p>Human receptionists cost thousands and don’t scale or cover 24/7.</p>
           </div>
 
-          <!-- PLATFORM BROADCAST (fills bottom empty box) -->
-          <div class="broadcast-wrap">
-            <div class="broadcast-pill">PLATFORM BROADCAST</div>
-            <div class="broadcast-text">
-              Hello! Thank you for visiting AI Call Port. We built this platform to help small businesses reach the next level—without needing a team, a developer, or complicated setup. AI Call Port is fully automated, AI-powered, and designed to be simple to use. You can activate AI call agents for your business in just a few minutes.
-              <br><br>
-              Before you activate, you can run a built-in demo call so you feel confident about the experience. We worked extremely hard to bring this to life, and I’m happy to share that our systems are stable and running strong.
-              <br><br>
-              Thank you for being here.
-            </div>
+          <div class="feature">
+            <div class="icon">⚙️</div>
+            <h3>Existing systems are complex</h3>
+            <p>Long setups, contracts, and outdated phone software slow you down.</p>
           </div>
         </div>
 
-        <!-- Bottom buttons (same size, one row) -->
-        <div class="mt-5 flex gap-3">
-          <button id="btnActivateHero" class="btn-orange w-full px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest italic" type="button">
-            ACTIVATE
-          </button>
-          <button id="btnSMB" class="btn-outline w-full px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest" type="button">
-            SMB BENEFITS
-          </button>
-        </div>
+        <p class="center muted mt-20">
+          AI CallPort fixes this in minutes — without sales calls, contracts, or complex setup.
+        </p>
       </div>
+    </section>
 
-      <!-- Right -->
-      <div class="lg:col-span-3">
-        <div class="bg-black/30 border border-white/10 rounded-3xl p-5 lg:p-6 h-full flex flex-col">
+    <!-- Credibility -->
+    <section class="section section-soft" aria-label="Credibility" id="credibility">
+      <div class="wrap">
+        <div class="cred-head">
+          <h2>Live in 7 countries • 3 languages • Built for real businesses</h2>
+          <p class="muted">
+            Start with a demo call, then activate instantly. Add integration when needed.
+          </p>
+        </div>
 
-          <div class="text-center">
-            <div class="text-white font-black uppercase tracking-[0.18em] text-[12px] lg:text-[13px]">
-              SELECT ANY AI AGENT. SWITCH AGENTS ANYTIME AFTER ACTIVATION.
-            </div>
-            <div class="mt-2 text-white font-black uppercase tracking-[0.16em] text-[10px] lg:text-[11px] opacity-95">
-              CLICK AN AGENT TO VIEW DETAILS
-            </div>
+        <div class="grid-3">
+          <div class="cred">
+            <h3>Countries live now</h3>
+            <p class="muted">USA, Canada, UK, Spain, France, Mexico, Chile</p>
           </div>
 
-          <!-- ECOSYSTEM GRID -->
-          <div class="mt-4 grid sm:grid-cols-2 gap-2" id="ecosystemGrid"></div>
-
-          <!-- PRICING -->
-          <div class="mt-6 bg-black/35 border border-orange-500/22 rounded-3xl p-5">
-            <div class="text-center mb-4">
-              <div class="text-[10px] uppercase font-black text-orange-500 tracking-[0.2em]">
-                BETA SPECIAL (LIMITED TIME OFFER)
-              </div>
-              <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mt-1">
-                PICK A PLAN (STEP 05)
-              </div>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-3">
-              <div id="planCard299" class="plan-card" role="button" tabindex="0">
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA SPECIAL</div>
-                <div class="flex items-end justify-between mt-2 gap-3">
-                  <div class="text-white font-black text-4xl leading-none">
-                    $299<span class="text-orange-500 text-base font-bold">/mo</span>
-                  </div>
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">
-                    <span class="strike">$499</span> REG
-                  </div>
-                </div>
-                <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-orange-500">UP TO 1,000 MIN</div>
-                <div class="mt-1 text-[10px] font-semibold text-slate-300">Overage: $0.30/min billed next invoice.</div>
-                <div class="mt-3 space-y-1.5">
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Secure payment via Stripe</div>
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Pay monthly</div>
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• No contracts. Cancel anytime</div>
-                </div>
-              </div>
-
-              <div id="planCard599" class="plan-card" role="button" tabindex="0">
-                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">BETA SPECIAL</div>
-                <div class="flex items-end justify-between mt-2 gap-3">
-                  <div class="text-white font-black text-4xl leading-none">
-                    $599<span class="text-orange-500 text-base font-bold">/mo</span>
-                  </div>
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">
-                    <span class="strike">$999</span> REG
-                  </div>
-                </div>
-                <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-orange-500">UP TO 2,500 MIN</div>
-                <div class="mt-1 text-[10px] font-semibold text-slate-300">Overage: $0.30/min billed next invoice.</div>
-                <div class="mt-3 space-y-1.5">
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Secure payment via Stripe</div>
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• Pay monthly</div>
-                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-300">• No contracts. Cancel anytime</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- WORLD PRICING CONVERTER (Option A, refined) -->
-            <div class="fx-card" aria-label="World pricing converter">
-              <div class="fx-top">
-                <div class="fx-title">WORLD PRICING CONVERTER</div>
-                <div class="fx-select-wrap">
-                  <select id="fxCurrency" class="fx-select" aria-label="Select currency"></select>
-                  <span class="fx-caret"></span>
-                </div>
-              </div>
-
-              <div class="fx-grid">
-                <div class="fx-box">
-                  <div class="k">BETA — $299 / MONTH</div>
-                  <div class="v" id="fx299" title="—">—</div>
-                  <div class="s" id="fx299Over" title="—">—</div>
-                </div>
-                <div class="fx-box">
-                  <div class="k">BETA — $599 / MONTH</div>
-                  <div class="v" id="fx599" title="—">—</div>
-                  <div class="s" id="fx599Over" title="—">—</div>
-                </div>
-              </div>
-
-              <div class="fx-foot" id="fxFoot">
-                Rates source: ExchangeRate API • Base: USD • Displayed for reference — billed in USD via Stripe.
-              </div>
-            </div>
-
-            <div class="mt-4">
-              <button id="btnStartActivation" class="btn-orange w-full py-4 rounded-xl text-[10px] font-black uppercase italic tracking-widest" type="button">
-                START ACTIVATION
-              </button>
-            </div>
+          <div class="cred">
+            <h3>Languages ready now</h3>
+            <p class="muted">English, Spanish, French</p>
           </div>
 
-        </div>
-      </div>
-    </div>
-
-    <!-- ACTIVATION PROTOCOL -->
-    <div class="mt-10 lg:mt-12">
-      <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
-        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">ACTIVATION PROTOCOL</span>
-        <span class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Only the next required button blinks</span>
-      </div>
-
-      <div class="bg-black/30 border border-white/10 rounded-3xl p-4 lg:p-6">
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
-          <div id="s1" class="step-card"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">01 Country</p><p id="v1" class="text-[10px] text-white/30 font-bold uppercase truncate">Select</p></div>
-          <div id="s2" class="step-card locked"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">02 Industry</p><p id="v2" class="text-[10px] text-white/30 font-bold uppercase truncate">Select</p></div>
-          <div id="s3" class="step-card locked"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">03 Agent</p><p id="v3" class="text-[10px] text-white/30 font-bold uppercase truncate">Choose</p></div>
-          <div id="s4" class="step-card locked"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">04 Company</p><p id="v4" class="text-[10px] text-white/30 font-bold uppercase truncate">Sync</p></div>
-          <div id="s5" class="step-card locked"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">05 Plan</p><p id="v5" class="text-[10px] text-white/30 font-bold uppercase truncate">Choose</p></div>
+          <div class="cred">
+            <h3>Integration option</h3>
+            <p class="muted">
+              If a client needs your agent inside an existing system, we support
+              integration via webhook/API-style handoff (CRM, scheduling, ticketing).
+            </p>
+          </div>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-3 mt-4">
-          <button id="s6" class="action-btn action-outline action-disabled" type="button">
-            <div><div class="k">DEMO</div><div class="s">Test your configured AI agent</div></div>
-            <span class="r">STEP 06</span>
+        <div class="industry">
+          <h3>Industries supported at launch (8)</h3>
+          <div class="chips" role="list">
+            <span class="chip" role="listitem">Auto Repair</span>
+            <span class="chip" role="listitem">Beauty Salon</span>
+            <span class="chip" role="listitem">Dental</span>
+            <span class="chip" role="listitem">Plumbing</span>
+            <span class="chip" role="listitem">HVAC</span>
+            <span class="chip" role="listitem">Real Estate</span>
+            <span class="chip" role="listitem">Legal Intake</span>
+            <span class="chip" role="listitem">Medical Clinic</span>
+          </div>
+          <p class="muted small mt-10">
+            More industries can be added quickly without changing your main activation flow.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works / Steps -->
+    <section class="section" id="how-it-works" aria-label="How it works">
+      <div class="wrap">
+        <h2 class="center">Activate your AI receptionist in 6 simple steps</h2>
+        <p class="center muted">Straightforward setup. No hidden screens. No waiting.</p>
+
+        <div class="steps" id="start">
+          <button class="step" type="button">
+            <span class="step-num">1</span>
+            <span class="step-title">Choose the country</span>
+            <span class="step-meta">Pick where you want your number</span>
           </button>
 
-          <button id="s7" class="action-btn action-outline action-disabled" type="button">
-            <div><div class="k">SATISFIED</div><div class="s">Confirm demo quality once</div></div>
-            <span class="r">STEP 07</span>
+          <button class="step" type="button">
+            <span class="step-num">2</span>
+            <span class="step-title">Choose the industry</span>
+            <span class="step-meta">Auto Repair, Beauty Salon, Dental, etc.</span>
           </button>
 
-          <button id="s8" class="action-btn action-primary action-disabled" type="button">
-            <div><div class="k">ACTIVATE</div><div class="s">Deploy and receive your number</div></div>
-            <span class="r">STEP 08</span>
+          <button class="step" type="button">
+            <span class="step-num">3</span>
+            <span class="step-title">Choose the AI call service</span>
+            <span class="step-meta">Receptionist, lead capture, scheduling</span>
+          </button>
+
+          <button class="step" type="button">
+            <span class="step-num">4</span>
+            <span class="step-title">Enter your business details</span>
+            <span class="step-meta">Hours, location, services, FAQs</span>
+          </button>
+
+          <button class="step" type="button">
+            <span class="step-num">5</span>
+            <span class="step-title">Call your company (live AI demo)</span>
+            <span class="step-meta">Hear your agent before you activate</span>
+          </button>
+
+          <button class="step" type="button">
+            <span class="step-num">6</span>
+            <span class="step-title">Activate your AI agent</span>
+            <span class="step-meta">Go live instantly. Monthly billing starts now.</span>
           </button>
         </div>
 
-        <div class="mt-3 text-[9px] font-black uppercase tracking-widest text-slate-500">
-          Rules: each step unlocks the next. Only the next required button blinks.
+        <div class="center mt-24">
+          <a class="btn btn-primary" href="#pricing">See pricing</a>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- MODAL -->
-  <div id="modal" aria-hidden="true">
-    <div id="modalShell" class="modal-shell">
-      <div class="modal-titlebar">
-        <div>
-          <div class="pill" id="modalPill">SETUP</div>
-          <h2 id="modalTitle" class="text-lg font-black uppercase text-white mt-2">Setup</h2>
+    <!-- Pricing -->
+    <section class="section section-soft" id="pricing" aria-label="Pricing">
+      <div class="wrap">
+        <h2 class="center">Simple pricing</h2>
+        <p class="center muted">Start fast. Upgrade later.</p>
+
+        <div class="pricing">
+          <div class="card">
+            <div class="card-badge">Beta Special</div>
+            <div class="price">
+              <span class="price-main">$199</span><span class="price-unit">/month</span>
+            </div>
+            <div class="price-sub">Locked for 2 years</div>
+
+            <ul class="checks">
+              <li>Unlimited calls (fair use)</li>
+              <li>English, Spanish, French</li>
+              <li>7 countries available</li>
+              <li>Cancel anytime</li>
+            </ul>
+
+            <a class="btn btn-primary btn-wide" href="#start">Activate your AI Agent</a>
+            <div class="small muted">No contract. No setup fees.</div>
+          </div>
         </div>
-        <button id="modalCloseX" class="btn-outline px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest" type="button">Close</button>
       </div>
-      <div class="modal-body" id="modalBody"></div>
-      <div class="modal-footer">
-        <button id="modalClose" class="w-full text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white" type="button">Close</button>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="support">
+      <div class="wrap footer-inner">
+        <div class="footer-left">
+          <div class="brand small">
+            <span class="brand-mark" aria-hidden="true">AI</span>
+            <span class="brand-name">AI CallPort</span>
+          </div>
+          <div class="muted small">© <span id="year"></span> AI CallPort. All rights reserved.</div>
+        </div>
+
+        <div class="footer-links">
+          <a href="#login" id="login">Log in</a>
+          <a href="#support">Support</a>
+          <a href="#billing">Billing</a>
+          <a href="#terms">Terms</a>
+          <a href="#privacy">Privacy</a>
+        </div>
       </div>
-    </div>
-  </div>
+    </footer>
+  </main>
 
-  <footer class="py-10 w-full text-center border-t border-white/5 bg-black/20">
-    <div class="max-w-xs mx-auto opacity-40 hover:opacity-100 transition-opacity duration-500">
-      <div class="flex items-center justify-center gap-2 mb-4">
-        <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-        <span class="text-[8px] font-black text-white uppercase tracking-widest"><span id="agentCount">14,214</span> ACTIVE AGENTS</span>
-      </div>
-      <div class="flex justify-center gap-6 text-[9px] font-black uppercase tracking-widest text-slate-500 mb-4">
-        <a href="#" class="hover:text-orange-500">Privacy</a>
-        <a href="#" class="hover:text-orange-500">Terms</a>
-        <a href="#" class="hover:text-orange-500">Support</a>
-      </div>
-      <p class="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">&copy; 2026 AI CALL PORT. GLOBAL SMALL BUSINESS PROTOCOL.</p>
-    </div>
-  </footer>
-
-  <script>
-    function parallax(e){
-      document.documentElement.style.setProperty('--mx', (e.clientX / innerWidth * 100) + '%');
-      document.documentElement.style.setProperty('--my', (e.clientY / innerHeight * 100) + '%');
-    }
-
-    // -----------------------------
-    // DATA
-    // -----------------------------
-    const AGENTS = [
-      { id:"receptionist", name:"AI Receptionist", desc:"Greets callers, captures intent, routes calls, and collects structured details for follow-up." },
-      { id:"booking", name:"AI Booking Agent", desc:"Books appointments, confirms availability, reschedules, and sends reminders to reduce no-shows." },
-      { id:"sales", name:"AI Sales Agent", desc:"Qualifies leads, answers objections, and routes hot prospects to the right sales path." },
-      { id:"customer_service", name:"AI Customer Service", desc:"Handles FAQs, order/service status, and resolves common issues quickly and consistently." },
-      { id:"after_hours", name:"AI After-Hours Agent", desc:"Captures urgent requests after-hours, provides next steps, and escalates when needed." },
-      { id:"dispatch", name:"AI Dispatch Agent", desc:"Collects critical job details, dispatches crews, and keeps calls structured under pressure." },
-      { id:"lead_capture", name:"AI Lead Capture Agent", desc:"Never misses a lead: captures contact info, need, location, urgency, and preferred follow-up." },
-      { id:"intake", name:"AI Intake Agent", desc:"Runs structured intake: gathers requirements, documents context, and routes to the correct workflow." },
-      { id:"triage", name:"AI Support Triage", desc:"Identifies issue type, urgency, and next action; routes to the right support lane." },
-      { id:"overflow", name:"AI Overflow Agent", desc:"Acts as overflow during peaks: answers instantly, collects info, and reduces missed calls." },
-      { id:"multilingual", name:"AI Multilingual Agent", desc:"Serves callers in multiple languages with consistent, structured intake and routing." },
-      { id:"custom", name:"Custom AI Agents", desc:"We build custom agents for your exact process, scripts, intake fields, and escalation rules." }
-    ];
-
-    const COUNTRIES = ["United States","Canada","United Kingdom","Australia","UAE","Germany","France"];
-    const INDUSTRIES = ["Security","Roofing","Windows & Doors","Medical Clinic","Dental","Legal","Home Services","Real Estate"];
-    const VOICES = ["Calm Professional","Confident Sales","Warm Reception","Crisp Dispatch","Minimal Neutral"];
-    const TEMPLATES = ["Standard Intake","High-Converting Sales","Service Triage","After-Hours Emergency","Booking Focused"];
-
-    // -----------------------------
-    // STATE
-    // -----------------------------
-    const state = {
-      country:null,
-      industry:null,
-      agentId:null,
-      agentName:null,
-      voice:null,
-      template:null,
-      company:null,
-      plan:null, // "299" | "599"
-      demoDone:false,
-      satisfied:false,
-      activated:false,
-      ecoOpenId:null
-    };
-
-    // -----------------------------
-    // ELEMENTS
-    // -----------------------------
-    const $ = (id)=>document.getElementById(id);
-
-    const ecosystemGrid = $("ecosystemGrid");
-    const plan299 = $("planCard299");
-    const plan599 = $("planCard599");
-
-    const steps = {
-      s1:$("s1"), s2:$("s2"), s3:$("s3"), s4:$("s4"), s5:$("s5"),
-      v1:$("v1"), v2:$("v2"), v3:$("v3"), v4:$("v4"), v5:$("v5"),
-      demo:$("s6"), sat:$("s7"), act:$("s8")
-    };
-
-    const modal = $("modal");
-    const modalShell = $("modalShell");
-    const modalTitle = $("modalTitle");
-    const modalPill = $("modalPill");
-    const modalBody = $("modalBody");
-    const modalClose = $("modalClose");
-    const modalCloseX = $("modalCloseX");
-
-    // Currency converter elements
-    const fxCurrency = $("fxCurrency");
-    const fx299 = $("fx299");
-    const fx599 = $("fx599");
-    const fx299Over = $("fx299Over");
-    const fx599Over = $("fx599Over");
-    const fxFoot = $("fxFoot");
-
-    // -----------------------------
-    // HELPERS
-    // -----------------------------
-    function openModal({title, pill="SETUP", narrow=false, html=""}){
-      modalTitle.textContent = title;
-      modalPill.textContent = pill;
-      modalBody.innerHTML = html;
-      modalShell.classList.toggle("narrow", !!narrow);
-      modal.style.display = "flex";
-      modal.setAttribute("aria-hidden","false");
-    }
-    function closeModal(){
-      modal.style.display = "none";
-      modal.setAttribute("aria-hidden","true");
-      modalBody.innerHTML = "";
-      modalShell.classList.remove("narrow");
-    }
-    modalClose.addEventListener("click", closeModal);
-    modalCloseX.addEventListener("click", closeModal);
-    modal.addEventListener("click", (e)=>{ if(e.target === modal) closeModal(); });
-    document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeModal(); });
-
-    function setNextBlink(){
-      ["s1","s2","s3","s4","s5"].forEach(k=>steps[k].classList.remove("next"));
-      steps.demo.classList.remove("action-next");
-      steps.sat.classList.remove("action-next");
-      steps.act.classList.remove("action-next");
-
-      steps.s2.classList.toggle("locked", !state.country);
-      steps.s3.classList.toggle("locked", !(state.country && state.industry));
-      steps.s4.classList.toggle("locked", !(state.country && state.industry && state.agentId && state.voice && state.template));
-      steps.s5.classList.toggle("locked", !(state.country && state.industry && state.agentId && state.voice && state.template && state.company));
-
-      steps.s1.classList.toggle("done", !!state.country);
-      steps.s2.classList.toggle("done", !!state.industry);
-      steps.s3.classList.toggle("done", !!(state.agentId && state.voice && state.template));
-      steps.s4.classList.toggle("done", !!state.company);
-      steps.s5.classList.toggle("done", !!state.plan);
-
-      const canDemo = !!state.plan;
-      const canSatisfied = state.demoDone;
-      const canActivate = state.satisfied;
-
-      steps.demo.classList.toggle("action-disabled", !canDemo);
-      steps.sat.classList.toggle("action-disabled", !canSatisfied);
-      steps.act.classList.toggle("action-disabled", !canActivate);
-
-      if(!state.country) steps.s1.classList.add("next");
-      else if(!state.industry) steps.s2.classList.add("next");
-      else if(!(state.agentId && state.voice && state.template)) steps.s3.classList.add("next");
-      else if(!state.company) steps.s4.classList.add("next");
-      else if(!state.plan) steps.s5.classList.add("next");
-      else if(!state.demoDone) steps.demo.classList.add("action-next");
-      else if(!state.satisfied) steps.sat.classList.add("action-next");
-      else if(!state.activated) steps.act.classList.add("action-next");
-    }
-
-    function autoOpenNext(){
-      if(!state.country){ openCountry(); return; }
-      if(!state.industry){ openIndustry(); return; }
-      if(!(state.agentId && state.voice && state.template)){ openAgent(); return; }
-      if(!state.company){ openCompany(); return; }
-      if(!state.plan){ openPlan(); return; }
-    }
-
-    function setStepLabels(){
-      steps.v1.textContent = state.country ? state.country : "Select";
-      steps.v2.textContent = state.industry ? state.industry : "Select";
-      steps.v3.textContent = (state.agentName && state.voice && state.template)
-        ? `${state.agentName} • ${state.voice} • ${state.template}`
-        : "Choose";
-      steps.v4.textContent = state.company ? state.company : "Sync";
-      steps.v5.textContent = state.plan ? (state.plan === "299" ? "$299/mo" : "$599/mo") : "Choose";
-    }
-
-    function renderPlanCards(){
-      plan299.classList.toggle("selected", state.plan === "299");
-      plan599.classList.toggle("selected", state.plan === "599");
-    }
-
-    // -----------------------------
-    // ECOSYSTEM RENDER
-    // -----------------------------
-    function renderEcosystem(){
-      ecosystemGrid.innerHTML = "";
-      AGENTS.forEach(a=>{
-        const btn = document.createElement("div");
-        btn.className = "eco-btn";
-        btn.dataset.agentId = a.id;
-
-        const isSelected = state.agentId === a.id;
-        const isOpen = state.ecoOpenId === a.id;
-
-        if(isSelected) btn.classList.add("selected");
-        if(isOpen) btn.classList.add("open");
-
-        btn.innerHTML = `
-          <div class="eco-top">
-            <div class="eco-name">${a.name}</div>
-            <div class="eco-tag">${isSelected ? "SELECTED" : (isOpen ? "CLOSE" : "VIEW")}</div>
-          </div>
-          <div class="eco-expand">
-            <div class="eco-desc">${a.desc}</div>
-            <div class="eco-select-row">
-              <button class="eco-select" type="button">SELECT THIS AGENT</button>
-            </div>
-          </div>
-        `;
-
-        btn.addEventListener("click", (e)=>{
-          const selectBtn = btn.querySelector(".eco-select");
-          if(e.target === selectBtn) return;
-          state.ecoOpenId = (state.ecoOpenId === a.id) ? null : a.id;
-          renderEcosystem();
-        });
-
-        btn.querySelector(".eco-select").addEventListener("click", (e)=>{
-          e.stopPropagation();
-          state.agentId = a.id;
-          state.agentName = a.name;
-          state.ecoOpenId = null;
-          setStepLabels();
-          setNextBlink();
-          renderEcosystem();
-          if(!(state.voice && state.template)) openAgent();
-        });
-
-        ecosystemGrid.appendChild(btn);
-      });
-    }
-
-    // -----------------------------
-    // MODALS (STEPS)
-    // -----------------------------
-    function openCountry(){
-      const items = COUNTRIES.map(x=>`
-        <button class="modal-item" data-value="${x}">
-          <span>${x}</span><span class="text-[10px] font-black opacity-60">Select</span>
-        </button>
-      `).join("");
-      openModal({ title:"Select Country", pill:"01 COUNTRY", html: items });
-      modalBody.querySelectorAll(".modal-item").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          state.country = b.dataset.value;
-
-          state.industry = null;
-          state.agentId = null; state.agentName = null;
-          state.voice = null; state.template = null;
-          state.company = null;
-          state.plan = null;
-          state.demoDone = false; state.satisfied = false; state.activated = false;
-          state.ecoOpenId = null;
-
-          setStepLabels();
-          renderPlanCards();
-          renderEcosystem();
-          closeModal();
-          setNextBlink();
-          setTimeout(autoOpenNext, 150);
-        });
-      });
-    }
-
-    function openIndustry(){
-      const items = INDUSTRIES.map(x=>`
-        <button class="modal-item" data-value="${x}">
-          <span>${x}</span><span class="text-[10px] font-black opacity-60">Select</span>
-        </button>
-      `).join("");
-      openModal({ title:"Select Industry", pill:"02 INDUSTRY", html: items });
-      modalBody.querySelectorAll(".modal-item").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          state.industry = b.dataset.value;
-
-          state.agentId = null; state.agentName = null;
-          state.voice = null; state.template = null;
-          state.company = null;
-          state.plan = null;
-          state.demoDone = false; state.satisfied = false; state.activated = false;
-          state.ecoOpenId = null;
-
-          setStepLabels();
-          renderPlanCards();
-          renderEcosystem();
-          closeModal();
-          setNextBlink();
-          setTimeout(autoOpenNext, 150);
-        });
-      });
-    }
-
-    function openAgent(){
-      const agentOptions = AGENTS.map(a=>`
-        <button class="modal-item" data-agent="${a.id}">
-          <span>${a.name}</span><span class="text-[10px] font-black opacity-60">Pick</span>
-        </button>
-      `).join("");
-
-      const voiceOptions = VOICES.map(v=>`
-        <button class="modal-item" data-voice="${v}">
-          <span>${v}</span><span class="text-[10px] font-black opacity-60">Pick</span>
-        </button>
-      `).join("");
-
-      const templateOptions = TEMPLATES.map(t=>`
-        <button class="modal-item" data-template="${t}">
-          <span>${t}</span><span class="text-[10px] font-black opacity-60">Pick</span>
-        </button>
-      `).join("");
-
-      openModal({
-        title:"Select Agent + Voice + Template",
-        pill:"03 AGENT",
-        html: `
-          <div class="small mb-3">
-            Choose an <b>agent</b>, then select a <b>voice</b> and <b>template</b>. This completes Step 03.
-          </div>
-
-          <div class="text-[9px] font-black uppercase tracking-[0.22em] text-slate-500 mb-2 border-b border-white/5 pb-2">
-            AGENT
-          </div>
-          <div class="grid md:grid-cols-2 gap-2 mb-5">${agentOptions}</div>
-
-          <div class="text-[9px] font-black uppercase tracking-[0.22em] text-slate-500 mb-2 border-b border-white/5 pb-2">
-            VOICE
-          </div>
-          <div class="grid md:grid-cols-2 gap-2 mb-5">${voiceOptions}</div>
-
-          <div class="text-[9px] font-black uppercase tracking-[0.22em] text-slate-500 mb-2 border-b border-white/5 pb-2">
-            TEMPLATE
-          </div>
-          <div class="grid md:grid-cols-2 gap-2">${templateOptions}</div>
-
-          <div class="mt-4 small">
-            Current selection:
-            <b>${state.agentName || "—"}</b> • <b>${state.voice || "—"}</b> • <b>${state.template || "—"}</b>
-          </div>
-        `
-      });
-
-      modalBody.querySelectorAll("[data-agent]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          const id = b.dataset.agent;
-          const a = AGENTS.find(x=>x.id===id);
-          state.agentId = id;
-          state.agentName = a ? a.name : id;
-          renderEcosystem();
-          setStepLabels();
-          setNextBlink();
-          openAgent();
-        });
-      });
-
-      modalBody.querySelectorAll("[data-voice]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          state.voice = b.dataset.voice;
-          setStepLabels();
-          setNextBlink();
-          openAgent();
-        });
-      });
-
-      modalBody.querySelectorAll("[data-template]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          state.template = b.dataset.template;
-          setStepLabels();
-          setNextBlink();
-          if(state.agentId && state.voice && state.template){
-            closeModal();
-            setTimeout(()=>{ setNextBlink(); autoOpenNext(); }, 150);
-          } else {
-            openAgent();
-          }
-        });
-      });
-    }
-
-    function openCompany(){
-      openModal({
-        title:"Company Sync",
-        pill:"04 COMPANY",
-        narrow:true,
-        html: `
-          <div class="small mb-3">
-            For prototype: pick a company profile. (Later this can pull from your dashboard / auth.)
-          </div>
-          <button class="modal-item" data-company="TTT">
-            <span>TTT</span><span class="text-[10px] font-black opacity-60">Select</span>
-          </button>
-          <div class="mt-2"></div>
-          <button class="modal-item" data-company="SecurePlus Services">
-            <span>SecurePlus Services</span><span class="text-[10px] font-black opacity-60">Select</span>
-          </button>
-          <div class="mt-2"></div>
-          <button class="modal-item" data-company="Windowbuilt">
-            <span>Windowbuilt</span><span class="text-[10px] font-black opacity-60">Select</span>
-          </button>
-        `
-      });
-
-      modalBody.querySelectorAll("[data-company]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          state.company = b.dataset.company;
-          state.plan = null;
-          state.demoDone = false; state.satisfied = false; state.activated = false;
-          setStepLabels();
-          renderPlanCards();
-          closeModal();
-          setNextBlink();
-          setTimeout(autoOpenNext, 150);
-        });
-      });
-    }
-
-    function openPlan(){
-      openModal({
-        title:"Select Plan",
-        pill:"05 PLAN",
-        narrow:true,
-        html: `
-          <div class="small mb-3">
-            Choose your beta plan. (This will also sync with the pricing cards.)
-          </div>
-          <button class="modal-item" data-plan="299">
-            <span>$299/mo — up to 1,000 minutes</span><span class="text-[10px] font-black opacity-60">Select</span>
-          </button>
-          <div class="mt-2"></div>
-          <button class="modal-item" data-plan="599">
-            <span>$599/mo — up to 2,500 minutes</span><span class="text-[10px] font-black opacity-60">Select</span>
-          </button>
-        `
-      });
-
-      modalBody.querySelectorAll("[data-plan]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          state.plan = b.dataset.plan;
-          setStepLabels();
-          renderPlanCards();
-          closeModal();
-          setNextBlink();
-        });
-      });
-    }
-
-    // -----------------------------
-    // DEMO FLOW (Prototype)
-    // -----------------------------
-    function showDemoInfoModal(){
-      openModal({
-        title:"Demo Call",
-        pill:"DEMO",
-        narrow:true,
-        html: `
-          <div class="small">
-            You can run <b>2 demo calls</b>, <b>30 seconds</b> each.
-            During the demo, you will talk to your configured company agent.
-          </div>
-          <div class="mt-4"></div>
-          <button id="btnStartDemoCall" class="btn-orange w-full py-4 rounded-xl text-[10px] font-black uppercase italic tracking-widest" type="button">
-            START DEMO CALL
-          </button>
-        `
-      });
-
-      $("btnStartDemoCall").addEventListener("click", ()=>{
-        closeModal();
-        state.demoDone = true;
-        setNextBlink();
-      });
-    }
-
-    function doSatisfied(){
-      state.satisfied = true;
-      setNextBlink();
-    }
-    function doActivate(){
-      state.activated = true;
-      setNextBlink();
-      openModal({
-        title:"Activation Started",
-        pill:"ACTIVATE",
-        narrow:true,
-        html: `
-          <div class="small">
-            Activation has been initiated for:
-            <div class="mt-3"></div>
-            <div class="small">
-              <b>${state.country}</b> • <b>${state.industry}</b><br>
-              <b>${state.agentName}</b> • <b>${state.voice}</b> • <b>${state.template}</b><br>
-              <b>${state.company}</b> • <b>${state.plan === "299" ? "$299/mo" : "$599/mo"}</b>
-            </div>
-            <div class="mt-4"></div>
-            <div class="small opacity-80">
-              (Prototype) Next step would be deploying and showing a provisioned phone number.
-            </div>
-          </div>
-        `
-      });
-    }
-
-    // -----------------------------
-    // Currency Converter (refined)
-    // -----------------------------
-    const FX = {
-      base: "USD",
-      rates: null,
-      updatedText: null
-    };
-
-    // A clean, global-friendly set (you can add more anytime)
-    const CURRENCIES = [
-      { code:"USD", name:"US Dollar" },
-      { code:"CAD", name:"Canadian Dollar" },
-      { code:"EUR", name:"Euro" },
-      { code:"GBP", name:"British Pound" },
-      { code:"AUD", name:"Australian Dollar" },
-      { code:"NZD", name:"New Zealand Dollar" },
-      { code:"CHF", name:"Swiss Franc" },
-      { code:"SEK", name:"Swedish Krona" },
-      { code:"NOK", name:"Norwegian Krone" },
-      { code:"DKK", name:"Danish Krone" },
-      { code:"PLN", name:"Polish Zloty" },
-      { code:"CZK", name:"Czech Koruna" },
-      { code:"HUF", name:"Hungarian Forint" },
-      { code:"RON", name:"Romanian Leu" },
-      { code:"TRY", name:"Turkish Lira" },
-      { code:"ILS", name:"Israeli Shekel" },
-      { code:"AED", name:"UAE Dirham" },
-      { code:"SAR", name:"Saudi Riyal" },
-      { code:"QAR", name:"Qatari Riyal" },
-      { code:"KWD", name:"Kuwaiti Dinar" },
-      { code:"INR", name:"Indian Rupee" },
-      { code:"PKR", name:"Pakistani Rupee" },
-      { code:"BDT", name:"Bangladeshi Taka" },
-      { code:"SGD", name:"Singapore Dollar" },
-      { code:"HKD", name:"Hong Kong Dollar" },
-      { code:"JPY", name:"Japanese Yen" },
-      { code:"KRW", name:"South Korean Won" },
-      { code:"CNY", name:"Chinese Yuan" },
-      { code:"THB", name:"Thai Baht" },
-      { code:"VND", name:"Vietnamese Dong" },
-      { code:"BRL", name:"Brazilian Real" },
-      { code:"MXN", name:"Mexican Peso" },
-      { code:"ZAR", name:"South African Rand" }
-    ];
-
-    function getLocaleCurrencyGuess(){
-      const lang = (navigator.language || "en-US").toUpperCase();
-      // Try to infer from region subtag: en-CA -> CA
-      const parts = lang.split("-");
-      const region = parts.length > 1 ? parts[1] : "";
-      const regionToCurrency = {
-        "US":"USD","CA":"CAD","GB":"GBP","AU":"AUD","NZ":"NZD",
-        "DE":"EUR","FR":"EUR","ES":"EUR","IT":"EUR","NL":"EUR","BE":"EUR","PT":"EUR","IE":"EUR","AT":"EUR","FI":"EUR","GR":"EUR",
-        "CH":"CHF","SE":"SEK","NO":"NOK","DK":"DKK","PL":"PLN","CZ":"CZK","HU":"HUF","RO":"RON",
-        "TR":"TRY","IL":"ILS",
-        "AE":"AED","SA":"SAR","QA":"QAR","KW":"KWD",
-        "IN":"INR","PK":"PKR","BD":"BDT",
-        "SG":"SGD","HK":"HKD","JP":"JPY","KR":"KRW","CN":"CNY","TH":"THB","VN":"VND",
-        "BR":"BRL","MX":"MXN","ZA":"ZAR"
-      };
-      return regionToCurrency[region] || "USD";
-    }
-
-    function buildFxDropdown(selected){
-      fxCurrency.innerHTML = "";
-      CURRENCIES.forEach(c=>{
-        const opt = document.createElement("option");
-        opt.value = c.code;
-        opt.textContent = `${c.code}`;
-        opt.title = `${c.code} — ${c.name}`;
-        if(c.code === selected) opt.selected = true;
-        fxCurrency.appendChild(opt);
-      });
-    }
-
-    function fmtCurrencyCompact(amount, currencyCode, compact=true){
-      // default: compact for large numbers, standard for smaller
-      const abs = Math.abs(amount);
-      const useCompact = compact && abs >= 10000;
-
-      const nf = new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: currencyCode,
-        maximumFractionDigits: abs >= 100 ? 0 : 2,
-        notation: useCompact ? "compact" : "standard",
-        compactDisplay: "short"
-      });
-      return nf.format(amount);
-    }
-
-    function fmtCurrencyFull(amount, currencyCode){
-      const nf = new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: currencyCode,
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-      return nf.format(amount);
-    }
-
-    function updateFxUI(currencyCode){
-      if(!FX.rates || !FX.rates[currencyCode]) {
-        fx299.textContent = "—";
-        fx599.textContent = "—";
-        fx299Over.textContent = "—";
-        fx599Over.textContent = "—";
-        return;
-      }
-
-      const rate = FX.rates[currencyCode];
-      const p299 = 299 * rate;
-      const p599 = 599 * rate;
-      const over = 0.30 * rate;
-
-      const p299Compact = fmtCurrencyCompact(p299, currencyCode, true);
-      const p599Compact = fmtCurrencyCompact(p599, currencyCode, true);
-
-      const p299Full = fmtCurrencyFull(p299, currencyCode);
-      const p599Full = fmtCurrencyFull(p599, currencyCode);
-
-      const overCompact = fmtCurrencyCompact(over, currencyCode, false);
-      const overFull = fmtCurrencyFull(over, currencyCode);
-
-      fx299.textContent = `${p299Compact} / mo`;
-      fx599.textContent = `${p599Compact} / mo`;
-      fx299.title = p299Full;
-      fx599.title = p599Full;
-
-      fx299Over.textContent = `UP TO 1,000 MIN • OVERAGE ${overCompact}/MIN`;
-      fx599Over.textContent = `UP TO 2,500 MIN • OVERAGE ${overCompact}/MIN`;
-      fx299Over.title = `Overage: ${overFull}/min`;
-      fx599Over.title = `Overage: ${overFull}/min`;
-
-      fxFoot.textContent =
-        `Rates source: open.er-api.com • Last updated: ${FX.updatedText || "—"} • Base: USD • Displayed for reference — billed in USD via Stripe.`;
-    }
-
-    async function loadRates(){
-      try{
-        const res = await fetch("https://open.er-api.com/v6/latest/USD", { cache: "no-store" });
-        const data = await res.json();
-
-        if(!data || data.result !== "success" || !data.rates){
-          throw new Error("Rates unavailable");
-        }
-
-        FX.rates = data.rates;
-        FX.updatedText = data.time_last_update_utc ? data.time_last_update_utc : null;
-
-        // Ensure dropdown selection exists
-        const guess = getLocaleCurrencyGuess();
-        buildFxDropdown(guess);
-        updateFxUI(guess);
-
-      }catch(err){
-        // Fail gracefully
-        buildFxDropdown("USD");
-        fxFoot.textContent = "Rates temporarily unavailable • Displayed for reference — billed in USD via Stripe.";
-        fx299.textContent = "$299 / mo";
-        fx599.textContent = "$599 / mo";
-        fx299Over.textContent = "UP TO 1,000 MIN • OVERAGE $0.30/MIN";
-        fx599Over.textContent = "UP TO 2,500 MIN • OVERAGE $0.30/MIN";
-      }
-    }
-
-    fxCurrency.addEventListener("change", ()=>{
-      updateFxUI(fxCurrency.value);
-    });
-
-    // -----------------------------
-    // WIRING
-    // -----------------------------
-    steps.s1.addEventListener("click", openCountry);
-    steps.s2.addEventListener("click", openIndustry);
-    steps.s3.addEventListener("click", openAgent);
-    steps.s4.addEventListener("click", openCompany);
-    steps.s5.addEventListener("click", openPlan);
-
-    function selectPlan(p){
-      state.plan = p;
-      setStepLabels();
-      renderPlanCards();
-      setNextBlink();
-    }
-    plan299.addEventListener("click", ()=>selectPlan("299"));
-    plan599.addEventListener("click", ()=>selectPlan("599"));
-
-    $("btnStartActivation").addEventListener("click", ()=>{ autoOpenNext(); });
-    $("btnActivateHero").addEventListener("click", ()=>{ autoOpenNext(); });
-
-    $("btnSMB").addEventListener("click", ()=>{
-      openModal({
-        title:"SMB Benefits",
-        pill:"SMB",
-        narrow:true,
-        html: `
-          <div class="small">
-            • Never miss calls<br>
-            • Capture every lead<br>
-            • Reduce staffing costs<br>
-            • 24/7 availability<br>
-            • Structured intake<br>
-            • Professional experience<br>
-            • Scalable without hiring
-          </div>
-        `
-      });
-    });
-
-    steps.demo.addEventListener("click", ()=>{ if(state.plan) showDemoInfoModal(); });
-    steps.sat.addEventListener("click", ()=>{ if(state.demoDone) doSatisfied(); });
-    steps.act.addEventListener("click", ()=>{ if(state.satisfied) doActivate(); });
-
-    $("btnDashboard").addEventListener("click", ()=>alert("Dashboard (placeholder)"));
-    $("btnQA").addEventListener("click", ()=>alert("AI Q&A (placeholder)"));
-    $("btnForum").addEventListener("click", ()=>alert("Forum (placeholder)"));
-    $("btnNews").addEventListener("click", ()=>alert("Newsletter (placeholder)"));
-
-    // -----------------------------
-    // INIT
-    // -----------------------------
-    renderEcosystem();
-    renderPlanCards();
-    setStepLabels();
-    setNextBlink();
-    loadRates();
-  </script>
+  <script src="./script.js"></script>
 </body>
 </html>
