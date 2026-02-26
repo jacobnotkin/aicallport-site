@@ -1922,3 +1922,93 @@ document.addEventListener("DOMContentLoaded", async () => {
     triggerModal("benefits");
   }
 });
+// ===============================
+// ACTIVATION PAGE LOGIC
+// ===============================
+
+// Load Countries
+async function loadCountries() {
+  const res = await fetch("/api/countries");
+  if (!res.ok) throw new Error("Failed to load countries");
+  return await res.json();
+}
+
+// Load Industries
+async function loadIndustries() {
+  const res = await fetch("/api/industries");
+  if (!res.ok) throw new Error("Failed to load industries");
+  return await res.json();
+}
+
+let INDUSTRIES_DATA = null;
+
+// Initialize Country Dropdown
+async function initCountrySelect() {
+  const countries = await loadCountries();
+  const select = document.getElementById("countrySelect");
+
+  if (!select) return;
+
+  select.innerHTML = countries
+    .map(c => `<option value="${c.code}">${c.name}</option>`)
+    .join("");
+}
+
+// Initialize Industry System
+async function initIndustrySelectors() {
+  INDUSTRIES_DATA = await loadIndustries();
+
+  const categorySelect = document.getElementById("categorySelect");
+  const industrySelect = document.getElementById("industrySelect");
+  const roleSelect = document.getElementById("roleSelect");
+
+  if (!categorySelect || !industrySelect || !roleSelect) return;
+
+  // Populate categories
+  categorySelect.innerHTML = INDUSTRIES_DATA.categories
+    .map(cat => `<option value="${cat.name}">${cat.name}</option>`)
+    .join("");
+
+  // When category changes
+  categorySelect.addEventListener("change", () => {
+    populateIndustrySelect(categorySelect.value);
+  });
+
+  // Load first category by default
+  populateIndustrySelect(INDUSTRIES_DATA.categories[0].name);
+}
+
+function populateIndustrySelect(categoryName) {
+  const category = INDUSTRIES_DATA.categories.find(c => c.name === categoryName);
+  const industrySelect = document.getElementById("industrySelect");
+  const roleSelect = document.getElementById("roleSelect");
+
+  if (!category || !industrySelect || !roleSelect) return;
+
+  industrySelect.innerHTML = category.industries
+    .map(ind => `<option value="${ind.id}">${ind.label}</option>`)
+    .join("");
+
+  // Load roles for first industry
+  roleSelect.innerHTML = category.industries[0].roles
+    .map(role => `<option value="${role}">${role}</option>`)
+    .join("");
+
+  // When industry changes
+  industrySelect.addEventListener("change", () => {
+    const selected = category.industries.find(i => i.id === industrySelect.value);
+    roleSelect.innerHTML = selected.roles
+      .map(role => `<option value="${role}">${role}</option>`)
+      .join("");
+  });
+}
+
+// Run on page load
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    await initCountrySelect();
+    await initIndustrySelectors();
+  } catch (err) {
+    console.error(err);
+  }
+});
