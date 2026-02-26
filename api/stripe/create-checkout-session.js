@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       line_items: [{ price: priceId, quantity: 1 }],
       customer_email: email || undefined,
 
-      success_url: `${siteUrl}/app?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${siteUrl}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/?checkout=cancel`,
       allow_promotion_codes: true,
     });
