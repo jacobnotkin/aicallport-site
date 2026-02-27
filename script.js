@@ -570,10 +570,7 @@ function openAgentRoleVoiceTemplate(){
     state.script = applyVars(v);
 
     // require selections
-    if(!state.agentId){
-      alert("Please select an agent from the grid first.");
-      return;
-    }
+    
     if(!state.roleId || !state.voice || !state.templateId){
       alert("Please select Role, Template, and Voice.");
       return;
