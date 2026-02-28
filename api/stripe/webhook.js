@@ -90,12 +90,20 @@ export default async function handler(req, res) {
       }
 
       // 1) Find the user in profiles by email
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("id, email")
-        .eq("email", email)
-        .maybeSingle();
+      // Prefer client_reference_id (most reliable)
+const userIdFromStripe = session.client_reference_id || session?.metadata?.user_id;
 
+if (!userIdFromStripe) {
+  console.log("No client_reference_id or metadata.user_id found");
+  return res.status(200).json({ received: true });
+}
+
+// Look up profile by user_id instead of email
+const { data: profile, error: profileError } = await supabase
+  .from("profiles")
+  .select("id")
+  .eq("id", userIdFromStripe)
+  .maybeSingle();
       if (profileError) {
         console.error("profiles lookup error:", profileError);
         return res.status(200).json({ received: true });
