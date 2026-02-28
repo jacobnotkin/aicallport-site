@@ -68,10 +68,28 @@ export default async function handler(req, res) {
       // These will be strings for a subscription checkout
       const stripeCustomerId =
         typeof session.customer === "string" ? session.customer : null;
+      // Fetch full subscription from Stripe to get accurate status
 
       const stripeSubscriptionId =
-        typeof session.subscription === "string" ? session.subscription : null;
+  typeof session.subscription === "string" ? session.subscription : null;
+      if (!stripeSubscriptionId) {
+  console.log(
+    "checkout.session.completed: no subscription id (is this really recurring monthly?)"
+  );
+  return res.status(200).json({ received: true });
+}
+      let subscriptionStatus = "active";
 
+
+   
+  const stripeSubscription = await stripe.subscriptions.retrieve(
+    stripeSubscriptionId
+  );
+
+  subscriptionStatus = stripeSubscription.status;
+
+
+      
       if (!email) {
         console.log("checkout.session.completed: no email found on session");
         return res.status(200).json({ received: true });
@@ -82,12 +100,7 @@ export default async function handler(req, res) {
         return res.status(200).json({ received: true });
       }
 
-      if (!stripeSubscriptionId) {
-        console.log(
-          "checkout.session.completed: no subscription id (is this really recurring monthly?)"
-        );
-        return res.status(200).json({ received: true });
-      }
+      
 
       // 1) Find the user in profiles by email
       // Prefer client_reference_id (most reliable)
@@ -110,7 +123,7 @@ const { data: profile, error: profileError } = await supabase
       }
 
       if (!profile?.id) {
-        console.log("No matching profile for email:", email);
+        console.log("No matching profile for user_id:", userIdFromStripe);
         return res.status(200).json({ received: true });
       }
 
@@ -123,7 +136,7 @@ const { data: profile, error: profileError } = await supabase
               user_id: profile.id,
               stripe_customer_id: stripeCustomerId,
               stripe_subscription_id: stripeSubscriptionId,
-              status: "active",
+              status: subscriptionStatus,
               // plan_code will be mapped later (price_id -> starter/pro/elite)
             },
           ],
