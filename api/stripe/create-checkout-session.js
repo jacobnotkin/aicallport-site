@@ -49,10 +49,11 @@ const user = userData.user;
       mode: "subscription", // recurring monthly
       line_items: [{ price: priceId, quantity: 1 }],
       customer_email: user.email,
+      client_reference_id: user.id,
 metadata: {
   user_id: user.id,
-  plan: plan,
-},,
+  plan,
+},
 
       success_url: `${siteUrl}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/?checkout=cancel`,
