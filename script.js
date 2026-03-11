@@ -734,7 +734,13 @@ function openActivatePreview(){
 
     const email = prompt("Enter your email (must match your Supabase user):", "");
     if(!email) return;
+const { data: { session } } = await supabase.auth.getSession();
+const token = session?.access_token;
 
+if (!token) {
+  alert("You must be signed in to continue.");
+  return;
+}
     openModal({
       title: "Redirecting to Stripe Checkout",
       pill: "ACTIVATE",
@@ -745,7 +751,10 @@ function openActivatePreview(){
     try{
       const response = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+  "Content-Type": "application/json",
+  "Authorization": `Bearer ${token}`
+},
         body: JSON.stringify({
           plan: state.plan,
           email: email,
