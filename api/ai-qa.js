@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Use POST" });
   }
 
-  // 1) Require Supabase JWT
+  // 1) Require auth token
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ")
     ? authHeader.slice("Bearer ".length)
@@ -22,7 +22,9 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Missing auth token" });
   }
 
-  const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
+  // 2) Validate Supabase user
+  const { data: userData, error: userErr } =
+    await supabaseAdmin.auth.getUser(token);
 
   if (userErr || !userData?.user) {
     return res.status(401).json({ error: "Invalid auth token" });
@@ -30,7 +32,7 @@ export default async function handler(req, res) {
 
   const user = userData.user;
 
-  // 2) Require active subscription
+  // 3) Require active subscription
   const { data: sub, error: subErr } = await supabaseAdmin
     .from("subscriptions")
     .select("status")
@@ -46,7 +48,7 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: "Subscription required" });
   }
 
-  // 3) Original logic
+  // 4) Original AI-QA logic
   let body = {};
   try {
     body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
