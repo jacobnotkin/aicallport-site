@@ -1,1290 +1,1185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Call Port — Deploy Your AI Call System in Minutes</title>
-  <style>
-    :root {
-      --bg: #080b12;
-      --bg-2: #0d1320;
-      --panel: rgba(14, 18, 28, 0.88);
-      --panel-2: rgba(18, 24, 38, 0.92);
-      --text: #eef2ff;
-      --muted: #aeb8d0;
-      --line: rgba(255,255,255,0.10);
-      --accent: #f97316;
-      --accent-2: #fb923c;
-      --success: #22c55e;
-      --coming: #f59e0b;
-      --future: #64748b;
-      --shadow: 0 24px 60px rgba(0,0,0,0.35);
-      --radius-xl: 28px;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --max: 1240px;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at 20% 15%, rgba(249,115,22,0.16), transparent 28%),
-        radial-gradient(circle at 80% 10%, rgba(59,130,246,0.12), transparent 24%),
-        radial-gradient(circle at 50% 80%, rgba(249,115,22,0.10), transparent 22%),
-        linear-gradient(180deg, var(--bg), var(--bg-2));
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; }
-    button { font: inherit; }
-
-    .container {
-      width: min(var(--max), calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .shell {
-      width: min(var(--max), calc(100% - 32px));
-      margin: 16px auto 28px;
-      background: linear-gradient(180deg, rgba(9, 13, 21, 0.86), rgba(9, 13, 21, 0.94));
-      border: 1px solid var(--line);
-      border-radius: 32px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      backdrop-filter: blur(12px);
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(8, 11, 18, 0.72);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(12px);
-    }
-
-    .topbar-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 18px 24px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .brand-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #130c06;
-      font-weight: 800;
-      box-shadow: 0 10px 30px rgba(249,115,22,0.28);
-    }
-
-    .brand-copy { min-width: 0; }
-    .brand-copy strong { display: block; font-size: 15px; letter-spacing: 0.02em; }
-    .brand-copy span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .nav a {
-      color: var(--muted);
-      font-size: 14px;
-      transition: color .2s ease;
-    }
-
-    .nav a:hover { color: var(--text); }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      border: 0;
-      border-radius: 999px;
-      padding: 13px 20px;
-      min-height: 48px;
-      cursor: pointer;
-      transition: transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
-      white-space: nowrap;
-    }
-
-    .btn:hover { transform: translateY(-1px); }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #140d06;
-      font-weight: 700;
-      box-shadow: 0 12px 28px rgba(249,115,22,0.28);
-    }
-
-    .btn-secondary {
-      background: rgba(255,255,255,0.03);
-      color: var(--text);
-      border: 1px solid var(--line);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--muted);
-      border: 1px dashed rgba(255,255,255,0.14);
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1.12fr .88fr;
-      gap: 28px;
-      padding: 38px 24px 22px;
-      align-items: stretch;
-    }
-
-    .hero-copy,
-    .hero-visual,
-    .section-card,
-    .pricing-card,
-    .feature-card,
-    .info-card,
-    .demo-card,
-    .country-card,
-    .industry-card,
-    .faq-item,
-    .report-card {
-      background: linear-gradient(180deg, rgba(18,24,38,0.86), rgba(11,16,27,0.92));
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-    }
-
-    .hero-copy {
-      padding: 34px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      width: fit-content;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(249,115,22,0.12);
-      color: #ffd6ba;
-      border: 1px solid rgba(249,115,22,0.28);
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 18px;
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-size: clamp(40px, 5vw, 66px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-    }
-
-    .hero p.lead {
-      margin: 18px 0 0;
-      font-size: 18px;
-      line-height: 1.7;
-      color: var(--muted);
-      max-width: 60ch;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 24px;
-    }
-
-    .mini-flow {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 26px;
-    }
-
-    .mini-step {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 16px;
-    }
-
-    .mini-step strong { display: block; font-size: 13px; color: #ffd6ba; margin-bottom: 6px; }
-    .mini-step span { color: var(--muted); font-size: 14px; }
-
-    .hero-visual {
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      justify-content: center;
-    }
-
-    .visual-panel {
-      background: rgba(6, 9, 16, 0.72);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 18px;
-    }
-
-    .visual-header,
-    .row-between {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: var(--success);
-      box-shadow: 0 0 16px rgba(34,197,94,0.58);
-    }
-
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .stat-box {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px;
-    }
-
-    .stat-box .label { display: block; color: var(--muted); font-size: 12px; }
-    .stat-box .value { display: block; margin-top: 6px; font-size: 22px; font-weight: 700; }
-
-    .section {
-      padding: 18px 24px 26px;
-    }
-
-    .section-title {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .section-title h2 {
-      margin: 0;
-      font-size: clamp(28px, 3.2vw, 40px);
-      letter-spacing: -0.03em;
-    }
-
-    .section-title p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      max-width: 70ch;
-      line-height: 1.7;
-    }
-
-    .section-card {
-      padding: 26px;
-    }
-
-    .video-placeholder {
-      display: grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 18px;
-      align-items: stretch;
-    }
-
-    .video-box {
-      min-height: 360px;
-      border-radius: 24px;
-      border: 1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
-        radial-gradient(circle at center, rgba(249,115,22,0.22), transparent 35%),
-        rgba(6, 9, 16, 0.78);
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 24px;
-    }
-
-    .play {
-      width: 78px;
-      height: 78px;
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #180f07;
-      font-size: 28px;
-      font-weight: 800;
-      margin: 0 auto 16px;
-      box-shadow: 0 14px 30px rgba(249,115,22,0.3);
-    }
-
-    .video-points {
-      display: grid;
-      gap: 12px;
-    }
-
-    .video-points .info-card,
-    .report-layout .info-card {
-      padding: 18px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-
-    .feature-card,
-    .info-card,
-    .demo-card,
-    .country-card,
-    .industry-card,
-    .pricing-card,
-    .faq-item,
-    .report-card {
-      padding: 20px;
-    }
-
-    .feature-card h3,
-    .info-card h3,
-    .demo-card h3,
-    .country-card h3,
-    .industry-card h3,
-    .pricing-card h3,
-    .report-card h3,
-    .faq-item h3 {
-      margin: 0 0 10px;
-      font-size: 18px;
-      letter-spacing: -0.02em;
-    }
-
-    .feature-card p,
-    .info-card p,
-    .demo-card p,
-    .country-card p,
-    .industry-card p,
-    .pricing-card p,
-    .report-card p,
-    .faq-item p,
-    .muted {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.65;
-    }
-
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .step-box {
-      padding: 22px;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--line);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .step-num {
-      display: inline-flex;
-      min-width: 34px;
-      height: 34px;
-      padding: 0 10px;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      background: rgba(249,115,22,0.12);
-      border: 1px solid rgba(249,115,22,0.32);
-      color: #ffd6ba;
-      font-weight: 700;
-      font-size: 13px;
-      margin-bottom: 14px;
-    }
-
-    .advisor-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .question-block {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 18px;
-      margin-bottom: 12px;
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .chip {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.02);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 14px;
-    }
-
-    .chip.active {
-      border-color: rgba(249,115,22,0.42);
-      background: rgba(249,115,22,0.12);
-      color: #ffd6ba;
-    }
-
-    .report-layout {
-      display: grid;
-      gap: 14px;
-    }
-
-    .report-highlight {
-      padding: 16px 18px;
-      border-radius: 18px;
-      background: rgba(249,115,22,0.10);
-      border: 1px solid rgba(249,115,22,0.28);
-      color: #ffd8bf;
-    }
-
-    .feature-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: rgba(249,115,22,0.14);
-      color: #ffd8bf;
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-
-    .dashboard-preview {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 16px;
-      min-height: 420px;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      overflow: hidden;
-      background: rgba(6,9,16,0.78);
-    }
-
-    .dash-side {
-      background: rgba(255,255,255,0.025);
-      border-right: 1px solid var(--line);
-      padding: 18px;
-      display: grid;
-      gap: 10px;
-      align-content: start;
-    }
-
-    .dash-nav-item {
-      padding: 12px 14px;
-      border: 1px solid transparent;
-      border-radius: 14px;
-      color: var(--muted);
-      background: rgba(255,255,255,0.02);
-    }
-
-    .dash-nav-item.active {
-      border-color: rgba(249,115,22,0.28);
-      background: rgba(249,115,22,0.10);
-      color: #ffd8bf;
-    }
-
-    .dash-main {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-      align-content: start;
-    }
-
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .pricing-card.recommended {
-      border-color: rgba(249,115,22,0.42);
-      box-shadow: 0 0 0 1px rgba(249,115,22,0.16), var(--shadow);
-      position: relative;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-    }
-
-    .badge.recommended {
-      background: rgba(249,115,22,0.12);
-      border-color: rgba(249,115,22,0.32);
-      color: #ffd6ba;
-    }
-
-    .price-row {
-      display: flex;
-      align-items: end;
-      gap: 10px;
-      margin: 14px 0;
-    }
-
-    .price-now {
-      font-size: 40px;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-    }
-
-    .price-old {
-      color: #7e889d;
-      text-decoration: line-through;
-      font-size: 18px;
-    }
-
-    .pricing-list,
-    .feature-list,
-    .faq-list,
-    .demo-questions,
-    .check-list {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .check {
-      display: flex;
-      align-items: start;
-      gap: 10px;
-      color: var(--muted);
-      line-height: 1.55;
-      font-size: 14px;
-    }
-
-    .check strong { color: var(--text); }
-
-    .country-grid,
-    .industry-grid,
-    .demo-grid,
-    .faq-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .country-status {
-      display: inline-flex;
-      width: fit-content;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      border: 1px solid var(--line);
-    }
-
-    .status-active { color: #b9f7c5; background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.28); }
-    .status-coming { color: #ffe0b2; background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.28); }
-    .status-future { color: #d2d8e5; background: rgba(100,116,139,0.12); border-color: rgba(100,116,139,0.28); }
-
-    .split-cta {
-      display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 16px;
-      align-items: stretch;
-    }
-
-    .footer {
-      border-top: 1px solid var(--line);
-      padding: 20px 24px 28px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px 18px;
-      margin-bottom: 12px;
-    }
-
-    @media (max-width: 1100px) {
-      .hero,
-      .video-placeholder,
-      .advisor-layout,
-      .dashboard-preview,
-      .split-cta { grid-template-columns: 1fr; }
-      .grid-4 { grid-template-columns: repeat(2, 1fr); }
-      .country-grid,
-      .industry-grid,
-      .demo-grid,
-      .faq-grid,
-      .pricing-grid,
-      .steps-grid,
-      .grid-3,
-      .grid-2 { grid-template-columns: 1fr 1fr; }
-    }
-
-    @media (max-width: 760px) {
-      .shell { width: 100%; margin: 0; border-radius: 0; border-left: 0; border-right: 0; }
-      .topbar-inner,
-      .hero,
-      .section,
-      .footer { padding-left: 16px; padding-right: 16px; }
-      .hero-copy,
-      .section-card { padding: 20px; }
-      .nav { display: none; }
-      .country-grid,
-      .industry-grid,
-      .demo-grid,
-      .faq-grid,
-      .pricing-grid,
-      .steps-grid,
-      .grid-3,
-      .grid-4,
-      .grid-2,
-      .mini-flow,
-      .stat-grid { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 38px; }
-      .price-now { font-size: 34px; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Call Port — Cinematic Intro</title>
+<style>
+:root {
+--bg: #06090f;
+--bg2: #0b1120;
+--panel: rgba(10, 14, 24, 0.82);
+--line: rgba(255,255,255,0.08);
+--text: #eef2ff;
+--muted: #aab6d3;
+--accent: #f97316;
+--accent2: #fb923c;
+--good: #22c55e;
+--warn: #f59e0b;
+--shadow: 0 30px 80px rgba(0,0,0,.4);
+--radius: 30px;
+--maxw: 1320px;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+margin: 0;
+font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+color: var(--text);
+background:
+radial-gradient(circle at 18% 18%, rgba(249,115,22,.13), transparent 24%),
+radial-gradient(circle at 82% 12%, rgba(59,130,246,.10), transparent 20%),
+radial-gradient(circle at 50% 85%, rgba(249,115,22,.10), transparent 24%),
+linear-gradient(180deg, var(--bg), var(--bg2));
+overflow: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+button, select {
+font: inherit;
+color: inherit;
+}
+
+.app {
+width: min(var(--maxw), calc(100% - 28px));
+height: calc(100vh - 28px);
+margin: 14px auto;
+background: linear-gradient(180deg, rgba(8,11,18,.84), rgba(8,11,18,.92));
+border: 1px solid var(--line);
+border-radius: 34px;
+box-shadow: var(--shadow);
+position: relative;
+overflow: hidden;
+backdrop-filter: blur(12px);
+}
+
+.topbar {
+position: absolute;
+inset: 0 0 auto 0;
+z-index: 30;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 18px 22px;
+pointer-events: none;
+}
+
+.brand, .controls, .lang-wrap, .progress-wrap { pointer-events: auto; }
+
+.brand {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.brand-mark {
+width: 42px;
+height: 42px;
+border-radius: 14px;
+display: grid;
+place-items: center;
+background: linear-gradient(135deg, var(--accent), var(--accent2));
+color: #160d06;
+font-weight: 800;
+box-shadow: 0 12px 26px rgba(249,115,22,.28);
+}
+
+.brand-copy strong {
+display: block;
+font-size: 14px;
+letter-spacing: .11em;
+}
+
+.brand-copy span {
+display: block;
+margin-top: 3px;
+color: var(--muted);
+font-size: 11px;
+letter-spacing: .05em;
+text-transform: uppercase;
+}
+
+.toolbar-right {
+display: flex;
+align-items: center;
+gap: 10px;
+flex-wrap: wrap;
+justify-content: flex-end;
+}
+
+.lang-wrap select,
+.ctl-btn {
+border: 1px solid var(--line);
+background: rgba(255,255,255,.03);
+border-radius: 999px;
+height: 40px;
+padding: 0 14px;
+color: var(--text);
+cursor: pointer;
+transition: .2s ease;
+}
+
+.ctl-btn:hover,
+.lang-wrap select:hover { border-color: rgba(255,255,255,.18); transform: translateY(-1px); }
+
+.progress-wrap {
+position: absolute;
+left: 50%;
+transform: translateX(-50%);
+top: 22px;
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 8px 12px;
+border-radius: 999px;
+border: 1px solid var(--line);
+background: rgba(255,255,255,.03);
+backdrop-filter: blur(10px);
+}
+
+.dot {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: rgba(255,255,255,.22);
+transition: .3s ease;
+}
+
+.dot.active {
+background: var(--accent);
+box-shadow: 0 0 14px rgba(249,115,22,.55);
+transform: scale(1.2);
+}
+
+.scene-stage {
+position: absolute;
+inset: 0;
+}
+
+.scene {
+position: absolute;
+inset: 0;
+display: grid;
+grid-template-columns: 1.08fr .92fr;
+align-items: center;
+gap: 24px;
+padding: 94px 28px 92px;
+opacity: 0;
+pointer-events: none;
+transform: translateY(18px) scale(.99);
+transition: opacity .7s ease, transform .7s ease;
+}
+
+.scene.active {
+opacity: 1;
+pointer-events: auto;
+transform: translateY(0) scale(1);
+}
+
+.copy, .visual {
+min-height: 100%;
+border: 1px solid var(--line);
+border-radius: var(--radius);
+background: linear-gradient(180deg, rgba(15,20,33,.82), rgba(9,13,21,.92));
+box-shadow: var(--shadow);
+position: relative;
+overflow: hidden;
+}
+
+.copy {
+padding: 40px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+
+.visual {
+padding: 24px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.eyebrow {
+display: inline-flex;
+width: fit-content;
+align-items: center;
+gap: 8px;
+margin-bottom: 18px;
+padding: 8px 12px;
+border-radius: 999px;
+border: 1px solid rgba(249,115,22,.28);
+background: rgba(249,115,22,.10);
+color: #ffd7be;
+font-size: 12px;
+letter-spacing: .09em;
+text-transform: uppercase;
+}
+
+h1, h2 {
+margin: 0;
+line-height: 1.02;
+letter-spacing: -.04em;
+}
+
+h1 { font-size: clamp(42px, 5vw, 74px); }
+h2 { font-size: clamp(34px, 4vw, 56px); }
+
+.copy p {
+margin: 18px 0 0;
+color: var(--muted);
+font-size: clamp(17px, 1.5vw, 20px);
+line-height: 1.75;
+max-width: 56ch;
+}
+
+.copy .stack-lines {
+margin-top: 18px;
+display: grid;
+gap: 8px;
+font-size: 18px;
+color: #dfe7fb;
+}
+
+.copy .stack-lines span {
+display: inline-flex;
+align-items: center;
+gap: 10px;
+}
+
+.btn-row {
+margin-top: 24px;
+display: flex;
+gap: 12px;
+flex-wrap: wrap;
+}
+
+.primary,
+.secondary {
+min-height: 50px;
+border-radius: 999px;
+border: 0;
+cursor: pointer;
+padding: 0 20px;
+transition: .2s ease;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+
+.primary {
+background: linear-gradient(135deg, var(--accent), var(--accent2));
+color: #160d06;
+font-weight: 800;
+box-shadow: 0 14px 28px rgba(249,115,22,.28);
+}
+
+.secondary {
+background: rgba(255,255,255,.04);
+color: var(--text);
+border: 1px solid var(--line);
+}
+
+.primary:hover, .secondary:hover { transform: translateY(-1px); }
+
+.bottom-controls {
+position: absolute;
+right: 24px;
+bottom: 24px;
+z-index: 35;
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+}
+
+.helpbar {
+position: absolute;
+left: 24px;
+bottom: 24px;
+z-index: 35;
+display: flex;
+gap: 12px;
+flex-wrap: wrap;
+align-items: center;
+}
+
+.mini-chip {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+min-height: 42px;
+padding: 0 14px;
+border-radius: 999px;
+border: 1px solid var(--line);
+background: rgba(255,255,255,.03);
+color: var(--muted);
+font-size: 14px;
+}
+
+.phone-shell,
+.map-shell,
+.team-shell,
+.flow-shell,
+.dash-shell,
+.price-shell {
+width: 100%;
+height: 100%;
+border: 1px solid var(--line);
+border-radius: 26px;
+background: rgba(7,10,17,.72);
+position: relative;
+overflow: hidden;
+}
+
+.phone-shell {
+min-height: 500px;
+display: grid;
+place-items: center;
+padding: 24px;
+}
+
+.phone-card {
+width: min(360px, 100%);
+border: 1px solid var(--line);
+border-radius: 28px;
+background: linear-gradient(180deg, rgba(20,26,39,.9), rgba(10,15,25,.96));
+padding: 22px;
+box-shadow: 0 20px 50px rgba(0,0,0,.35);
+text-align: center;
+}
+
+.phone-ring {
+width: 120px;
+height: 120px;
+margin: 10px auto 18px;
+border-radius: 50%;
+border: 1px solid rgba(249,115,22,.26);
+background: radial-gradient(circle, rgba(249,115,22,.18), rgba(249,115,22,.03));
+position: relative;
+animation: pulse 1.9s ease-in-out infinite;
+}
+
+.phone-ring::before,
+.phone-ring::after {
+content: "";
+position: absolute;
+inset: -14px;
+border-radius: 50%;
+border: 1px solid rgba(249,115,22,.14);
+animation: pulse2 1.9s ease-in-out infinite;
+}
+
+.phone-ring::after {
+inset: -28px;
+animation-delay: .35s;
+}
+
+.phone-icon {
+position: absolute;
+inset: 0;
+display: grid;
+place-items: center;
+font-size: 34px;
+}
+
+.status-pill {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+padding: 8px 12px;
+border-radius: 999px;
+border: 1px solid rgba(255,255,255,.1);
+background: rgba(255,255,255,.03);
+color: var(--muted);
+font-size: 13px;
+}
+
+.status-pill .ok {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: var(--good);
+box-shadow: 0 0 12px rgba(34,197,94,.55);
+}
+
+.flash-list {
+margin-top: 20px;
+display: grid;
+gap: 12px;
+text-align: left;
+}
+
+.flash-item {
+border: 1px solid var(--line);
+border-radius: 16px;
+background: rgba(255,255,255,.03);
+padding: 14px 16px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 12px;
+color: var(--muted);
+}
+
+.flash-item strong { color: var(--text); }
+
+.danger { color: #fecaca; }
+.muted { color: var(--muted); }
+.good { color: #bbf7d0; }
+
+.solution-flow,
+.activation-steps,
+.price-cards,
+.dash-grid,
+.team-grid {
+display: grid;
+gap: 14px;
+width: 100%;
+}
+
+.solution-flow { grid-template-columns: 1fr; padding: 22px; }
+
+.flow-step,
+.team-card,
+.dash-card,
+.price-card,
+.lang-card,
+.step-card {
+border: 1px solid var(--line);
+border-radius: 20px;
+background: rgba(255,255,255,.03);
+padding: 18px;
+}
+
+.flow-step strong,
+.team-card strong,
+.dash-card strong,
+.price-card strong,
+.lang-card strong,
+.step-card strong {
+display: block;
+font-size: 16px;
+margin-bottom: 8px;
+}
+
+.flow-arrow {
+text-align: center;
+color: #ffd6bb;
+font-size: 26px;
+line-height: 1;
+}
+
+.map-shell {
+min-height: 500px;
+padding: 24px;
+display: grid;
+align-items: center;
+}
+
+.map-board {
+height: 100%;
+border: 1px solid var(--line);
+border-radius: 24px;
+background:
+radial-gradient(circle at 30% 35%, rgba(249,115,22,.18), transparent 22%),
+radial-gradient(circle at 70% 42%, rgba(59,130,246,.12), transparent 18%),
+rgba(6,10,17,.7);
+position: relative;
+overflow: hidden;
+padding: 22px;
+}
+
+.map-grid {
+position: absolute;
+inset: 0;
+background-image:
+linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+background-size: 42px 42px;
+mask-image: radial-gradient(circle at center, black, transparent 88%);
+}
+
+.lang-bubbles {
+position: relative;
+z-index: 2;
+display: grid;
+grid-template-columns: repeat(2, minmax(0, 1fr));
+gap: 14px;
+margin-top: 120px;
+}
+
+.lang-card {
+min-height: 94px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+
+.lang-card span {
+color: var(--muted);
+font-size: 14px;
+}
+
+.map-points span {
+position: absolute;
+width: 12px;
+height: 12px;
+border-radius: 50%;
+background: var(--accent);
+box-shadow: 0 0 14px rgba(249,115,22,.65);
+}
+
+.p1 { left: 22%; top: 34%; }
+.p2 { left: 46%; top: 30%; }
+.p3 { left: 50%; top: 38%; }
+.p4 { left: 60%; top: 27%; }
+
+.team-shell {
+min-height: 500px;
+padding: 20px;
+display: grid;
+align-items: center;
+}
+
+.team-grid {
+grid-template-columns: repeat(3, 1fr);
+}
+
+.team-card small {
+color: #ffd6bb;
+display: block;
+margin-bottom: 6px;
+text-transform: uppercase;
+letter-spacing: .07em;
+font-size: 11px;
+}
+
+.team-flow {
+margin-top: 16px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+flex-wrap: wrap;
+}
+
+.team-pill {
+border: 1px solid var(--line);
+border-radius: 999px;
+padding: 10px 14px;
+background: rgba(255,255,255,.03);
+color: var(--text);
+font-size: 14px;
+}
+
+.activation-steps {
+grid-template-columns: repeat(3, 1fr);
+width: 100%;
+padding: 16px;
+}
+
+.step-card {
+min-height: 220px;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+}
+
+.step-badge {
+display: inline-flex;
+width: fit-content;
+padding: 8px 12px;
+border-radius: 999px;
+border: 1px solid rgba(249,115,22,.28);
+background: rgba(249,115,22,.10);
+color: #ffd6bb;
+font-size: 12px;
+text-transform: uppercase;
+letter-spacing: .08em;
+}
+
+.dash-shell {
+min-height: 500px;
+padding: 18px;
+display: grid;
+align-items: stretch;
+}
+
+.dash-layout {
+display: grid;
+grid-template-columns: 270px 1fr;
+gap: 14px;
+width: 100%;
+height: 100%;
+}
+
+.dash-side {
+border: 1px solid var(--line);
+border-radius: 22px;
+background: rgba(255,255,255,.03);
+padding: 16px;
+display: grid;
+gap: 10px;
+align-content: start;
+}
+
+.dash-nav {
+padding: 12px 14px;
+border-radius: 14px;
+color: var(--muted);
+background: rgba(255,255,255,.025);
+border: 1px solid transparent;
+}
+
+.dash-nav.active {
+color: #ffd6bb;
+border-color: rgba(249,115,22,.25);
+background: rgba(249,115,22,.08);
+}
+
+.dash-main {
+border: 1px solid var(--line);
+border-radius: 22px;
+background: rgba(255,255,255,.03);
+padding: 16px;
+display: grid;
+gap: 14px;
+align-content: start;
+}
+
+.dash-grid {
+grid-template-columns: repeat(4, 1fr);
+}
+
+.dash-card .num {
+display: block;
+margin-top: 8px;
+font-weight: 800;
+font-size: 28px;
+letter-spacing: -.04em;
+}
+
+.activity-list {
+display: grid;
+gap: 10px;
+}
+
+.activity-item {
+border: 1px solid var(--line);
+border-radius: 16px;
+background: rgba(255,255,255,.02);
+padding: 14px;
+color: var(--muted);
+}
+
+.activity-item strong { color: var(--text); display: block; margin-bottom: 4px; }
+
+.price-shell {
+min-height: 500px;
+padding: 18px;
+display: grid;
+align-items: center;
+}
+
+.price-cards {
+grid-template-columns: repeat(3, 1fr);
+}
+
+.price-card .price {
+display: flex;
+align-items: end;
+gap: 10px;
+margin: 14px 0 10px;
+}
+
+.price-card .now {
+font-size: 38px;
+font-weight: 800;
+letter-spacing: -.04em;
+}
+
+.price-card .old {
+color: #7c879b;
+text-decoration: line-through;
+font-size: 18px;
+}
+
+.price-card ul {
+margin: 14px 0 0;
+padding-left: 18px;
+color: var(--muted);
+line-height: 1.6;
+}
+
+.small-note {
+margin-top: 18px;
+text-align: center;
+color: var(--muted);
+font-size: 13px;
+line-height: 1.6;
+}
+
+.cta-center {
+text-align: center;
+width: 100%;
+max-width: 640px;
+margin: 0 auto;
+}
+
+.cta-center .btn-row { justify-content: center; }
+
+.scene-counter {
+color: var(--muted);
+font-size: 13px;
+}
+
+@keyframes pulse {
+0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(249,115,22,.18); }
+50% { transform: scale(1.03); box-shadow: 0 0 0 20px rgba(249,115,22,0); }
+}
+
+@keyframes pulse2 {
+0%,100% { opacity: .15; transform: scale(1); }
+50% { opacity: .04; transform: scale(1.04); }
+}
+
+@media (max-width: 1180px) {
+.scene { grid-template-columns: 1fr; padding-top: 100px; padding-bottom: 100px; }
+.copy, .visual { min-height: auto; }
+.team-grid, .price-cards, .dash-grid, .activation-steps { grid-template-columns: 1fr 1fr; }
+.dash-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+body { overflow: auto; }
+.app {
+width: 100%;
+height: auto;
+min-height: 100vh;
+margin: 0;
+border-radius: 0;
+border-left: 0;
+border-right: 0;
+}
+.topbar { padding-bottom: 0; }
+.progress-wrap { display: none; }
+.scene {
+padding: 104px 16px 96px;
+min-height: 100vh;
+position: absolute;
+}
+.copy { padding: 24px; }
+.visual { padding: 16px; }
+.team-grid, .price-cards, .dash-grid, .activation-steps, .lang-bubbles { grid-template-columns: 1fr; }
+.bottom-controls, .helpbar { left: 16px; right: 16px; }
+.bottom-controls { justify-content: flex-end; }
+.helpbar { bottom: 78px; }
+.toolbar-right { max-width: 58%; }
+.lang-wrap select, .ctl-btn { height: 36px; padding: 0 12px; font-size: 13px; }
+h1 { font-size: 38px; }
+h2 { font-size: 32px; }
+.copy p { font-size: 16px; }
+}
+</style>
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar">
-      <div class="topbar-inner">
-        <div class="brand">
-          <div class="brand-mark">A</div>
-          <div class="brand-copy">
-            <strong>AI Call Port</strong>
-            <span>Automatic AI Call System for SMB</span>
-          </div>
-        </div>
-        <nav class="nav">
-          <a href="#consultation">Business Analysis</a>
-          <a href="#dashboard-preview">Dashboard</a>
-          <a href="#markets">Markets</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#support">Support</a>
-          <a href="#signin">Sign In</a>
-          <a class="btn btn-primary" href="#activation">Enter the System</a>
-        </nav>
-      </div>
-    </header>
+<div class="app">
+<header class="topbar">
+<div class="brand">
+<div class="brand-mark">A</div>
+<div class="brand-copy">
+<strong>AI CALL PORT</strong>
+<span>Automated AI Call Team</span>
+</div>
+</div>
 
-    <main>
-      <section class="hero" id="top">
-        <div class="hero-copy">
-          <div class="eyebrow">Automatic System Configuration • Built-in CRM • 3-Step Activation</div>
-          <h1>Deploy Your AI Call System in Minutes</h1>
-          <p class="lead">
-            AI Call Port automatically builds the right AI phone system for your business. No configuration required. Every plan includes all agents, built-in CRM, monthly AI insights, and continuous optimization.
-          </p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#activation">Enter the System</a>
-            <a class="btn btn-secondary" href="#dashboard-preview">Preview Dashboard</a>
-            <a class="btn btn-ghost" href="#video">Watch Overview Video</a>
-          </div>
-          <div class="mini-flow">
-            <div class="mini-step">
-              <strong>Configure</strong>
-              <span>Country, industry, business needs, call volume, and schedule.</span>
-            </div>
-            <div class="mini-step">
-              <strong>Demo</strong>
-              <span>Hear two guided demo scenarios and review your AI setup.</span>
-            </div>
-            <div class="mini-step">
-              <strong>Activate</strong>
-              <span>Choose the recommended plan and launch instantly.</span>
-            </div>
-          </div>
-        </div>
+<div class="progress-wrap" id="progressDots" aria-label="Intro progress"></div>
 
-        <div class="hero-visual">
-          <div class="visual-panel">
-            <div class="visual-header">
-              <div>
-                <strong>AI System Preview</strong>
-                <div class="muted">Automatically generated for SMB businesses</div>
-              </div>
-              <div class="row-between"><span class="status-dot"></span><span class="muted">Ready</span></div>
-            </div>
-            <div class="stat-grid">
-              <div class="stat-box"><span class="label">Industry</span><span class="value">Plumbing</span></div>
-              <div class="stat-box"><span class="label">Market</span><span class="value">United States</span></div>
-              <div class="stat-box"><span class="label">AI Agents</span><span class="value">5 Active</span></div>
-              <div class="stat-box"><span class="label">Recommended Plan</span><span class="value">Growth</span></div>
-            </div>
-          </div>
-          <div class="visual-panel">
-            <div class="row-between">
-              <strong>Capabilities Included</strong>
-              <span class="badge recommended">All Plans</span>
-            </div>
-            <div class="check-list">
-              <div class="check">✔ AI receptionist, lead qualification, appointment scheduling, follow-up automation</div>
-              <div class="check">✔ Built-in CRM with automatic lead records and call history</div>
-              <div class="check">✔ Monthly AI report with recommendations and script improvement proposals</div>
-              <div class="check">✔ Automatic system configuration, voice selection, routing, and number provisioning</div>
-            </div>
-          </div>
-        </div>
-      </section>
+<div class="toolbar-right">
+<div class="lang-wrap">
+<select aria-label="Language selector">
+<option>English</option>
+<option>Español</option>
+<option>Français</option>
+<option>Deutsch</option>
+</select>
+</div>
+<button class="ctl-btn" id="soundToggle">🎧 Sound Off</button>
+</div>
+</header>
 
-      <section class="section" id="video">
-        <div class="section-title">
-          <div>
-            <h2>How AI Call Port Works</h2>
-            <p>Show the system in under 90 seconds. This section should hold your explanation video and quickly prove the product value before the visitor goes deeper.</p>
-          </div>
-        </div>
-        <div class="section-card video-placeholder">
-          <div class="video-box">
-            <div>
-              <div class="play">▶</div>
-              <h3 style="margin:0 0 8px; font-size:28px;">AI Explanation Video Placeholder</h3>
-              <p class="muted" style="max-width:52ch; margin:0 auto;">Use this area for your AI-generated explanation video showing call answering, lead capture, appointment booking, dashboard overview, and the 3-step activation flow.</p>
-            </div>
-          </div>
-          <div class="video-points">
-            <div class="info-card">
-              <h3>What the video should show</h3>
-              <div class="check-list">
-                <div class="check">✔ Automatic system configuration based on business answers</div>
-                <div class="check">✔ Two guided demo call scenarios</div>
-                <div class="check">✔ Built-in CRM, dashboard, and AI reports</div>
-                <div class="check">✔ 75 active countries and multilingual website support</div>
-              </div>
-            </div>
-            <div class="info-card">
-              <h3>Ideal ending message</h3>
-              <p>Welcome to AI Call Port. Configure, demo, and activate your AI call system in minutes — no technical setup required.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+<main class="scene-stage" id="sceneStage">
+<section class="scene active" data-scene="1">
+<div class="copy">
+<div class="eyebrow">Intro • 30 seconds</div>
+<h1>AI CALL PORT</h1>
+<p><strong style="color:var(--text); font-weight:800;">Your Business’s Automated AI Call Team</strong></p>
+<p>Built for small and medium businesses.</p>
+<div class="stack-lines">
+<span>Deploy your AI call system in 3 simple steps.</span>
+</div>
+</div>
+<div class="visual">
+<div class="phone-shell">
+<div class="phone-card">
+<div class="status-pill"><span class="ok"></span> Intro scene active</div>
+<div class="phone-ring">
+<div class="phone-icon">📞</div>
+</div>
+<h3 style="margin:0; font-size:28px; letter-spacing:-.03em;">Incoming Call</h3>
+<p class="muted" style="margin:10px 0 0; line-height:1.7;">A premium guided experience starts here.</p>
+</div>
+</div>
+</div>
+</section>
 
-      <section class="section" id="activation">
-        <div class="section-title">
-          <div>
-            <h2>Three-Step Activation</h2>
-            <p>The entire onboarding is reduced to three guided steps. The system does the hard work automatically in the background.</p>
-          </div>
-        </div>
-        <div class="section-card">
-          <div class="steps-grid">
-            <div class="step-box">
-              <div class="step-num">Step 1</div>
-              <h3>System Configuration</h3>
-              <p>Choose your market and industry, then answer a short business questionnaire. AI Call Port generates the entire system automatically.</p>
-            </div>
-            <div class="step-box">
-              <div class="step-num">Step 2</div>
-              <h3>Demo & Confirm</h3>
-              <p>See your AI configuration summary and test two guided demo scenarios so you fully understand how the system works.</p>
-            </div>
-            <div class="step-box">
-              <div class="step-num">Step 3</div>
-              <h3>Choose Plan & Activate</h3>
-              <p>Pick the recommended plan, complete Stripe checkout, and launch your AI call system with number assignment and CRM included.</p>
-            </div>
-          </div>
-          <div class="hero-actions" style="margin-top:20px;">
-            <a class="btn btn-primary" href="#consultation">Start Business Analysis</a>
-            <a class="btn btn-secondary" href="#pricing">View Pricing</a>
-          </div>
-        </div>
-      </section>
+<section class="scene" data-scene="2">
+<div class="copy">
+<div class="eyebrow">The Problem</div>
+<h2>Missed calls cost businesses real money.</h2>
+<p>Customers call when you are busy. Customers call when you are closed.</p>
+<div class="stack-lines">
+<span>Missed calls become lost customers.</span>
+</div>
+</div>
+<div class="visual">
+<div class="phone-shell">
+<div class="phone-card">
+<div class="flash-list">
+<div class="flash-item"><strong class="danger">Missed Call</strong><span>11:42 PM</span></div>
+<div class="flash-item"><strong class="danger">After-Hours Inquiry</strong><span>No answer</span></div>
+<div class="flash-item"><strong class="danger">Customer Left</strong><span>Lost opportunity</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
 
-      <section class="section" id="consultation">
-        <div class="section-title">
-          <div>
-            <h2>AI Business Analysis</h2>
-            <p>Help visitors understand what they actually need before they sign up. This section should feel like a mini consultation, not a form.</p>
-          </div>
-        </div>
-        <div class="section-card advisor-layout">
-          <div>
-            <div class="question-block">
-              <strong>1. What industry is your business in?</strong>
-              <div class="chips">
-                <span class="chip active">Plumbing</span>
-                <span class="chip">Dental Clinic</span>
-                <span class="chip">Restaurant</span>
-                <span class="chip">Law Firm</span>
-                <span class="chip">Auto Repair</span>
-              </div>
-            </div>
-            <div class="question-block">
-              <strong>2. How many calls do you receive per day?</strong>
-              <div class="chips">
-                <span class="chip">0–10</span>
-                <span class="chip active">10–30</span>
-                <span class="chip">30–60</span>
-                <span class="chip">60+</span>
-              </div>
-            </div>
-            <div class="question-block">
-              <strong>3. What happens after hours?</strong>
-              <div class="chips">
-                <span class="chip">Voicemail</span>
-                <span class="chip active">Missed Calls</span>
-                <span class="chip">Manual Answering</span>
-              </div>
-            </div>
-            <div class="question-block">
-              <strong>4. Do you receive emergency calls?</strong>
-              <div class="chips">
-                <span class="chip active">Yes</span>
-                <span class="chip">No</span>
-              </div>
-            </div>
-            <div class="question-block">
-              <strong>5. Do you want outbound follow-ups and reminders?</strong>
-              <div class="chips">
-                <span class="chip active">Yes</span>
-                <span class="chip">No</span>
-              </div>
-            </div>
-            <div class="hero-actions" style="margin-top:18px;">
-              <button class="btn btn-primary" type="button">Generate My AI Report</button>
-            </div>
-          </div>
+<section class="scene" data-scene="3">
+<div class="copy">
+<div class="eyebrow">The Solution</div>
+<h2>AI Call Port solves this automatically.</h2>
+<p>We build a custom AI call system for your business needs.</p>
+<div class="stack-lines">
+<span>Your AI call team answers every call instantly.</span>
+</div>
+</div>
+<div class="visual">
+<div class="flow-shell">
+<div class="solution-flow">
+<div class="flow-step"><strong>Incoming Call</strong><span class="muted">Customer reaches your business</span></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><strong>AI Answers</strong><span class="muted">No missed opportunity</span></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><strong>Lead Captured</strong><span class="muted">Information saved automatically</span></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-step"><strong>Appointment Booked</strong><span class="muted">Customer guided to outcome</span></div>
+</div>
+</div>
+</div>
+</section>
 
-          <div class="report-layout">
-            <div class="report-card">
-              <h3>AI Call Readiness Report</h3>
-              <p>Based on your answers, your business has strong automation potential and likely loses valuable after-hours opportunities.</p>
-            </div>
-            <div class="report-highlight">
-              Recommended setup: Receptionist, Lead Qualification, Appointment Scheduler, Emergency Agent, Follow-Up Agent.
-            </div>
-            <div class="grid-2 report-layout">
-              <div class="info-card">
-                <h3>Opportunity Analysis</h3>
-                <p>AI can reduce missed calls, capture more leads after hours, identify urgent situations faster, and help schedule service visits automatically.</p>
-              </div>
-              <div class="info-card">
-                <h3>Recommended Plan</h3>
-                <p><strong>Growth</strong> — estimated monthly usage around 1,200 minutes with room for follow-ups and appointment reminders.</p>
-              </div>
-            </div>
-            <div class="info-card">
-              <h3>Expected Impact</h3>
-              <div class="check-list">
-                <div class="check">✔ Reduce missed calls and voicemail dependency</div>
-                <div class="check">✔ Capture service requests and urgent calls faster</div>
-                <div class="check">✔ Automatically create lead records in built-in CRM</div>
-                <div class="check">✔ Save staff time every month with automated follow-up</div>
-              </div>
-            </div>
-            <div class="hero-actions" style="margin-top:4px;">
-              <a class="btn btn-primary" href="#activation">Enter the System</a>
-              <a class="btn btn-secondary" href="#pricing">View Recommended Plan</a>
-            </div>
-          </div>
-        </div>
-      </section>
+<section class="scene" data-scene="4">
+<div class="copy">
+<div class="eyebrow">Global Languages</div>
+<h2>Serve customers in their language.</h2>
+<p>Your website, system, scripts, dashboard, and communication work in your chosen language.</p>
+<div class="stack-lines">
+<span>Hello</span>
+<span>Hola</span>
+<span>Bonjour</span>
+<span>Guten Tag</span>
+</div>
+</div>
+<div class="visual">
+<div class="map-shell">
+<div class="map-board">
+<div class="map-grid"></div>
+<div class="map-points">
+<span class="p1"></span>
+<span class="p2"></span>
+<span class="p3"></span>
+<span class="p4"></span>
+</div>
+<div class="lang-bubbles">
+<div class="lang-card"><strong>Hello</strong><span>English</span></div>
+<div class="lang-card"><strong>Hola</strong><span>Spanish</span></div>
+<div class="lang-card"><strong>Bonjour</strong><span>French</span></div>
+<div class="lang-card"><strong>Guten Tag</strong><span>German</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
 
-      <section class="section" id="features">
-        <div class="section-title">
-          <div>
-            <h2>What the System Does Automatically</h2>
-            <p>The visitor should clearly understand that AI Call Port is not a manual setup tool. It is an automatic system configuration platform for SMB phone operations.</p>
-          </div>
-        </div>
-        <div class="grid-3">
-          <div class="feature-card">
-            <div class="feature-icon">R</div>
-            <h3>AI Receptionist</h3>
-            <p>Answers inbound calls, identifies intent, and routes the conversation correctly without the owner configuring anything.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">L</div>
-            <h3>Lead Capture</h3>
-            <p>Collects caller information, creates a CRM record, and tracks what service or appointment the customer requested.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">A</div>
-            <h3>Appointment Scheduling</h3>
-            <p>Books appointments automatically, handles confirmations, and can trigger reminders or follow-up actions later.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">E</div>
-            <h3>Emergency Detection</h3>
-            <p>Detects urgent requests for the industries that need it and routes or escalates them according to the business setup.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">F</div>
-            <h3>Follow-Up Automation</h3>
-            <p>Contacts leads later, sends reminders, and supports automatic outbound follow-up where it makes business sense.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">C</div>
-            <h3>Built-In CRM</h3>
-            <p>Every call automatically becomes usable business data: contacts, leads, call history, summaries, and appointment records.</p>
-          </div>
-        </div>
-      </section>
+<section class="scene" data-scene="5">
+<div class="copy">
+<div class="eyebrow">Your AI Team</div>
+<h2>Meet your AI call team.</h2>
+<p>12 specialized AI agents work together for your business.</p>
+<div class="stack-lines">
+<span>They switch automatically depending on the task.</span>
+</div>
+</div>
+<div class="visual">
+<div class="team-shell">
+<div class="team-grid">
+<div class="team-card"><small>Reception</small><strong>CallGuard</strong><span class="muted">Answers and triages calls</span></div>
+<div class="team-card"><small>Lead Qualification</small><strong>LeadFlow</strong><span class="muted">Captures service details</span></div>
+<div class="team-card"><small>Scheduling</small><strong>BookEasy</strong><span class="muted">Books appointments</span></div>
+<div class="team-card"><small>After Hours</small><strong>NightDesk</strong><span class="muted">Handles closed-hour calls</span></div>
+<div class="team-card"><small>Emergency</small><strong>UrgentLine</strong><span class="muted">Escalates urgent requests</span></div>
+<div class="team-card"><small>Follow-Up</small><strong>FollowPro</strong><span class="muted">Reconnects with leads</span></div>
+</div>
+<div class="team-flow">
+<span class="team-pill">Customer Call</span>
+<span>→</span>
+<span class="team-pill">CallGuard</span>
+<span>→</span>
+<span class="team-pill">LeadFlow</span>
+<span>→</span>
+<span class="team-pill">BookEasy</span>
+<span>→</span>
+<span class="team-pill">FollowPro</span>
+</div>
+</div>
+</div>
+</section>
 
-      <section class="section" id="dashboard-preview">
-        <div class="section-title">
-          <div>
-            <h2>Your AI Call Command Center</h2>
-            <p>Preview the dashboard customers reach after activation. This is where they monitor calls, CRM activity, analytics, billing, and referrals.</p>
-          </div>
-          <a class="btn btn-secondary" href="#pricing">Preview Billing Flow</a>
-        </div>
-        <div class="section-card">
-          <div class="dashboard-preview">
-            <div class="dash-side">
-              <div class="dash-nav-item active">Dashboard</div>
-              <div class="dash-nav-item">AI System</div>
-              <div class="dash-nav-item">Calls & CRM</div>
-              <div class="dash-nav-item">Analytics</div>
-              <div class="dash-nav-item">Billing</div>
-              <div class="dash-nav-item">Referrals</div>
-              <div class="dash-nav-item">Settings</div>
-            </div>
-            <div class="dash-main">
-              <div class="grid-4">
-                <div class="stat-box"><span class="label">Calls Today</span><span class="value">23</span></div>
-                <div class="stat-box"><span class="label">Leads Captured</span><span class="value">8</span></div>
-                <div class="stat-box"><span class="label">Minutes Used</span><span class="value">430</span></div>
-                <div class="stat-box"><span class="label">Referral Credits</span><span class="value">$20</span></div>
-              </div>
-              <div class="grid-2">
-                <div class="info-card">
-                  <h3>Recent Activity</h3>
-                  <div class="check-list">
-                    <div class="check">10:14 — New lead captured for plumbing repair</div>
-                    <div class="check">11:02 — Appointment scheduled automatically</div>
-                    <div class="check">11:37 — Emergency call flagged for priority handling</div>
-                  </div>
-                </div>
-                <div class="info-card">
-                  <h3>AI Insights</h3>
-                  <div class="check-list">
-                    <div class="check">✔ Most calls happen between 4–6 PM</div>
-                    <div class="check">✔ After-hours calls produced 22% of new leads</div>
-                    <div class="check">✔ AI recommends a shorter greeting for faster triage</div>
-                  </div>
-                </div>
-              </div>
-              <div class="report-highlight">Dashboard unlocks after activation. Every plan includes the full AI system, built-in CRM, analytics, and monthly AI recommendations.</div>
-            </div>
-          </div>
-        </div>
-      </section>
+<section class="scene" data-scene="6">
+<div class="copy">
+<div class="eyebrow">3-Step Activation</div>
+<h2>Getting started is simple.</h2>
+<p>We build the system for you.</p>
+<div class="stack-lines">
+<span>1 — System Configuration</span>
+<span>2 — Demo + Confirm</span>
+<span>3 — Plan + Activate</span>
+</div>
+</div>
+<div class="visual">
+<div class="flow-shell">
+<div class="activation-steps">
+<div class="step-card">
+<span class="step-badge">Step 1</span>
+<div>
+<strong>System Configuration</strong>
+<span class="muted">Answer a few questions so AI Call Port can build your system automatically.</span>
+</div>
+</div>
+<div class="step-card">
+<span class="step-badge">Step 2</span>
+<div>
+<strong>Demo + Confirm</strong>
+<span class="muted">Test the AI system with a real guided demo call before activation.</span>
+</div>
+</div>
+<div class="step-card">
+<span class="step-badge">Step 3</span>
+<div>
+<strong>Plan + Activate</strong>
+<span class="muted">Choose your monthly usage level and launch the system instantly.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
 
-      <section class="section" id="demo">
-        <div class="section-title">
-          <div>
-            <h2>Guided Demo Experience</h2>
-            <p>Instead of random testing, the visitor gets two clear scenarios so they fully understand how the system behaves before activation.</p>
-          </div>
-        </div>
-        <div class="demo-grid">
-          <div class="demo-card">
-            <h3>Scenario 1 — New Customer Call</h3>
-            <p>The AI answers, identifies intent, captures lead details, and shows how appointment or service requests are handled.</p>
-            <div class="demo-questions">
-              <div class="check">Try asking: “Can I schedule an appointment?”</div>
-              <div class="check">Try asking: “Do you handle emergencies?”</div>
-              <div class="check">Try asking: “What information do you need?”</div>
-            </div>
-          </div>
-          <div class="demo-card">
-            <h3>Scenario 2 — Follow-Up / Existing Contact</h3>
-            <p>The AI demonstrates appointment confirmation, after-hours logic, callback scheduling, or follow-up behavior.</p>
-            <div class="demo-questions">
-              <div class="check">Try asking: “I called earlier about a service request.”</div>
-              <div class="check">Try asking: “Can someone call me back later?”</div>
-              <div class="check">Try asking: “What happens after hours?”</div>
-            </div>
-          </div>
-          <div class="demo-card">
-            <h3>Demo Rules</h3>
-            <p>Each activation session allows two guided demo calls, one minute each. The system uses your business configuration to generate realistic scenarios.</p>
-            <div class="hero-actions" style="margin-top:16px;">
-              <a class="btn btn-primary" href="#activation">Start Activation</a>
-            </div>
-          </div>
-        </div>
-      </section>
+<section class="scene" data-scene="7">
+<div class="copy">
+<div class="eyebrow">Dashboard Preview</div>
+<h2>Your business call command center.</h2>
+<p>Track calls, leads, appointments, and AI performance automatically.</p>
+<div class="stack-lines">
+<span>Built-in CRM and monthly AI reports included.</span>
+</div>
+</div>
+<div class="visual">
+<div class="dash-shell">
+<div class="dash-layout">
+<div class="dash-side">
+<div class="dash-nav active">Dashboard</div>
+<div class="dash-nav">AI System</div>
+<div class="dash-nav">Calls & CRM</div>
+<div class="dash-nav">Analytics</div>
+<div class="dash-nav">Billing</div>
+</div>
+<div class="dash-main">
+<div class="dash-grid">
+<div class="dash-card"><strong>Calls Today</strong><span class="num">27</span></div>
+<div class="dash-card"><strong>Leads Captured</strong><span class="num">8</span></div>
+<div class="dash-card"><strong>Appointments</strong><span class="num">5</span></div>
+<div class="dash-card"><strong>AI Insights</strong><span class="num">3</span></div>
+</div>
+<div class="activity-list">
+<div class="activity-item"><strong>10:14 AM — Lead captured</strong>Plumbing repair inquiry saved in CRM.</div>
+<div class="activity-item"><strong>11:02 AM — Appointment booked</strong>Customer scheduled for tomorrow at 2 PM.</div>
+<div class="activity-item"><strong>AI Recommendation</strong>Enable after-hours booking for +18% more appointments.</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
 
-      <section class="section" id="markets">
-        <div class="section-title">
-          <div>
-            <h2>Global AI Voice Infrastructure</h2>
-            <p>AI Call Port is designed for 75 active countries, about 140 total markets, and 20 website languages. If a market is not active yet, capture the lead with a waiting list.</p>
-          </div>
-        </div>
-        <div class="section-card">
-          <div class="grid-4" style="margin-bottom:16px;">
-            <div class="stat-box"><span class="label">Active Countries</span><span class="value">75</span></div>
-            <div class="stat-box"><span class="label">Planned Markets</span><span class="value">140</span></div>
-            <div class="stat-box"><span class="label">Website Languages</span><span class="value">20</span></div>
-            <div class="stat-box"><span class="label">Phone Number Provisioning</span><span class="value">Automatic</span></div>
-          </div>
-          <div class="country-grid">
-            <div class="country-card">
-              <div class="country-status status-active">Active</div>
-              <h3>United States</h3>
-              <p>Local number assignment, multilingual AI support, built-in CRM, and full activation available.</p>
-              <div class="hero-actions" style="margin-top:14px;"><a class="btn btn-secondary" href="#activation">Select Market</a></div>
-            </div>
-            <div class="country-card">
-              <div class="country-status status-coming">Coming Soon</div>
-              <h3>Poland</h3>
-              <p>Capture interest before launch. Let visitors join the waiting list and notify them when activation becomes available.</p>
-              <div class="hero-actions" style="margin-top:14px;"><button class="btn btn-secondary" type="button">Notify Me</button></div>
-            </div>
-            <div class="country-card">
-              <div class="country-status status-future">Projected</div>
-              <h3>Morocco</h3>
-              <p>Future market. Keep it visible to communicate scale, but use a softer call to follow updates or explore other active regions.</p>
-              <div class="hero-actions" style="margin-top:14px;"><button class="btn btn-ghost" type="button">Follow Updates</button></div>
-            </div>
-          </div>
-        </div>
-      </section>
+<section class="scene" data-scene="8">
+<div class="copy">
+<div class="eyebrow">Beta Pricing</div>
+<h2>Beta early access pricing.</h2>
+<p>All plans include the full AI call team and CRM. Only minutes differ.</p>
+<div class="stack-lines">
+<span>No contracts — pay monthly</span>
+<span>Change your plan anytime</span>
+<span>Cancel anytime</span>
+<span>Price locked for 24 months after activation</span>
+</div>
+<p style="font-size:14px;">Beta pricing may change or end at any time.</p>
+</div>
+<div class="visual">
+<div class="price-shell">
+<div>
+<div class="price-cards">
+<div class="price-card">
+<strong>Starter</strong>
+<div class="price"><span class="now">$299</span><span class="old">$499</span></div>
+<span class="muted">1000 minutes</span>
+<ul>
+<li>Full AI team included</li>
+<li>Built-in CRM included</li>
+</ul>
+</div>
+<div class="price-card">
+<strong>Growth</strong>
+<div class="price"><span class="now">$599</span><span class="old">$999</span></div>
+<span class="muted">2200 minutes</span>
+<ul>
+<li>Full AI team included</li>
+<li>Built-in CRM included</li>
+</ul>
+</div>
+<div class="price-card">
+<strong>Scale</strong>
+<div class="price"><span class="now">$899</span><span class="old">$1499</span></div>
+<span class="muted">3500 minutes</span>
+<ul>
+<li>Full AI team included</li>
+<li>Built-in CRM included</li>
+</ul>
+</div>
+</div>
+<div class="small-note">All three plans include the same system benefits. Your usage level is the only difference.</div>
+</div>
+</div>
+</div>
+</section>
 
-      <section class="section" id="pricing">
-        <div class="section-title">
-          <div>
-            <h2>Simple Pricing</h2>
-            <p>Every plan includes the same benefits: all AI agents, automatic system configuration, built-in CRM, monthly AI reports, and script optimization. Only the minutes change.</p>
-          </div>
-        </div>
-        <div class="pricing-grid">
-          <div class="pricing-card">
-            <h3>Starter</h3>
-            <p>For lower call volume businesses getting started with full AI automation.</p>
-            <div class="price-row">
-              <span class="price-now">$299</span>
-              <span class="price-old">$699</span>
-            </div>
-            <p>1000 minutes / month</p>
-            <div class="pricing-list">
-              <div class="check">✔ All AI agents included</div>
-              <div class="check">✔ Built-in CRM included</div>
-              <div class="check">✔ Monthly AI report included</div>
-              <div class="check">✔ Overage: $0.30 / minute</div>
-            </div>
-            <div class="hero-actions" style="margin-top:16px;"><a class="btn btn-secondary" href="#activation">Choose Starter</a></div>
-          </div>
-          <div class="pricing-card recommended">
-            <span class="badge recommended">Recommended</span>
-            <h3 style="margin-top:12px;">Growth</h3>
-            <p>Best for businesses with moderate call volume, follow-ups, after-hours activity, and room to grow.</p>
-            <div class="price-row">
-              <span class="price-now">$599</span>
-              <span class="price-old">$1299</span>
-            </div>
-            <p>2200 minutes / month</p>
-            <div class="pricing-list">
-              <div class="check">✔ All AI agents included</div>
-              <div class="check">✔ Built-in CRM included</div>
-              <div class="check">✔ Monthly AI report included</div>
-              <div class="check">✔ Overage: $0.30 / minute</div>
-            </div>
-            <div class="hero-actions" style="margin-top:16px;"><a class="btn btn-primary" href="#activation">Choose Growth</a></div>
-          </div>
-          <div class="pricing-card">
-            <h3>Pro</h3>
-            <p>For higher-volume businesses that need more monthly minutes while keeping the same complete platform.</p>
-            <div class="price-row">
-              <span class="price-now">$899</span>
-              <span class="price-old">$1999</span>
-            </div>
-            <p>3500 minutes / month</p>
-            <div class="pricing-list">
-              <div class="check">✔ All AI agents included</div>
-              <div class="check">✔ Built-in CRM included</div>
-              <div class="check">✔ Monthly AI report included</div>
-              <div class="check">✔ Overage: $0.30 / minute</div>
-            </div>
-            <div class="hero-actions" style="margin-top:16px;"><a class="btn btn-secondary" href="#activation">Choose Pro</a></div>
-          </div>
-        </div>
-      </section>
+<section class="scene" data-scene="9">
+<div class="copy cta-center" style="grid-column: 1 / -1; max-width: 980px; margin: auto;">
+<div class="eyebrow">Final Step</div>
+<h2>Build Your AI Call System</h2>
+<p>It takes less than a minute to begin.</p>
+<div class="stack-lines" style="justify-items:center; margin-top: 20px;">
+<span>Answer a few questions</span>
+<span>Test your AI system</span>
+<span>Activate when ready</span>
+</div>
+<div class="btn-row">
+<a class="primary" href="#">Enter the System</a>
+<a class="secondary" href="#">Preview Dashboard</a>
+<a class="secondary" href="#">Ask AI</a>
+</div>
+<p style="font-size:14px; margin-top: 18px;">No contracts. Pay monthly. Cancel anytime.</p>
+</div>
+</section>
+</main>
 
-      <section class="section" id="referrals">
-        <div class="section-title">
-          <div>
-            <h2>Earn Monthly Credits</h2>
-            <p>Referral rewards should feel simple and recurring. Every active referral reduces the customer’s monthly bill, and overflow credits convert to bonus minutes.</p>
-          </div>
-        </div>
-        <div class="split-cta">
-          <div class="section-card">
-            <h3>Referral Program</h3>
-            <p>Share AI Call Port with other businesses and earn <strong>$10 monthly credit</strong> for every active referral. If credits exceed the subscription cost, the extra value becomes additional call minutes.</p>
-            <div class="check-list">
-              <div class="check">✔ Recurring credit while the referral stays active</div>
-              <div class="check">✔ Credits applied automatically to monthly billing</div>
-              <div class="check">✔ Extra credit converted into bonus minutes</div>
-            </div>
-          </div>
-          <div class="section-card">
-            <h3>Example</h3>
-            <div class="check-list">
-              <div class="check"><strong>3 active referrals</strong> = $30 monthly credit</div>
-              <div class="check"><strong>Plan cost</strong> = $299</div>
-              <div class="check"><strong>New invoice</strong> = $269</div>
-            </div>
-            <div class="hero-actions" style="margin-top:16px;"><button class="btn btn-secondary" type="button">Learn More</button></div>
-          </div>
-        </div>
-      </section>
+<div class="helpbar">
+<div class="mini-chip scene-counter"><span id="sceneLabel">Scene 1 of 9</span></div>
+</div>
 
-      <section class="section" id="reports">
-        <div class="section-title">
-          <div>
-            <h2>Monthly AI Reports & Script Intelligence</h2>
-            <p>AI Call Port should not just answer calls. It should analyze CRM activity, create monthly business reports, recommend improvements, and propose safer script updates for owner approval.</p>
-          </div>
-        </div>
-        <div class="grid-3">
-          <div class="info-card">
-            <h3>Business Report</h3>
-            <p>Total calls, peak hours, lead capture, appointments booked, missed opportunities, and call trend summaries presented clearly each month.</p>
-          </div>
-          <div class="info-card">
-            <h3>Script Optimization</h3>
-            <p>The system proposes script improvements based on real call outcomes, repeated caller questions, and conversion performance — but the owner must approve changes.</p>
-          </div>
-          <div class="info-card">
-            <h3>AI Recommendations</h3>
-            <p>Examples: enable after-hours coverage, adjust emergency flow, shorten greeting, or upgrade plan as minutes approach the monthly limit.</p>
-          </div>
-        </div>
-      </section>
+<div class="bottom-controls">
+<button class="ctl-btn" id="pauseBtn">⏸ Pause</button>
+<button class="ctl-btn" id="replayBtn">🔁 Replay</button>
+<button class="ctl-btn" id="skipBtn">Skip → Enter System</button>
+</div>
+</div>
 
-      <section class="section" id="faq">
-        <div class="section-title">
-          <div>
-            <h2>Frequently Asked Questions</h2>
-            <p>Keep answers short, practical, and written for business owners, not engineers.</p>
-          </div>
-        </div>
-        <div class="faq-grid">
-          <div class="faq-item">
-            <h3>Do I need to configure agents, scripts, or voices?</h3>
-            <p>No. AI Call Port builds the complete system automatically. You provide business information, test the demo, then activate.</p>
-          </div>
-          <div class="faq-item">
-            <h3>What is included in every plan?</h3>
-            <p>All AI agents, automatic system configuration, built-in CRM, monthly AI reports, script optimization, and dashboard analytics. Only minutes differ.</p>
-          </div>
-          <div class="faq-item">
-            <h3>Can I hear the AI before I pay?</h3>
-            <p>Yes. The activation flow includes two guided demo scenarios so you understand how the system behaves before activation.</p>
-          </div>
-          <div class="faq-item">
-            <h3>What if my country is not active yet?</h3>
-            <p>You can join the waiting list for coming-soon markets and get notified when activation becomes available.</p>
-          </div>
-          <div class="faq-item">
-            <h3>Can the script change later?</h3>
-            <p>Yes, but the script is locked for quality control. Owners request changes and the system generates a new version for approval.</p>
-          </div>
-          <div class="faq-item">
-            <h3>Do I need a CRM?</h3>
-            <p>No. AI Call Port includes a simple built-in CRM in the dashboard so every call becomes a contact, lead, and business record automatically.</p>
-          </div>
-        </div>
-      </section>
+<script>
+const scenes = Array.from(document.querySelectorAll('.scene'));
+const progressDots = document.getElementById('progressDots');
+const sceneLabel = document.getElementById('sceneLabel');
+const pauseBtn = document.getElementById('pauseBtn');
+const replayBtn = document.getElementById('replayBtn');
+const skipBtn = document.getElementById('skipBtn');
+const soundToggle = document.getElementById('soundToggle');
 
-      <section class="section" id="final-cta">
-        <div class="section-card split-cta">
-          <div>
-            <div class="eyebrow">Ready to Launch</div>
-            <h2 style="margin:0 0 10px; font-size: clamp(32px, 4vw, 48px); letter-spacing:-0.03em;">Ready to Activate Your AI Call System?</h2>
-            <p class="muted">Configure, demo, and activate your AI call system in minutes. No manual setup. No prompt engineering. No feature paywalls between plans.</p>
-          </div>
-          <div style="display:flex; align-items:center; justify-content:flex-start; gap:12px; flex-wrap:wrap;">
-            <a class="btn btn-primary" href="#activation">Enter the System</a>
-            <a class="btn btn-secondary" href="#consultation">Start Business Analysis</a>
-          </div>
-        </div>
-      </section>
-    </main>
+let current = 0;
+let paused = false;
+let timer = null;
+const duration = 3300;
 
-    <footer class="footer" id="support">
-      <div class="footer-links">
-        <a href="#pricing">Pricing</a>
-        <a href="#markets">Markets</a>
-        <a href="#referrals">Referral Program</a>
-        <a href="#faq">FAQ</a>
-        <a href="#">Terms</a>
-        <a href="#">Privacy</a>
-        <a href="#">Referral Policy</a>
-        <a href="#">Support</a>
-      </div>
-      <div>AI Call Port © 2026 — Automatic AI phone system for SMB businesses.</div>
-    </footer>
-  </div>
+scenes.forEach((_, i) => {
+const dot = document.createElement('span');
+dot.className = 'dot' + (i === 0 ? ' active' : '');
+progressDots.appendChild(dot);
+});
+
+function updateUI() {
+scenes.forEach((scene, i) => scene.classList.toggle('active', i === current));
+Array.from(progressDots.children).forEach((dot, i) => dot.classList.toggle('active', i === current));
+sceneLabel.textContent = `Scene ${current + 1} of ${scenes.length}`;
+}
+
+function queueNext() {
+clearTimeout(timer);
+if (paused) return;
+timer = setTimeout(() => {
+if (current < scenes.length - 1) {
+current += 1;
+updateUI();
+queueNext();
+}
+}, duration);
+}
+
+function restartIntro() {
+clearTimeout(timer);
+current = 0;
+updateUI();
+if (!paused) queueNext();
+}
+
+pauseBtn.addEventListener('click', () => {
+paused = !paused;
+pauseBtn.textContent = paused ? '▶ Resume' : '⏸ Pause';
+if (!paused) queueNext();
+else clearTimeout(timer);
+});
+
+replayBtn.addEventListener('click', restartIntro);
+
+skipBtn.addEventListener('click', () => {
+window.location.href = '/analysis';
+});
+
+soundToggle.addEventListener('click', () => {
+const on = soundToggle.textContent.includes('Off');
+soundToggle.textContent = on ? '🎧 Sound On' : '🎧 Sound Off';
+});
+
+document.addEventListener('visibilitychange', () => {
+if (document.hidden) {
+clearTimeout(timer);
+} else if (!paused) {
+queueNext();
+}
+});
+
+updateUI();
+queueNext();
+</script>
 </body>
 </html>
