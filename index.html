@@ -1,662 +1,718 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Call Port — Premium Guided Intro</title>
-<style>
-:root {
---bg-1: #02050b;
---bg-2: #08101d;
---text: #f4f7ff;
---muted: #b7c1d7;
---line: rgba(255,255,255,0.08);
---accent: #ff7a18;
---accent-2: #ffb347;
---blue: #5ca9ff;
---purple: #8b5cf6;
---danger: #ff6262;
---good: #38d27a;
---shadow: 0 30px 90px rgba(0,0,0,0.45);
---ease: cubic-bezier(.22,.85,.18,1);
---radius: 34px;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Call Port — Premium Guided Intro</title>
+  <style>
+    :root {
+      --bg-1: #02050b;
+      --bg-2: #09111e;
+      --text: #f4f7ff;
+      --muted: #b7c1d7;
+      --line: rgba(255,255,255,0.08);
+      --accent: #ff7a18;
+      --accent-2: #ffb347;
+      --blue: #63a8ff;
+      --purple: #8b5cf6;
+      --danger: #ff6a6a;
+      --shadow: 0 30px 90px rgba(0,0,0,0.45);
+      --ease: cubic-bezier(.22,.85,.18,1);
+      --radius: 34px;
+    }
 
-* { box-sizing: border-box; }
-html, body { height: 100%; }
-body {
-margin: 0;
-overflow: hidden;
-font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-color: var(--text);
-background:
-radial-gradient(circle at 14% 15%, rgba(255,122,24,.16), transparent 22%),
-radial-gradient(circle at 86% 16%, rgba(92,169,255,.12), transparent 18%),
-radial-gradient(circle at 50% 88%, rgba(139,92,246,.12), transparent 22%),
-linear-gradient(180deg, var(--bg-1), var(--bg-2));
-}
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 14% 15%, rgba(255,122,24,.14), transparent 22%),
+        radial-gradient(circle at 86% 16%, rgba(99,168,255,.10), transparent 18%),
+        radial-gradient(circle at 50% 88%, rgba(139,92,246,.10), transparent 22%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    }
 
-a { color: inherit; text-decoration: none; }
-button, select { font: inherit; color: inherit; }
+    a { color: inherit; text-decoration: none; }
+    button, select { font: inherit; color: inherit; }
 
-.app {
-width: min(1400px, calc(100% - 28px));
-height: calc(100vh - 28px);
-margin: 14px auto;
-position: relative;
-overflow: hidden;
-border-radius: 38px;
-border: 1px solid var(--line);
-background: linear-gradient(180deg, rgba(6,10,18,.76), rgba(6,10,18,.9));
-box-shadow: var(--shadow);
-backdrop-filter: blur(14px);
-}
+    .app {
+      width: min(1400px, calc(100% - 28px));
+      height: calc(100vh - 28px);
+      margin: 14px auto;
+      position: relative;
+      overflow: hidden;
+      border-radius: 38px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(6,10,18,.76), rgba(6,10,18,.9));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
 
-.ambient, .ambient::before, .ambient::after {
-position: absolute;
-border-radius: 50%;
-filter: blur(70px);
-pointer-events: none;
-opacity: .5;
-}
-.ambient {
-width: 360px; height: 360px; left: -70px; top: -40px; background: rgba(255,122,24,.13);
-}
-.ambient::before, .ambient::after { content: ""; }
-.ambient::before {
-width: 320px; height: 320px; right: -1080px; top: 40px; background: rgba(92,169,255,.11);
-}
-.ambient::after {
-width: 300px; height: 300px; right: -640px; top: 520px; background: rgba(139,92,246,.11);
-}
+    .ambient, .ambient::before, .ambient::after {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      pointer-events: none;
+      opacity: .5;
+    }
+    .ambient {
+      width: 360px; height: 360px; left: -70px; top: -40px; background: rgba(255,122,24,.13);
+    }
+    .ambient::before, .ambient::after { content: ""; }
+    .ambient::before {
+      width: 320px; height: 320px; right: -1080px; top: 40px; background: rgba(99,168,255,.10);
+    }
+    .ambient::after {
+      width: 300px; height: 300px; right: -640px; top: 520px; background: rgba(139,92,246,.10);
+    }
 
-.topbar {
-position: absolute;
-inset: 0 0 auto 0;
-z-index: 30;
-padding: 20px 24px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
+    .topbar {
+      position: absolute;
+      inset: 0 0 auto 0;
+      z-index: 30;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.brand {
-display: flex;
-align-items: center;
-gap: 12px;
-}
-.brand-mark {
-width: 44px; height: 44px; border-radius: 14px;
-display: grid; place-items: center;
-background: linear-gradient(135deg, var(--accent), var(--accent-2));
-color: #160f09; font-weight: 900;
-box-shadow: 0 12px 28px rgba(255,122,24,.3);
-}
-.brand-copy strong {
-display: block; font-size: 15px; letter-spacing: .14em;
-}
-.brand-copy span {
-display: block; margin-top: 2px; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
-}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-mark {
+      width: 44px; height: 44px; border-radius: 14px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #160f09; font-weight: 900;
+      box-shadow: 0 12px 28px rgba(255,122,24,.3);
+    }
+    .brand-copy strong {
+      display: block; font-size: 15px; letter-spacing: .14em;
+    }
+    .brand-copy span {
+      display: block; margin-top: 2px; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    }
 
-.top-tools { display: flex; gap: 10px; align-items: center; }
-.tool {
-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line);
-background: rgba(255,255,255,.035); cursor: pointer; transition: .2s ease;
-}
-.tool:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.15); }
+    .top-tools { display: flex; gap: 10px; align-items: center; }
+    .tool {
+      height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.035); cursor: pointer; transition: .2s ease;
+    }
+    .tool:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.15); }
 
-.progress {
-position: absolute;
-left: 50%; top: 26px; transform: translateX(-50%);
-z-index: 31; display: flex; gap: 8px; align-items: center;
-padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line);
-background: rgba(255,255,255,.03);
-backdrop-filter: blur(10px);
-}
-.progress-dot {
-width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.18); transition: .22s ease;
-}
-.progress-dot.active {
-width: 18px; border-radius: 999px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
-box-shadow: 0 0 18px rgba(255,122,24,.42);
-}
+    .progress {
+      position: absolute;
+      left: 50%; top: 26px; transform: translateX(-50%);
+      z-index: 31; display: flex; gap: 8px; align-items: center;
+      padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      backdrop-filter: blur(10px);
+    }
+    .progress-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.18); transition: .22s ease;
+    }
+    .progress-dot.active {
+      width: 18px; border-radius: 999px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 18px rgba(255,122,24,.42);
+    }
 
-.scene-wrap { position: absolute; inset: 0; }
-.scene {
-position: absolute; inset: 0;
-padding: 104px 38px 106px;
-display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-text-align: center;
-opacity: 0; pointer-events: none;
-transform: translateY(18px) scale(.99);
-transition: opacity .45s var(--ease), transform .45s var(--ease);
-}
-.scene.active {
-opacity: 1; pointer-events: auto; transform: translateY(0) scale(1);
-}
+    .scene-wrap { position: absolute; inset: 0; }
+    .scene {
+      position: absolute; inset: 0;
+      padding: 104px 38px 106px;
+      display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+      text-align: center;
+      opacity: 0; pointer-events: none;
+      transform: translateY(18px) scale(.99);
+      transition: opacity .45s var(--ease), transform .45s var(--ease);
+    }
+    .scene.active {
+      opacity: 1; pointer-events: auto; transform: translateY(0) scale(1);
+    }
 
-.scene-top { width: min(980px, 100%); }
-.scene-center {
-flex: 1; width: min(1120px, 100%); display: flex; align-items: center; justify-content: center; position: relative;
-margin: 16px 0;
-}
-.scene-bottom { width: min(860px, 100%); display: grid; gap: 14px; justify-items: center; }
+    .scene-top { width: min(900px, 100%); }
+    .scene-center {
+      flex: 1; width: min(1120px, 100%); display: flex; align-items: center; justify-content: center; position: relative;
+      margin: 14px 0;
+    }
+    .scene-bottom { width: min(760px, 100%); display: grid; gap: 14px; justify-items: center; }
 
-.eyebrow {
-display: inline-flex; padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(255,122,24,.22);
-background: rgba(255,122,24,.08); color: #ffd8ba; font-size: 12px; text-transform: uppercase; letter-spacing: .1em;
-}
-h1, h2 { margin: 18px 0 0; line-height: .98; letter-spacing: -.05em; font-weight: 800; }
-h1 { font-size: clamp(56px, 8vw, 112px); }
-h2 { font-size: clamp(46px, 6.2vw, 90px); }
+    .eyebrow {
+      display: inline-flex; padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(255,122,24,.22);
+      background: rgba(255,122,24,.08); color: #ffd8ba; font-size: 11px; text-transform: uppercase; letter-spacing: .12em;
+    }
+    h1, h2 { margin: 18px 0 0; line-height: 1.02; letter-spacing: -.04em; font-weight: 700; }
+    h1 { font-size: clamp(36px, 5vw, 56px); }
+    h2 { font-size: clamp(30px, 4vw, 46px); }
 
-.subtitle {
-margin: 14px auto 0; max-width: 900px; color: #edf2ff; font-size: clamp(22px, 2.3vw, 32px); line-height: 1.4; font-weight: 650;
-}
-.bottom-copy {
-color: var(--muted); font-size: clamp(17px, 1.45vw, 20px); line-height: 1.7; max-width: 840px;
-}
+    .subtitle {
+      margin: 14px auto 0; max-width: 780px; color: #edf2ff; font-size: clamp(18px, 1.9vw, 24px); line-height: 1.5; font-weight: 500;
+    }
+    .bottom-copy {
+      color: var(--muted); font-size: clamp(15px, 1.2vw, 18px); line-height: 1.7; max-width: 720px;
+    }
 
-.nav {
-position: absolute; left: 24px; right: 24px; bottom: 24px; z-index: 32;
-display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap;
-}
-.nav-left, .nav-right { display: flex; gap: 10px; flex-wrap: wrap; }
-.btn {
-min-height: 48px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line);
-background: rgba(255,255,255,.035); cursor: pointer; transition: .2s ease;
-display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-}
-.btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.15); }
-.btn-primary {
-border: none; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #150f08; font-weight: 800;
-box-shadow: 0 14px 28px rgba(255,122,24,.26);
-}
-.btn-ghost { color: var(--muted); }
+    .nav {
+      position: absolute; left: 24px; right: 24px; bottom: 24px; z-index: 32;
+      display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .nav-left, .nav-right { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      min-height: 48px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.035); cursor: pointer; transition: .2s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.15); }
+    .btn-primary {
+      border: none; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #150f08; font-weight: 800;
+      box-shadow: 0 14px 28px rgba(255,122,24,.26);
+    }
+    .btn-ghost { color: var(--muted); }
 
-/* scene visuals */
-.pulse-wrap { position: relative; width: min(420px, 62vw); aspect-ratio: 1; }
-.pulse-core {
-position: absolute; inset: 0; border-radius: 50%;
-background: radial-gradient(circle, rgba(255,122,24,.16), rgba(255,122,24,.03) 42%, transparent 62%);
-border: 1px solid rgba(255,122,24,.16);
-box-shadow: 0 0 90px rgba(255,122,24,.14);
-animation: breathe 3s ease-in-out infinite;
-}
-.pulse-core::before, .pulse-core::after {
-content: ""; position: absolute; inset: -26px; border-radius: 50%; border: 1px solid rgba(255,122,24,.1); animation: echo 3s ease-in-out infinite;
-}
-.pulse-core::after { inset: -52px; animation-delay: .35s; }
-.pulse-icon {
-position: absolute; inset: 0; display: grid; place-items: center; font-size: clamp(54px, 7vw, 84px);
-text-shadow: 0 0 18px rgba(255,122,24,.18);
-}
+    /* scene visuals */
+    .pulse-wrap { position: relative; width: min(360px, 54vw); aspect-ratio: 1; }
+    .pulse-core {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,122,24,.16), rgba(255,122,24,.03) 42%, transparent 62%);
+      border: 1px solid rgba(255,122,24,.16);
+      box-shadow: 0 0 90px rgba(255,122,24,.14);
+      animation: breathe 3s ease-in-out infinite;
+    }
+    .pulse-core::before, .pulse-core::after {
+      content: ""; position: absolute; inset: -26px; border-radius: 50%; border: 1px solid rgba(255,122,24,.1); animation: echo 3s ease-in-out infinite;
+    }
+    .pulse-core::after { inset: -52px; animation-delay: .35s; }
+    .pulse-icon {
+      position: absolute; inset: 0; display: grid; place-items: center; font-size: clamp(42px, 5vw, 60px);
+      text-shadow: 0 0 18px rgba(255,122,24,.18);
+      font-weight: 300;
+    }
 
-.problem-stage {
-position: relative; width: min(760px, 100%); height: min(360px, 38vh);
-display: grid; place-items: center;
-}
-.problem-pulse {
-width: min(250px, 36vw); aspect-ratio: 1; border-radius: 50%;
-background: radial-gradient(circle, rgba(255,255,255,.05), rgba(255,255,255,0) 58%);
-border: 1px solid rgba(255,255,255,.08);
-opacity: .35;
-}
-.problem-word {
-position: absolute; padding: 16px 22px; border-radius: 20px; border: 1px solid rgba(255,255,255,.07);
-background: rgba(18,23,36,.86); box-shadow: 0 18px 40px rgba(0,0,0,.24); font-size: 28px; letter-spacing: -.03em;
-}
-.pw1 { top: 18px; color: #ffd2d2; border-color: rgba(255,98,98,.16); }
-.pw2 { right: 60px; color: #ffe3c5; border-color: rgba(255,122,24,.14); }
-.pw3 { bottom: 22px; color: #ffd2d2; border-color: rgba(255,98,98,.16); }
+    .problem-stage {
+      position: relative; width: min(680px, 100%); height: min(300px, 34vh);
+      display: grid; place-items: center;
+    }
+    .problem-pulse {
+      width: min(220px, 32vw); aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.05), rgba(255,255,255,0) 58%);
+      border: 1px solid rgba(255,255,255,.08);
+      opacity: .35;
+    }
+    .problem-word {
+      position: absolute; padding: 14px 18px; border-radius: 18px; border: 1px solid rgba(255,255,255,.07);
+      background: rgba(18,23,36,.86); box-shadow: 0 18px 40px rgba(0,0,0,.24); font-size: 20px; letter-spacing: -.02em;
+    }
+    .pw1 { top: 18px; color: #ffd2d2; border-color: rgba(255,98,98,.16); }
+    .pw2 { right: 60px; color: #ffe3c5; border-color: rgba(255,122,24,.14); }
+    .pw3 { bottom: 22px; color: #ffd2d2; border-color: rgba(255,98,98,.16); }
 
-.solution-stage {
-width: min(960px, 100%); height: min(360px, 42vh); position: relative; display: grid; place-items: center;
-}
-.flow-label {
-position: absolute; padding: 16px 20px; border-radius: 22px; border: 1px solid rgba(255,255,255,.07); background: rgba(18,23,36,.86);
-box-shadow: 0 18px 40px rgba(0,0,0,.22); font-size: 24px; letter-spacing: -.03em;
-}
-.flow-left { left: 10%; top: 44%; transform: translateY(-50%); }
-.flow-core { left: 50%; top: 44%; transform: translate(-50%,-50%); border-color: rgba(255,122,24,.18); }
-.flow-top { right: 12%; top: 24%; }
-.flow-bottom { right: 10%; bottom: 18%; }
-.svg-flow { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .solution-stage {
+      width: min(920px, 100%); height: min(320px, 38vh); position: relative; display: grid; place-items: center;
+    }
+    .flow-label {
+      position: absolute; padding: 14px 18px; border-radius: 18px; border: 1px solid rgba(255,255,255,.07); background: rgba(18,23,36,.86);
+      box-shadow: 0 18px 40px rgba(0,0,0,.22); font-size: 20px; letter-spacing: -.02em;
+    }
+    .flow-left { left: 10%; top: 50%; transform: translateY(-50%); }
+    .flow-core { left: 50%; top: 50%; transform: translate(-50%,-50%); border-color: rgba(255,122,24,.18); }
+    .flow-top { right: 12%; top: 24%; }
+    .flow-bottom { right: 10%; bottom: 18%; }
+    .svg-flow { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-.globe-stage {
-width: min(560px, 72vw); aspect-ratio: 1; position: relative;
-}
-.globe {
-position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,.08);
-background:
-radial-gradient(circle at 35% 35%, rgba(255,122,24,.2), transparent 24%),
-radial-gradient(circle at 68% 36%, rgba(92,169,255,.15), transparent 18%),
-radial-gradient(circle at 54% 72%, rgba(139,92,246,.14), transparent 20%),
-rgba(8,12,22,.72);
-box-shadow: 0 26px 58px rgba(0,0,0,.26);
-}
-.globe::before {
-content: ""; position: absolute; inset: 0;
-background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
-background-size: 42px 42px;
-mask-image: radial-gradient(circle at center, black 70%, transparent 71%);
-animation: slowspin 18s linear infinite;
-}
-.lang-bubble {
-position: absolute; min-width: 160px; padding: 16px 18px; border-radius: 20px; border: 1px solid rgba(255,255,255,.07);
-background: rgba(18,23,36,.88); box-shadow: 0 16px 36px rgba(0,0,0,.24); text-align: left;
-}
-.lang-bubble strong { display:block; font-size: 28px; letter-spacing: -.03em; }
-.lang-bubble span { display:block; margin-top: 4px; color: var(--muted); }
-.lb1 { left: -8%; top: 26%; }
-.lb2 { right: -10%; top: 22%; }
-.lb3 { left: 2%; bottom: 16%; }
-.lb4 { right: -2%; bottom: 18%; }
+    .globe-stage {
+      width: min(500px, 64vw); aspect-ratio: 1; position: relative;
+    }
+    .globe {
+      position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(circle at 35% 35%, rgba(255,122,24,.2), transparent 24%),
+        radial-gradient(circle at 68% 36%, rgba(99,168,255,.15), transparent 18%),
+        radial-gradient(circle at 54% 72%, rgba(139,92,246,.14), transparent 20%),
+        rgba(8,12,22,.72);
+      box-shadow: 0 26px 58px rgba(0,0,0,.26);
+    }
+    .globe::before {
+      content: ""; position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, black 70%, transparent 71%);
+      animation: slowspin 18s linear infinite;
+    }
+    .lang-bubble {
+      position: absolute; min-width: 150px; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(255,255,255,.07);
+      background: rgba(18,23,36,.88); box-shadow: 0 16px 36px rgba(0,0,0,.24); text-align: left;
+    }
+    .lang-bubble strong { display:block; font-size: 22px; letter-spacing: -.02em; }
+    .lang-bubble span { display:block; margin-top: 4px; color: var(--muted); font-size: 14px; }
+    .lb1 { left: -8%; top: 26%; }
+    .lb2 { right: -10%; top: 22%; }
+    .lb3 { left: 2%; bottom: 16%; }
+    .lb4 { right: -2%; bottom: 18%; }
 
-.team-stage {
-width: min(860px, 100%); aspect-ratio: 1.1 / 1; position: relative;
-}
-.team-core {
-position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
-width: 150px; height: 150px; border-radius: 50%; border: 1px solid rgba(255,122,24,.2);
-background: radial-gradient(circle, rgba(255,122,24,.18), rgba(255,122,24,.04) 50%, transparent 70%);
-display: grid; place-items: center; font-weight: 800; letter-spacing: -.03em; box-shadow: 0 0 60px rgba(255,122,24,.14);
-}
-.orbit {
-position: absolute; left: 50%; top: 50%; width: 100%; height: 100%; transform: translate(-50%,-50%);
-animation: spin 24s linear infinite;
-}
-.agent-node {
-position: absolute; left: 50%; top: 50%; transform-origin: 0 0;
-width: 150px; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(255,255,255,.07); background: rgba(18,23,36,.88);
-box-shadow: 0 16px 36px rgba(0,0,0,.24); text-align: left;
-}
-.agent-node small { display:block; color:#ffd8b8; font-size:10px; text-transform: uppercase; letter-spacing:.08em; margin-bottom:6px; }
-.agent-node strong { display:block; font-size:22px; letter-spacing:-.03em; }
-.agent-node span { display:block; color: var(--muted); margin-top: 4px; font-size: 14px; }
-.n1 { transform: translate(-50%,-50%) rotate(0deg) translateX(290px) rotate(0deg); }
-.n2 { transform: translate(-50%,-50%) rotate(60deg) translateX(290px) rotate(-60deg); }
-.n3 { transform: translate(-50%,-50%) rotate(120deg) translateX(290px) rotate(-120deg); }
-.n4 { transform: translate(-50%,-50%) rotate(180deg) translateX(290px) rotate(-180deg); }
-.n5 { transform: translate(-50%,-50%) rotate(240deg) translateX(290px) rotate(-240deg); }
-.n6 { transform: translate(-50%,-50%) rotate(300deg) translateX(290px) rotate(-300deg); }
+    .team-stage {
+      width: min(820px, 100%); aspect-ratio: 1.1 / 1; position: relative;
+    }
+    .team-core {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+      width: 130px; height: 130px; border-radius: 50%; border: 1px solid rgba(255,122,24,.2);
+      background: radial-gradient(circle, rgba(255,122,24,.18), rgba(255,122,24,.04) 50%, transparent 70%);
+      display: grid; place-items: center; font-weight: 700; letter-spacing: -.02em; box-shadow: 0 0 60px rgba(255,122,24,.14);
+      font-size: 18px;
+    }
+    .orbit {
+      position: absolute; left: 50%; top: 50%; width: 100%; height: 100%; transform: translate(-50%,-50%);
+      animation: spin 24s linear infinite;
+    }
+    .agent-node {
+      position: absolute; left: 50%; top: 50%; transform-origin: 0 0;
+      width: 140px; padding: 12px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,.07); background: rgba(18,23,36,.88);
+      box-shadow: 0 16px 36px rgba(0,0,0,.24); text-align: left;
+    }
+    .agent-node small { display:block; color:#ffd8b8; font-size:10px; text-transform: uppercase; letter-spacing:.08em; margin-bottom:6px; }
+    .agent-node strong { display:block; font-size:18px; letter-spacing:-.02em; }
+    .agent-node span { display:block; color: var(--muted); margin-top: 4px; font-size: 13px; }
+    .n1 { transform: translate(-50%,-50%) rotate(0deg) translateX(270px) rotate(0deg); }
+    .n2 { transform: translate(-50%,-50%) rotate(60deg) translateX(270px) rotate(-60deg); }
+    .n3 { transform: translate(-50%,-50%) rotate(120deg) translateX(270px) rotate(-120deg); }
+    .n4 { transform: translate(-50%,-50%) rotate(180deg) translateX(270px) rotate(-180deg); }
+    .n5 { transform: translate(-50%,-50%) rotate(240deg) translateX(270px) rotate(-240deg); }
+    .n6 { transform: translate(-50%,-50%) rotate(300deg) translateX(270px) rotate(-300deg); }
 
-.steps-stage {
-width: min(1120px, 100%); display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
-}
-.step {
-border-radius: 30px; border: 1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(18,23,36,.9), rgba(10,14,22,.94));
-padding: 28px; min-height: 250px; text-align: left; box-shadow: 0 18px 44px rgba(0,0,0,.24); position: relative; overflow: hidden;
-}
-.step::before {
-content: ""; position: absolute; right: -25px; bottom: -25px; width: 120px; height: 120px; border-radius: 50%;
-background: radial-gradient(circle, rgba(255,122,24,.16), transparent 62%);
-}
-.step-badge { display:inline-flex; padding:8px 14px; border-radius:999px; border:1px solid rgba(255,122,24,.22); background:rgba(255,122,24,.08); color:#ffd8b8; font-size:12px; text-transform:uppercase; letter-spacing:.09em; }
-.step strong { display:block; margin-top:18px; font-size:32px; letter-spacing:-.04em; }
-.step span { display:block; margin-top:10px; color:var(--muted); line-height:1.6; font-size:18px; }
+    .steps-stage {
+      width: min(1020px, 100%); display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    }
+    .step {
+      border-radius: 28px; border: 1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(18,23,36,.9), rgba(10,14,22,.94));
+      padding: 24px; min-height: 220px; text-align: left; box-shadow: 0 18px 44px rgba(0,0,0,.24); position: relative; overflow: hidden;
+    }
+    .step::before {
+      content: ""; position: absolute; right: -25px; bottom: -25px; width: 120px; height: 120px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,122,24,.16), transparent 62%);
+    }
+    .step-badge { display:inline-flex; padding:8px 14px; border-radius:999px; border:1px solid rgba(255,122,24,.22); background:rgba(255,122,24,.08); color:#ffd8b8; font-size:11px; text-transform:uppercase; letter-spacing:.09em; }
+    .step strong { display:block; margin-top:16px; font-size:24px; letter-spacing:-.03em; }
+    .step span { display:block; margin-top:10px; color:var(--muted); line-height:1.6; font-size:16px; }
 
-.dashboard-stage {
-width: min(1140px, 100%); height: min(560px, 56vh); border-radius: 34px; overflow: hidden; border:1px solid rgba(255,255,255,.08);
-background: linear-gradient(180deg, rgba(12,17,28,.94), rgba(9,13,21,.98)); box-shadow: 0 24px 54px rgba(0,0,0,.3); display:grid; grid-template-columns:280px 1fr;
-}
-.dash-side { padding:18px; background: rgba(255,255,255,.025); border-right:1px solid rgba(255,255,255,.06); display:grid; gap:12px; align-content:start; }
-.dash-nav { padding:14px 16px; border-radius:16px; background:rgba(255,255,255,.025); color:var(--muted); }
-.dash-nav.active { background: rgba(255,122,24,.1); color:#ffd8b8; border:1px solid rgba(255,122,24,.18); }
-.dash-main { padding:18px; display:grid; gap:16px; align-content:start; }
-.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
-.stat { border-radius:22px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.03); padding:18px; text-align:left; }
-.stat strong { display:block; font-size:18px; }
-.stat span { display:block; margin-top:8px; font-size:42px; font-weight:800; letter-spacing:-.05em; }
-.insights { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-.insight { border-radius:22px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.03); padding:18px; text-align:left; }
-.insight strong { display:block; font-size:20px; margin-bottom:10px; }
-.insight div { color:var(--muted); line-height:1.6; margin-top:8px; font-size:16px; }
+    .dashboard-stage {
+      width: min(1080px, 100%); height: min(500px, 52vh); border-radius: 30px; overflow: hidden; border:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(12,17,28,.94), rgba(9,13,21,.98)); box-shadow: 0 24px 54px rgba(0,0,0,.3); display:grid; grid-template-columns:260px 1fr;
+    }
+    .dash-side { padding:18px; background: rgba(255,255,255,.025); border-right:1px solid rgba(255,255,255,.06); display:grid; gap:12px; align-content:start; }
+    .dash-nav { padding:14px 16px; border-radius:16px; background:rgba(255,255,255,.025); color:var(--muted); font-size:14px; }
+    .dash-nav.active { background: rgba(255,122,24,.1); color:#ffd8b8; border:1px solid rgba(255,122,24,.18); }
+    .dash-main { padding:18px; display:grid; gap:16px; align-content:start; }
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+    .stat { border-radius:20px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.03); padding:16px; text-align:left; }
+    .stat strong { display:block; font-size:15px; }
+    .stat span { display:block; margin-top:8px; font-size:32px; font-weight:800; letter-spacing:-.05em; }
+    .insights { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .insight { border-radius:20px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.03); padding:16px; text-align:left; }
+    .insight strong { display:block; font-size:18px; margin-bottom:10px; }
+    .insight div { color:var(--muted); line-height:1.6; margin-top:8px; font-size:15px; }
 
-.pricing-stage {
-width: min(1120px, 100%); display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
-}
-.price {
-border-radius:30px; border:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(18,23,36,.92), rgba(10,14,22,.96));
-padding:28px; min-height:320px; text-align:left; box-shadow:0 18px 42px rgba(0,0,0,.24); position:relative; overflow:hidden;
-}
-.price::before { content:""; position:absolute; right:-20px; top:-20px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle, rgba(255,122,24,.16), transparent 62%); }
-.price strong { display:block; font-size:30px; letter-spacing:-.03em; }
-.money { margin-top:14px; display:flex; align-items:end; gap:10px; }
-.now { font-size:56px; font-weight:800; letter-spacing:-.05em; }
-.old { color:#7c879b; text-decoration:line-through; font-size:24px; }
-.mins { margin-top:8px; color:#dfe7ff; font-size:21px; }
-.price ul { margin:18px 0 0; padding-left:20px; color:var(--muted); line-height:1.7; font-size:17px; }
+    .pricing-stage {
+      width: min(1040px, 100%); display:grid; grid-template-columns:repeat(3,1fr); gap:18px;
+    }
+    .price {
+      border-radius:28px; border:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(18,23,36,.92), rgba(10,14,22,.96));
+      padding:24px; min-height:290px; text-align:left; box-shadow:0 18px 42px rgba(0,0,0,.24); position:relative; overflow:hidden;
+    }
+    .price::before { content:""; position:absolute; right:-20px; top:-20px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle, rgba(255,122,24,.16), transparent 62%); }
+    .price strong { display:block; font-size:24px; letter-spacing:-.02em; }
+    .money { margin-top:12px; display:flex; align-items:end; gap:10px; }
+    .now { font-size:42px; font-weight:800; letter-spacing:-.05em; }
+    .old { color:#7c879b; text-decoration:line-through; font-size:18px; }
+    .mins { margin-top:8px; color:#dfe7ff; font-size:17px; }
+    .price ul { margin:16px 0 0; padding-left:18px; color:var(--muted); line-height:1.65; font-size:15px; }
 
-.cta-stage {
-width: min(760px, 100%); display:grid; gap:18px; justify-items:center;
-}
-.cta-pulse {
-width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(255,122,24,.14), rgba(255,122,24,.02) 50%, transparent 70%);
-border:1px solid rgba(255,122,24,.12); box-shadow:0 0 70px rgba(255,122,24,.1);
-}
-.cta-row { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+    .beta-stage {
+      width: min(560px, 100%);
+    }
+    .beta-card {
+      border-radius: 30px; border: 1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(18,23,36,.92), rgba(10,14,22,.96));
+      padding: 30px; box-shadow: 0 18px 42px rgba(0,0,0,.24); text-align: center; position: relative; overflow: hidden;
+    }
+    .beta-card::before {
+      content: ""; position: absolute; inset: auto -60px -60px auto; width: 180px; height: 180px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,122,24,.18), transparent 62%);
+    }
+    .beta-card strong { display:block; font-size: 22px; letter-spacing:-.02em; }
+    .beta-price { margin-top: 14px; font-size: 64px; font-weight: 800; letter-spacing: -.06em; }
+    .beta-mins { margin-top: 4px; color: #e7edff; font-size: 18px; }
+    .beta-card ul { margin: 20px 0 0; padding-left: 20px; text-align: left; color: var(--muted); line-height: 1.75; font-size: 15px; }
 
-@keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.035); } }
-@keyframes echo { 0%,100% { opacity:.12; transform: scale(1); } 50% { opacity:.04; transform: scale(1.06); } }
-@keyframes slowspin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes spin { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+    .cta-stage {
+      width: min(760px, 100%); display:grid; gap:18px; justify-items:center;
+    }
+    .cta-pulse {
+      width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(255,122,24,.14), rgba(255,122,24,.02) 50%, transparent 70%);
+      border:1px solid rgba(255,122,24,.12); box-shadow:0 0 70px rgba(255,122,24,.1);
+    }
+    .cta-row { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
 
-@media (max-width: 1100px) {
-.steps-stage, .pricing-stage, .stats, .insights { grid-template-columns: 1fr 1fr; }
-.dashboard-stage { grid-template-columns: 1fr; height: auto; }
-.dash-side { grid-template-columns: repeat(3,1fr); }
-.agent-node { width: 132px; }
-.n1,.n2,.n3,.n4,.n5,.n6 { transform-origin: 0 0; }
-}
+    @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+    @keyframes echo { 0%,100% { opacity:.12; transform: scale(1); } 50% { opacity:.04; transform: scale(1.06); } }
+    @keyframes slowspin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes spin { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
 
-@media (max-width: 760px) {
-body { overflow: auto; }
-.app { width: 100%; height: auto; min-height: 100vh; margin: 0; border-radius: 0; border-left: 0; border-right: 0; }
-.topbar { padding: 16px; }
-.progress { top: 74px; }
-.scene { min-height: 100vh; padding: 122px 18px 110px; }
-.nav { left: 16px; right: 16px; }
-.steps-stage, .pricing-stage, .stats, .insights, .dash-side { grid-template-columns: 1fr; }
-.dashboard-stage { width: 100%; }
-.problem-word { position: static; }
-.problem-stage { display: grid; gap: 12px; height: auto; }
-.solution-stage { height: 340px; }
-.flow-left { left: 4%; } .flow-top { right: 4%; } .flow-bottom { right: 2%; }
-.globe-stage { width: min(360px, 88vw); }
-.lang-bubble { position: static; margin: 8px auto; }
-.team-stage { width: 100%; aspect-ratio: auto; min-height: 520px; }
-.agent-node { width: 126px; font-size: 12px; }
-.n1 { transform: translate(-50%,-50%) rotate(0deg) translateX(160px) rotate(0deg); }
-.n2 { transform: translate(-50%,-50%) rotate(60deg) translateX(160px) rotate(-60deg); }
-.n3 { transform: translate(-50%,-50%) rotate(120deg) translateX(160px) rotate(-120deg); }
-.n4 { transform: translate(-50%,-50%) rotate(180deg) translateX(160px) rotate(-180deg); }
-.n5 { transform: translate(-50%,-50%) rotate(240deg) translateX(160px) rotate(-240deg); }
-.n6 { transform: translate(-50%,-50%) rotate(300deg) translateX(160px) rotate(-300deg); }
-}
-</style>
+    @media (max-width: 1100px) {
+      .steps-stage, .pricing-stage, .stats, .insights { grid-template-columns: 1fr 1fr; }
+      .dashboard-stage { grid-template-columns: 1fr; height: auto; }
+      .dash-side { grid-template-columns: repeat(3,1fr); }
+      .agent-node { width: 126px; }
+    }
+
+    @media (max-width: 760px) {
+      body { overflow: auto; }
+      .app { width: 100%; height: auto; min-height: 100vh; margin: 0; border-radius: 0; border-left: 0; border-right: 0; }
+      .topbar { padding: 16px; }
+      .progress { top: 74px; }
+      .scene { min-height: 100vh; padding: 122px 18px 110px; }
+      .nav { left: 16px; right: 16px; }
+      .steps-stage, .pricing-stage, .stats, .insights, .dash-side { grid-template-columns: 1fr; }
+      .dashboard-stage { width: 100%; }
+      .problem-word { position: static; }
+      .problem-stage { display: grid; gap: 12px; height: auto; }
+      .solution-stage { height: 320px; }
+      .flow-left { left: 4%; } .flow-top { right: 4%; } .flow-bottom { right: 2%; }
+      .globe-stage { width: min(360px, 88vw); }
+      .lang-bubble { position: static; margin: 8px auto; }
+      .team-stage { width: 100%; aspect-ratio: auto; min-height: 500px; }
+      .agent-node { width: 118px; }
+      .n1 { transform: translate(-50%,-50%) rotate(0deg) translateX(150px) rotate(0deg); }
+      .n2 { transform: translate(-50%,-50%) rotate(60deg) translateX(150px) rotate(-60deg); }
+      .n3 { transform: translate(-50%,-50%) rotate(120deg) translateX(150px) rotate(-120deg); }
+      .n4 { transform: translate(-50%,-50%) rotate(180deg) translateX(150px) rotate(-180deg); }
+      .n5 { transform: translate(-50%,-50%) rotate(240deg) translateX(150px) rotate(-240deg); }
+      .n6 { transform: translate(-50%,-50%) rotate(300deg) translateX(150px) rotate(-300deg); }
+      .pulse-wrap { width: min(280px, 74vw); }
+    }
+  </style>
 </head>
 <body>
-<div class="app">
-<div class="ambient"></div>
+  <div class="app">
+    <div class="ambient"></div>
 
-<header class="topbar">
-<div class="brand">
-<div class="brand-mark">A</div>
-<div class="brand-copy">
-<strong>AI CALL PORT</strong>
-<span>Automated AI Call Team</span>
-</div>
-</div>
-<div class="top-tools">
-<select class="tool" aria-label="Language selector">
-<option>English</option>
-<option>Español</option>
-<option>Français</option>
-<option>Deutsch</option>
-</select>
-<button class="tool">🎧 Sound Off</button>
-</div>
-</header>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">A</div>
+        <div class="brand-copy">
+          <strong>AI CALL PORT</strong>
+          <span>Automated AI Call Team</span>
+        </div>
+      </div>
+      <div class="top-tools">
+        <select class="tool" aria-label="Language selector">
+          <option>English</option>
+          <option>Español</option>
+          <option>Français</option>
+          <option>Deutsch</option>
+        </select>
+        <button class="tool">🎧 Sound Off</button>
+      </div>
+    </header>
 
-<div class="progress" id="progress"></div>
+    <div class="progress" id="progress"></div>
 
-<main class="scene-wrap">
-<section class="scene active">
-<div class="scene-top">
-<div class="eyebrow">Intro</div>
-<h1>AI CALL PORT</h1>
-<div class="subtitle">Your Business’s Automated AI Call Team</div>
-</div>
-<div class="scene-center">
-<div class="pulse-wrap">
-<div class="pulse-core"></div>
-<div class="pulse-icon">⌁</div>
-</div>
-</div>
-<div class="scene-bottom">
-<div class="bottom-copy">You are losing calls right now.</div>
-</div>
-</section>
+    <main class="scene-wrap">
+      <section class="scene active">
+        <div class="scene-top">
+          <div class="eyebrow">Intro</div>
+          <h1>AI Call Port</h1>
+          <div class="subtitle">We build and operate your automated AI call system.</div>
+        </div>
+        <div class="scene-center">
+          <div class="pulse-wrap">
+            <div class="pulse-core"></div>
+            <div class="pulse-icon">⌁</div>
+          </div>
+        </div>
+        <div class="scene-bottom">
+          <div class="bottom-copy">Your business responds to every call. 24/7.</div>
+        </div>
+      </section>
 
-<section class="scene">
-<div class="scene-top">
-<div class="eyebrow">The Problem</div>
-<h2>Missed calls cost you customers.</h2>
-</div>
-<div class="scene-center">
-<div class="problem-stage">
-<div class="problem-pulse"></div>
-<div class="problem-word pw1">Missed Call</div>
-<div class="problem-word pw2">After Hours</div>
-<div class="problem-word pw3">Customer Left</div>
-</div>
-</div>
-<div class="scene-bottom">
-<div class="bottom-copy">Customers call when you are busy or closed.</div>
-</div>
-</section>
+      <section class="scene">
+        <div class="scene-top">
+          <div class="eyebrow">The Problem</div>
+          <h2>Most businesses miss calls.</h2>
+        </div>
+        <div class="scene-center">
+          <div class="problem-stage">
+            <div class="problem-pulse"></div>
+            <div class="problem-word pw1">Missed Call</div>
+            <div class="problem-word pw2">After Hours</div>
+            <div class="problem-word pw3">Customer Left</div>
+          </div>
+        </div>
+        <div class="scene-bottom">
+          <div class="bottom-copy">After hours. During busy hours. When it matters most.</div>
+        </div>
+      </section>
 
-<section class="scene">
-<div class="scene-top">
-<div class="eyebrow">The Solution</div>
-<h2>AI Call Port handles every call automatically.</h2>
-</div>
-<div class="scene-center">
-<div class="solution-stage">
-<svg class="svg-flow" viewBox="0 0 1000 420" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-<path d="M230 210H450" stroke="url(#g1)" stroke-width="4" stroke-linecap="round"/>
-<path d="M550 210H760" stroke="url(#g2)" stroke-width="4" stroke-linecap="round"/>
-<path d="M550 210C680 210 700 110 780 110" stroke="url(#g2)" stroke-width="4" stroke-linecap="round"/>
-<path d="M550 210C680 210 700 300 780 300" stroke="url(#g2)" stroke-width="4" stroke-linecap="round"/>
-<defs>
-<linearGradient id="g1" x1="230" y1="210" x2="450" y2="210" gradientUnits="userSpaceOnUse">
-<stop stop-color="#5CA9FF"/>
-<stop offset="1" stop-color="#FF7A18"/>
-</linearGradient>
-<linearGradient id="g2" x1="550" y1="210" x2="780" y2="210" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FF7A18"/>
-<stop offset="1" stop-color="#FFB347"/>
-</linearGradient>
-</defs>
-</svg>
-<div class="flow-label flow-left">Call</div>
-<div class="flow-label flow-core">AI</div>
-<div class="flow-label flow-top">Lead</div>
-<div class="flow-label flow-bottom">Booking</div>
-</div>
-</div>
-<div class="scene-bottom">
-<div class="bottom-copy">No missed calls. No lost customers.</div>
-</div>
-</section>
+      <section class="scene">
+        <div class="scene-top">
+          <div class="eyebrow">The System</div>
+          <h2>We build a complete AI call system for your business.</h2>
+        </div>
+        <div class="scene-center">
+          <div class="solution-stage">
+            <svg class="svg-flow" viewBox="0 0 1000 420" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M230 210H450" stroke="url(#g1)" stroke-width="4" stroke-linecap="round"/>
+              <path d="M550 210H760" stroke="url(#g2)" stroke-width="4" stroke-linecap="round"/>
+              <path d="M550 210C680 210 700 110 780 110" stroke="url(#g2)" stroke-width="4" stroke-linecap="round"/>
+              <path d="M550 210C680 210 700 300 780 300" stroke="url(#g2)" stroke-width="4" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="g1" x1="230" y1="210" x2="450" y2="210" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#63A8FF"/>
+                  <stop offset="1" stop-color="#FF7A18"/>
+                </linearGradient>
+                <linearGradient id="g2" x1="550" y1="210" x2="780" y2="210" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#FF7A18"/>
+                  <stop offset="1" stop-color="#FFB347"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="flow-label flow-left">Call</div>
+            <div class="flow-label flow-core">AI</div>
+            <div class="flow-label flow-top">Lead</div>
+            <div class="flow-label flow-bottom">Booking</div>
+          </div>
+        </div>
+        <div class="scene-bottom">
+          <div class="bottom-copy">Configured for your industry, schedule, and workflow.</div>
+        </div>
+      </section>
 
-<section class="scene">
-<div class="scene-top">
-<div class="eyebrow">Global Languages</div>
-<h2>Serve every customer in their language.</h2>
-</div>
-<div class="scene-center">
-<div class="globe-stage">
-<div class="globe"></div>
-<div class="lang-bubble lb1"><strong>Hello</strong><span>English</span></div>
-<div class="lang-bubble lb2"><strong>Hola</strong><span>Spanish</span></div>
-<div class="lang-bubble lb3"><strong>Bonjour</strong><span>French</span></div>
-<div class="lang-bubble lb4"><strong>Guten Tag</strong><span>German</span></div>
-</div>
-</div>
-<div class="scene-bottom">
-<div class="bottom-copy">Your system adapts automatically.</div>
-</div>
-</section>
+      <section class="scene">
+        <div class="scene-top">
+          <div class="eyebrow">Global Coverage</div>
+          <h2>Serve every customer in their language.</h2>
+        </div>
+        <div class="scene-center">
+          <div class="globe-stage">
+            <div class="globe"></div>
+            <div class="lang-bubble lb1"><strong>Hello</strong><span>English</span></div>
+            <div class="lang-bubble lb2"><strong>Hola</strong><span>Spanish</span></div>
+            <div class="lang-bubble lb3"><strong>Bonjour</strong><span>French</span></div>
+            <div class="lang-bubble lb4"><strong>Guten Tag</strong><span>German</span></div>
+          </div>
+        </div>
+        <div class="scene-bottom">
+          <div class="bottom-copy">Global coverage across 75 active countries with full language support.</div>
+        </div>
+      </section>
 
-<section class="scene">
-<div class="scene-top">
-<div class="eyebrow">Your AI Team</div>
-<h2>Meet your AI call team.</h2>
-</div>
-<div class="scene-center">
-<div class="team-stage">
-<div class="team-core">AI Team</div>
-<div class="orbit">
-<div class="agent-node n1"><small>Reception</small><strong>CallGuard</strong><span>Answers calls</span></div>
-<div class="agent-node n2"><small>Lead Qualification</small><strong>LeadFlow</strong><span>Captures needs</span></div>
-<div class="agent-node n3"><small>Scheduling</small><strong>BookEasy</strong><span>Books appointments</span></div>
-<div class="agent-node n4"><small>After Hours</small><strong>NightDesk</strong><span>Handles closed-hour calls</span></div>
-<div class="agent-node n5"><small>Emergency</small><strong>UrgentLine</strong><span>Escalates urgent issues</span></div>
-<div class="agent-node n6"><small>Follow-Up</small><strong>FollowPro</strong><span>Reconnects with leads</span></div>
-</div>
-</div>
-</div>
-<div class="scene-bottom">
-<div class="bottom-copy">12 specialized AI agents work together automatically.</div>
-</div>
-</section>
+      <section class="scene">
+        <div class="scene-top">
+          <div class="eyebrow">AI Team</div>
+          <h2>A team of 12 AI agents works for you.</h2>
+        </div>
+        <div class="scene-center">
+          <div class="team-stage">
+            <div class="team-core">AI Team</div>
+            <div class="orbit">
+              <div class="agent-node n1"><small>Reception</small><strong>CallGuard</strong><span>Answers calls</span></div>
+              <div class="agent-node n2"><small>Lead Qualification</small><strong>LeadFlow</strong><span>Captures needs</span></div>
+              <div class="agent-node n3"><small>Scheduling</small><strong>BookEasy</strong><span>Books appointments</span></div>
+              <div class="agent-node n4"><small>After Hours</small><strong>NightDesk</strong><span>Handles closed-hour calls</span></div>
+              <div class="agent-node n5"><small>Emergency</small><strong>UrgentLine</strong><span>Escalates urgent issues</span></div>
+              <div class="agent-node n6"><small>Follow-Up</small><strong>FollowPro</strong><span>Reconnects with leads</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="scene-bottom">
+          <div class="bottom-copy">All agents work together and automatically switch depending on the situation.</div>
+        </div>
+      </section>
 
-<section class="scene">
-<div class="scene-top">
-<div class="eyebrow">3-Step Activation</div>
-<h2>Getting started is simple.</h2>
-</div>
-<div class="scene-center">
-<div class="steps-stage">
-<div class="step"><div class="step-badge">Step 1</div><strong>System Configuration</strong><span>You answer a few questions</span></div>
-<div class="step"><div class="step-badge">Step 2</div><strong>Demo & Confirm</strong><span>You test your system</span></div>
-<div class="step"><div class="step-badge">Step 3</div><strong>Activate</strong><span>You go live</span></div>
-</div>
-</div>
-<div class="scene-bottom">
-<div class="bottom-copy">We build the system for you.</div>
-</div>
-</section>
+      <section class="scene">
+        <div class="scene-top">
+          <div class="eyebrow">Managed System</div>
+          <h2>We operate and improve your system.</h2>
+        </div>
+        <div class="scene-center">
+          <div class="solution-stage" style="height:min(280px,34vh);">
+            <svg class="svg-flow" viewBox="0 0 1000 320" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M220 160H460" stroke="url(#g3)" stroke-width="4" stroke-linecap="round"/>
+              <path d="M540 160H780" stroke="url(#g4)" stroke-width="4" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="g3" x1="220" y1="160" x2="460" y2="160" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#63A8FF"/>
+                  <stop offset="1" stop-color="#FF7A18"/>
+                </linearGradient>
+                <linearGradient id="g4" x1="540" y1="160" x2="780" y2="160" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#FF7A18"/>
+                  <stop offset="1" stop-color="#8B5CF6"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="flow-label flow-left">Calls</div>
+            <div class="flow-label flow-core">Analysis</div>
+            <div class="flow-label flow-top" style="top:18%;">Reports</div>
+            <div class="flow-label flow-bottom" style="bottom:16%;">Optimization</div>
+          </div>
+        </div>
+        <div class="scene-bottom">
+          <div class="bottom-copy">Monthly optimization, business analysis, reports, and performance suggestions.</div>
+        </div>
+      </section>
 
-<section class="scene">
-<div class="scene-top">
-<div class="eyebrow">Dashboard Preview</div>
-<h2>Your business call command center.</h2>
-</div>
-<div class="scene-center">
-<div class="dashboard-stage">
-<div class="dash-side">
-<div class="dash-nav active">Dashboard</div>
-<div class="dash-nav">AI System</div>
-<div class="dash-nav">Calls & CRM</div>
-<div class="dash-nav">Analytics</div>
-<div class="dash-nav">Billing</div>
-</div>
-<div class="dash-main">
-<div class="stats">
-<div class="stat"><strong>Calls Today</strong><span>27</span></div>
-<div class="stat"><strong>Leads</strong><span>8</span></div>
-<div class="stat"><strong>Bookings</strong><span>5</span></div>
-<div class="stat"><strong>AI Insight</strong><span>3</span></div>
-</div>
-<div class="insights">
-<div class="insight"><strong>Recent Activity</strong><div>Lead captured</div><div>Appointment booked</div><div>Follow-up queued</div></div>
-<div class="insight"><strong>AI Recommendation</strong><div>Enable after-hours booking</div><div>Estimated +18% more appointments</div></div>
-</div>
-</div>
-</div>
-</div>
-<div class="scene-bottom">
-<div class="bottom-copy">Calls, leads, and AI insights — all in one place.</div>
-</div>
-</section>
+      <section class="scene">
+        <div class="scene-top">
+          <div class="eyebrow">Built-In Benefits</div>
+          <h2>Built-in CRM and analytics are included.</h2>
+        </div>
+        <div class="scene-center">
+          <div class="dashboard-stage">
+            <div class="dash-side">
+              <div class="dash-nav active">Dashboard</div>
+              <div class="dash-nav">AI System</div>
+              <div class="dash-nav">Calls & CRM</div>
+              <div class="dash-nav">Analytics</div>
+              <div class="dash-nav">Referrals</div>
+            </div>
+            <div class="dash-main">
+              <div class="stats">
+                <div class="stat"><strong>Calls Today</strong><span>27</span></div>
+                <div class="stat"><strong>Leads</strong><span>8</span></div>
+                <div class="stat"><strong>Bookings</strong><span>5</span></div>
+                <div class="stat"><strong>Reports</strong><span>1</span></div>
+              </div>
+              <div class="insights">
+                <div class="insight"><strong>Stored Automatically</strong><div>Calls</div><div>Recordings</div><div>Customer history</div></div>
+                <div class="insight"><strong>Additional Benefit</strong><div>Built-in referral system</div><div>Recurring credit opportunity</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="scene-bottom">
+          <div class="bottom-copy">Every interaction is saved and ready for management, reporting, and growth.</div>
+        </div>
+      </section>
 
-<section class="scene">
-<div class="scene-top">
-<div class="eyebrow">Pricing</div>
-<h2>Simple monthly pricing.</h2>
-</div>
-<div class="scene-center">
-<div class="pricing-stage">
-<div class="price"><strong>Starter</strong><div class="money"><span class="now">$299</span><span class="old">$499</span></div><div class="mins">1000 minutes</div><ul><li>Full AI team included</li><li>CRM included</li></ul></div>
-<div class="price"><strong>Growth</strong><div class="money"><span class="now">$599</span><span class="old">$999</span></div><div class="mins">2200 minutes</div><ul><li>Full AI team included</li><li>CRM included</li></ul></div>
-<div class="price"><strong>Scale</strong><div class="money"><span class="now">$899</span><span class="old">$1499</span></div><div class="mins">3500 minutes</div><ul><li>Full AI team included</li><li>CRM included</li></ul></div>
-</div>
-</div>
-<div class="scene-bottom">
-<div class="bottom-copy">All plans include the full AI system. Only minutes differ.</div>
-</div>
-</section>
+      <section class="scene">
+        <div class="scene-top">
+          <div class="eyebrow">3-Step Activation</div>
+          <h2>You activate everything in 3 simple steps.</h2>
+        </div>
+        <div class="scene-center">
+          <div class="steps-stage">
+            <div class="step"><div class="step-badge">Step 1</div><strong>System Configuration</strong><span>We generate your custom AI call team in minutes.</span></div>
+            <div class="step"><div class="step-badge">Step 2</div><strong>Demo + Confirm</strong><span>Test your system before it goes live.</span></div>
+            <div class="step"><div class="step-badge">Step 3</div><strong>Activate</strong><span>Your business responds 24/7.</span></div>
+          </div>
+        </div>
+        <div class="scene-bottom">
+          <div class="bottom-copy">The process is fully automatic. We handle the rest.</div>
+        </div>
+      </section>
 
-<section class="scene">
-<div class="scene-top">
-<div class="eyebrow">Final Step</div>
-<h2>Build your AI call system.</h2>
-</div>
-<div class="scene-center">
-<div class="cta-stage">
-<div class="cta-pulse"></div>
-<div class="subtitle" style="font-size:clamp(22px,2.2vw,30px); margin-top:0;">It takes less than a minute to get started.</div>
-<div class="cta-row">
-<a class="btn btn-primary" href="#">Enter the System</a>
-<a class="btn" href="#">Preview Dashboard</a>
-<a class="btn" href="#">Ask AI</a>
-</div>
-</div>
-</div>
-<div class="scene-bottom">
-<div class="bottom-copy">No contracts. Pay monthly. Cancel anytime.</div>
-</div>
-</section>
-</main>
+      <section class="scene">
+        <div class="scene-top">
+          <div class="eyebrow">Beta Pricing</div>
+          <h2>Beta pricing is currently available.</h2>
+        </div>
+        <div class="scene-center">
+          <div class="beta-stage">
+            <div class="beta-card">
+              <strong>Full AI System</strong>
+              <div class="beta-price">$299</div>
+              <div class="beta-mins">per month · 1000 minutes included</div>
+              <ul>
+                <li>Complete AI agent team included</li>
+                <li>Price locked for 2 years</li>
+                <li>No contract · cancel anytime</li>
+                <li>Referral credits available</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="scene-bottom">
+          <div class="bottom-copy">Limited phase while we expand the platform. We grow together.</div>
+        </div>
+      </section>
 
-<nav class="nav">
-<div class="nav-left">
-<button class="btn btn-ghost" id="prevBtn">← Previous</button>
-</div>
-<div class="nav-right">
-<button class="btn" id="skipBtn">Skip → Enter System</button>
-<button class="btn btn-primary" id="nextBtn">Next →</button>
-</div>
-</nav>
-</div>
+      <section class="scene">
+        <div class="scene-top">
+          <div class="eyebrow">Final Step</div>
+          <h2>Activate your AI team.</h2>
+        </div>
+        <div class="scene-center">
+          <div class="cta-stage">
+            <div class="cta-pulse"></div>
+            <div class="subtitle" style="font-size:clamp(18px,1.8vw,24px); margin-top:0;">It takes less than a minute to get started.</div>
+            <div class="cta-row">
+              <a class="btn btn-primary" href="#">Enter the System</a>
+              <a class="btn" href="#">Preview Dashboard</a>
+              <a class="btn" href="#">Ask AI</a>
+            </div>
+          </div>
+        </div>
+        <div class="scene-bottom">
+          <div class="bottom-copy">No contracts. Pay monthly. Cancel anytime.</div>
+        </div>
+      </section>
+    </main>
 
-<script>
-const scenes = [...document.querySelectorAll('.scene')];
-const progress = document.getElementById('progress');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const skipBtn = document.getElementById('skipBtn');
-let current = 0;
+    <nav class="nav">
+      <div class="nav-left">
+        <button class="btn btn-ghost" id="prevBtn">← Previous</button>
+      </div>
+      <div class="nav-right">
+        <button class="btn" id="skipBtn">Skip → Enter System</button>
+        <button class="btn btn-primary" id="nextBtn">Next →</button>
+      </div>
+    </nav>
+  </div>
 
-scenes.forEach((_, i) => {
-const dot = document.createElement('span');
-dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
-progress.appendChild(dot);
-});
+  <script>
+    const scenes = [...document.querySelectorAll('.scene')];
+    const progress = document.getElementById('progress');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const skipBtn = document.getElementById('skipBtn');
+    let current = 0;
 
-function updateScene() {
-scenes.forEach((scene, i) => scene.classList.toggle('active', i === current));
-[...progress.children].forEach((dot, i) => dot.classList.toggle('active', i === current));
-prevBtn.style.visibility = current === 0 ? 'hidden' : 'visible';
-nextBtn.textContent = current === scenes.length - 1 ? 'Enter the System →' : 'Next →';
-}
+    scenes.forEach((_, i) => {
+      const dot = document.createElement('span');
+      dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
+      progress.appendChild(dot);
+    });
 
-prevBtn.addEventListener('click', () => {
-if (current > 0) {
-current -= 1;
-updateScene();
-}
-});
+    function updateScene() {
+      scenes.forEach((scene, i) => scene.classList.toggle('active', i === current));
+      [...progress.children].forEach((dot, i) => dot.classList.toggle('active', i === current));
+      prevBtn.style.visibility = current === 0 ? 'hidden' : 'visible';
+      nextBtn.textContent = current === scenes.length - 1 ? 'Enter the System →' : 'Next →';
+    }
 
-nextBtn.addEventListener('click', () => {
-if (current < scenes.length - 1) {
-current += 1;
-updateScene();
-} else {
-window.location.href = '/analysis';
-}
-});
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current -= 1;
+        updateScene();
+      }
+    });
 
-skipBtn.addEventListener('click', () => {
-window.location.href = '/analysis';
-});
+    nextBtn.addEventListener('click', () => {
+      if (current < scenes.length - 1) {
+        current += 1;
+        updateScene();
+      } else {
+        window.location.href = '/analysis';
+      }
+    });
 
-updateScene();
-</script>
+    skipBtn.addEventListener('click', () => {
+      window.location.href = '/analysis';
+    });
+
+    updateScene();
+  </script>
 </body>
 </html>
-
