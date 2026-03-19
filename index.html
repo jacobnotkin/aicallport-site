@@ -3,165 +3,1260 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Call Port - Step 1</title>
+<title>AI Call Port — Step 1 System Configuration</title>
 <script src="https://cdn.tailwindcss.com"></script>
-
 <style>
+:root {
+--bg-1: #040816;
+--bg-2: #09132d;
+--bg-3: #0f1d45;
+--panel: rgba(255,255,255,0.06);
+--panel-strong: rgba(255,255,255,0.10);
+--line: rgba(255,255,255,0.10);
+--line-strong: rgba(255,255,255,0.22);
+--text: #f8fbff;
+--muted: rgba(225,232,255,0.74);
+--muted-2: rgba(225,232,255,0.52);
+--blue: #5d8cff;
+--purple: #8b5cf6;
+--teal: #2dd4bf;
+--green: #22c55e;
+--shadow: 0 30px 80px rgba(0,0,0,0.32);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
 body {
-background: radial-gradient(circle at 20% 20%, #1e3a8a, #020617);
-color: white;
-font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+margin: 0;
+color: var(--text);
 overflow-x: hidden;
+font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+background:
+radial-gradient(circle at 18% 15%, rgba(93,140,255,0.18), transparent 24%),
+radial-gradient(circle at 84% 18%, rgba(139,92,246,0.14), transparent 22%),
+radial-gradient(circle at 50% 90%, rgba(45,212,191,0.08), transparent 26%),
+linear-gradient(180deg, var(--bg-3) 0%, var(--bg-2) 34%, var(--bg-1) 100%);
 }
 
-.section {
-opacity: 0;
-transform: translateY(20px);
-transition: all 0.5s ease;
+.bg-grid,
+.bg-orbs,
+.bg-stars {
+position: fixed;
+inset: 0;
+pointer-events: none;
 }
 
-.section.active {
-opacity: 1;
-transform: translateY(0);
+.bg-grid {
+background:
+linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+background-size: 44px 44px;
+mask-image: radial-gradient(circle at center, black 42%, transparent 95%);
+opacity: .56;
 }
 
-.card {
-border: 1px solid rgba(255,255,255,0.1);
-border-radius: 14px;
-padding: 16px;
-cursor: pointer;
-transition: 0.2s;
+.bg-orbs::before,
+.bg-orbs::after {
+content: "";
+position: absolute;
+border-radius: 999px;
+filter: blur(86px);
+opacity: .34;
+animation: drift 16s ease-in-out infinite alternate;
 }
 
-.card:hover {
-border-color: rgba(255,255,255,0.4);
+.bg-orbs::before {
+width: 360px;
+height: 360px;
+left: -90px;
+top: 8%;
+background: rgba(93,140,255,.24);
 }
 
-.selected {
-border-color: #4f46e5;
-background: rgba(79,70,229,0.15);
+.bg-orbs::after {
+width: 300px;
+height: 300px;
+right: -40px;
+top: 18%;
+background: rgba(139,92,246,.18);
+animation-delay: 1.6s;
 }
 
-input {
-background: rgba(255,255,255,0.05);
-border: 1px solid rgba(255,255,255,0.2);
-border-radius: 12px;
-padding: 14px;
+.bg-stars span {
+position: absolute;
+width: 2px;
+height: 2px;
+border-radius: 999px;
+background: rgba(255,255,255,.45);
+box-shadow: 0 0 10px rgba(255,255,255,.4);
+animation: twinkle 4s ease-in-out infinite;
+}
+
+.shell {
+position: relative;
+z-index: 1;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+padding: 22px 28px 28px;
+}
+
+.topbar {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 20px;
+margin-bottom: 10px;
+}
+
+.brand {
+display: inline-flex;
+align-items: center;
+gap: 10px;
+font-size: 15px;
+font-weight: 700;
+letter-spacing: -.03em;
+color: rgba(242,247,255,.97);
+}
+
+.brand-mark {
+width: 28px;
+height: 28px;
+border-radius: 10px;
+background: linear-gradient(180deg, #8bb5ff 0%, #5d8cff 100%);
+box-shadow: 0 10px 28px rgba(93,140,255,.34);
+}
+
+.progress-wrap {
+display: flex;
+align-items: center;
+gap: 14px;
+min-width: 220px;
+justify-content: flex-end;
+}
+
+.progress-text {
+font-size: 12px;
+color: rgba(225,232,255,.78);
+white-space: nowrap;
+}
+
+.progress-bar {
+position: relative;
+width: 170px;
+height: 9px;
+border-radius: 999px;
+background: rgba(255,255,255,.08);
+overflow: hidden;
+border: 1px solid rgba(255,255,255,.06);
+}
+
+.progress-fill {
+position: absolute;
+inset: 0 auto 0 0;
+width: 33.33%;
+border-radius: inherit;
+background: linear-gradient(90deg, #5d8cff 0%, #7380ff 45%, #8b5cf6 100%);
+box-shadow: 0 0 24px rgba(93,140,255,.42);
+animation: progressGlow 2.4s ease-in-out infinite;
+}
+
+.main {
+flex: 1;
+display: grid;
+grid-template-columns: minmax(0, 1fr) 380px;
+gap: 24px;
+align-items: start;
+max-width: 1320px;
 width: 100%;
+margin: 0 auto;
+padding-top: 8px;
 }
 
-button {
-background: linear-gradient(135deg, #4f46e5, #3b82f6);
+.builder {
+display: flex;
+flex-direction: column;
+align-items: center;
+min-width: 0;
+}
+
+.intro {
+width: min(760px, 100%);
+text-align: center;
+padding: 42px 12px 22px;
+animation: fadeUp .55s cubic-bezier(.22,.8,.24,1);
+}
+
+.step-label {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+min-height: 34px;
+padding: 0 14px;
+border-radius: 999px;
+border: 1px solid rgba(255,255,255,.10);
+background: rgba(255,255,255,.04);
+color: rgba(225,232,255,.82);
+font-size: 11px;
+letter-spacing: .14em;
+text-transform: uppercase;
+margin-bottom: 18px;
+}
+
+.title {
+margin: 0;
+font-size: clamp(42px, 5.4vw, 72px);
+line-height: .94;
+font-weight: 700;
+letter-spacing: -.065em;
+text-wrap: balance;
+}
+
+.subtitle {
+margin: 18px auto 0;
+max-width: 620px;
+color: var(--muted);
+font-size: clamp(16px, 1.35vw, 20px);
+line-height: 1.65;
+text-wrap: balance;
+}
+
+.config-stack {
+width: min(760px, 100%);
+display: flex;
+flex-direction: column;
+gap: 14px;
+padding: 6px 0 26px;
+}
+
+.config-btn {
+width: 100%;
+min-height: 88px;
+display: grid;
+grid-template-columns: 56px minmax(0, 1fr) auto;
+align-items: center;
+gap: 16px;
+padding: 18px 20px;
+border-radius: 22px;
+background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.042));
+border: 1px solid rgba(255,255,255,.10);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 16px 42px rgba(0,0,0,.18);
+backdrop-filter: blur(18px);
+-webkit-backdrop-filter: blur(18px);
+transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease;
+text-align: left;
+color: inherit;
+cursor: pointer;
+position: relative;
+overflow: hidden;
+}
+
+.config-btn:hover {
+transform: translateY(-1px);
+border-color: rgba(255,255,255,.18);
+background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.048));
+}
+
+.config-btn.active {
+border-color: rgba(93,140,255,.58);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 24px 54px rgba(7,14,38,.34), 0 0 0 1px rgba(93,140,255,.16);
+}
+
+.config-btn.active::after {
+content: "";
+position: absolute;
+inset: auto auto -50% -10%;
+width: 180px;
+height: 180px;
+border-radius: 999px;
+background: radial-gradient(circle, rgba(93,140,255,.16), transparent 62%);
+filter: blur(16px);
+pointer-events: none;
+}
+
+.config-btn.completed {
+border-color: rgba(34,197,94,.34);
+background: linear-gradient(180deg, rgba(34,197,94,.12), rgba(255,255,255,.048));
+}
+
+.config-btn.completed .config-index {
+background: linear-gradient(180deg, rgba(34,197,94,.24), rgba(34,197,94,.14));
+border-color: rgba(34,197,94,.28);
+color: #d9ffe4;
+}
+
+.config-index {
+width: 42px;
+height: 42px;
+border-radius: 14px;
+display: grid;
+place-items: center;
+font-size: 15px;
+font-weight: 700;
+color: rgba(238,244,255,.95);
+border: 1px solid rgba(255,255,255,.12);
+background: rgba(255,255,255,.05);
+}
+
+.config-copy {
+min-width: 0;
+}
+
+.config-title {
+font-size: 18px;
+font-weight: 650;
+letter-spacing: -.03em;
+color: #f5f8ff;
+}
+
+.config-sub {
+margin-top: 5px;
+color: var(--muted-2);
+font-size: 14px;
+line-height: 1.45;
+}
+
+.config-value {
+font-size: 14px;
+color: rgba(233,239,255,.88);
+text-align: right;
+max-width: 180px;
+line-height: 1.4;
+}
+
+.config-value.empty {
+color: rgba(225,232,255,.40);
+}
+
+.config-value-wrap {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.blink-dot {
+width: 10px;
+height: 10px;
+border-radius: 999px;
+background: var(--blue);
+box-shadow: 0 0 18px rgba(93,140,255,.8);
+animation: pulse 1.8s ease-in-out infinite;
+}
+
+.config-btn.completed .blink-dot {
+display: none;
+}
+
+.cta-zone {
+width: min(760px, 100%);
+display: flex;
+justify-content: center;
+padding: 16px 0 6px;
+}
+
+.cta {
+min-width: 280px;
+height: 60px;
+border: 0;
+border-radius: 18px;
+color: white;
+font-size: 16px;
+font-weight: 650;
+letter-spacing: -.02em;
+background: linear-gradient(180deg, #6894ff 0%, #456bff 100%);
+box-shadow: 0 18px 44px rgba(69,107,255,.32);
+transition: transform .22s ease, box-shadow .22s ease, opacity .22s ease;
+cursor: pointer;
+}
+
+.cta:hover:not(:disabled) {
+transform: translateY(-1px);
+box-shadow: 0 24px 52px rgba(69,107,255,.42);
+}
+
+.cta:disabled {
+opacity: .42;
+cursor: not-allowed;
+box-shadow: none;
+}
+
+.side-panel {
+position: sticky;
+top: 24px;
+border-radius: 26px;
+border: 1px solid rgba(255,255,255,.10);
+background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.04));
+box-shadow: var(--shadow);
+backdrop-filter: blur(18px);
+-webkit-backdrop-filter: blur(18px);
+padding: 22px;
+animation: fadeUp .6s cubic-bezier(.22,.8,.24,1);
+}
+
+.side-title {
+font-size: 13px;
+letter-spacing: .12em;
+text-transform: uppercase;
+color: rgba(225,232,255,.72);
+margin-bottom: 14px;
+}
+
+.preview-list {
+display: grid;
+gap: 12px;
+margin-bottom: 18px;
+}
+
+.preview-item {
+border-radius: 18px;
+border: 1px solid rgba(255,255,255,.08);
+background: rgba(255,255,255,.035);
+padding: 14px 15px;
+}
+
+.preview-item strong {
+display: block;
+font-size: 15px;
+font-weight: 650;
+letter-spacing: -.02em;
+margin-bottom: 5px;
+color: rgba(245,248,255,.96);
+}
+
+.preview-item span {
+color: rgba(225,232,255,.66);
+font-size: 13px;
+line-height: 1.5;
+}
+
+.summary-box {
+border-radius: 20px;
+border: 1px solid rgba(255,255,255,.08);
+background: rgba(255,255,255,.035);
+padding: 16px;
+}
+
+.summary-row {
+display: flex;
+justify-content: space-between;
+gap: 14px;
+padding: 8px 0;
+border-bottom: 1px solid rgba(255,255,255,.06);
+font-size: 13px;
+color: rgba(225,232,255,.68);
+}
+
+.summary-row:last-child { border-bottom: 0; }
+
+.summary-row b {
+color: rgba(245,248,255,.94);
+font-weight: 600;
+}
+
+.overlay {
+position: fixed;
+inset: 0;
+display: none;
+align-items: center;
+justify-content: center;
+z-index: 30;
+background: rgba(2,6,23,.58);
+backdrop-filter: blur(14px);
+-webkit-backdrop-filter: blur(14px);
+padding: 24px;
+}
+
+.overlay.show { display: flex; }
+
+.modal {
+width: min(760px, 100%);
+max-height: min(84vh, 860px);
+overflow: hidden;
+border-radius: 28px;
+border: 1px solid rgba(255,255,255,.12);
+background: linear-gradient(180deg, rgba(15,23,53,.96), rgba(7,12,28,.97));
+box-shadow: 0 40px 100px rgba(0,0,0,.5);
+animation: modalIn .28s cubic-bezier(.22,.8,.24,1);
+display: flex;
+flex-direction: column;
+}
+
+.modal-head {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 20px;
+padding: 22px 24px 18px;
+border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.modal-head-left small {
+display: block;
+color: rgba(225,232,255,.62);
+font-size: 12px;
+letter-spacing: .10em;
+text-transform: uppercase;
+margin-bottom: 8px;
+}
+
+.modal-head-left h2 {
+margin: 0;
+font-size: 28px;
+line-height: 1.04;
+font-weight: 700;
+letter-spacing: -.05em;
+}
+
+.modal-head-left p {
+margin: 10px 0 0;
+color: rgba(225,232,255,.72);
+font-size: 15px;
+line-height: 1.6;
+}
+
+.modal-progress {
+min-width: 110px;
+text-align: right;
+font-size: 13px;
+color: rgba(225,232,255,.72);
+}
+
+.modal-body {
+padding: 22px 24px;
+overflow: auto;
+display: grid;
+gap: 16px;
+}
+
+.search {
+width: 100%;
+height: 56px;
+border-radius: 18px;
+border: 1px solid rgba(255,255,255,.10);
+background: rgba(255,255,255,.05);
+color: white;
+padding: 0 18px;
+font-size: 15px;
+outline: none;
+transition: border-color .22s ease, box-shadow .22s ease;
+}
+
+.search:focus {
+border-color: rgba(93,140,255,.66);
+box-shadow: 0 0 0 4px rgba(93,140,255,.10);
+}
+
+.search::placeholder { color: rgba(225,232,255,.42); }
+
+.option-grid {
+display: grid;
+grid-template-columns: repeat(2, minmax(0, 1fr));
+gap: 12px;
+}
+
+.option-card {
+border-radius: 18px;
+border: 1px solid rgba(255,255,255,.09);
+background: rgba(255,255,255,.035);
+padding: 14px 14px 13px;
+cursor: pointer;
+transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.option-card:hover {
+transform: translateY(-1px);
+border-color: rgba(255,255,255,.18);
+}
+
+.option-card.selected {
+border-color: rgba(93,140,255,.58);
+background: rgba(93,140,255,.12);
+box-shadow: 0 0 0 1px rgba(93,140,255,.16);
+}
+
+.option-card strong {
+display: block;
+font-size: 16px;
+font-weight: 650;
+letter-spacing: -.02em;
+}
+
+.option-card span {
+display: block;
+margin-top: 4px;
+color: rgba(225,232,255,.62);
+font-size: 13px;
+line-height: 1.45;
+}
+
+.search-list {
+display: grid;
+gap: 16px;
+max-height: 420px;
+overflow: auto;
+padding-right: 4px;
+}
+
+.group-title {
+font-size: 12px;
+letter-spacing: .14em;
+text-transform: uppercase;
+color: rgba(225,232,255,.56);
+margin-bottom: 10px;
+}
+
+.search-option {
+display: grid;
+grid-template-columns: minmax(0, 1fr) auto;
+align-items: center;
+gap: 12px;
+border-radius: 16px;
+border: 1px solid rgba(255,255,255,.08);
+background: rgba(255,255,255,.035);
+padding: 13px 14px;
+cursor: pointer;
+transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+
+.search-option:hover {
+transform: translateY(-1px);
+border-color: rgba(255,255,255,.16);
+}
+
+.search-option.selected {
+border-color: rgba(93,140,255,.56);
+background: rgba(93,140,255,.12);
+}
+
+.search-option strong {
+display: block;
+font-size: 15px;
+font-weight: 650;
+letter-spacing: -.02em;
+}
+
+.search-option span {
+display: block;
+margin-top: 4px;
+color: rgba(225,232,255,.62);
+font-size: 13px;
+line-height: 1.4;
+}
+
+.badge {
+min-height: 28px;
+padding: 0 10px;
+border-radius: 999px;
+display: inline-flex;
+align-items: center;
+font-size: 12px;
+font-weight: 600;
+border: 1px solid rgba(255,255,255,.08);
+white-space: nowrap;
+}
+
+.badge.active { background: rgba(34,197,94,.14); color: #d8ffe4; border-color: rgba(34,197,94,.22); }
+.badge.soon { background: rgba(250,204,21,.12); color: #fff0b6; border-color: rgba(250,204,21,.18); }
+.badge.projected { background: rgba(96,165,250,.12); color: #dce9ff; border-color: rgba(96,165,250,.18); }
+
+.text-input {
+width: 100%;
+height: 60px;
+border-radius: 18px;
+border: 1px solid rgba(255,255,255,.10);
+background: rgba(255,255,255,.05);
+color: white;
+padding: 0 18px;
+font-size: 16px;
+outline: none;
+transition: border-color .22s ease, box-shadow .22s ease;
+}
+
+.text-input:focus {
+border-color: rgba(93,140,255,.66);
+box-shadow: 0 0 0 4px rgba(93,140,255,.10);
+}
+
+.text-input::placeholder { color: rgba(225,232,255,.42); }
+
+.modal-foot {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+padding: 18px 24px 22px;
+border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.modal-btn {
+min-width: 120px;
+height: 48px;
+border-radius: 16px;
+font-size: 15px;
+font-weight: 600;
+border: 1px solid rgba(255,255,255,.10);
+cursor: pointer;
+transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+}
+
+.modal-btn:hover:not(:disabled) { transform: translateY(-1px); }
+
+.btn-ghost {
+background: rgba(255,255,255,.04);
+color: rgba(240,245,255,.9);
+}
+
+.btn-primary {
+border: 0;
+color: white;
+background: linear-gradient(180deg, #6b95ff 0%, #476dff 100%);
+box-shadow: 0 18px 36px rgba(71,109,255,.30);
+}
+
+.modal-btn:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(14px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modalIn {
+from { opacity: 0; transform: translateY(12px) scale(.985); }
+to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes drift {
+0% { transform: translate3d(0, 0, 0) scale(1); }
+100% { transform: translate3d(22px, -10px, 0) scale(1.08); }
+}
+
+@keyframes twinkle {
+0%,100% { opacity: .22; transform: scale(1); }
+50% { opacity: .84; transform: scale(1.55); }
+}
+
+@keyframes pulse {
+0%,100% { transform: scale(1); opacity: .82; }
+50% { transform: scale(1.35); opacity: 1; }
+}
+
+@keyframes progressGlow {
+0%,100% { filter: saturate(1); }
+50% { filter: saturate(1.2) brightness(1.06); }
+}
+
+@media (max-width: 1100px) {
+.main {
+grid-template-columns: 1fr;
+max-width: 760px;
+}
+
+.side-panel {
+position: relative;
+top: 0;
+}
+}
+
+@media (max-width: 700px) {
+.shell { padding: 18px 16px 22px; }
+.progress-wrap { min-width: auto; gap: 10px; }
+.progress-bar { width: 110px; }
+.intro { padding-top: 30px; }
+.title { font-size: clamp(38px, 9vw, 54px); }
+.config-btn {
+grid-template-columns: 46px minmax(0,1fr);
+align-items: start;
+}
+.config-value-wrap {
+grid-column: 2 / -1;
+justify-content: space-between;
+}
+.option-grid { grid-template-columns: 1fr; }
+.modal { border-radius: 22px; }
+.modal-head, .modal-body, .modal-foot { padding-left: 18px; padding-right: 18px; }
 }
 </style>
 </head>
-
-<body class="min-h-screen flex flex-col items-center">
-
-<div class="w-full max-w-2xl px-6 py-12">
-
-<h1 class="text-4xl font-bold text-center mb-6">
-System Configuration
-</h1>
-
-<p class="text-center text-gray-300 mb-10">
-We will automatically build your AI call system based on your answers
-</p>
-
-<!-- COMPANY -->
-<div id="step1" class="section active">
-<h2 class="text-xl mb-4">Company name</h2>
-<input id="company" placeholder="Enter company name" />
+<body>
+<div class="bg-grid"></div>
+<div class="bg-orbs"></div>
+<div class="bg-stars" aria-hidden="true">
+<span style="left:15%; top:18%; animation-delay:.3s"></span>
+<span style="left:30%; top:24%; animation-delay:1.2s"></span>
+<span style="left:46%; top:16%; animation-delay:2.1s"></span>
+<span style="left:65%; top:25%; animation-delay:.9s"></span>
+<span style="left:80%; top:19%; animation-delay:1.8s"></span>
+<span style="left:72%; top:76%; animation-delay:2.6s"></span>
+<span style="left:38%; top:74%; animation-delay:1.4s"></span>
 </div>
 
-<!-- INDUSTRY -->
-<div id="step2" class="section mt-10">
-<h2 class="text-xl mb-4">Industry</h2>
-<div class="grid grid-cols-2 gap-3">
-<div class="card" onclick="select(this,'industry','Plumbing')">Plumbing</div>
-<div class="card" onclick="select(this,'industry','HVAC')">HVAC</div>
-<div class="card" onclick="select(this,'industry','Clinic')">Clinic</div>
-<div class="card" onclick="select(this,'industry','Real Estate')">Real Estate</div>
+<div class="shell">
+<header class="topbar">
+<div class="brand">
+<span class="brand-mark"></span>
+<span>AI Call Port</span>
 </div>
+<div class="progress-wrap">
+<span class="progress-text">Step 1 of 3</span>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+</div>
+</header>
+
+<main class="main">
+<section class="builder">
+<div class="intro">
+<div class="step-label">System Configuration</div>
+<h1 class="title">System Configuration</h1>
+<p class="subtitle">We automatically build your AI call system based on your business.</p>
 </div>
 
-<!-- CALL MODE -->
-<div id="step3" class="section mt-10">
-<h2 class="text-xl mb-4">Call handling</h2>
-<div class="space-y-3">
-<div class="card" onclick="select(this,'calls','Leads')">Capture Leads</div>
-<div class="card" onclick="select(this,'calls','Booking')">Book Appointments</div>
-<div class="card" onclick="select(this,'calls','Both')">Both</div>
-</div>
-</div>
+<div class="config-stack" id="configStack"></div>
 
-<!-- HOURS -->
-<div id="step4" class="section mt-10">
-<h2 class="text-xl mb-4">Business hours</h2>
-<div class="grid grid-cols-2 gap-3">
-<div class="card" onclick="select(this,'hours','9-5')">9AM - 5PM</div>
-<div class="card" onclick="select(this,'hours','Extended')">Extended</div>
-<div class="card" onclick="select(this,'hours','24/7')">24/7</div>
+<div class="cta-zone">
+<button class="cta" id="buildBtn" disabled>Build My AI System</button>
 </div>
-</div>
+</section>
 
-<!-- TEAM -->
-<div id="step5" class="section mt-10">
-<h2 class="text-xl mb-4">Team size</h2>
-<div class="space-y-3">
-<div class="card" onclick="select(this,'team','Solo')">Just me</div>
-<div class="card" onclick="select(this,'team','Small')">Small team</div>
-<div class="card" onclick="select(this,'team','Large')">Large team</div>
+<aside class="side-panel">
+<div class="side-title">Live system summary</div>
+<div class="preview-list">
+<div class="preview-item">
+<strong id="previewMode">AI call system not configured yet</strong>
+<span id="previewSub">Complete the required configuration to generate your business-specific setup.</span>
+</div>
+<div class="preview-item">
+<strong>What will be configured</strong>
+<span>Call handling, business logic, reminders, CRM structure, team workflow, and system automation.</span>
 </div>
 </div>
 
-<!-- CTA -->
-<div class="mt-12 text-center">
-<button id="submitBtn" class="px-8 py-4 rounded-xl opacity-40" disabled>
-Build My AI System
-</button>
+<div class="summary-box">
+<div class="summary-row"><span>Country</span><b id="sumCountry">Pending</b></div>
+<div class="summary-row"><span>Industry</span><b id="sumIndustry">Pending</b></div>
+<div class="summary-row"><span>Business Name</span><b id="sumBusiness">Pending</b></div>
+<div class="summary-row"><span>Call Handling</span><b id="sumCalls">Pending</b></div>
+<div class="summary-row"><span>Business Hours</span><b id="sumHours">Pending</b></div>
+<div class="summary-row"><span>Team Setup</span><b id="sumTeam">Pending</b></div>
+</div>
+</aside>
+</main>
 </div>
 
+<div class="overlay" id="overlay">
+<div class="modal" id="modal">
+<div class="modal-head">
+<div class="modal-head-left">
+<small id="modalStepLabel">Step 1</small>
+<h2 id="modalTitle">Select your country</h2>
+<p id="modalDescription">Choose where your business operates so we can configure your system correctly.</p>
+</div>
+<div class="modal-progress" id="modalProgress">1 / 6</div>
+</div>
+<div class="modal-body" id="modalBody"></div>
+<div class="modal-foot">
+<button class="modal-btn btn-ghost" id="cancelBtn">Cancel</button>
+<button class="modal-btn btn-primary" id="nextBtn" disabled>Next</button>
+</div>
+</div>
 </div>
 
 <script>
-let data = {};
+const countryData = {
+"North America": [
+{ name: "Canada", status: "active" },
+{ name: "United States", status: "active" },
+{ name: "Mexico", status: "active" },
+{ name: "Jamaica", status: "soon" },
+{ name: "Dominican Republic", status: "projected" }
+],
+"Europe": [
+{ name: "United Kingdom", status: "active" },
+{ name: "Germany", status: "active" },
+{ name: "France", status: "active" },
+{ name: "Spain", status: "active" },
+{ name: "Italy", status: "soon" },
+{ name: "Netherlands", status: "active" },
+{ name: "Sweden", status: "projected" },
+{ name: "Poland", status: "projected" }
+],
+"Asia": [
+{ name: "China", status: "active" },
+{ name: "Japan", status: "active" },
+{ name: "India", status: "soon" },
+{ name: "Singapore", status: "active" },
+{ name: "United Arab Emirates", status: "active" },
+{ name: "Saudi Arabia", status: "projected" },
+{ name: "South Korea", status: "active" },
+{ name: "Philippines", status: "projected" }
+],
+"South America": [
+{ name: "Brazil", status: "soon" },
+{ name: "Argentina", status: "projected" },
+{ name: "Chile", status: "projected" },
+{ name: "Colombia", status: "projected" }
+],
+"Africa": [
+{ name: "South Africa", status: "projected" },
+{ name: "Nigeria", status: "projected" },
+{ name: "Kenya", status: "projected" },
+{ name: "Egypt", status: "projected" }
+],
+"Oceania": [
+{ name: "Australia", status: "active" },
+{ name: "New Zealand", status: "active" }
+]
+};
 
-const companyInput = document.getElementById('company');
-companyInput.addEventListener('input', () => {
-if(companyInput.value.length > 2) {
-data.company = companyInput.value;
-reveal('step2');
+const industryData = {
+"Home Services": ["Plumbing", "HVAC", "Electrical", "Roofing", "Appliance Repair", "Cleaning Services", "Landscaping", "Pest Control"],
+"Healthcare": ["Clinic", "Dental", "Physiotherapy", "Chiropractic", "Home Care", "Mental Health Practice", "Veterinary"],
+"Professional Services": ["Real Estate", "Law Firm", "Accounting", "Insurance", "Consulting", "Financial Services"],
+"Beauty & Wellness": ["Salon", "Med Spa", "Barbershop", "Massage Therapy", "Nail Studio", "Wellness Center"],
+"Automotive": ["Auto Repair", "Tire Shop", "Detailing", "Collision Repair", "Mobile Mechanic"],
+"Local Business": ["Retail Store", "Restaurant", "Catering", "Property Management", "Education & Training", "Security Services"]
+};
+
+const steps = [
+{
+key: 'country',
+label: 'Country',
+helper: 'Select your operating country',
+type: 'search-country',
+description: 'Search and choose your business country. Active countries can continue immediately.'
+},
+{
+key: 'industry',
+label: 'Industry',
+helper: 'Choose your business category',
+type: 'search-industry',
+description: 'Select your industry so we can generate the right workflow, scripts, and automation.'
+},
+{
+key: 'businessName',
+label: 'Business Name',
+helper: 'Enter your company name',
+type: 'text',
+description: 'This becomes part of your business-specific AI system configuration.',
+placeholder: 'Enter your company name'
+},
+{
+key: 'callHandling',
+label: 'Call Handling',
+helper: 'Define what the system should do',
+type: 'cards',
+description: 'Choose how your AI system should handle calls for your business.',
+options: [
+{ value: 'Lead Capture', desc: 'Capture caller details and notify your team.' },
+{ value: 'Appointment Booking', desc: 'Book appointments automatically when possible.' },
+{ value: 'Both', desc: 'Capture leads and schedule appointments.' }
+]
+},
+{
+key: 'businessHours',
+label: 'Business Hours',
+helper: 'Choose your operating schedule',
+type: 'cards',
+description: 'This helps us configure when calls, reminders, and bookings should be handled.',
+options: [
+{ value: 'Standard 9–5', desc: 'Standard weekday business hours.' },
+{ value: 'Extended Hours', desc: 'Evenings or longer service windows.' },
+{ value: '24/7', desc: 'Always available or after-hours handling required.' }
+]
+},
+{
+key: 'teamSetup',
+label: 'Team Setup',
+helper: 'Tell us how your business is staffed',
+type: 'cards',
+description: 'This determines whether the system prepares solo or team-based workflow logic.',
+options: [
+{ value: 'Just Me', desc: 'Solo operator or owner-managed business.' },
+{ value: 'Small Team', desc: 'A few employees or field staff.' },
+{ value: 'Larger Team', desc: 'Multiple employees and more active workflow.' }
+]
 }
+];
+
+const state = {
+currentStepIndex: 0,
+activeStepIndex: 0,
+values: {
+country: '',
+countryStatus: '',
+industry: '',
+businessName: '',
+callHandling: '',
+businessHours: '',
+teamSetup: ''
+}
+};
+
+const stack = document.getElementById('configStack');
+const overlay = document.getElementById('overlay');
+const modalTitle = document.getElementById('modalTitle');
+const modalDescription = document.getElementById('modalDescription');
+const modalProgress = document.getElementById('modalProgress');
+const modalStepLabel = document.getElementById('modalStepLabel');
+const modalBody = document.getElementById('modalBody');
+const cancelBtn = document.getElementById('cancelBtn');
+const nextBtn = document.getElementById('nextBtn');
+const buildBtn = document.getElementById('buildBtn');
+
+let stagedValue = null;
+
+function renderButtons() {
+stack.innerHTML = steps.map((step, index) => {
+const value = state.values[step.key];
+const isCompleted = !!value;
+const isActive = index === state.activeStepIndex;
+const valueText = step.key === 'country' && value
+? `${value}${state.values.countryStatus ? ` — ${formatStatus(state.values.countryStatus)}` : ''}`
+: value || 'Select to continue';
+
+return `
+<button class="config-btn ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}" onclick="openStep(${index})">
+<div class="config-index">${index + 1}</div>
+<div class="config-copy">
+<div class="config-title">${step.label}</div>
+<div class="config-sub">${step.helper}</div>
+</div>
+<div class="config-value-wrap">
+<div class="config-value ${isCompleted ? '' : 'empty'}">${valueText}</div>
+${isCompleted ? '' : (isActive ? '<span class="blink-dot"></span>' : '')}
+</div>
+</button>
+`;
+}).join('');
+
+buildBtn.disabled = !steps.every(step => !!state.values[step.key]);
+updatePreview();
+}
+
+function formatStatus(status) {
+if (status === 'active') return 'Active';
+if (status === 'soon') return 'Coming soon';
+return 'Projected';
+}
+
+function updatePreview() {
+document.getElementById('sumCountry').textContent = state.values.country || 'Pending';
+document.getElementById('sumIndustry').textContent = state.values.industry || 'Pending';
+document.getElementById('sumBusiness').textContent = state.values.businessName || 'Pending';
+document.getElementById('sumCalls').textContent = state.values.callHandling || 'Pending';
+document.getElementById('sumHours').textContent = state.values.businessHours || 'Pending';
+document.getElementById('sumTeam').textContent = state.values.teamSetup || 'Pending';
+
+const completed = steps.filter(step => !!state.values[step.key]).length;
+const previewMode = document.getElementById('previewMode');
+const previewSub = document.getElementById('previewSub');
+
+if (completed === 0) {
+previewMode.textContent = 'AI call system not configured yet';
+previewSub.textContent = 'Complete the required configuration to generate your business-specific setup.';
+} else if (completed < steps.length) {
+previewMode.textContent = `${completed} of ${steps.length} configuration points completed`;
+previewSub.textContent = 'Your system structure is being prepared as you complete each required step.';
+} else {
+previewMode.textContent = 'Your AI call system is ready to build';
+previewSub.textContent = 'All core configuration is complete. Continue to generate your business-specific setup.';
+}
+}
+
+function openStep(index) {
+state.currentStepIndex = index;
+const step = steps[index];
+stagedValue = state.values[step.key] || null;
+
+modalStepLabel.textContent = `Step ${index + 1}`;
+modalTitle.textContent = step.label;
+modalDescription.textContent = step.description;
+modalProgress.textContent = `${index + 1} / ${steps.length}`;
+
+renderModalBody(step);
+overlay.classList.add('show');
+}
+
+function renderModalBody(step) {
+nextBtn.disabled = true;
+
+if (step.type === 'text') {
+modalBody.innerHTML = `
+<input id="textInput" class="text-input" type="text" placeholder="${step.placeholder || ''}" value="${state.values[step.key] || ''}" />
+`;
+const input = document.getElementById('textInput');
+input.focus();
+input.addEventListener('input', () => {
+stagedValue = input.value.trim();
+nextBtn.disabled = stagedValue.length < 2;
+});
+nextBtn.disabled = !(state.values[step.key] && state.values[step.key].length >= 2);
+stagedValue = state.values[step.key] || '';
+return;
+}
+
+if (step.type === 'cards') {
+modalBody.innerHTML = `
+<div class="option-grid">
+${step.options.map(option => `
+<div class="option-card ${state.values[step.key] === option.value ? 'selected' : ''}" data-value="${option.value}">
+<strong>${option.value}</strong>
+<span>${option.desc}</span>
+</div>
+`).join('')}
+</div>
+`;
+
+modalBody.querySelectorAll('.option-card').forEach(card => {
+card.addEventListener('click', () => {
+modalBody.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+card.classList.add('selected');
+stagedValue = card.dataset.value;
+nextBtn.disabled = false;
+});
 });
 
-function select(el, key, value) {
-el.parentNode.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-el.classList.add('selected');
-data[key] = value;
-
-if(key === 'industry') reveal('step3');
-if(key === 'calls') reveal('step4');
-if(key === 'hours') reveal('step5');
-
-checkComplete();
+stagedValue = state.values[step.key] || null;
+nextBtn.disabled = !stagedValue;
+return;
 }
 
-function reveal(id) {
-const el = document.getElementById(id);
-el.classList.add('active');
-el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+if (step.type === 'search-country') {
+modalBody.innerHTML = `
+<input id="countrySearch" class="search" type="text" placeholder="Search country" />
+<div class="search-list" id="countryList"></div>
+`;
+renderCountryList('');
+document.getElementById('countrySearch').addEventListener('input', e => renderCountryList(e.target.value));
+stagedValue = state.values[step.key] || null;
+nextBtn.disabled = !stagedValue;
+return;
 }
 
-function checkComplete() {
-if(data.company && data.industry && data.calls && data.hours && data.team) {
-document.getElementById('submitBtn').disabled = false;
-document.getElementById('submitBtn').classList.remove('opacity-40');
+if (step.type === 'search-industry') {
+modalBody.innerHTML = `
+<input id="industrySearch" class="search" type="text" placeholder="Search industry" />
+<div class="search-list" id="industryList"></div>
+`;
+renderIndustryList('');
+document.getElementById('industrySearch').addEventListener('input', e => renderIndustryList(e.target.value));
+stagedValue = state.values[step.key] || null;
+nextBtn.disabled = !stagedValue;
 }
 }
 
+function renderCountryList(query) {
+const q = query.trim().toLowerCase();
+const list = document.getElementById('countryList');
+list.innerHTML = Object.entries(countryData).map(([continent, items]) => {
+const filtered = items.filter(item => item.name.toLowerCase().includes(q));
+if (!filtered.length) return '';
+return `
+<div>
+<div class="group-title">${continent}</div>
+<div class="option-grid" style="grid-template-columns: 1fr;">
+${filtered.map(item => `
+<div class="search-option ${state.values.country === item.name ? 'selected' : ''}" data-value="${item.name}" data-status="${item.status}">
+<div>
+<strong>${item.name}</strong>
+<span>${item.status === 'active' ? 'Available now' : item.status === 'soon' ? 'Coming soon' : 'Projected market'}</span>
+</div>
+<span class="badge ${item.status}">${formatStatus(item.status)}</span>
+</div>
+`).join('')}
+</div>
+</div>
+`;
+}).join('');
+
+list.querySelectorAll('.search-option').forEach(option => {
+option.addEventListener('click', () => {
+list.querySelectorAll('.search-option').forEach(o => o.classList.remove('selected'));
+option.classList.add('selected');
+stagedValue = option.dataset.value;
+state.values.countryStatus = option.dataset.status;
+nextBtn.disabled = false;
+});
+});
+}
+
+function renderIndustryList(query) {
+const q = query.trim().toLowerCase();
+const list = document.getElementById('industryList');
+list.innerHTML = Object.entries(industryData).map(([category, items]) => {
+const filtered = items.filter(item => item.toLowerCase().includes(q));
+if (!filtered.length) return '';
+return `
+<div>
+<div class="group-title">${category}</div>
+<div class="option-grid">
+${filtered.map(item => `
+<div class="option-card ${state.values.industry === item ? 'selected' : ''}" data-value="${item}">
+<strong>${item}</strong>
+<span>${category}</span>
+</div>
+`).join('')}
+</div>
+</div>
+`;
+}).join('');
+
+list.querySelectorAll('.option-card').forEach(card => {
+card.addEventListener('click', () => {
+list.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+card.classList.add('selected');
+stagedValue = card.dataset.value;
+nextBtn.disabled = false;
+});
+});
+}
+
+function closeModal() {
+overlay.classList.remove('show');
+stagedValue = null;
+}
+
+function saveCurrentStepAndAdvance() {
+const step = steps[state.currentStepIndex];
+if (!stagedValue) return;
+state.values[step.key] = stagedValue;
+
+if (step.key !== 'country') {
+state.values.countryStatus = state.values.countryStatus || '';
+}
+
+if (state.currentStepIndex < steps.length - 1) {
+state.activeStepIndex = Math.max(state.activeStepIndex, state.currentStepIndex + 1);
+}
+
+renderButtons();
+
+const shouldAdvance = state.currentStepIndex < steps.length - 1;
+if (shouldAdvance) {
+state.currentStepIndex += 1;
+const nextStep = steps[state.currentStepIndex];
+modalStepLabel.textContent = `Step ${state.currentStepIndex + 1}`;
+modalTitle.textContent = nextStep.label;
+modalDescription.textContent = nextStep.description;
+modalProgress.textContent = `${state.currentStepIndex + 1} / ${steps.length}`;
+stagedValue = state.values[nextStep.key] || null;
+renderModalBody(nextStep);
+} else {
+closeModal();
+}
+}
+
+cancelBtn.addEventListener('click', closeModal);
+overlay.addEventListener('click', (e) => {
+if (e.target === overlay) closeModal();
+});
+nextBtn.addEventListener('click', saveCurrentStepAndAdvance);
+
+buildBtn.addEventListener('click', () => {
+alert('System configuration complete. Ready to build your AI system.');
+console.log('Configuration:', state.values);
+});
+
+renderButtons();
 </script>
-
 </body>
 </html>
-
