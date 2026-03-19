@@ -180,20 +180,7 @@ padding: 20px 6px 22px;
 }
 
 .kicker {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-min-height: 30px;
-padding: 0 12px;
-border-radius: 999px;
-border: 1px solid rgba(255,122,26,0.22);
-background: rgba(255,122,26,0.05);
-color: rgba(255,213,186,0.86);
-font-size: 11px;
-letter-spacing: .12em;
-text-transform: uppercase;
-font-weight: 700;
-margin-bottom: 16px;
+display: none;
 }
 
 .hero h1 {
@@ -203,6 +190,14 @@ line-height: .95;
 letter-spacing: -.07em;
 font-weight: 800;
 text-shadow: 0 0 16px rgba(255,255,255,0.05);
+}
+
+.hero-white {
+color: #f5f2ed;
+}
+
+.hero-accent {
+color: #ffb27a;
 }
 
 .hero p {
@@ -337,7 +332,10 @@ background: transparent;
 
 .step-card.active .step-indicator {
 background: var(--orange);
-box-shadow: 0 0 12px rgba(255,122,26,0.34);
+box-shadow: 0 0 12px rgba(255,122,26,0.22);
+}
+
+.step-indicator.blink-live {
 animation: pulse 1.8s ease-in-out infinite;
 }
 
@@ -487,6 +485,10 @@ font-weight: 700;
 
 .summary-row.active-summary {
 color: rgba(255,213,186,0.86);
+background: rgba(255,122,26,0.05);
+border-radius: 10px;
+padding-left: 8px;
+padding-right: 8px;
 }
 
 .summary-row.active-summary b {
@@ -810,8 +812,7 @@ box-shadow: 0 0 0 1px rgba(255,140,58,0.14), 0 0 14px rgba(255,140,58,0.08);
 <div class="main-grid">
 <section class="left-side">
 <div class="hero">
-<div class="kicker">Activation Protocol</div>
-<h1>Activation Protocol</h1>
+<h1><span class="hero-white">System</span> <span class="hero-accent">Configuration</span></h1>
 <p>We automatically build your AI call system based on your business.</p>
 </div>
 
@@ -982,6 +983,7 @@ const isCompleted = !!value;
 const isActive = index === state.activeStepIndex;
 const isEnabled = isCompleted || isActive;
 const isCurrentCompleted = state.lastCompletedKey === step.key;
+const shouldBlink = isActive && !isCompleted;
 const display = step.key === 'country' && value
 ? `${value} — ${formatStatus(state.values.countryStatus)}`
 : (value || step.cta);
@@ -990,7 +992,7 @@ return `
 <button class="step-card ${isEnabled ? 'enabled' : ''} ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''} ${isCurrentCompleted ? 'current-completed' : ''}" onclick="openStep(${index})">
 <div class="step-top">
 <div class="step-label">Step ${step.code}</div>
-<div class="step-indicator"></div>
+<div class="step-indicator ${shouldBlink ? 'blink-live' : ''}"></div>
 </div>
 <h3>${step.label}</h3>
 <div class="step-meta">
@@ -1020,7 +1022,6 @@ document.getElementById('summaryProgressSub').textContent = done === 6
 : 'Your system structure is being prepared as you complete each required step.';
 
 document.querySelectorAll('.summary-row').forEach(row => row.classList.remove('active-summary'));
-const activeKey = state.lastCompletedKey || steps[state.activeStepIndex]?.key;
 const map = {
 country: 'sumCountry',
 industry: 'sumIndustry',
@@ -1029,8 +1030,13 @@ callHandling: 'sumCalls',
 businessHours: 'sumHours',
 teamSetup: 'sumTeam'
 };
-const activeEl = document.getElementById(map[activeKey]);
-if (activeEl) activeEl.parentElement.classList.add('active-summary');
+
+steps.forEach(step => {
+if (state.values[step.key]) {
+const el = document.getElementById(map[step.key]);
+if (el) el.parentElement.classList.add('active-summary');
+}
+});
 }
 
 function openStep(index) {
