@@ -238,28 +238,42 @@ align-items: center;
 gap: 16px;
 padding: 18px 20px;
 border-radius: 22px;
-background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.042));
-border: 1px solid rgba(255,255,255,.10);
-box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 16px 42px rgba(0,0,0,.18);
+background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+border: 1px solid rgba(255,255,255,.07);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 12px 28px rgba(0,0,0,.14);
 backdrop-filter: blur(18px);
 -webkit-backdrop-filter: blur(18px);
-transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease;
+transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease, opacity .22s ease;
 text-align: left;
 color: inherit;
-cursor: pointer;
+cursor: not-allowed;
 position: relative;
 overflow: hidden;
+opacity: .38;
+pointer-events: none;
 }
 
-.config-btn:hover {
+.config-btn.enabled {
+cursor: pointer;
+pointer-events: auto;
+opacity: 1;
+}
+
+.config-btn.enabled:hover {
 transform: translateY(-1px);
-border-color: rgba(255,255,255,.18);
-background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.048));
+border-color: rgba(255,255,255,.16);
+background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
 }
 
 .config-btn.active {
-border-color: rgba(93,140,255,.58);
-box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 24px 54px rgba(7,14,38,.34), 0 0 0 1px rgba(93,140,255,.16);
+border-color: rgba(255,140,58,.72);
+box-shadow:
+inset 0 1px 0 rgba(255,255,255,.05),
+0 18px 44px rgba(0,0,0,.22),
+0 0 0 1px rgba(255,122,26,.16),
+0 0 22px rgba(255,122,26,.18);
+background: linear-gradient(180deg, rgba(255,140,58,.10), rgba(255,255,255,.03));
+animation: activeBorderPulse 1.8s ease-in-out infinite;
 }
 
 .config-btn.active::after {
@@ -269,78 +283,28 @@ inset: auto auto -50% -10%;
 width: 180px;
 height: 180px;
 border-radius: 999px;
-background: radial-gradient(circle, rgba(93,140,255,.16), transparent 62%);
+background: radial-gradient(circle, rgba(255,122,26,.16), transparent 62%);
 filter: blur(16px);
 pointer-events: none;
 }
 
 .config-btn.completed {
-border-color: rgba(34,197,94,.34);
-background: linear-gradient(180deg, rgba(34,197,94,.12), rgba(255,255,255,.048));
+opacity: .82;
+cursor: pointer;
+pointer-events: auto;
+border-color: rgba(255,255,255,.10);
+background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.028));
+}
+
+.config-btn.completed:hover {
+transform: translateY(-1px);
+border-color: rgba(255,255,255,.18);
 }
 
 .config-btn.completed .config-index {
 background: linear-gradient(180deg, rgba(34,197,94,.24), rgba(34,197,94,.14));
 border-color: rgba(34,197,94,.28);
 color: #d9ffe4;
-}
-
-.config-index {
-width: 42px;
-height: 42px;
-border-radius: 14px;
-display: grid;
-place-items: center;
-font-size: 15px;
-font-weight: 700;
-color: rgba(238,244,255,.95);
-border: 1px solid rgba(255,255,255,.12);
-background: rgba(255,255,255,.05);
-}
-
-.config-copy {
-min-width: 0;
-}
-
-.config-title {
-font-size: 18px;
-font-weight: 650;
-letter-spacing: -.03em;
-color: #f5f8ff;
-}
-
-.config-sub {
-margin-top: 5px;
-color: var(--muted-2);
-font-size: 14px;
-line-height: 1.45;
-}
-
-.config-value {
-font-size: 14px;
-color: rgba(233,239,255,.88);
-text-align: right;
-max-width: 180px;
-line-height: 1.4;
-}
-
-.config-value.empty {
-color: rgba(225,232,255,.40);
-}
-
-.config-value-wrap {
-display: flex;
-align-items: center;
-gap: 12px;
-}
-
-.blink-dot {
-width: 10px;
-height: 10px;
-border-radius: 999px;
-background: var(--blue);
-box-shadow: 0 0 18px rgba(93,140,255,.8);
-animation: pulse 1.8s ease-in-out infinite;
 }
 
 .config-btn.completed .blink-dot {
@@ -745,6 +709,27 @@ to { opacity: 1; transform: translateY(0) scale(1); }
 50% { filter: saturate(1.2) brightness(1.06); }
 }
 
+@keyframes activeBorderPulse {
+0%, 100% {
+border-color: rgba(255,140,58,.62);
+box-shadow:
+inset 0 1px 0 rgba(255,255,255,.05),
+0 18px 44px rgba(0,0,0,.22),
+0 0 0 1px rgba(255,122,26,.14),
+0 0 18px rgba(255,122,26,.14);
+}
+50% {
+border-color: rgba(255,166,94,.92);
+box-shadow:
+inset 0 1px 0 rgba(255,255,255,.06),
+0 20px 48px rgba(0,0,0,.24),
+0 0 0 1px rgba(255,140,58,.20),
+0 0 28px rgba(255,140,58,.24);
+}
+}
+50% { filter: saturate(1.2) brightness(1.06); }
+}
+
 @media (max-width: 1100px) {
 .main {
 grid-template-columns: 1fr;
@@ -1009,12 +994,13 @@ stack.innerHTML = steps.map((step, index) => {
 const value = state.values[step.key];
 const isCompleted = !!value;
 const isActive = index === state.activeStepIndex;
+const isEnabled = isActive || isCompleted;
 const valueText = step.key === 'country' && value
 ? `${value}${state.values.countryStatus ? ` — ${formatStatus(state.values.countryStatus)}` : ''}`
 : value || 'Select to continue';
 
 return `
-<button class="config-btn ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}" onclick="openStep(${index})">
+<button class="config-btn ${isEnabled ? 'enabled' : ''} ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}" onclick="openStep(${index})">
 <div class="config-index">${index + 1}</div>
 <div class="config-copy">
 <div class="config-title">${step.label}</div>
@@ -1022,7 +1008,7 @@ return `
 </div>
 <div class="config-value-wrap">
 <div class="config-value ${isCompleted ? '' : 'empty'}">${valueText}</div>
-${isCompleted ? '' : (isActive ? '<span class="blink-dot"></span>' : '')}
+${isActive && !isCompleted ? '<span class="blink-dot"></span>' : ''}
 </div>
 </button>
 `;
@@ -1237,7 +1223,7 @@ const nextStep = steps[state.currentStepIndex];
 modalStepLabel.textContent = `Step ${state.currentStepIndex + 1}`;
 modalTitle.textContent = nextStep.label;
 modalDescription.textContent = nextStep.description;
-modalProgress.textContent = `${state.currentStepIndex + 1} / ${steps.length}`; 
+modalProgress.textContent = `${state.currentStepIndex + 1} / ${steps.length}`;
 stagedValue = state.values[nextStep.key] || null;
 renderModalBody(nextStep);
 } else {
