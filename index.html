@@ -24,7 +24,6 @@
 
 * { box-sizing: border-box; }
 html, body { height: 100%; }
-
 body {
 margin: 0;
 font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -129,7 +128,6 @@ height: 24px;
 border-radius: 8px;
 background: var(--orange);
 box-shadow: 0 6px 16px rgba(255,122,26,0.14);
-flex: 0 0 auto;
 }
 
 .brand-text {
@@ -284,7 +282,16 @@ pointer-events: auto;
 }
 
 .step-card.completed {
-opacity: .84;
+opacity: .88;
+pointer-events: auto;
+border-color: rgba(255,255,255,0.10);
+background: var(--panel);
+}
+
+.step-card.completed.current-completed {
+border-color: rgba(255,140,58,0.72);
+background: linear-gradient(180deg, rgba(255,122,26,0.08), #14110f);
+box-shadow: 0 0 0 1px rgba(255,122,26,0.10), 0 0 12px rgba(255,122,26,0.08);
 }
 
 .step-card.active {
@@ -296,22 +303,13 @@ box-shadow:
 animation: activeBorderPulse 1.8s ease-in-out infinite;
 }
 
-.step-card.current-completed {
-border-color: rgba(255,140,58,0.72);
-background: linear-gradient(180deg, rgba(255,122,26,0.08), #14110f);
-box-shadow:
-0 0 0 1px rgba(255,122,26,0.10),
-0 0 12px rgba(255,122,26,0.08);
-}
-
 .step-card:hover.enabled {
 transform: translateY(-1px);
 background: var(--panel-2);
 border-color: rgba(255,255,255,0.14);
 }
 
-.step-card.active:hover,
-.step-card.current-completed:hover {
+.step-card.active:hover {
 border-color: rgba(255,166,94,0.88);
 }
 
@@ -327,10 +325,7 @@ opacity: 0;
 transition: opacity .18s ease;
 }
 
-.step-card.active::after,
-.step-card.current-completed::after {
-opacity: 1;
-}
+.step-card.active::after { opacity: 1; }
 
 .step-top {
 display: flex;
@@ -360,11 +355,6 @@ box-shadow: 0 0 12px rgba(255,122,26,0.34);
 animation: pulse 1.8s ease-in-out infinite;
 }
 
-.step-card.current-completed .step-indicator {
-background: var(--orange);
-box-shadow: 0 0 10px rgba(255,122,26,0.24);
-}
-
 .step-card h3 {
 margin: 18px 0 8px;
 font-size: 28px;
@@ -392,8 +382,7 @@ letter-spacing: -.01em;
 color: rgba(255,232,217,0.92);
 }
 
-.step-card.completed .step-action,
-.step-card.current-completed .step-action {
+.step-card.completed .step-action {
 color: rgba(245,242,237,0.80);
 }
 
@@ -404,7 +393,7 @@ font-weight: 700;
 text-align: right;
 }
 
-.step-card:not(.completed):not(.current-completed) .step-value {
+.step-card:not(.completed) .step-value {
 color: rgba(245,242,237,0.26);
 }
 
@@ -498,34 +487,30 @@ color: rgba(245,242,237,0.58);
 }
 
 .summary-row:last-child { border-bottom: 0; }
-
-.summary-row b {
-color: rgba(245,242,237,0.92);
-font-weight: 700;
-}
-
+.summary-row b { color: rgba(245,242,237,0.92); font-weight: 700; }
 .summary-row.active-summary {
 color: rgba(255,213,186,0.86);
 }
-
 .summary-row.active-summary b {
 color: #fff1e7;
 }
-
-.summary-row.active-summary span {
-display: flex;
-align-items: center;
-gap: 10px;
-}
-
-.summary-row.active-summary span::before {
-content: "";
+.summary-row.active-summary::before {
+content: '';
 width: 8px;
 height: 8px;
 border-radius: 999px;
 background: var(--orange);
 box-shadow: 0 0 10px rgba(255,122,26,0.28);
+display: inline-block;
+margin-right: 10px;
 flex: 0 0 auto;
+}
+.summary-row {
+position: relative;
+}
+.summary-row.active-summary span {
+display: flex;
+align-items: center;
 }
 
 .overlay {
@@ -758,17 +743,18 @@ color: white;
 0%, 100% { opacity: .16; transform: scale(1); }
 50% { opacity: .42; transform: scale(1.3); }
 }
-
+@keyframes drift {
+0% { transform: translate3d(0,0,0) scale(1); }
+100% { transform: translate3d(14px,-6px,0) scale(1.03); }
+}
 @keyframes pulse {
 0%, 100% { transform: scale(1); opacity: .84; }
 50% { transform: scale(1.24); opacity: 1; }
 }
-
 @keyframes modalIn {
 from { opacity: 0; transform: translateY(10px) scale(.99); }
 to { opacity: 1; transform: translateY(0) scale(1); }
 }
-
 @keyframes activeBorderPulse {
 0%, 100% {
 border-color: rgba(255,140,58,0.62);
@@ -819,14 +805,11 @@ grid-template-columns: 1fr;
 <div class="brand-mark"></div>
 <div class="brand-text">AI Call Port</div>
 </div>
-
 <div class="console-meta">
 <div class="page-title">Step 1 — System Configuration</div>
 <div class="progress-wrap">
 <div class="progress-text">Step 1 of 3</div>
-<div class="progress-bar">
-<div class="progress-fill"></div>
-</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
 </div>
 </div>
 </header>
@@ -856,21 +839,14 @@ grid-template-columns: 1fr;
 <aside class="right-side">
 <div class="summary-panel">
 <div class="summary-title">Live System Summary</div>
-
 <div class="summary-block">
 <strong id="summaryProgress">0 of 6 configuration points completed</strong>
-<span id="summaryProgressSub">
-Your system structure is being prepared as you complete each required step.
-</span>
+<span id="summaryProgressSub">Your system structure is being prepared as you complete each required step.</span>
 </div>
-
 <div class="summary-block">
 <strong>What will be configured</strong>
-<span>
-Call handling, business logic, reminders, CRM structure, team workflow, and system automation.
-</span>
+<span>Call handling, business logic, reminders, CRM structure, team workflow, and system automation.</span>
 </div>
-
 <div class="summary-rows">
 <div class="summary-row"><span>Country</span><b id="sumCountry">Pending</b></div>
 <div class="summary-row"><span>Industry</span><b id="sumIndustry">Pending</b></div>
@@ -890,15 +866,13 @@ Call handling, business logic, reminders, CRM structure, team workflow, and syst
 <div class="modal">
 <div class="modal-head">
 <div class="modal-head-left">
-<small id="modalStepLabel">Step 1A</small>
+<small id="modalStepLabel">Step 01</small>
 <h2 id="modalTitle">Country</h2>
 <p id="modalDescription">Choose where your business operates so we can configure your system correctly.</p>
 </div>
 <div class="modal-progress" id="modalProgress">1 / 6</div>
 </div>
-
 <div class="modal-body" id="modalBody"></div>
-
 <div class="modal-foot">
 <button class="modal-btn btn-ghost" id="cancelBtn">Cancel</button>
 <button class="modal-btn btn-primary" id="nextBtn" disabled>Next</button>
@@ -955,70 +929,24 @@ const industryData = {
 };
 
 const steps = [
-{
-key: 'country',
-label: 'Country',
-code: '1A',
-cta: 'Select',
-description: 'Choose where your business operates so we can configure your system correctly.',
-type: 'search-country'
-},
-{
-key: 'industry',
-label: 'Industry',
-code: '1B',
-cta: 'Select',
-description: 'Select your business type so we can generate the right workflow and automation.',
-type: 'search-industry'
-},
-{
-key: 'businessName',
-label: 'Business Name',
-code: '1C',
-cta: 'Select',
-description: 'Enter your company name for business-specific configuration.',
-type: 'text',
-placeholder: 'Enter your company name'
-},
-{
-key: 'callHandling',
-label: 'Call Handling',
-code: '1D',
-cta: 'Configure',
-description: 'Define how your AI system should handle incoming calls.',
-type: 'cards',
-options: [
+{ key: 'country', label: 'Country', code: '1A', cta: 'Select', description: 'Choose where your business operates so we can configure your system correctly.', type: 'search-country' },
+{ key: 'industry', label: 'Industry', code: '1B', cta: 'Select', description: 'Select your business type so we can generate the right workflow and automation.', type: 'search-industry' },
+{ key: 'businessName', label: 'Business Name', code: '1C', cta: 'Select', description: 'Enter your company name for business-specific configuration.', type: 'text', placeholder: 'Enter your company name' },
+{ key: 'callHandling', label: 'Call Handling', code: '1D', cta: 'Configure', description: 'Define how your AI system should handle incoming calls.', type: 'cards', options: [
 { value: 'Lead Capture', desc: 'Capture caller details and notify your team.' },
 { value: 'Appointment Booking', desc: 'Book appointments automatically when possible.' },
 { value: 'Both', desc: 'Capture leads and book appointments.' }
-]
-},
-{
-key: 'businessHours',
-label: 'Business Hours',
-code: '1E',
-cta: 'Configure',
-description: 'Choose your operating schedule and service availability.',
-type: 'cards',
-options: [
+]},
+{ key: 'businessHours', label: 'Business Hours', code: '1E', cta: 'Configure', description: 'Choose your operating schedule and service availability.', type: 'cards', options: [
 { value: 'Standard 9–5', desc: 'Standard weekday business hours.' },
 { value: 'Extended Hours', desc: 'Evenings or longer service windows.' },
 { value: '24/7', desc: 'Always available or after-hours handling required.' }
-]
-},
-{
-key: 'teamSetup',
-label: 'Team Setup',
-code: '1F',
-cta: 'Configure',
-description: 'Tell us how your business is staffed so workflow can be prepared correctly.',
-type: 'cards',
-options: [
+]},
+{ key: 'teamSetup', label: 'Team Setup', code: '1F', cta: 'Configure', description: 'Tell us how your business is staffed so workflow can be prepared correctly.', type: 'cards', options: [
 { value: 'Just Me', desc: 'Solo operator or owner-managed business.' },
 { value: 'Small Team', desc: 'A few employees or field staff.' },
 { value: 'Larger Team', desc: 'Multiple employees and more active workflow.' }
-]
-}
+]}
 ];
 
 const state = {
@@ -1046,7 +974,6 @@ const modalProgress = document.getElementById('modalProgress');
 const modalStepLabel = document.getElementById('modalStepLabel');
 const cancelBtn = document.getElementById('cancelBtn');
 const nextBtn = document.getElementById('nextBtn');
-
 let stagedValue = null;
 
 function formatStatus(status) {
@@ -1061,24 +988,18 @@ const value = state.values[step.key];
 const isCompleted = !!value;
 const isActive = index === state.activeStepIndex;
 const isEnabled = isCompleted || isActive;
-const isCurrentCompleted = state.lastCompletedKey === step.key;
-
+const isCurrentCompleted = isCompleted && state.lastCompletedKey === step.key;
 const display = step.key === 'country' && value
 ? `${value} — ${formatStatus(state.values.countryStatus)}`
 : (value || step.cta);
 
 return `
-<button
-class="step-card ${isEnabled ? 'enabled' : ''} ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''} ${isCurrentCompleted ? 'current-completed' : ''}"
-onclick="openStep(${index})"
->
+<button class="step-card ${isEnabled ? 'enabled' : ''} ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''} ${isCurrentCompleted ? 'current-completed' : ''}" onclick="openStep(${index})">
 <div class="step-top">
 <div class="step-label">Step ${step.code}</div>
 <div class="step-indicator"></div>
 </div>
-
 <h3>${step.label}</h3>
-
 <div class="step-meta">
 <div class="step-action">${step.cta}</div>
 <div class="step-value">${display}</div>
@@ -1101,13 +1022,11 @@ document.getElementById('sumTeam').textContent = state.values.teamSetup || 'Pend
 
 const done = steps.filter(s => !!state.values[s.key]).length;
 document.getElementById('summaryProgress').textContent = `${done} of 6 configuration points completed`;
-document.getElementById('summaryProgressSub').textContent =
-done === 6
+document.getElementById('summaryProgressSub').textContent = done === 6
 ? 'All required inputs are complete. Your activation flow is ready to continue.'
 : 'Your system structure is being prepared as you complete each required step.';
 
 document.querySelectorAll('.summary-row').forEach(row => row.classList.remove('active-summary'));
-
 const activeKey = state.lastCompletedKey || steps[state.activeStepIndex]?.key;
 const map = {
 country: 'sumCountry',
@@ -1117,19 +1036,19 @@ callHandling: 'sumCalls',
 businessHours: 'sumHours',
 teamSetup: 'sumTeam'
 };
-
 const activeEl = document.getElementById(map[activeKey]);
-if (activeEl) activeEl.parentElement.classList.add('active-summary');
+if (activeEl) {
+activeEl.parentElement.classList.add('active-summary');
+}
 }
 
 function openStep(index) {
 if (!(index === state.activeStepIndex || !!state.values[steps[index].key])) return;
-
 state.currentStepIndex = index;
 const step = steps[index];
 stagedValue = state.values[step.key] || null;
 
-modalStepLabel.textContent = `Step ${step.code}`;
+modalStepLabel.textContent = `Step ${steps[index].code}`;
 modalTitle.textContent = step.label;
 modalDescription.textContent = step.description;
 modalProgress.textContent = `${index + 1} / ${steps.length}`;
@@ -1142,40 +1061,24 @@ function renderModalBody(step) {
 nextBtn.disabled = true;
 
 if (step.type === 'text') {
-modalBody.innerHTML = `
-<input
-id="textInput"
-class="text-input"
-type="text"
-placeholder="${step.placeholder}"
-value="${state.values[step.key] || ''}"
-/>
-`;
-
+modalBody.innerHTML = `<input id="textInput" class="text-input" type="text" placeholder="${step.placeholder}" value="${state.values[step.key] || ''}" />`;
 const input = document.getElementById('textInput');
 input.focus();
-
 input.addEventListener('input', () => {
 stagedValue = input.value.trim();
 nextBtn.disabled = stagedValue.length < 2;
 });
-
 stagedValue = state.values[step.key] || '';
 nextBtn.disabled = stagedValue.length < 2;
 return;
 }
 
 if (step.type === 'cards') {
-modalBody.innerHTML = `
-<div class="option-grid">
-${step.options.map(option => `
+modalBody.innerHTML = `<div class="option-grid">${step.options.map(option => `
 <div class="option-card ${state.values[step.key] === option.value ? 'selected' : ''}" data-value="${option.value}">
 <strong>${option.value}</strong>
 <span>${option.desc}</span>
-</div>
-`).join('')}
-</div>
-`;
+</div>`).join('')}</div>`;
 
 modalBody.querySelectorAll('.option-card').forEach(card => {
 card.addEventListener('click', () => {
@@ -1185,18 +1088,13 @@ stagedValue = card.dataset.value;
 nextBtn.disabled = false;
 });
 });
-
 stagedValue = state.values[step.key] || null;
 nextBtn.disabled = !stagedValue;
 return;
 }
 
 if (step.type === 'search-country') {
-modalBody.innerHTML = `
-<input id="countrySearch" class="search" type="text" placeholder="Search country" />
-<div class="search-list" id="countryList"></div>
-`;
-
+modalBody.innerHTML = `<input id="countrySearch" class="search" type="text" placeholder="Search country" /><div class="search-list" id="countryList"></div>`;
 renderCountryList('');
 document.getElementById('countrySearch').addEventListener('input', e => renderCountryList(e.target.value));
 stagedValue = state.values[step.key] || null;
@@ -1205,11 +1103,7 @@ return;
 }
 
 if (step.type === 'search-industry') {
-modalBody.innerHTML = `
-<input id="industrySearch" class="search" type="text" placeholder="Search industry" />
-<div class="search-list" id="industryList"></div>
-`;
-
+modalBody.innerHTML = `<input id="industrySearch" class="search" type="text" placeholder="Search industry" /><div class="search-list" id="industryList"></div>`;
 renderIndustryList('');
 document.getElementById('industrySearch').addEventListener('input', e => renderIndustryList(e.target.value));
 stagedValue = state.values[step.key] || null;
@@ -1220,13 +1114,10 @@ nextBtn.disabled = !stagedValue;
 function renderCountryList(query) {
 const q = query.trim().toLowerCase();
 const list = document.getElementById('countryList');
-
 list.innerHTML = Object.entries(countryData).map(([continent, items]) => {
 const filtered = items.filter(item => item.name.toLowerCase().includes(q));
 if (!filtered.length) return '';
-
-return `
-<div>
+return `<div>
 <div class="group-title">${continent}</div>
 <div class="option-grid" style="grid-template-columns:1fr;">
 ${filtered.map(item => `
@@ -1236,11 +1127,9 @@ ${filtered.map(item => `
 <span>${item.status === 'active' ? 'Available now' : item.status === 'soon' ? 'Coming soon' : 'Projected market'}</span>
 </div>
 <span class="badge ${item.status}">${formatStatus(item.status)}</span>
+</div>`).join('')}
 </div>
-`).join('')}
-</div>
-</div>
-`;
+</div>`;
 }).join('');
 
 list.querySelectorAll('.search-option').forEach(option => {
@@ -1257,24 +1146,19 @@ nextBtn.disabled = false;
 function renderIndustryList(query) {
 const q = query.trim().toLowerCase();
 const list = document.getElementById('industryList');
-
 list.innerHTML = Object.entries(industryData).map(([category, items]) => {
 const filtered = items.filter(item => item.toLowerCase().includes(q));
 if (!filtered.length) return '';
-
-return `
-<div>
+return `<div>
 <div class="group-title">${category}</div>
 <div class="option-grid">
 ${filtered.map(item => `
 <div class="option-card ${state.values.industry === item ? 'selected' : ''}" data-value="${item}">
 <strong>${item}</strong>
 <span>${category}</span>
+</div>`).join('')}
 </div>
-`).join('')}
-</div>
-</div>
-`;
+</div>`;
 }).join('');
 
 list.querySelectorAll('.option-card').forEach(card => {
@@ -1295,7 +1179,6 @@ stagedValue = null;
 function saveAndAdvance() {
 const step = steps[state.currentStepIndex];
 if (!stagedValue) return;
-
 state.values[step.key] = stagedValue;
 state.lastCompletedKey = step.key;
 
@@ -1320,11 +1203,8 @@ closeModal();
 }
 
 cancelBtn.addEventListener('click', closeModal);
-overlay.addEventListener('click', (e) => {
-if (e.target === overlay) closeModal();
-});
+overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
 nextBtn.addEventListener('click', saveAndAdvance);
-
 buildBtn.addEventListener('click', () => {
 alert('Activation protocol complete. Ready to continue to the next stage.');
 console.log(state.values);
@@ -1334,3 +1214,4 @@ renderSteps();
 </script>
 </body>
 </html>
+
