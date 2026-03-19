@@ -18,7 +18,7 @@
 --light-gray: rgba(245,242,237,0.82);
 --orange: #ff7a1a;
 --orange-2: #ff8c3a;
---orange-3: #ffb27a;
+--orange-3: #ff8a2a;
 --orange-soft: #f39a58;
 --blue: #1f7cff;
 --green: #5fd07a;
@@ -299,7 +299,21 @@ validateCurrentStep();
 }
 
 function bindBusinessProfile(){ document.getElementById('countrySearch').addEventListener('input', e=>renderCountryList(e.target.value)); document.getElementById('industrySearch').addEventListener('input', e=>renderIndustryList(e.target.value)); document.getElementById('businessNameInput').addEventListener('input', e=>{ stagedValue.businessName=e.target.value.trim(); refreshQuestionSummaries(); validateCurrentStep(); }); document.getElementById('websiteInput').addEventListener('input', e=>{ stagedValue.website=e.target.value.trim(); refreshQuestionSummaries(); validateCurrentStep(); }); document.getElementById('phoneInput').addEventListener('input', e=>{ stagedValue.phone=e.target.value.trim(); refreshQuestionSummaries(); validateCurrentStep(); }); }
-function bindCommon(){ modalBody.querySelectorAll('[data-single-name]').forEach(card=>card.addEventListener('click',()=>{ const name=card.dataset.singleName; modalBody.querySelectorAll(`[data-single-name="${name}"]`).forEach(c=>c.classList.remove('selected')); card.classList.add('selected'); stagedValue[name]=card.dataset.value; nextQuestionReveal(); })); modalBody.querySelectorAll('[data-multi-name]').forEach(chip=>chip.addEventListener('click',()=>{ const name=chip.dataset.multiName,val=chip.dataset.value; chip.classList.toggle('selected'); if(!Array.isArray(stagedValue[name])) stagedValue[name]=[]; stagedValue[name]=stagedValue[name].includes(val)?stagedValue[name].filter(v=>v!==val):[...stagedValue[name],val]; refreshQuestionSummaries(); validateCurrentStep(); })); const other=document.getElementById('offeredOtherInput'); if(other) other.addEventListener('blur',()=>{ stagedValue.offeredOther=other.value.trim(); nextQuestionReveal(); }); }
+function bindCommon(){ modalBody.querySelectorAll('[data-single-name]').forEach(card=>card.addEventListener('click',()=>{ const name=card.dataset.singleName; modalBody.querySelectorAll(`[data-single-name="${name}"]`).forEach(c=>c.classList.remove('selected')); card.classList.add('selected'); stagedValue[name]=card.dataset.value; nextQuestionReveal(); })); modalBody.querySelectorAll('[data-multi-name]').forEach(chip=>chip.addEventListener('click',()=>{
+const name=chip.dataset.multiName,val=chip.dataset.value;
+chip.classList.toggle('selected');
+if(!Array.isArray(stagedValue[name])) stagedValue[name]=[];
+stagedValue[name]=stagedValue[name].includes(val)
+? stagedValue[name].filter(v=>v!==val)
+: [...stagedValue[name],val];
+
+refreshQuestionSummaries();
+validateCurrentStep();
+
+if(name === 'offered' && stagedValue[name].length > 0){
+setTimeout(()=> nextQuestionReveal(), 250);
+}
+})); const other=document.getElementById('offeredOtherInput'); if(other) other.addEventListener('blur',()=>{ stagedValue.offeredOther=other.value.trim(); nextQuestionReveal(); }); }
 function bindBusinessHours(){ modalBody.querySelectorAll('[data-day-enabled]').forEach(cb=>cb.addEventListener('change',()=>{ stagedValue.hours[cb.dataset.dayEnabled].enabled=cb.checked; refreshQuestionSummaries(); validateCurrentStep(); })); modalBody.querySelectorAll('[data-day-open]').forEach(i=>i.addEventListener('input',()=>{ stagedValue.hours[i.dataset.dayOpen].open=i.value; refreshQuestionSummaries(); validateCurrentStep(); })); modalBody.querySelectorAll('[data-day-close]').forEach(i=>i.addEventListener('input',()=>{ stagedValue.hours[i.dataset.dayClose].close=i.value; refreshQuestionSummaries(); validateCurrentStep(); })); }
 function renderCountryList(query){ const q=query.trim().toLowerCase(), wrap=document.getElementById('countryList'); if(!wrap) return; wrap.innerHTML = Object.entries(countryData).map(([continent,items])=>{ const filtered=items.filter(item=>item.name.toLowerCase().includes(q)); if(!filtered.length) return ''; return `<div><div class="group-title">${continent}</div>${filtered.map(item=>`<div class="search-option ${stagedValue.country===item.name?'selected':''}" data-country-value="${item.name}" data-country-status="${item.status}"><div><strong>${item.name}</strong><span>${item.status==='active'?'Available now':item.status==='soon'?'Coming soon':'Projected market'}</span></div><span class="badge ${item.status}">${formatStatus(item.status)}</span></div>`).join('')}</div>`; }).join(''); wrap.querySelectorAll('[data-country-value]').forEach(opt=>opt.addEventListener('click',()=>{ stagedValue.country=opt.dataset.countryValue; stagedValue.countryStatus=opt.dataset.countryStatus; refreshQuestionSummaries(); if(stagedValue.countryStatus!=='active'){ showWaitlistBox(); validateCurrentStep(); } else { removeWaitlistBox(); nextQuestionReveal(); } renderCountryList(query); })); }
 function showWaitlistBox(){ removeWaitlistBox(); const box=document.createElement('div'); box.id='waitingListPrompt'; box.className='notify-box'; box.innerHTML=`<strong>${stagedValue.country} is not active yet</strong><p>We’ll notify you as soon as your country becomes active.</p><div class="inline-grid-2"><input id="notifyEmail" class="text-input" type="email" placeholder="Enter your email" value="${stagedValue.waitlistEmail||''}"/><input id="notifyBusiness" class="text-input" type="text" placeholder="Business name (optional)" value="${stagedValue.waitlistBusiness||stagedValue.businessName||''}"/></div>`; const target = modalBody.querySelector('[data-question="country"]'); if (target) target.appendChild(box); document.getElementById('notifyEmail').addEventListener('blur',e=>{ stagedValue.waitlistEmail=e.target.value.trim(); refreshQuestionSummaries(); nextQuestionReveal(); }); document.getElementById('notifyBusiness').addEventListener('input',e=>{ stagedValue.waitlistBusiness=e.target.value.trim(); }); }
@@ -313,3 +327,4 @@ renderSummaryRows(); renderSteps();
 </script>
 </body>
 </html>
+
