@@ -14,7 +14,473 @@
 --panel-2: #161311;
 --line: rgba(255,255,255,0.08);
 --text: #f5f2ed;
+--muted: rgba(245,242,237,0.70);<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Call Port — Step 1 System Configuration</title>
+<style>
+:root {
+--bg: #050404;
+--bg-2: #0a0807;
+--console: #0f0d0b;
+--console-2: #14110f;
+--panel: #12100e;
+--panel-2: #161311;
+--line: rgba(255,255,255,0.08);
+--text: #f5f2ed;
 --muted: rgba(245,242,237,0.70);
+--orange: #ff7a1a;
+--orange-2: #ff8c3a;
+--orange-3: #ffb27a;
+--blue: #1f7cff;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+margin: 0;
+height: 100vh;
+overflow: hidden;
+font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+color: var(--text);
+background:
+radial-gradient(circle at 18% 14%, rgba(255,122,26,0.05), transparent 22%),
+radial-gradient(circle at 82% 22%, rgba(255,180,120,0.04), transparent 18%),
+linear-gradient(180deg, #080706 0%, var(--bg-2) 48%, var(--bg) 100%);
+}
+.bg-grid,.bg-stars{position:fixed;inset:0;pointer-events:none}.bg-grid{background:linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at center,black 45%,transparent 96%);opacity:.35}.bg-stars span{position:absolute;width:2px;height:2px;border-radius:999px;background:rgba(255,255,255,.15);box-shadow:0 0 6px rgba(255,255,255,.08);animation:twinkle 4s ease-in-out infinite}
+.page-shell{height:100vh;padding:18px 20px;display:flex;align-items:center;justify-content:center;overflow:hidden}.console{position:relative;width:min(1280px,calc(100vw - 40px));height:min(94vh,900px);padding:18px 22px;background:linear-gradient(180deg,var(--console-2) 0%,var(--console) 100%);border:1px solid rgba(255,255,255,.12);border-radius:28px;box-shadow:0 40px 120px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.04);overflow:hidden}.console::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%),rgba(255,140,58,.11),rgba(255,122,26,.05) 20%,transparent 58%)}.console::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:28px;box-shadow:inset 0 0 70px rgba(255,122,26,.03)}.console-inner{position:relative;z-index:1;height:100%;display:grid;grid-template-rows:auto auto 1fr auto;gap:10px}
+.console-header{display:flex;align-items:center;justify-content:space-between;gap:20px}.brand-row{display:flex;align-items:center;gap:10px}.brand-mark{width:18px;height:18px;border-radius:6px;background:var(--orange);box-shadow:0 6px 16px rgba(255,122,26,.14)}.brand-text{font-size:13px;font-weight:800;letter-spacing:-.03em}.console-meta{display:flex;align-items:center;gap:12px}.page-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,242,237,.5);font-weight:700}.progress-wrap{display:flex;align-items:center;gap:10px}.progress-text{font-size:11px;color:rgba(245,242,237,.64);white-space:nowrap}.progress-bar{position:relative;width:110px;height:7px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.04);overflow:hidden}.progress-fill{position:absolute;inset:0 auto 0 0;width:33.33%;background:var(--orange);border-radius:inherit;box-shadow:0 0 10px rgba(255,122,26,.12)}
+.status-row{display:flex;align-items:center;justify-content:space-between;gap:18px}.system-status{display:inline-flex;align-items:center;gap:10px;min-height:28px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,122,26,.18);background:rgba(255,122,26,.05);color:rgba(255,221,203,.88);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800}.status-dot{width:8px;height:8px;border-radius:999px;background:var(--orange);box-shadow:0 0 10px rgba(255,122,26,.3)}
+.main-grid{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 332px;gap:18px;align-items:stretch}.left-col{min-height:0;display:grid;grid-template-rows:auto auto 1fr auto;gap:10px}.hero{padding:2px 2px 0}.hero h1{margin:0;font-size:clamp(34px,4vw,54px);line-height:.95;letter-spacing:-.07em;font-weight:800;text-shadow:0 0 16px rgba(255,255,255,.05)}.hero-white{color:#f5f2ed}.hero-accent{color:var(--orange-3)}.hero p{margin:8px 0 0;max-width:700px;color:var(--muted);font-size:14px;line-height:1.45}.protocol-head{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end}.protocol-title{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);font-weight:800}.protocol-sub{margin-top:4px;color:rgba(245,242,237,.56);font-size:10px;letter-spacing:.10em;text-transform:uppercase;font-weight:700}
+.steps-grid{min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(6,1fr);gap:10px}.step-card{min-height:0;height:100%;border-radius:18px;border:1px solid var(--line);background:var(--panel);padding:12px 14px;position:relative;overflow:hidden;cursor:not-allowed;opacity:.24;pointer-events:none;transition:transform .18s ease,opacity .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease}.step-card.enabled{opacity:1;pointer-events:auto}.step-card.completed{opacity:.94;border-color:rgba(255,140,58,.46);background:linear-gradient(180deg,rgba(255,122,26,.045),#14110f);box-shadow:0 0 0 1px rgba(255,122,26,.06)}.step-card.active{border-color:rgba(255,140,58,.72);background:linear-gradient(180deg,rgba(255,122,26,.08),#14110f);box-shadow:0 0 0 1px rgba(255,122,26,.10),0 0 12px rgba(255,122,26,.08);animation:activeBorderPulse 1.8s ease-in-out infinite}.step-card.current-completed{border-color:rgba(255,140,58,.72);background:linear-gradient(180deg,rgba(255,122,26,.08),#14110f);box-shadow:0 0 0 1px rgba(255,122,26,.10),0 0 12px rgba(255,122,26,.08)}.step-card:hover.enabled{transform:translateY(-1px);background:var(--panel-2);border-color:rgba(255,255,255,.14)}.step-card::after{content:"";position:absolute;inset:auto auto -34px -34px;width:100px;height:100px;border-radius:999px;background:radial-gradient(circle,rgba(255,122,26,.06),transparent 68%);opacity:0;transition:opacity .18s ease}.step-card.active::after,.step-card.completed::after,.step-card.current-completed::after{opacity:1}.step-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.step-label{color:var(--orange);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:800}.step-indicator{width:9px;height:9px;border-radius:999px;background:transparent}.step-card.active .step-indicator{background:var(--orange);box-shadow:0 0 12px rgba(255,122,26,.22)}.step-indicator.blink-live{animation:pulse 1.8s ease-in-out infinite}.step-card.completed .step-indicator,.step-card.current-completed .step-indicator{background:var(--orange);box-shadow:0 0 10px rgba(255,122,26,.18)}.step-card h3{margin:10px 0 4px;font-size:22px;line-height:1.02;letter-spacing:-.05em;font-weight:800;color:var(--blue)}.step-meta{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-top:10px}.step-action{font-size:12px;color:rgba(245,242,237,.32);font-weight:700;letter-spacing:-.01em}.step-card.active .step-action,.step-card.current-completed .step-action,.step-card.completed .step-action{color:rgba(245,242,237,.88)}.step-value{font-size:11px;color:rgba(245,242,237,.76);font-weight:700;text-align:right;max-width:54%}.step-card:not(.completed):not(.current-completed) .step-value{color:rgba(245,242,237,.26)}.step-card.completed .step-value,.step-card.current-completed .step-value{color:rgba(245,242,237,.92)}
+.cta-wrap{padding-top:0}.cta-note{font-size:12px;color:rgba(255,222,201,.82);font-weight:700;margin:0 0 8px 2px;letter-spacing:-.01em}.cta-button{width:100%;height:64px;border:1px solid rgba(255,122,26,.60);border-radius:18px;background:linear-gradient(180deg,var(--orange-2),var(--orange));color:#fff;font-size:17px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;cursor:pointer;transition:transform .18s ease,background .18s ease,opacity .18s ease,box-shadow .18s ease}.cta-button:hover:not(:disabled){transform:translateY(-1px);background:var(--orange-2)}.cta-button:disabled{opacity:.34;cursor:not-allowed}.cta-button.pulse{animation:ctaPulse 1.45s ease-in-out infinite;box-shadow:0 0 24px rgba(255,122,26,.38), inset 0 1px 0 rgba(255,255,255,.18)}
+.summary-panel{height:100%;border-radius:20px;border:1px solid rgba(255,255,255,.10);background:var(--panel);padding:14px;box-shadow:0 18px 46px rgba(0,0,0,.28);display:grid;grid-template-rows:auto auto 1fr;gap:8px}.summary-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,213,186,.72);font-weight:800}.summary-block{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);border-radius:14px;padding:10px 12px}.summary-block strong{display:block;font-size:12px;font-weight:800;margin-bottom:4px}.summary-block span{display:block;color:rgba(245,242,237,.62);font-size:11px;line-height:1.4}.summary-rows{min-height:0;overflow:auto;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.018);border-radius:14px;padding:8px 10px}.summary-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;color:rgba(245,242,237,.58)}.summary-row:last-child{border-bottom:0}.summary-row b{color:rgba(245,242,237,.92);font-weight:700}.summary-row.active-summary{color:rgba(255,213,186,.86);background:rgba(255,122,26,.05);border-radius:8px;padding-left:8px;padding-right:8px}.summary-row.active-summary b{color:#fff1e7}.summary-row.active-summary span{display:flex;align-items:center;gap:8px}.summary-row.active-summary span::before{content:"";width:7px;height:7px;border-radius:999px;background:var(--orange);box-shadow:0 0 10px rgba(255,122,26,.28);flex:0 0 auto}
+.overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:50;padding:20px;background:rgba(3,2,2,.76);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}.overlay.show{display:flex}.modal{width:min(900px,100%);max-height:min(88vh,900px);overflow:hidden;border-radius:24px;border:1px solid rgba(255,255,255,.10);background:#100e0c;box-shadow:0 38px 90px rgba(0,0,0,.60);animation:modalIn .24s cubic-bezier(.22,.8,.24,1);display:flex;flex-direction:column}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.07)}.modal-head-left small{display:block;color:rgba(255,213,186,.72);font-size:11px;letter-spacing:.10em;text-transform:uppercase;font-weight:800;margin-bottom:8px}.modal-head-left h2{margin:0;font-size:26px;line-height:1.04;letter-spacing:-.05em;font-weight:800}.modal-head-left p{margin:8px 0 0;color:rgba(245,242,237,.66);font-size:14px;line-height:1.5;max-width:620px}.modal-progress{font-size:12px;color:rgba(245,242,237,.56);font-weight:700;white-space:nowrap}.modal-body{padding:16px 20px;overflow:auto;display:grid;gap:10px}
+.accordion{border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.018);overflow:hidden}.accordion-head{width:100%;border:0;background:transparent;color:inherit;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;text-align:left}.accordion-head:hover{background:rgba(255,255,255,.02)}.accordion-title{font-size:12px;font-weight:800;color:rgba(255,245,236,.96)}.accordion-summary{font-size:11px;color:rgba(245,242,237,.62);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:50%}.accordion.open .accordion-summary{color:rgba(255,212,183,.88)}.accordion-caret{font-size:14px;color:rgba(255,180,120,.8)}.accordion-body{display:none;padding:0 16px 14px}.accordion.open .accordion-body{display:block}.question-note{margin-top:8px;font-size:11px;color:rgba(245,242,237,.56);line-height:1.4}
+.search,.text-input,.textarea-input,.phone-input{width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#151311;color:#fff;padding:0 14px;font-size:14px;outline:none;transition:border-color .18s ease,box-shadow .18s ease}.search,.text-input,.phone-input{height:50px}.textarea-input{min-height:98px;padding:12px 14px;resize:vertical}.search:focus,.text-input:focus,.textarea-input:focus,.phone-input:focus{border-color:rgba(255,140,58,.52);box-shadow:0 0 0 3px rgba(255,122,26,.06)}.search::placeholder,.text-input::placeholder,.textarea-input::placeholder,.phone-input::placeholder{color:rgba(245,242,237,.34)}
+.option-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}.chips-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.option-card,.search-option,.chip{border:1px solid rgba(255,255,255,.08);background:#151311;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease}.option-card{border-radius:14px;padding:12px}.search-option{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border-radius:12px;padding:11px 12px;margin-top:10px}.chip{border-radius:999px;padding:10px 12px;font-size:12px;font-weight:700;color:rgba(245,242,237,.86)}.option-card:hover,.search-option:hover,.chip:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.14)}.option-card.selected,.search-option.selected,.chip.selected{border-color:rgba(255,140,58,.54);background:rgba(255,122,26,.08)}.option-card strong,.search-option strong{display:block;font-size:14px;font-weight:800;letter-spacing:-.02em}.option-card span,.search-option span{display:block;margin-top:3px;color:rgba(245,242,237,.54);font-size:12px;line-height:1.35}.search-list{display:grid;gap:14px;max-height:240px;overflow:auto;padding-right:4px;margin-top:10px}.group-title{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,242,237,.42);font-weight:800;margin-bottom:8px}.badge{min-height:24px;padding:0 9px;border-radius:999px;display:inline-flex;align-items:center;font-size:11px;font-weight:800;border:1px solid rgba(255,255,255,.06);white-space:nowrap}.badge.active{background:rgba(34,197,94,.12);color:#d8ffe4;border-color:rgba(34,197,94,.16)}.badge.soon{background:rgba(255,122,26,.10);color:#ffd2ae;border-color:rgba(255,122,26,.16)}.badge.projected{background:rgba(255,255,255,.04);color:rgba(245,242,237,.72);border-color:rgba(255,255,255,.08)}
+.day-hours-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}.day-row{border:1px solid rgba(255,255,255,.08);border-radius:14px;background:#151311;padding:12px}.day-row-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:10px}.day-row-head strong{font-size:13px}.day-row input[type="time"]{width:100%;height:38px;margin-top:8px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#0f0d0b;color:#fff;padding:0 10px;font-size:12px}.inline-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}.notify-box{border:1px solid rgba(255,122,26,.18);background:rgba(255,122,26,.05);border-radius:14px;padding:12px;margin-top:10px}.notify-box strong{display:block;margin-bottom:6px;font-size:13px;letter-spacing:-.01em}.notify-box p{margin:0;color:rgba(245,242,237,.66);font-size:12px;line-height:1.4}
+.modal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px 18px;border-top:1px solid rgba(255,255,255,.07)}.modal-btn{min-width:120px;height:44px;border-radius:13px;font-size:14px;font-weight:800;border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:transform .16s ease,opacity .16s ease,background .16s ease}.modal-btn:hover:not(:disabled){transform:translateY(-1px)}.btn-ghost{background:rgba(255,255,255,.03);color:rgba(245,242,237,.90)}.btn-primary{border:1px solid rgba(255,122,26,.56);background:var(--orange);color:#fff}.btn-primary:hover:not(:disabled){background:var(--orange-2)}.modal-btn:disabled{opacity:.4;cursor:not-allowed}
+@keyframes twinkle{0%,100%{opacity:.16;transform:scale(1)}50%{opacity:.42;transform:scale(1.3)}}@keyframes pulse{0%,100%{transform:scale(1);opacity:.84}50%{transform:scale(1.24);opacity:1}}@keyframes ctaPulse{0%,100%{transform:scale(1);box-shadow:0 0 18px rgba(255,122,26,.25)}50%{transform:scale(1.02);box-shadow:0 0 30px rgba(255,140,58,.48)}}@keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes activeBorderPulse{0%,100%{border-color:rgba(255,140,58,.62);box-shadow:0 0 0 1px rgba(255,122,26,.10),0 0 10px rgba(255,122,26,.06)}50%{border-color:rgba(255,166,94,.88);box-shadow:0 0 0 1px rgba(255,140,58,.14),0 0 14px rgba(255,140,58,.08)}}
+@media (max-width:1100px){body{overflow:auto}.page-shell{height:auto;min-height:100vh;overflow:auto}.console{height:auto;min-height:94vh}.console-inner{grid-template-rows:auto auto auto auto}.main-grid{grid-template-columns:1fr}.summary-panel{height:auto}}
+@media (max-width:760px){body{overflow:auto}.page-shell{padding:14px}.console{width:100%;height:auto;min-height:unset;padding:16px;border-radius:22px}.console-inner{height:auto;display:block}.console-header{flex-direction:column;align-items:flex-start;gap:10px}.status-row{display:block}.main-grid{display:block}.left-col{display:block}.hero h1{font-size:clamp(34px,10vw,52px)}.hero p{font-size:15px}.steps-grid,.option-grid,.day-hours-grid,.inline-grid-2{grid-template-columns:1fr}.steps-grid{grid-template-rows:none}.step-card{min-height:118px}.summary-panel{margin-top:14px}.modal{width:min(94vw,860px)}.accordion-head{padding:12px 14px}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-stars" aria-hidden="true">
+<span style="left:15%; top:18%; animation-delay:.3s"></span>
+<span style="left:30%; top:24%; animation-delay:1.2s"></span>
+<span style="left:46%; top:16%; animation-delay:2.1s"></span>
+<span style="left:65%; top:25%; animation-delay:.9s"></span>
+<span style="left:80%; top:19%; animation-delay:1.8s"></span>
+<span style="left:72%; top:76%; animation-delay:2.6s"></span>
+<span style="left:38%; top:74%; animation-delay:1.4s"></span>
+</div>
+
+<div class="page-shell">
+<div class="console" id="console">
+<div class="console-inner">
+<header class="console-header">
+<div class="brand-row"><div class="brand-mark"></div><div class="brand-text">AI Call Port</div></div>
+<div class="console-meta">
+<div class="page-title">Step 1 — System Configuration</div>
+<div class="progress-wrap"><div class="progress-text">Step 1 of 3</div><div class="progress-bar"><div class="progress-fill"></div></div></div>
+</div>
+</header>
+<div class="status-row"><div class="system-status"><span class="status-dot"></span><span id="systemStatusText">System status: configuring</span></div></div>
+<div class="main-grid">
+<section class="left-col">
+<div class="hero"><h1><span class="hero-white">System</span> <span class="hero-accent">Configuration</span></h1><p>We analyze your business and automatically build your AI call system.</p></div>
+<div class="protocol-head"><div><div class="protocol-title">11 Steps Build Sequence</div><div class="protocol-sub">Only the next unfinished step blinks</div></div></div>
+<div class="steps-grid" id="stepsGrid"></div>
+<div class="cta-wrap"><div class="cta-note" id="ctaNote">Complete Step 1 to unlock your live demo</div><button class="cta-button" id="buildBtn" disabled>Step 2 — Demo Call</button></div>
+</section>
+<aside><div class="summary-panel"><div class="summary-title">Live System Summary</div><div class="summary-block"><strong id="summaryProgress">0 of 11 system components configured</strong><span id="summaryProgressSub">Your system structure is being prepared as you complete each required step.</span></div><div class="summary-block"><strong>What will be configured</strong><span>Call handling, business logic, reminders, CRM structure, team workflow, templates, inferred voice, and demo scenarios.</span></div><div class="summary-rows" id="summaryRows"></div></div></aside>
+</div>
+</div>
+</div>
+</div>
+
+<div class="overlay" id="overlay">
+<div class="modal">
+<div class="modal-head"><div class="modal-head-left"><small id="modalStepLabel">Step 1A</small><h2 id="modalTitle">Business Profile</h2><p id="modalDescription">Answer a few questions and we’ll configure the system for you.</p></div><div class="modal-progress" id="modalProgress">1 / 11</div></div>
+<div class="modal-body" id="modalBody"></div>
+<div class="modal-foot"><button class="modal-btn btn-ghost" id="cancelBtn">Cancel</button><button class="modal-btn btn-primary" id="nextBtn" disabled>Next</button></div>
+</div>
+</div>
+
+<script>
+const consoleEl = document.getElementById('console');
+consoleEl.addEventListener('mousemove', e => {
+const r = consoleEl.getBoundingClientRect();
+consoleEl.style.setProperty('--mx', `${((e.clientX-r.left)/r.width)*100}%`);
+consoleEl.style.setProperty('--my', `${((e.clientY-r.top)/r.height)*100}%`);
+});
+
+const countryData = {
+'North America': [{ name:'Canada', status:'active' }, { name:'United States', status:'active' }, { name:'Mexico', status:'active' }, { name:'Jamaica', status:'soon' }, { name:'Dominican Republic', status:'projected' }],
+'South America': [{ name:'Brazil', status:'soon' }, { name:'Argentina', status:'projected' }, { name:'Chile', status:'projected' }],
+'Europe': [{ name:'United Kingdom', status:'active' }, { name:'Germany', status:'active' }, { name:'France', status:'active' }, { name:'Spain', status:'active' }, { name:'Italy', status:'soon' }, { name:'Netherlands', status:'active' }, { name:'Sweden', status:'projected' }],
+'Asia': [{ name:'China', status:'active' }, { name:'Japan', status:'active' }, { name:'India', status:'soon' }, { name:'Singapore', status:'active' }, { name:'United Arab Emirates', status:'active' }],
+'Africa': [{ name:'South Africa', status:'projected' }, { name:'Nigeria', status:'projected' }],
+'Oceania': [{ name:'Australia', status:'active' }, { name:'New Zealand', status:'active' }]
+};
+
+const industryData = {
+'Home Services': ['Plumbing','HVAC','Electrical','Roofing','Appliance Repair','Cleaning Services','Landscaping','Pest Control','Windows & Doors'],
+'Healthcare': ['Clinic','Dental','Physiotherapy','Chiropractic','Home Care','Veterinary'],
+'Professional Services': ['Real Estate','Law Firm','Accounting','Insurance','Consulting','Financial Services'],
+'Beauty & Wellness': ['Salon','Med Spa','Barbershop','Massage Therapy','Nail Studio'],
+'Automotive': ['Auto Repair','Tire Shop','Detailing','Collision Repair','Tow Service'],
+'Retail & Local': ['Retail Store','Restaurant','Catering','Education & Training','Security Services','Cleaning Company']
+};
+
+const serviceCatalog = {
+'Plumbing':['Leak Repair','Drain Cleaning','Water Heater','Installation','Inspection','Emergency Service'],
+'HVAC':['Repair','Installation','Maintenance','Emergency Service','Inspection'],
+'Electrical':['Repair','Installation','Panel Upgrade','Inspection','Emergency Service'],
+'Windows & Doors':['Estimate','Installation','Repair','Replacement','Commercial Project'],
+'Clinic':['Consultation','Follow-up Visit','Urgent Visit','General Questions'],
+'Dental':['Cleaning','Consultation','Emergency Visit','Follow-up'],
+'Real Estate':['Showing','Buyer Inquiry','Seller Inquiry','Valuation','Consultation'],
+'default':['Consultation','Estimate','Repair','Installation','Emergency Service','General Service']
+};
+const urgencyCatalog = {
+'Plumbing':['Burst pipe','No water','Overflow','Major leak'],
+'HVAC':['No heat','No cooling','Gas smell','System failure'],
+'Electrical':['Power outage','Burning smell','Sparking','Panel issue'],
+'default':['Urgent request','Customer stranded','Safety risk','Immediate response needed']
+};
+
+const steps = [
+{ key:'businessProfile', label:'Business Profile', code:'1A', cta:'Answer', description:'Tell us who you are and where your business operates.' },
+{ key:'services', label:'Services', code:'1B', cta:'Answer', description:'Help us understand what your business offers.' },
+{ key:'customerIntent', label:'Customer Intent', code:'1C', cta:'Answer', description:'Tell us why customers usually contact your business.' },
+{ key:'currentWorkflow', label:'Current Workflow', code:'1D', cta:'Answer', description:'Show us how your business handles calls today.' },
+{ key:'scheduling', label:'Scheduling & Availability', code:'1E', cta:'Answer', description:'Define appointment logic and business availability.' },
+{ key:'team', label:'Team Structure', code:'1F', cta:'Answer', description:'Tell us how your team is organized.' },
+{ key:'urgency', label:'Urgency & Priority', code:'1G', cta:'Answer', description:'Tell us how urgent calls and priority customers should be treated.' },
+{ key:'serviceArea', label:'Service Area', code:'1H', cta:'Answer', description:'Where do you operate and what happens outside your service area?' },
+{ key:'pricing', label:'Pricing & Quotes', code:'1I', cta:'Answer', description:'Tell us how pricing and estimates are handled.' },
+{ key:'followUp', label:'Communication & Follow-Up', code:'1J', cta:'Answer', description:'Tell us how reminders, missed calls, and summaries should work.' },
+{ key:'specialNotes', label:'Special Notes', code:'1K', cta:'Answer', description:'Anything special we should know before generating your system?' }
+];
+
+const summaryMap = { businessProfile:'Business Profile', services:'Services', customerIntent:'Customer Intent', currentWorkflow:'Current Workflow', scheduling:'Scheduling & Availability', team:'Team Structure', urgency:'Urgency & Priority', serviceArea:'Service Area', pricing:'Pricing & Quotes', followUp:'Communication & Follow-Up', specialNotes:'Special Notes' };
+const defaultHours = () => { const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']; const out={}; days.forEach((d,i)=>out[d]={enabled:i<5,open:'09:00',close:'17:00'}); return out; };
+
+const state = { currentStepIndex:0, activeStepIndex:0, lastCompletedKey:'', values:{ businessProfile:{country:'',countryStatus:'',industry:'',businessName:'',website:'',phone:'',waitlistEmail:'',waitlistBusiness:''}, services:{offered:[],offeredOther:'',handledSameWay:'',commonServices:[]}, customerIntent:{reasons:[],topPriority:'',firstCallGoal:''}, currentWorkflow:{callsHandledToday:'',missedCallBehavior:'',newLeadHandling:'',existingCustomerHandling:''}, scheduling:{appointmentsNeeded:'',schedulingHandledBy:'',hours:defaultHours(),afterHours:'',sameDay:'',duration:'',buffer:''}, team:{teamSize:'',roles:[],whoAnswersCalls:'',whoReceivesLeads:'',assignmentStyle:''}, urgency:{urgencyFrequency:'',urgentTypes:[],urgentTypesOther:'',urgentAction:'',vipCustomers:'',vipHandling:''}, serviceArea:{areas:'',multiLocation:'',outsideAreaBehavior:''}, pricing:{pricingAsked:'',pricingImmediate:'',quoteFallback:'',pricingMentioned:''}, followUp:{missedCallFollowUp:'',customerReminders:'',teamReminders:'',noConfirmationBaseline:'',summaryDelivery:''}, specialNotes:{notes:'',exclusions:''} } };
+
+const stepsGrid = document.getElementById('stepsGrid');
+const summaryRows = document.getElementById('summaryRows');
+const buildBtn = document.getElementById('buildBtn');
+const overlay = document.getElementById('overlay');
+const modalBody = document.getElementById('modalBody');
+const modalTitle = document.getElementById('modalTitle');
+const modalDescription = document.getElementById('modalDescription');
+const modalProgress = document.getElementById('modalProgress');
+const modalStepLabel = document.getElementById('modalStepLabel');
+const cancelBtn = document.getElementById('cancelBtn');
+const nextBtn = document.getElementById('nextBtn');
+const systemStatusText = document.getElementById('systemStatusText');
+const ctaNote = document.getElementById('ctaNote');
+let stagedValue = null;
+
+const formatStatus = s => s === 'active' ? 'Active' : s === 'soon' ? 'Coming soon' : 'Projected';
+const getSelectedIndustry = () => state.values.businessProfile.industry || 'default';
+const getServicesForIndustry = () => serviceCatalog[getSelectedIndustry()] || serviceCatalog.default;
+const getUrgenciesForIndustry = () => urgencyCatalog[getSelectedIndustry()] || urgencyCatalog.default;
+
+function isStepComplete(key){
+const v = state.values[key];
+switch(key){
+case 'businessProfile': return !!(v.country && v.industry && v.businessName && (v.countryStatus==='active' || v.waitlistEmail));
+case 'services': return v.offered.length>0 && !!v.handledSameWay;
+case 'customerIntent': return v.reasons.length>0 && !!v.topPriority && !!v.firstCallGoal;
+case 'currentWorkflow': return !!(v.callsHandledToday && v.missedCallBehavior && v.newLeadHandling && v.existingCustomerHandling);
+case 'scheduling': return !!(v.appointmentsNeeded && v.schedulingHandledBy && v.afterHours && (v.appointmentsNeeded==='No, mostly inquiry only' || (v.sameDay && v.duration && v.buffer)));
+case 'team': return !!(v.teamSize && v.roles.length && v.whoAnswersCalls && v.whoReceivesLeads && v.assignmentStyle);
+case 'urgency': return !!v.urgencyFrequency && (v.urgencyFrequency==='Never' || (v.urgentAction && v.vipCustomers && (v.vipCustomers!=='Yes' || v.vipHandling)));
+case 'serviceArea': return !!(v.areas && v.multiLocation && v.outsideAreaBehavior);
+case 'pricing': return !!(v.pricingAsked && v.pricingImmediate && v.quoteFallback && v.pricingMentioned);
+case 'followUp': return !!(v.missedCallFollowUp && v.customerReminders && v.teamReminders && v.noConfirmationBaseline && v.summaryDelivery);
+case 'specialNotes': return true;
+default: return false;
+}
+}
+
+function summaryValue(key){
+const v = state.values[key];
+switch(key){
+case 'businessProfile': return v.businessName || 'Pending';
+case 'services': return v.offered.length ? `${v.offered.length} selected` : 'Pending';
+case 'customerIntent': return v.topPriority || 'Pending';
+case 'currentWorkflow': return v.callsHandledToday || 'Pending';
+case 'scheduling': return v.appointmentsNeeded || 'Pending';
+case 'team': return v.teamSize || 'Pending';
+case 'urgency': return v.urgencyFrequency || 'Pending';
+case 'serviceArea': return v.areas || 'Pending';
+case 'pricing': return v.pricingImmediate || 'Pending';
+case 'followUp': return v.summaryDelivery || 'Pending';
+case 'specialNotes': return v.notes ? 'Added' : 'Optional';
+default: return 'Pending';
+}
+}
+
+function accordionSummary(stepKey, questionId){
+const v = stagedValue || {};
+const join = arr => arr && arr.length ? `${arr.length} selected` : 'Select';
+const map = {
+businessProfile_country: v.country ? `${v.country}${v.countryStatus && v.countryStatus !== 'active' ? ' — notify' : ''}` : 'Select',
+businessProfile_industry: v.industry || 'Select',
+businessProfile_name: v.businessName || 'Select',
+businessProfile_website: v.website || 'Optional',
+businessProfile_phone: v.phone || 'Optional',
+services_offered: join(v.offered),
+services_other: v.offeredOther || 'Optional',
+services_handled: v.handledSameWay || 'Select',
+services_common: join(v.commonServices),
+customerIntent_reasons: join(v.reasons),
+customerIntent_priority: v.topPriority || 'Select',
+customerIntent_goal: v.firstCallGoal || 'Select',
+currentWorkflow_calls: v.callsHandledToday || 'Select',
+currentWorkflow_missed: v.missedCallBehavior || 'Select',
+currentWorkflow_leads: v.newLeadHandling || 'Select',
+currentWorkflow_existing: v.existingCustomerHandling || 'Select',
+scheduling_needed: v.appointmentsNeeded || 'Select',
+scheduling_who: v.schedulingHandledBy || 'Select',
+scheduling_hours: 'Set hours',
+scheduling_after: v.afterHours || 'Select',
+scheduling_same: v.sameDay || 'Select',
+scheduling_duration: v.duration || 'Select',
+scheduling_buffer: v.buffer || 'Select',
+team_size: v.teamSize || 'Select',
+team_roles: join(v.roles),
+team_answer: v.whoAnswersCalls || 'Select',
+team_receive: v.whoReceivesLeads || 'Select',
+team_assign: v.assignmentStyle || 'Select',
+urgency_freq: v.urgencyFrequency || 'Select',
+urgency_types: join(v.urgentTypes),
+urgency_other: v.urgentTypesOther || 'Optional',
+urgency_action: v.urgentAction || 'Select',
+urgency_vip: v.vipCustomers || 'Select',
+urgency_viphandling: v.vipHandling || 'Select',
+serviceArea_areas: v.areas || 'Select',
+serviceArea_multi: v.multiLocation || 'Select',
+serviceArea_outside: v.outsideAreaBehavior || 'Select',
+pricing_asked: v.pricingAsked || 'Select',
+pricing_immediate: v.pricingImmediate || 'Select',
+pricing_fallback: v.quoteFallback || 'Select',
+pricing_mention: v.pricingMentioned || 'Select',
+followUp_missed: v.missedCallFollowUp || 'Select',
+followUp_customer: v.customerReminders || 'Select',
+followUp_team: v.teamReminders || 'Select',
+followUp_confirm: v.noConfirmationBaseline || 'Select',
+followUp_delivery: v.summaryDelivery || 'Select',
+specialNotes_notes: v.notes ? 'Added' : 'Optional',
+specialNotes_exclusions: v.exclusions ? 'Added' : 'Optional'
+};
+return map[`${stepKey}_${questionId}`] || 'Select';
+}
+
+function makeAccordion(stepKey, questionId, label, content, note = '', open = false){
+return `<div class="accordion ${open ? 'open' : ''}" data-accordion="${questionId}"><button type="button" class="accordion-head" data-accordion-toggle="${questionId}"><div class="accordion-title">${label}</div><div class="accordion-summary">${accordionSummary(stepKey, questionId)}</div><div class="accordion-caret">▾</div></button><div class="accordion-body">${content}${note ? `<div class="question-note">${note}</div>` : ''}</div></div>`;
+}
+
+function renderSummaryRows(){
+summaryRows.innerHTML = steps.map(step => `<div class="summary-row" data-summary-key="${step.key}"><span>${summaryMap[step.key]}</span><b id="sum-${step.key}">${summaryValue(step.key)}</b></div>`).join('');
+}
+
+function updateStatusUI(){
+const done = steps.filter(step=>isStepComplete(step.key)).length;
+const allDone = done === steps.length;
+systemStatusText.textContent = allDone ? 'System status: ready for demo' : 'System status: configuring';
+ctaNote.textContent = allDone ? 'Your AI system is ready to simulate real calls' : 'Complete Step 1 to unlock your live demo';
+}
+
+function updateSummary(){
+steps.forEach(step=>{ const el=document.getElementById(`sum-${step.key}`); if(el) el.textContent = summaryValue(step.key); });
+const done = steps.filter(step=>isStepComplete(step.key)).length;
+document.getElementById('summaryProgress').textContent = `${done} of ${steps.length} system components configured`;
+document.getElementById('summaryProgressSub').textContent = done===steps.length ? 'All required inputs are complete. Your activation flow is ready to continue.' : 'Your system structure is being prepared as you complete each required step.';
+document.querySelectorAll('.summary-row').forEach(r=>r.classList.remove('active-summary'));
+steps.forEach(step=>{ if(isStepComplete(step.key)){ const row=document.querySelector(`[data-summary-key="${step.key}"]`); if(row) row.classList.add('active-summary'); } });
+updateStatusUI();
+}
+
+function renderSteps(){
+stepsGrid.innerHTML = steps.map((step,index)=>{
+const completed = isStepComplete(step.key), active = index===state.activeStepIndex, enabled = completed || active, currentCompleted = state.lastCompletedKey===step.key;
+const display = summaryValue(step.key), shouldBlink = active && !completed;
+return `<button class="step-card ${enabled?'enabled':''} ${completed?'completed':''} ${active?'active':''} ${currentCompleted?'current-completed':''}" onclick="openStep(${index})"><div class="step-top"><div class="step-label">Step ${step.code}</div><div class="step-indicator ${shouldBlink?'blink-live':''}"></div></div><h3>${step.label}</h3><div class="step-meta"><div class="step-action">${step.cta}</div><div class="step-value">${display}</div></div></button>`;
+}).join('');
+const allDone = steps.every(step=>isStepComplete(step.key));
+buildBtn.disabled = !allDone;
+buildBtn.classList.toggle('pulse', allDone);
+updateSummary();
+}
+
+function openStep(index){
+if(!(index===state.activeStepIndex || isStepComplete(steps[index].key))) return;
+state.currentStepIndex = index;
+stagedValue = JSON.parse(JSON.stringify(state.values[steps[index].key]));
+const step = steps[index];
+modalStepLabel.textContent = `Step ${step.code}`;
+modalTitle.textContent = step.label;
+modalDescription.textContent = step.description;
+modalProgress.textContent = `${index+1} / ${steps.length}`;
+renderModalBody(step);
+overlay.classList.add('show');
+}
+
+function singleCardGroup(name, options, current){ return `<div class="option-grid">${options.map(o=>`<div class="option-card ${current===o.value?'selected':''}" data-single-name="${name}" data-value="${o.value}"><strong>${o.value}</strong>${o.desc?`<span>${o.desc}</span>`:''}</div>`).join('')}</div>`; }
+function multiChipGroup(name, options, current){ return `<div class="chips-grid">${options.map(v=>`<div class="chip ${current.includes(v)?'selected':''}" data-multi-name="${name}" data-value="${v}">${v}</div>`).join('')}</div>`; }
+function renderBusinessHours(){ return `<div class="day-hours-grid">${Object.entries(stagedValue.hours).map(([day,cfg])=>`<div class="day-row"><div class="day-row-head"><strong>${day}</strong><label><input type="checkbox" data-day-enabled="${day}" ${cfg.enabled?'checked':''}/> Open</label></div><div class="inline-grid-2"><input type="time" data-day-open="${day}" value="${cfg.open}" ${cfg.enabled?'':'disabled'}/><input type="time" data-day-close="${day}" value="${cfg.close}" ${cfg.enabled?'':'disabled'}/></div></div>`).join('')}</div>`; }
+function renderCountrySearch(){ return `<input id="countrySearch" class="search" type="text" placeholder="Search country" /><div class="search-list" id="countryList"></div>`; }
+
+function renderModalBody(step){
+if(step.key==='businessProfile') modalBody.innerHTML = `${makeAccordion('businessProfile','country','Let’s locate your business', renderCountrySearch(), 'Active countries continue normally. Coming soon and projected countries open a notify flow.', true)}${makeAccordion('businessProfile','industry','Select your industry so we can model your call flows', `<input id="industrySearch" class="search" type="text" placeholder="Search industry" /><div class="search-list" id="industryList"></div>`)}${makeAccordion('businessProfile','name','What is your business name?', `<input id="businessNameInput" class="text-input" type="text" placeholder="Enter your business name" value="${stagedValue.businessName||''}" />`)}${makeAccordion('businessProfile','website','What is your business website? (optional)', `<input id="websiteInput" class="text-input" type="text" placeholder="https://yourbusiness.com" value="${stagedValue.website||''}" />`)}${makeAccordion('businessProfile','phone','What is your main phone number? (optional)', `<input id="phoneInput" class="phone-input" type="text" placeholder="(555) 555-5555" value="${stagedValue.phone||''}" />`)}`;
+if(step.key==='services') modalBody.innerHTML = `${makeAccordion('services','offered','What services do you offer?', multiChipGroup('offered', getServicesForIndustry(), stagedValue.offered), 'We’ll use this to map likely call outcomes and service-specific logic.', true)}${makeAccordion('services','other','Other service (optional)', `<input id="offeredOtherInput" class="text-input" type="text" placeholder="Add another service" value="${stagedValue.offeredOther||''}" />`)}${makeAccordion('services','handled','Are all services handled the same way?', singleCardGroup('handledSameWay', [{value:'Yes'},{value:'No — some require booking'},{value:'No — some require follow-up'},{value:'No — some are urgent'}], stagedValue.handledSameWay))}${makeAccordion('services','common','Which services are most common?', multiChipGroup('commonServices', stagedValue.offered.length?stagedValue.offered:getServicesForIndustry(), stagedValue.commonServices))}`;
+if(step.key==='customerIntent') modalBody.innerHTML = `${makeAccordion('customerIntent','reasons','Why do customers usually contact you?', multiChipGroup('reasons', ['Book appointment','Ask for price','Request urgent help','Ask general questions','Follow up on existing job','Reschedule or cancel','Leave a message'], stagedValue.reasons), '', true)}${makeAccordion('customerIntent','priority','What matters most to your business?', singleCardGroup('topPriority', [{value:'Capture every lead'},{value:'Book more appointments'},{value:'Handle urgent calls correctly'},{value:'Reduce missed calls'},{value:'Save staff time'}], stagedValue.topPriority))}${makeAccordion('customerIntent','goal','What outcome matters most on the first call?', singleCardGroup('firstCallGoal', [{value:'Booking'},{value:'Qualification'},{value:'Information'},{value:'Escalation'}], stagedValue.firstCallGoal))}`;
+if(step.key==='currentWorkflow') modalBody.innerHTML = `${makeAccordion('currentWorkflow','calls','How are calls handled today?', singleCardGroup('callsHandledToday', [{value:'I answer them myself'},{value:'My team answers them'},{value:'It depends who is available'},{value:'Many calls are missed'},{value:'We use voicemail'}], stagedValue.callsHandledToday), '', true)}${makeAccordion('currentWorkflow','missed','What happens when nobody answers?', singleCardGroup('missedCallBehavior', [{value:'We call back later'},{value:'We usually lose the lead'},{value:'We send a text'},{value:'Nothing consistent happens'}], stagedValue.missedCallBehavior))}${makeAccordion('currentWorkflow','leads','How are new leads handled today?', singleCardGroup('newLeadHandling', [{value:'Call immediately'},{value:'Follow up later'},{value:'Team handles it manually'},{value:'No clear process'}], stagedValue.newLeadHandling))}${makeAccordion('currentWorkflow','existing','How are existing customers handled?', singleCardGroup('existingCustomerHandling', [{value:'Same as new callers'},{value:'Prioritized'},{value:'Routed to team'},{value:'Depends on situation'}], stagedValue.existingCustomerHandling))}`;
+if(step.key==='scheduling') modalBody.innerHTML = `${makeAccordion('scheduling','needed','Do customers usually need appointments?', singleCardGroup('appointmentsNeeded', [{value:'Yes, almost always'},{value:'Sometimes'},{value:'No, mostly inquiry only'}], stagedValue.appointmentsNeeded), '', true)}${makeAccordion('scheduling','who','How is scheduling handled today?', singleCardGroup('schedulingHandledBy', [{value:'I schedule everything manually'},{value:'My team handles scheduling'},{value:'Customers book themselves'},{value:'We do not have a structured process'}], stagedValue.schedulingHandledBy))}${makeAccordion('scheduling','hours','Business hours', renderBusinessHours())}${makeAccordion('scheduling','after','What should happen after hours?', singleCardGroup('afterHours', [{value:'Take a message'},{value:'Capture lead and follow up later'},{value:'Book next available slot'},{value:'Urgent calls only'},{value:'Do nothing'}], stagedValue.afterHours))}${makeAccordion('scheduling','same','Are same-day appointments possible?', singleCardGroup('sameDay', [{value:'Yes'},{value:'Sometimes'},{value:'No'}], stagedValue.sameDay))}${makeAccordion('scheduling','duration','How long is a typical appointment?', singleCardGroup('duration', [{value:'15 min'},{value:'30 min'},{value:'45 min'},{value:'60 min'},{value:'90+ min'},{value:'Varies by service'}], stagedValue.duration))}${makeAccordion('scheduling','buffer','Do you need buffer time between appointments?', singleCardGroup('buffer', [{value:'None'},{value:'15 min'},{value:'30 min'},{value:'60 min'}], stagedValue.buffer))}`;
+if(step.key==='team') modalBody.innerHTML = `${makeAccordion('team','size','How many people work for you?', singleCardGroup('teamSize', [{value:'Just me'},{value:'2–5'},{value:'6–15'},{value:'16+'}], stagedValue.teamSize), '', true)}${makeAccordion('team','roles','What kind of team do you have?', multiChipGroup('roles', ['Service workers','Salespeople','Office staff','Dispatchers','Estimators','Mixed roles'], stagedValue.roles))}${makeAccordion('team','answer','Who usually answers calls?', singleCardGroup('whoAnswersCalls', [{value:'I do'},{value:'Office team'},{value:'Sales team'},{value:'Whoever is available'},{value:'Nobody consistently'}], stagedValue.whoAnswersCalls))}${makeAccordion('team','receive','Who should receive leads or bookings?', singleCardGroup('whoReceivesLeads', [{value:'Always owner'},{value:'Round robin'},{value:'Office team first'},{value:'Sales team'},{value:'Best available person'}], stagedValue.whoReceivesLeads))}${makeAccordion('team','assign','Do workers manage their own schedule or are jobs assigned?', singleCardGroup('assignmentStyle', [{value:'Workers manage their own schedule'},{value:'Office assigns jobs'},{value:'Owner assigns jobs'},{value:'Mixed process'}], stagedValue.assignmentStyle))}`;
+if(step.key==='urgency') modalBody.innerHTML = `${makeAccordion('urgency','freq','Do you receive urgent or emergency calls?', singleCardGroup('urgencyFrequency', [{value:'Often'},{value:'Sometimes'},{value:'Rarely'},{value:'Never'}], stagedValue.urgencyFrequency), '', true)}${makeAccordion('urgency','types','What counts as urgent?', multiChipGroup('urgentTypes', getUrgenciesForIndustry(), stagedValue.urgentTypes), 'We’ll use this to determine escalation logic automatically.')}${makeAccordion('urgency','other','Other urgent scenario (optional)', `<input id="urgentOtherInput" class="text-input" type="text" placeholder="Describe another urgent case" value="${stagedValue.urgentTypesOther||''}" />`)}${makeAccordion('urgency','action','What should happen on urgent calls?', singleCardGroup('urgentAction', [{value:'Notify owner immediately'},{value:'Route to available worker'},{value:'Collect details and escalate'},{value:'Give instructions then escalate'}], stagedValue.urgentAction))}${makeAccordion('urgency','vip','Do you have priority customers?', singleCardGroup('vipCustomers', [{value:'Yes'},{value:'No'}], stagedValue.vipCustomers))}${makeAccordion('urgency','viphandling','If yes, how should they be handled?', singleCardGroup('vipHandling', [{value:'Escalate immediately'},{value:'Skip normal queue'},{value:'Notify owner'},{value:'Standard handling'}], stagedValue.vipHandling))}`;
+if(step.key==='serviceArea') modalBody.innerHTML = `${makeAccordion('serviceArea','areas','Where do you operate?', `<textarea id="areasInput" class="textarea-input" placeholder="Enter cities, regions, ZIPs, or a service radius">${stagedValue.areas||''}</textarea>`, '', true)}${makeAccordion('serviceArea','multi','Do you serve multiple locations?', singleCardGroup('multiLocation', [{value:'Yes'},{value:'No'}], stagedValue.multiLocation))}${makeAccordion('serviceArea','outside','What should happen if someone is outside your service area?', singleCardGroup('outsideAreaBehavior', [{value:'Politely decline'},{value:'Collect lead anyway'},{value:'Offer callback'},{value:'Redirect elsewhere'}], stagedValue.outsideAreaBehavior))}`;
+if(step.key==='pricing') modalBody.innerHTML = `${makeAccordion('pricing','asked','Do customers usually ask for pricing over the phone?', singleCardGroup('pricingAsked', [{value:'Yes, often'},{value:'Sometimes'},{value:'Rarely'}], stagedValue.pricingAsked), '', true)}${makeAccordion('pricing','immediate','Can pricing be given immediately?', singleCardGroup('pricingImmediate', [{value:'Yes'},{value:'Only rough estimates'},{value:'No, quote required after inspection'}], stagedValue.pricingImmediate))}${makeAccordion('pricing','fallback','If pricing cannot be given, what should happen?', singleCardGroup('quoteFallback', [{value:'Book estimate'},{value:'Collect details for callback'},{value:'Explain process and create lead'}], stagedValue.quoteFallback))}${makeAccordion('pricing','mention','Do you want pricing mentioned at all?', singleCardGroup('pricingMentioned', [{value:'Yes'},{value:'Only starting prices'},{value:'No'}], stagedValue.pricingMentioned))}`;
+if(step.key==='followUp') modalBody.innerHTML = `${makeAccordion('followUp','missed','Should missed callers receive automatic follow-up?', singleCardGroup('missedCallFollowUp', [{value:'Yes'},{value:'No'}], stagedValue.missedCallFollowUp), '', true)}${makeAccordion('followUp','customer','Should customers receive appointment reminders?', singleCardGroup('customerReminders', [{value:'Yes'},{value:'No'}], stagedValue.customerReminders))}${makeAccordion('followUp','team','Should your team receive reminders too?', singleCardGroup('teamReminders', [{value:'Yes'},{value:'No'}], stagedValue.teamReminders))}${makeAccordion('followUp','confirm','If someone does not confirm, what happens today?', singleCardGroup('noConfirmationBaseline', [{value:'We follow up manually'},{value:'We often find out too late'},{value:'It varies'},{value:'No clear process'}], stagedValue.noConfirmationBaseline))}${makeAccordion('followUp','delivery','How should summaries be delivered?', singleCardGroup('summaryDelivery', [{value:'SMS'},{value:'Email'},{value:'CRM only'},{value:'Owner only'}], stagedValue.summaryDelivery))}`;
+if(step.key==='specialNotes') modalBody.innerHTML = `${makeAccordion('specialNotes','notes','Anything special we should know about your business?', `<textarea id="notesInput" class="textarea-input" placeholder="Add any business-specific details, exceptions, or important notes">${stagedValue.notes||''}</textarea>`, '', true)}${makeAccordion('specialNotes','exclusions','Are there any calls you never want handled automatically? (optional)', `<textarea id="exclusionsInput" class="textarea-input" placeholder="Describe any call types that should never be automated">${stagedValue.exclusions||''}</textarea>`)}`;
+
+bindAccordion();
+if(step.key==='businessProfile'){ renderCountryList(''); renderIndustryList(''); bindBusinessProfile(); }
+bindCommon();
+if(step.key==='scheduling') bindBusinessHours();
+if(step.key==='urgency'){ const u=document.getElementById('urgentOtherInput'); if(u) u.addEventListener('input',()=>{ stagedValue.urgentTypesOther=u.value.trim(); refreshAccordionSummaries(); validateCurrentStep(); }); }
+if(step.key==='serviceArea'){ const a=document.getElementById('areasInput'); a.addEventListener('input',()=>{ stagedValue.areas=a.value.trim(); refreshAccordionSummaries(); validateCurrentStep(); }); }
+if(step.key==='specialNotes'){ document.getElementById('notesInput').addEventListener('input',e=>{ stagedValue.notes=e.target.value.trim(); refreshAccordionSummaries(); validateCurrentStep(); }); document.getElementById('exclusionsInput').addEventListener('input',e=>{ stagedValue.exclusions=e.target.value.trim(); refreshAccordionSummaries(); validateCurrentStep(); }); }
+validateCurrentStep();
+refreshAccordionSummaries();
+}
+
+function bindAccordion(){
+modalBody.querySelectorAll('[data-accordion-toggle]').forEach(btn => btn.addEventListener('click', () => {
+const id = btn.dataset.accordionToggle;
+modalBody.querySelectorAll('.accordion').forEach(acc => acc.classList.remove('open'));
+const target = modalBody.querySelector(`[data-accordion="${id}"]`);
+if (target) target.classList.add('open');
+}));
+}
+
+function refreshAccordionSummaries(){
+const stepKey = steps[state.currentStepIndex].key;
+modalBody.querySelectorAll('.accordion').forEach(acc => {
+const id = acc.dataset.accordion;
+const el = acc.querySelector('.accordion-summary');
+if (el) el.textContent = accordionSummary(stepKey, id);
+});
+}
+
+function bindBusinessProfile(){
+document.getElementById('countrySearch').addEventListener('input', e=>renderCountryList(e.target.value));
+document.getElementById('industrySearch').addEventListener('input', e=>renderIndustryList(e.target.value));
+document.getElementById('businessNameInput').addEventListener('input', e=>{ stagedValue.businessName=e.target.value.trim(); refreshAccordionSummaries(); validateCurrentStep(); });
+document.getElementById('websiteInput').addEventListener('input', e=>{ stagedValue.website=e.target.value.trim(); refreshAccordionSummaries(); });
+document.getElementById('phoneInput').addEventListener('input', e=>{ stagedValue.phone=e.target.value.trim(); refreshAccordionSummaries(); });
+}
+
+function bindCommon(){
+modalBody.querySelectorAll('[data-single-name]').forEach(card=>card.addEventListener('click',()=>{
+const name=card.dataset.singleName; modalBody.querySelectorAll(`[data-single-name="${name}"]`).forEach(c=>c.classList.remove('selected')); card.classList.add('selected'); stagedValue[name]=card.dataset.value; refreshAccordionSummaries(); validateCurrentStep();
+}));
+modalBody.querySelectorAll('[data-multi-name]').forEach(chip=>chip.addEventListener('click',()=>{
+const name=chip.dataset.multiName,val=chip.dataset.value; chip.classList.toggle('selected'); if(!Array.isArray(stagedValue[name])) stagedValue[name]=[]; stagedValue[name]=stagedValue[name].includes(val)?stagedValue[name].filter(v=>v!==val):[...stagedValue[name],val]; refreshAccordionSummaries(); validateCurrentStep();
+}));
+const other=document.getElementById('offeredOtherInput'); if(other) other.addEventListener('input',()=>{ stagedValue.offeredOther=other.value.trim(); refreshAccordionSummaries(); });
+}
+
+function bindBusinessHours(){
+modalBody.querySelectorAll('[data-day-enabled]').forEach(cb=>cb.addEventListener('change',()=>{ stagedValue.hours[cb.dataset.dayEnabled].enabled=cb.checked; renderModalBody(steps[state.currentStepIndex]); }));
+modalBody.querySelectorAll('[data-day-open]').forEach(i=>i.addEventListener('input',()=>{ stagedValue.hours[i.dataset.dayOpen].open=i.value; refreshAccordionSummaries(); }));
+modalBody.querySelectorAll('[data-day-close]').forEach(i=>i.addEventListener('input',()=>{ stagedValue.hours[i.dataset.dayClose].close=i.value; refreshAccordionSummaries(); }));
+}
+
+function renderCountryList(query){
+const q=query.trim().toLowerCase(), wrap=document.getElementById('countryList'); if(!wrap) return;
+wrap.innerHTML = Object.entries(countryData).map(([continent,items])=>{
+const filtered=items.filter(item=>item.name.toLowerCase().includes(q)); if(!filtered.length) return '';
+return `<div><div class="group-title">${continent}</div>${filtered.map(item=>`<div class="search-option ${stagedValue.country===item.name?'selected':''}" data-country-value="${item.name}" data-country-status="${item.status}"><div><strong>${item.name}</strong><span>${item.status==='active'?'Available now':item.status==='soon'?'Coming soon':'Projected market'}</span></div><span class="badge ${item.status}">${formatStatus(item.status)}</span></div>`).join('')}</div>`;
+}).join('');
+wrap.querySelectorAll('[data-country-value]').forEach(opt=>opt.addEventListener('click',()=>{ stagedValue.country=opt.dataset.countryValue; stagedValue.countryStatus=opt.dataset.countryStatus; if(stagedValue.countryStatus!=='active') showWaitlistBox(); else removeWaitlistBox(); renderCountryList(query); refreshAccordionSummaries(); validateCurrentStep(); }));
+}
+
+function showWaitlistBox(){
+removeWaitlistBox();
+const box=document.createElement('div'); box.id='waitingListPrompt'; box.className='notify-box';
+box.innerHTML=`<strong>${stagedValue.country} is not active yet</strong><p>We’ll notify you as soon as your country becomes active.</p><div class="inline-grid-2"><input id="notifyEmail" class="text-input" type="email" placeholder="Enter your email" value="${stagedValue.waitlistEmail||''}"/><input id="notifyBusiness" class="text-input" type="text" placeholder="Business name (optional)" value="${stagedValue.waitlistBusiness||stagedValue.businessName||''}"/></div>`;
+const target = modalBody.querySelector('[data-accordion="country"] .accordion-body');
+if (target) target.appendChild(box);
+document.getElementById('notifyEmail').addEventListener('input',e=>{ stagedValue.waitlistEmail=e.target.value.trim(); refreshAccordionSummaries(); validateCurrentStep(); });
+document.getElementById('notifyBusiness').addEventListener('input',e=>{ stagedValue.waitlistBusiness=e.target.value.trim(); });
+}
+
+function removeWaitlistBox(){ const box=document.getElementById('waitingListPrompt'); if(box) box.remove(); }
+
+function renderIndustryList(query){
+const q=query.trim().toLowerCase(), wrap=document.getElementById('industryList'); if(!wrap) return;
+wrap.innerHTML = Object.entries(industryData).map(([category,items])=>{
+const filtered=items.filter(item=>item.toLowerCase().includes(q)); if(!filtered.length) return '';
+return `<div><div class="group-title">${category}</div><div class="option-grid">${filtered.map(item=>`<div class="option-card ${stagedValue.industry===item?'selected':''}" data-industry-value="${item}"><strong>${item}</strong><span>${category}</span></div>`).join('')}</div></div>`;
+}).join('');
+wrap.querySelectorAll('[data-industry-value]').forEach(card=>card.addEventListener('click',()=>{ wrap.querySelectorAll('[data-industry-value]').forEach(c=>c.classList.remove('selected')); card.classList.add('selected'); stagedValue.industry=card.dataset.industryValue; refreshAccordionSummaries(); validateCurrentStep(); }));
+}
+
+function validateCurrentStep(){
+const key=steps[state.currentStepIndex].key; let valid=false;
+if(key==='businessProfile') valid=!!(stagedValue.country && stagedValue.industry && stagedValue.businessName && (stagedValue.countryStatus==='active' || stagedValue.waitlistEmail));
+if(key==='services') valid=stagedValue.offered.length>0 && !!stagedValue.handledSameWay;
+if(key==='customerIntent') valid=stagedValue.reasons.length>0 && !!stagedValue.topPriority && !!stagedValue.firstCallGoal;
+if(key==='currentWorkflow') valid=!!(stagedValue.callsHandledToday && stagedValue.missedCallBehavior && stagedValue.newLeadHandling && stagedValue.existingCustomerHandling);
+if(key==='scheduling') valid=!!(stagedValue.appointmentsNeeded && stagedValue.schedulingHandledBy && stagedValue.afterHours && (stagedValue.appointmentsNeeded==='No, mostly inquiry only' || (stagedValue.sameDay && stagedValue.duration && stagedValue.buffer)));
+if(key==='team') valid=!!(stagedValue.teamSize && stagedValue.roles.length && stagedValue.whoAnswersCalls && stagedValue.whoReceivesLeads && stagedValue.assignmentStyle);
+if(key==='urgency') valid=!!stagedValue.urgencyFrequency && (stagedValue.urgencyFrequency==='Never' || (stagedValue.urgentAction && stagedValue.vipCustomers && (stagedValue.vipCustomers!=='Yes' || stagedValue.vipHandling)));
+if(key==='serviceArea') valid=!!(stagedValue.areas && stagedValue.multiLocation && stagedValue.outsideAreaBehavior);
+if(key==='pricing') valid=!!(stagedValue.pricingAsked && stagedValue.pricingImmediate && stagedValue.quoteFallback && stagedValue.pricingMentioned);
+if(key==='followUp') valid=!!(stagedValue.missedCallFollowUp && stagedValue.customerReminders && stagedValue.teamReminders && stagedValue.noConfirmationBaseline && stagedValue.summaryDelivery);
+if(key==='specialNotes') valid=true;
+nextBtn.disabled=!valid;
+}
+
+function closeModal(){ overlay.classList.remove('show'); stagedValue=null; }
+function saveAndAdvance(){
+if(nextBtn.disabled) return;
+const step=steps[state.currentStepIndex];
+state.values[step.key]=JSON.parse(JSON.stringify(stagedValue));
+state.lastCompletedKey=step.key;
+if(state.currentStepIndex < steps.length-1) state.activeStepIndex=Math.max(state.activeStepIndex, state.currentStepIndex+1);
+renderSteps();
+if(state.currentStepIndex < steps.length-1){
+state.currentStepIndex += 1;
+const nextStep=steps[state.currentStepIndex];
+stagedValue=JSON.parse(JSON.stringify(state.values[nextStep.key]));
+modalStepLabel.textContent=`Step ${nextStep.code}`; modalTitle.textContent=nextStep.label; modalDescription.textContent=nextStep.description; modalProgress.textContent=`${state.currentStepIndex+1} / ${steps.length}`;
+renderModalBody(nextStep);
+} else closeModal();
+}
+
+cancelBtn.addEventListener('click', closeModal);
+overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
+nextBtn.addEventListener('click', saveAndAdvance);
+buildBtn.addEventListener('click', ()=>{ alert('Step 1 complete. Proceeding to Step 2 — Demo Call.'); console.log('System configuration:', state.values); });
+
+renderSummaryRows();
+renderSteps();
+</script>
+</body>
+</html>
+
 --orange: #ff7a1a;
 --orange-2: #ff8c3a;
 --orange-3: #ffb27a;
