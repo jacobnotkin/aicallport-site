@@ -937,6 +937,15 @@ steps.forEach(step=>{ if(isStepComplete(step.key)){ const row=document.querySele
 updateStatusUI();
 }
 
+function bindStepCardHandlers(){
+document.querySelectorAll('[data-step-index]').forEach(btn=>{
+btn.addEventListener('click', ()=>{
+const index = Number(btn.dataset.stepIndex);
+openStep(index);
+});
+});
+}
+
 function renderSteps(){
 stepsGrid.innerHTML = steps.map((step,index)=>{
 const completed = isStepComplete(step.key);
@@ -944,8 +953,9 @@ const active = index===state.activeStepIndex && !completed;
 const enabled = completed || index===state.activeStepIndex;
 const currentCompleted = state.lastCompletedKey===step.key && completed;
 const display = summaryValue(step.key);
-return `<button class="step-card ${enabled?'enabled':''} ${completed?'completed':''} ${active?'active':''} ${currentCompleted?'current-completed':''}" onclick="openStep(${index})"><div class="step-top"><div class="step-label">Step ${step.code}</div><div class="step-indicator ${active?'blink-live':''}"></div></div><h3>${step.label}</h3><div class="step-meta"><div class="step-action">${step.cta}</div><div class="step-value">${display}</div></div></button>`;
+return `<button type="button" class="step-card ${enabled?'enabled':''} ${completed?'completed':''} ${active?'active':''} ${currentCompleted?'current-completed':''}" data-step-index="${index}"><div class="step-top"><div class="step-label">Step ${step.code}</div><div class="step-indicator ${active?'blink-live':''}"></div></div><h3>${step.label}</h3><div class="step-meta"><div class="step-action">${step.cta}</div><div class="step-value">${display}</div></div></button>`;
 }).join('');
+bindStepCardHandlers();
 const allDone = steps.every(step=>isStepComplete(step.key));
 buildBtn.disabled = !allDone;
 buildBtn.classList.toggle('pulse', allDone);
@@ -1230,6 +1240,78 @@ nextQuestionReveal();
 }));
 }
 
+function isCurrentQuestionValid() {
+const stepKey = steps[state.currentStepIndex].key;
+const q = modalQuestionOrder[modalQuestionIndex];
+const v = stagedValue;
+
+if (stepKey === 'businessProfile') {
+if (q === 'country') return !!(v.country && (v.countryStatus === 'active' || v.waitlistEmail));
+if (q === 'industry') return !!v.industry;
+if (q === 'name') return !!v.businessName;
+return true;
+}
+if (stepKey === 'services') {
+if (q === 'offered') return v.offered.length > 0;
+if (q === 'handled') return !!v.handledSameWay;
+return true;
+}
+if (stepKey === 'customerIntent') {
+if (q === 'reasons') return v.reasons.length > 0;
+if (q === 'priority') return !!v.topPriority;
+if (q === 'goal') return !!v.firstCallGoal;
+}
+if (stepKey === 'currentWorkflow') {
+if (q === 'calls') return !!v.callsHandledToday;
+if (q === 'missed') return !!v.missedCallBehavior;
+if (q === 'leads') return !!v.newLeadHandling;
+if (q === 'existing') return !!v.existingCustomerHandling;
+}
+if (stepKey === 'scheduling') {
+if (q === 'needed') return !!v.appointmentsNeeded;
+if (q === 'who') return !!v.schedulingHandledBy;
+if (q === 'hours') return true;
+if (q === 'after') return !!v.afterHours;
+if (q === 'same') return !!v.sameDay;
+if (q === 'duration') return v.appointmentsNeeded === 'No, mostly inquiry only' ? true : !!v.duration;
+if (q === 'buffer') return v.appointmentsNeeded === 'No, mostly inquiry only' ? true : !!v.buffer;
+}
+if (stepKey === 'team') {
+if (q === 'size') return !!v.teamSize;
+if (q === 'roles') return v.roles.length > 0;
+if (q === 'answer') return !!v.whoAnswersCalls;
+if (q === 'receive') return !!v.whoReceivesLeads;
+if (q === 'assign') return !!v.assignmentStyle;
+}
+if (stepKey === 'urgency') {
+if (q === 'freq') return !!v.urgencyFrequency;
+if (q === 'types') return v.urgencyFrequency === 'Never' ? true : v.urgentTypes.length > 0;
+if (q === 'action') return v.urgencyFrequency === 'Never' ? true : !!v.urgentAction;
+if (q === 'vip') return v.urgencyFrequency === 'Never' ? true : !!v.vipCustomers;
+if (q === 'viphandling') return v.vipCustomers === 'Yes' ? !!v.vipHandling : true;
+return true;
+}
+if (stepKey === 'serviceArea') {
+if (q === 'areas') return !!v.areas;
+if (q === 'multi') return !!v.multiLocation;
+if (q === 'outside') return !!v.outsideAreaBehavior;
+}
+if (stepKey === 'pricing') {
+if (q === 'asked') return !!v.pricingAsked;
+if (q === 'immediate') return !!v.pricingImmediate;
+if (q === 'fallback') return !!v.quoteFallback;
+if (q === 'mention') return !!v.pricingMentioned;
+}
+if (stepKey === 'followUp') {
+if (q === 'missed') return !!v.missedCallFollowUp;
+if (q === 'customer') return !!v.customerReminders;
+if (q === 'team') return !!v.teamReminders;
+if (q === 'confirm') return !!v.noConfirmationBaseline;
+if (q === 'delivery') return !!v.summaryDelivery;
+}
+return true;
+}
+
 function validateCurrentStep(){
 const key=steps[state.currentStepIndex].key;
 let valid=false;
@@ -1244,7 +1326,10 @@ if(key==='serviceArea') valid=!!(stagedValue.areas && stagedValue.multiLocation 
 if(key==='pricing') valid=!!(stagedValue.pricingAsked && stagedValue.pricingImmediate && stagedValue.quoteFallback && stagedValue.pricingMentioned);
 if(key==='followUp') valid=!!(stagedValue.missedCallFollowUp && stagedValue.customerReminders && stagedValue.teamReminders && stagedValue.noConfirmationBaseline && stagedValue.summaryDelivery);
 if(key==='specialNotes') valid=true;
-nextBtn.disabled=!valid;
+
+const onLastQuestion = modalQuestionIndex >= modalQuestionOrder.length - 1;
+nextBtn.textContent = onLastQuestion ? 'Next' : 'Continue';
+nextBtn.disabled = onLastQuestion ? !valid : !isCurrentQuestionValid();
 }
 
 function closeModal(){ overlay.classList.remove('show'); stagedValue=null; }
@@ -1270,7 +1355,15 @@ renderModalBody(nextStep);
 
 cancelBtn.addEventListener('click', closeModal);
 overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
-nextBtn.addEventListener('click', saveAndAdvance);
+nextBtn.addEventListener('click', () => {
+if (modalQuestionIndex < modalQuestionOrder.length - 1) {
+modalQuestionIndex += 1;
+showCurrentQuestion();
+validateCurrentStep();
+return;
+}
+saveAndAdvance();
+});
 buildBtn.addEventListener('click', ()=>{ alert('Step 1 complete. Proceeding to Step 2 — Demo Call.'); console.log('System configuration:', state.values); });
 
 renderSummaryRows();
