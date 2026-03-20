@@ -6,35 +6,34 @@
 <title>AI Call Port — Step 1 System Configuration</title>
 <style>
 :root {
---bg: #050404;
---bg-2: #0a0807;
---console: #0f0d0b;
---console-2: #14110f;
---panel: #12100e;
---panel-2: #161311;
---line: rgba(255,255,255,0.08);
+--bg: #060505;
+--bg2: #0b0908;
+--console: #100d0b;
+--console2: #171210;
+--panel: #14110f;
+--panel2: #191512;
+--line: rgba(255,255,255,0.09);
 --text: #f5f2ed;
---muted: rgba(245,242,237,0.70);
---light-gray: rgba(245,242,237,0.82);
+--muted: rgba(245,242,237,0.68);
+--soft: rgba(245,242,237,0.82);
 --orange: #ff7a1a;
---orange-2: #ff8c3a;
---orange-3: #ff9c4a;
---orange-soft: #f39a58;
---green: #5fd07a;
+--orange2: #ff8f38;
+--heroAccent: #ff9a47;
+--questionAccent: #ee9653;
+--green: #60d27d;
 }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
 margin: 0;
-height: 100vh;
-overflow: hidden;
 font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 color: var(--text);
 background:
-radial-gradient(circle at 18% 14%, rgba(255,122,26,0.05), transparent 22%),
-radial-gradient(circle at 82% 22%, rgba(255,180,120,0.04), transparent 18%),
-linear-gradient(180deg, #080706 0%, var(--bg-2) 48%, var(--bg) 100%);
+radial-gradient(circle at 18% 14%, rgba(255,122,26,.05), transparent 22%),
+radial-gradient(circle at 82% 22%, rgba(255,180,120,.04), transparent 18%),
+linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+overflow: hidden;
 }
 
 .bg-grid, .bg-stars { position: fixed; inset: 0; pointer-events: none; }
@@ -62,7 +61,6 @@ padding: 18px 20px;
 display: flex;
 align-items: center;
 justify-content: center;
-overflow: hidden;
 }
 
 .console {
@@ -70,7 +68,7 @@ position: relative;
 width: min(1280px, calc(100vw - 40px));
 height: min(94vh, 900px);
 padding: 18px 22px;
-background: linear-gradient(180deg, var(--console-2) 0%, var(--console) 100%);
+background: linear-gradient(180deg, var(--console2) 0%, var(--console) 100%);
 border: 1px solid rgba(255,255,255,.12);
 border-radius: 28px;
 box-shadow: 0 40px 120px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);
@@ -81,15 +79,7 @@ content: "";
 position: absolute;
 inset: 0;
 pointer-events: none;
-background: radial-gradient(320px circle at var(--mx,50%) var(--my,50%), rgba(255,140,58,.11), rgba(255,122,26,.05) 20%, transparent 58%);
-}
-.console::after {
-content: "";
-position: absolute;
-inset: 0;
-pointer-events: none;
-border-radius: 28px;
-box-shadow: inset 0 0 70px rgba(255,122,26,.03);
+background: radial-gradient(320px circle at var(--mx,50%) var(--my,50%), rgba(255,140,58,.10), rgba(255,122,26,.04) 24%, transparent 58%);
 }
 .console-inner {
 position: relative;
@@ -124,9 +114,8 @@ color: rgba(245,242,237,.5);
 font-weight: 700;
 }
 .progress-wrap { display: flex; align-items: center; gap: 10px; }
-.progress-text { font-size: 11px; color: rgba(245,242,237,.64); white-space: nowrap; }
+.progress-text { font-size: 11px; color: rgba(245,242,237,.64); }
 .progress-bar {
-position: relative;
 width: 110px;
 height: 7px;
 border-radius: 999px;
@@ -135,9 +124,8 @@ border: 1px solid rgba(255,255,255,.04);
 overflow: hidden;
 }
 .progress-fill {
-position: absolute;
-inset: 0 auto 0 0;
 width: 33.33%;
+height: 100%;
 background: var(--orange);
 border-radius: inherit;
 box-shadow: 0 0 10px rgba(255,122,26,.12);
@@ -164,10 +152,9 @@ font-size: clamp(44px, 4.6vw, 64px);
 line-height: .94;
 letter-spacing: -.07em;
 font-weight: 800;
-text-shadow: 0 0 24px rgba(255,255,255,.06), 0 0 28px rgba(255,122,26,.04);
 }
 .hero-white { color: #f5f2ed; }
-.hero-accent { color: var(--orange-3); }
+.hero-accent { color: var(--heroAccent); }
 .hero p {
 margin: 10px 0 0;
 max-width: 760px;
@@ -176,12 +163,6 @@ font-size: 15px;
 line-height: 1.45;
 }
 
-.protocol-head {
-display: grid;
-grid-template-columns: 1fr auto;
-gap: 18px;
-align-items: end;
-}
 .protocol-title {
 font-size: 11px;
 letter-spacing: .14em;
@@ -207,7 +188,6 @@ gap: 9px;
 }
 .step-card {
 min-height: 0;
-height: 100%;
 border-radius: 16px;
 border: 1px solid var(--line);
 background: var(--panel);
@@ -230,7 +210,7 @@ box-shadow: 0 0 0 1px rgba(255,122,26,.06), inset 0 0 20px rgba(255,122,26,.02);
 border-color: rgba(255,166,94,.96);
 background: linear-gradient(180deg, rgba(255,122,26,.11), #17120f);
 box-shadow: 0 0 0 1px rgba(255,140,58,.18), 0 0 24px rgba(255,122,26,.18), inset 0 0 30px rgba(255,122,26,.04);
-animation: activeBorderPulseHard 1.05s ease-in-out infinite;
+animation: activeBorderPulse 1.05s ease-in-out infinite;
 }
 .step-card.current-completed {
 border-color: rgba(255,166,94,.78);
@@ -239,24 +219,9 @@ box-shadow: 0 0 0 1px rgba(255,140,58,.12), 0 0 16px rgba(255,122,26,.10);
 }
 .step-card:hover.enabled {
 transform: translateY(-1px);
-background: var(--panel-2);
+background: var(--panel2);
 border-color: rgba(255,255,255,.16);
 }
-.step-card::after {
-content: "";
-position: absolute;
-inset: auto auto -34px -34px;
-width: 100px;
-height: 100px;
-border-radius: 999px;
-background: radial-gradient(circle, rgba(255,122,26,.08), transparent 68%);
-opacity: 0;
-transition: opacity .18s ease;
-}
-.step-card.active::after,
-.step-card.completed::after,
-.step-card.current-completed::after { opacity: 1; }
-
 .step-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .step-label {
 color: var(--orange);
@@ -271,39 +236,38 @@ height: 9px;
 border-radius: 999px;
 background: transparent;
 }
-.step-card.active .step-indicator {
+.step-indicator.blink-live {
 background: var(--orange);
 box-shadow: 0 0 18px rgba(255,122,26,.6), 0 0 26px rgba(255,122,26,.35);
+animation: liveBlink .88s ease-in-out infinite;
 }
-.step-indicator.blink-live { animation: liveBlink .88s ease-in-out infinite; }
 .step-card.completed .step-indicator,
 .step-card.current-completed .step-indicator {
 background: var(--orange);
 box-shadow: 0 0 12px rgba(255,122,26,.24);
 }
-
 .step-card h3 {
 margin: 8px 0 4px;
 font-size: 20px;
 line-height: 1.02;
 letter-spacing: -.05em;
 font-weight: 800;
-color: var(--light-gray);
-transition: color .18s ease, text-shadow .18s ease;
+color: var(--soft);
 }
-.step-card.active h3 {
-color: #ffffff;
-text-shadow: 0 0 12px rgba(255,255,255,.12), 0 0 18px rgba(255,140,58,.08);
-}
+.step-card.active h3 { color: #fff; }
 .step-card.completed h3,
 .step-card.current-completed h3 { color: rgba(245,242,237,.92); }
-
-.step-meta { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 8px; }
+.step-meta {
+display: flex;
+align-items: flex-end;
+justify-content: space-between;
+gap: 12px;
+margin-top: 8px;
+}
 .step-action {
 font-size: 11px;
 color: rgba(245,242,237,.34);
 font-weight: 700;
-letter-spacing: -.01em;
 }
 .step-card.active .step-action,
 .step-card.current-completed .step-action,
@@ -319,14 +283,11 @@ max-width: 54%;
 .step-card.completed .step-value,
 .step-card.current-completed .step-value { color: rgba(245,242,237,.94); }
 
-.cta-wrap { padding-top: 0; }
 .cta-note {
 font-size: 12px;
 color: rgba(255,222,201,.86);
 font-weight: 700;
 margin: 0 0 8px 2px;
-letter-spacing: -.01em;
-transition: all .22s ease;
 }
 .cta-button {
 width: 100%;
@@ -342,10 +303,6 @@ text-transform: uppercase;
 cursor: pointer;
 transition: transform .18s ease, background .18s ease, opacity .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
-.cta-button:hover:not(:disabled) {
-transform: translateY(-1px);
-background: linear-gradient(180deg, #ffa35c, #ff7f1d);
-}
 .cta-button:disabled {
 opacity: .48;
 cursor: not-allowed;
@@ -354,7 +311,7 @@ border-color: rgba(255,122,26,.32);
 color: rgba(255,242,234,.84);
 }
 .cta-button.pulse {
-animation: ctaPulseHard 1.08s ease-in-out infinite;
+animation: ctaPulse 1.08s ease-in-out infinite;
 box-shadow: 0 0 44px rgba(255,122,26,.48), 0 0 86px rgba(255,122,26,.26), inset 0 1px 0 rgba(255,255,255,.22);
 border-color: rgba(255,204,150,.98);
 }
@@ -377,29 +334,6 @@ text-transform: uppercase;
 color: rgba(255,213,186,.72);
 font-weight: 800;
 }
-.summary-block {
-border: 1px solid rgba(255,255,255,.08);
-background: rgba(255,255,255,.02);
-border-radius: 14px;
-padding: 10px 12px;
-transition: box-shadow .2s ease, border-color .2s ease;
-}
-.summary-block.live {
-border-color: rgba(255,140,58,.22);
-box-shadow: 0 0 18px rgba(255,122,26,.06);
-}
-.summary-block strong {
-display: block;
-font-size: 12px;
-font-weight: 800;
-margin-bottom: 4px;
-}
-.summary-block span {
-display: block;
-color: rgba(245,242,237,.62);
-font-size: 11px;
-line-height: 1.4;
-}
 .live-console-status {
 display: inline-flex;
 align-items: center;
@@ -414,9 +348,8 @@ font-size: 10px;
 letter-spacing: .12em;
 text-transform: uppercase;
 font-weight: 800;
-box-shadow: 0 0 18px rgba(255,122,26,.08);
 }
-.live-console-status .status-dot {
+.status-dot {
 width: 8px;
 height: 8px;
 border-radius: 999px;
@@ -424,6 +357,18 @@ background: var(--orange);
 box-shadow: 0 0 14px rgba(255,122,26,.45);
 animation: statusPulse 1.8s ease-in-out infinite;
 }
+.summary-block {
+border: 1px solid rgba(255,255,255,.08);
+background: rgba(255,255,255,.02);
+border-radius: 14px;
+padding: 10px 12px;
+}
+.summary-block.live {
+border-color: rgba(255,140,58,.22);
+box-shadow: 0 0 18px rgba(255,122,26,.06);
+}
+.summary-block strong { display: block; font-size: 12px; font-weight: 800; margin-bottom: 4px; }
+.summary-block span { display: block; color: rgba(245,242,237,.62); font-size: 11px; line-height: 1.4; }
 .summary-rows {
 min-height: 0;
 overflow: auto;
@@ -440,7 +385,6 @@ padding: 6px 0;
 border-bottom: 1px solid rgba(255,255,255,.05);
 font-size: 11px;
 color: rgba(245,242,237,.58);
-transition: all .2s ease;
 }
 .summary-row:last-child { border-bottom: 0; }
 .summary-row b { color: rgba(245,242,237,.92); font-weight: 700; }
@@ -450,7 +394,6 @@ background: rgba(255,122,26,.06);
 border-radius: 8px;
 padding-left: 8px;
 padding-right: 8px;
-box-shadow: inset 0 0 12px rgba(255,122,26,.03);
 }
 .summary-row.active-summary b { color: #fff1e7; }
 .summary-row.active-summary span {
@@ -465,7 +408,6 @@ height: 7px;
 border-radius: 999px;
 background: var(--orange);
 box-shadow: 0 0 12px rgba(255,122,26,.45);
-flex: 0 0 auto;
 }
 
 .overlay {
@@ -524,17 +466,12 @@ font-size: 16px;
 line-height: 1.5;
 max-width: 700px;
 }
-.modal-progress {
-font-size: 14px;
-color: rgba(245,242,237,.62);
-font-weight: 800;
-white-space: nowrap;
-}
+.modal-progress { font-size: 14px; color: rgba(245,242,237,.62); font-weight: 800; }
 .modal-body {
 padding: 18px 22px;
 overflow: auto;
-display: grid;
-gap: 12px;
+display: block;
+min-height: 300px;
 }
 
 .question-card {
@@ -558,19 +495,10 @@ font-size: 24px;
 line-height: 1.08;
 font-weight: 800;
 letter-spacing: -.04em;
-color: var(--orange-soft);
+color: var(--questionAccent);
 }
-.question-summary {
-font-size: 14px;
-font-weight: 800;
-color: rgba(255,233,219,.92);
-}
-.question-note {
-margin-top: 10px;
-font-size: 12px;
-color: rgba(245,242,237,.56);
-line-height: 1.42;
-}
+.question-summary { font-size: 14px; font-weight: 800; color: rgba(255,233,219,.92); }
+.question-note { margin-top: 10px; font-size: 12px; color: rgba(245,242,237,.56); line-height: 1.42; }
 
 .search, .text-input, .textarea-input, .phone-input {
 width: 100%;
@@ -584,20 +512,20 @@ outline: none;
 transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
 }
 .search, .text-input, .phone-input { height: 52px; }
-.textarea-input {
-min-height: 106px;
-padding: 12px 14px;
-resize: vertical;
-}
+.textarea-input { min-height: 106px; padding: 12px 14px; resize: vertical; }
 .search:focus, .text-input:focus, .textarea-input:focus, .phone-input:focus {
 border-color: rgba(255,160,98,.74);
 box-shadow: 0 0 0 3px rgba(255,122,26,.08), 0 0 18px rgba(255,122,26,.08);
 background: #181411;
 }
-.search::placeholder, .text-input::placeholder, .textarea-input::placeholder, .phone-input::placeholder {
-color: rgba(245,242,237,.34);
+.search-list {
+display: grid;
+gap: 14px;
+max-height: 280px;
+overflow: auto;
+padding-right: 4px;
+margin-top: 12px;
 }
-
 .option-grid {
 display: grid;
 grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -633,36 +561,13 @@ font-size: 12px;
 font-weight: 700;
 color: rgba(245,242,237,.86);
 }
-.option-card:hover, .search-option:hover, .chip:hover {
-transform: translateY(-1px);
-border-color: rgba(255,255,255,.14);
-}
 .option-card.selected, .search-option.selected, .chip.selected {
 border-color: rgba(255,140,58,.54);
 background: rgba(255,122,26,.08);
 box-shadow: 0 0 14px rgba(255,122,26,.05);
 }
-.option-card strong, .search-option strong {
-display: block;
-font-size: 14px;
-font-weight: 800;
-letter-spacing: -.02em;
-}
-.option-card span, .search-option span {
-display: block;
-margin-top: 3px;
-color: rgba(245,242,237,.54);
-font-size: 12px;
-line-height: 1.35;
-}
-.search-list {
-display: grid;
-gap: 14px;
-max-height: 280px;
-overflow: auto;
-padding-right: 4px;
-margin-top: 12px;
-}
+.option-card strong, .search-option strong { display: block; font-size: 14px; font-weight: 800; }
+.option-card span, .search-option span { display: block; margin-top: 3px; color: rgba(245,242,237,.54); font-size: 12px; line-height: 1.35; }
 .group-title {
 font-size: 11px;
 letter-spacing: .14em;
@@ -682,79 +587,22 @@ font-weight: 800;
 border: 1px solid rgba(255,255,255,.06);
 white-space: nowrap;
 }
-.badge.active {
-background: rgba(95,208,122,.14);
-color: #d8ffe4;
-border-color: rgba(95,208,122,.24);
-box-shadow: 0 0 14px rgba(95,208,122,.12);
-}
-.badge.soon {
-background: rgba(255,122,26,.10);
-color: #ffd2ae;
-border-color: rgba(255,122,26,.16);
-}
-.badge.projected {
-background: rgba(255,255,255,.04);
-color: rgba(245,242,237,.72);
-border-color: rgba(255,255,255,.08);
-}
+.badge.active { background: rgba(95,208,122,.14); color: #d8ffe4; border-color: rgba(95,208,122,.24); }
+.badge.soon { background: rgba(255,122,26,.10); color: #ffd2ae; border-color: rgba(255,122,26,.16); }
+.badge.projected { background: rgba(255,255,255,.04); color: rgba(245,242,237,.72); border-color: rgba(255,255,255,.08); }
 
-.day-hours-grid {
-display: grid;
-grid-template-columns: repeat(2, minmax(0, 1fr));
-gap: 10px;
-margin-top: 12px;
-}
-.day-row {
-border: 1px solid rgba(255,255,255,.08);
-border-radius: 14px;
-background: #151311;
-padding: 12px;
-}
-.day-row-head {
-display: flex;
-align-items: center;
-justify-content: space-between;
-margin-bottom: 8px;
-gap: 10px;
-}
+.day-hours-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.day-row { border: 1px solid rgba(255,255,255,.08); border-radius: 14px; background: #151311; padding: 12px; }
+.day-row-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
 .day-row-head strong { font-size: 13px; }
 .day-row input[type="time"] {
-width: 100%;
-height: 38px;
-margin-top: 8px;
-border-radius: 10px;
-border: 1px solid rgba(255,255,255,.08);
-background: #0f0d0b;
-color: #fff;
-padding: 0 10px;
-font-size: 12px;
+width: 100%; height: 38px; margin-top: 8px; border-radius: 10px; border: 1px solid rgba(255,255,255,.08);
+background: #0f0d0b; color: #fff; padding: 0 10px; font-size: 12px;
 }
-.inline-grid-2 {
-display: grid;
-grid-template-columns: repeat(2, minmax(0, 1fr));
-gap: 10px;
-margin-top: 12px;
-}
-.notify-box {
-border: 1px solid rgba(255,122,26,.18);
-background: rgba(255,122,26,.05);
-border-radius: 14px;
-padding: 12px;
-margin-top: 12px;
-}
-.notify-box strong {
-display: block;
-margin-bottom: 6px;
-font-size: 13px;
-letter-spacing: -.01em;
-}
-.notify-box p {
-margin: 0;
-color: rgba(245,242,237,.66);
-font-size: 12px;
-line-height: 1.4;
-}
+.inline-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.notify-box { border: 1px solid rgba(255,122,26,.18); background: rgba(255,122,26,.05); border-radius: 14px; padding: 12px; margin-top: 12px; }
+.notify-box strong { display: block; margin-bottom: 6px; font-size: 13px; }
+.notify-box p { margin: 0; color: rgba(245,242,237,.66); font-size: 12px; line-height: 1.4; }
 
 .modal-foot {
 display: flex;
@@ -772,30 +620,23 @@ font-size: 14px;
 font-weight: 800;
 border: 1px solid rgba(255,255,255,.08);
 cursor: pointer;
-transition: transform .16s ease, opacity .16s ease, background .16s ease;
 }
-.modal-btn:hover:not(:disabled) { transform: translateY(-1px); }
 .btn-ghost { background: rgba(255,255,255,.03); color: rgba(245,242,237,.90); }
 .btn-primary { border: 1px solid rgba(255,122,26,.56); background: var(--orange); color: #fff; }
-.btn-primary:hover:not(:disabled) { background: var(--orange-2); }
 .modal-btn:disabled { opacity: .4; cursor: not-allowed; }
 
 @keyframes twinkle { 0%,100%{opacity:.16;transform:scale(1)} 50%{opacity:.42;transform:scale(1.3)} }
 @keyframes liveBlink { 0%,100%{transform:scale(1);opacity:1;box-shadow:0 0 18px rgba(255,122,26,.6),0 0 26px rgba(255,122,26,.35)} 50%{transform:scale(1.62);opacity:1;box-shadow:0 0 32px rgba(255,166,94,.94),0 0 54px rgba(255,122,26,.62)} }
-@keyframes ctaPulseHard { 0%,100%{transform:scale(1);box-shadow:0 0 24px rgba(255,122,26,.34),0 0 48px rgba(255,122,26,.14), inset 0 1px 0 rgba(255,255,255,.22)} 50%{transform:scale(1.03);box-shadow:0 0 52px rgba(255,140,58,.58),0 0 98px rgba(255,122,26,.30), inset 0 1px 0 rgba(255,255,255,.26)} }
-@keyframes statusPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.22);opacity:1} }
+@keyframes ctaPulse { 0%,100%{transform:scale(1);box-shadow:0 0 24px rgba(255,122,26,.34),0 0 48px rgba(255,122,26,.14), inset 0 1px 0 rgba(255,255,255,.22)} 50%{transform:scale(1.03);box-shadow:0 0 52px rgba(255,140,58,.58),0 0 98px rgba(255,122,26,.30), inset 0 1px 0 rgba(255,255,255,.26)} }
+@keyframes statusPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.22)} }
 @keyframes modalIn { from{opacity:0;transform:translateY(10px) scale(.99)} to{opacity:1;transform:translateY(0) scale(1)} }
 @keyframes questionFadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-@keyframes activeBorderPulseHard {
-0%,100%{border-color:rgba(255,166,94,.76);box-shadow:0 0 0 1px rgba(255,140,58,.18),0 0 18px rgba(255,122,26,.14), inset 0 0 26px rgba(255,122,26,.03)}
-50%{border-color:rgba(255,201,158,1);box-shadow:0 0 0 1px rgba(255,186,120,.24),0 0 30px rgba(255,140,58,.24),0 0 48px rgba(255,122,26,.14), inset 0 0 36px rgba(255,122,26,.05)}
-}
+@keyframes activeBorderPulse { 0%,100%{border-color:rgba(255,166,94,.76);box-shadow:0 0 0 1px rgba(255,140,58,.18),0 0 18px rgba(255,122,26,.14)} 50%{border-color:rgba(255,201,158,1);box-shadow:0 0 0 1px rgba(255,186,120,.24),0 0 30px rgba(255,140,58,.24),0 0 48px rgba(255,122,26,.14)} }
 
 @media (max-width: 1100px) {
 body { overflow: auto; }
-.page-shell { height: auto; min-height: 100vh; overflow: auto; }
+.page-shell { height: auto; min-height: 100vh; }
 .console { height: auto; min-height: 94vh; }
-.console-inner { grid-template-rows: auto auto auto; }
 .main-grid { grid-template-columns: 1fr; }
 .summary-panel { height: auto; }
 }
@@ -808,7 +649,6 @@ body { overflow: auto; }
 .main-grid { display: block; }
 .left-col { display: block; }
 .hero h1 { font-size: clamp(34px, 10vw, 52px); }
-.hero p { font-size: 15px; }
 .steps-grid, .option-grid, .day-hours-grid, .inline-grid-2 { grid-template-columns: 1fr; }
 .steps-grid { grid-template-rows: none; }
 .step-card { min-height: 118px; }
@@ -840,13 +680,10 @@ body { overflow: auto; }
 
 <div class="main-grid">
 <section class="left-col">
-<div class="hero">
-<h1><span class="hero-white">System</span> <span class="hero-accent">Configuration</span></h1>
-<p>We analyze your business and automatically build your AI call system.</p>
-</div>
-<div class="protocol-head"><div><div class="protocol-title">11 Steps Build Sequence</div><div class="protocol-sub">Only the next unfinished step blinks</div></div></div>
+<div class="hero"><h1><span class="hero-white">System</span> <span class="hero-accent">Configuration</span></h1><p>We analyze your business and automatically build your AI call system.</p></div>
+<div><div class="protocol-title">11 Steps Build Sequence</div><div class="protocol-sub">Only the next unfinished step blinks</div></div>
 <div class="steps-grid" id="stepsGrid"></div>
-<div class="cta-wrap"><div class="cta-note" id="ctaNote">Complete Step 1 to unlock your live demo</div><button class="cta-button" id="buildBtn" disabled>Step 2 — Demo Call</button></div>
+<div><div class="cta-note" id="ctaNote">Complete Step 1 to unlock your live demo</div><button class="cta-button" id="buildBtn" disabled>Step 2 — Demo Call</button></div>
 </section>
 
 <aside>
@@ -865,10 +702,7 @@ body { overflow: auto; }
 
 <div class="overlay" id="overlay">
 <div class="modal">
-<div class="modal-head">
-<div class="modal-head-left"><small id="modalStepLabel">Step 1A</small><h2 id="modalTitle">Business Profile</h2><p id="modalDescription">Answer a few questions and we’ll configure the system for you.</p></div>
-<div class="modal-progress" id="modalProgress">1 / 11</div>
-</div>
+<div class="modal-head"><div class="modal-head-left"><small id="modalStepLabel">Step 1A</small><h2 id="modalTitle">Business Profile</h2><p id="modalDescription">Answer a few questions and we’ll configure the system for you.</p></div><div class="modal-progress" id="modalProgress">1 / 11</div></div>
 <div class="modal-body" id="modalBody"></div>
 <div class="modal-foot"><button class="modal-btn btn-ghost" id="cancelBtn">Cancel</button><button class="modal-btn btn-primary" id="nextBtn" disabled>Next</button></div>
 </div>
@@ -1082,10 +916,6 @@ specialNotes_exclusions: v.exclusions ? 'Added' : 'Optional'
 return map[`${stepKey}_${questionId}`] || '';
 }
 
-function makeQuestion(stepKey, questionId, label, content, note='') {
-return `<div class="question-card" data-question="${questionId}"><div class="question-card-header"><div class="question-title">${label}</div><div class="question-summary" data-question-summary="${questionId}">${questionSummary(stepKey, questionId) || ' '}</div></div>${content}${note ? `<div class="question-note">${note}</div>` : ''}</div>`;
-}
-
 function renderSummaryRows(){
 summaryRows.innerHTML = steps.map(step => `<div class="summary-row" data-summary-key="${step.key}"><span>${summaryMap[step.key]}</span><b id="sum-${step.key}">${summaryValue(step.key)}</b></div>`).join('');
 }
@@ -1114,8 +944,7 @@ const active = index===state.activeStepIndex && !completed;
 const enabled = completed || index===state.activeStepIndex;
 const currentCompleted = state.lastCompletedKey===step.key && completed;
 const display = summaryValue(step.key);
-const shouldBlink = active;
-return `<button class="step-card ${enabled?'enabled':''} ${completed?'completed':''} ${active?'active':''} ${currentCompleted?'current-completed':''}" onclick="openStep(${index})"><div class="step-top"><div class="step-label">Step ${step.code}</div><div class="step-indicator ${shouldBlink?'blink-live':''}"></div></div><h3>${step.label}</h3><div class="step-meta"><div class="step-action">${step.cta}</div><div class="step-value">${display}</div></div></button>`;
+return `<button class="step-card ${enabled?'enabled':''} ${completed?'completed':''} ${active?'active':''} ${currentCompleted?'current-completed':''}" onclick="openStep(${index})"><div class="step-top"><div class="step-label">Step ${step.code}</div><div class="step-indicator ${active?'blink-live':''}"></div></div><h3>${step.label}</h3><div class="step-meta"><div class="step-action">${step.cta}</div><div class="step-value">${display}</div></div></button>`;
 }).join('');
 const allDone = steps.every(step=>isStepComplete(step.key));
 buildBtn.disabled = !allDone;
@@ -1153,7 +982,7 @@ return `<input id="countrySearch" class="search" type="text" placeholder="Search
 }
 
 function getQuestionOrder(stepKey) {
-const base = {
+return {
 businessProfile: ['country','industry','name','website','phone'],
 services: ['offered','other','handled','common'],
 customerIntent: ['reasons','priority','goal'],
@@ -1165,8 +994,11 @@ serviceArea: ['areas','multi','outside'],
 pricing: ['asked','immediate','fallback','mention'],
 followUp: ['missed','customer','team','confirm','delivery'],
 specialNotes: ['notes','exclusions']
-};
-return base[stepKey] || [];
+}[stepKey] || [];
+}
+
+function questionCard(stepKey, id, title, content, note='') {
+return `<div class="question-card" data-question="${id}"><div class="question-card-header"><div class="question-title">${title}</div><div class="question-summary" data-question-summary="${id}">${questionSummary(stepKey,id) || ' '}</div></div>${content}${note ? `<div class="question-note">${note}</div>` : ''}</div>`;
 }
 
 function showCurrentQuestion() {
@@ -1176,6 +1008,14 @@ const target = modalBody.querySelector(`[data-question="${id}"]`);
 if (target) target.classList.add('active');
 const activeInput = modalBody.querySelector('.question-card.active input, .question-card.active textarea');
 if (activeInput) activeInput.focus();
+}
+
+function refreshQuestionSummaries(){
+const stepKey = steps[state.currentStepIndex].key;
+modalBody.querySelectorAll('[data-question-summary]').forEach(el => {
+const id = el.dataset.questionSummary;
+el.textContent = questionSummary(stepKey, id) || ' ';
+});
 }
 
 function nextQuestionReveal() {
@@ -1189,45 +1029,99 @@ showCurrentQuestion();
 }
 }
 
-function refreshQuestionSummaries(){
-const stepKey = steps[state.currentStepIndex].key;
-modalBody.querySelectorAll('[data-question-summary]').forEach(el => {
-const id = el.dataset.questionSummary;
-const val = questionSummary(stepKey, id);
-el.textContent = val || ' ';
-});
-}
-
 function renderModalBody(step){
 modalQuestionOrder = getQuestionOrder(step.key);
 modalQuestionIndex = 0;
 
-if(step.key==='businessProfile') modalBody.innerHTML = `${makeQuestion('businessProfile','country','Let’s locate your business', renderCountrySearch(), 'Active countries continue normally. Coming soon and projected countries open a notify flow.')}${makeQuestion('businessProfile','industry','Select your industry so we can model your call flows', `<input id="industrySearch" class="search" type="text" placeholder="Search industry" /><div class="search-list" id="industryList"></div>`)}${makeQuestion('businessProfile','name','What is your business name?', `<input id="businessNameInput" class="text-input" type="text" placeholder="Enter your business name" value="${stagedValue.businessName||''}" />`)}${makeQuestion('businessProfile','website','What is your business website? (optional)', `<input id="websiteInput" class="text-input" type="text" placeholder="https://yourbusiness.com" value="${stagedValue.website||''}" />`)}${makeQuestion('businessProfile','phone','What is your main phone number? (optional)', `<input id="phoneInput" class="phone-input" type="text" placeholder="(555) 555-5555" value="${stagedValue.phone||''}" />`)}`;
-if(step.key==='services') modalBody.innerHTML = `${makeQuestion('services','offered','What services do you offer?', multiChipGroup('offered', getServicesForIndustry(), stagedValue.offered), 'We’ll use this to map likely call outcomes and service-specific logic.')}${makeQuestion('services','other','Other service (optional)', `<input id="offeredOtherInput" class="text-input" type="text" placeholder="Add another service" value="${stagedValue.offeredOther||''}" />`)}${makeQuestion('services','handled','Are all services handled the same way?', singleCardGroup('handledSameWay', [{value:'Yes'},{value:'No — some require booking'},{value:'No — some require follow-up'},{value:'No — some are urgent'}], stagedValue.handledSameWay))}${makeQuestion('services','common','Which services are most common?', multiChipGroup('commonServices', stagedValue.offered.length?stagedValue.offered:getServicesForIndustry(), stagedValue.commonServices))}`;
-if(step.key==='customerIntent') modalBody.innerHTML = `${makeQuestion('customerIntent','reasons','Why do customers usually contact you?', multiChipGroup('reasons', ['Book appointment','Ask for price','Request urgent help','Ask general questions','Follow up on existing job','Reschedule or cancel','Leave a message'], stagedValue.reasons))}${makeQuestion('customerIntent','priority','What matters most to your business?', singleCardGroup('topPriority', [{value:'Capture every lead'},{value:'Book more appointments'},{value:'Handle urgent calls correctly'},{value:'Reduce missed calls'},{value:'Save staff time'}], stagedValue.topPriority))}${makeQuestion('customerIntent','goal','What outcome matters most on the first call?', singleCardGroup('firstCallGoal', [{value:'Booking'},{value:'Qualification'},{value:'Information'},{value:'Escalation'}], stagedValue.firstCallGoal))}`;
-if(step.key==='currentWorkflow') modalBody.innerHTML = `${makeQuestion('currentWorkflow','calls','How are calls handled today?', singleCardGroup('callsHandledToday', [{value:'I answer them myself'},{value:'My team answers them'},{value:'It depends who is available'},{value:'Many calls are missed'},{value:'We use voicemail'}], stagedValue.callsHandledToday))}${makeQuestion('currentWorkflow','missed','What happens when nobody answers?', singleCardGroup('missedCallBehavior', [{value:'We call back later'},{value:'We usually lose the lead'},{value:'We send a text'},{value:'Nothing consistent happens'}], stagedValue.missedCallBehavior))}${makeQuestion('currentWorkflow','leads','How are new leads handled today?', singleCardGroup('newLeadHandling', [{value:'Call immediately'},{value:'Follow up later'},{value:'Team handles it manually'},{value:'No clear process'}], stagedValue.newLeadHandling))}${makeQuestion('currentWorkflow','existing','How are existing customers handled?', singleCardGroup('existingCustomerHandling', [{value:'Same as new callers'},{value:'Prioritized'},{value:'Routed to team'},{value:'Depends on situation'}], stagedValue.existingCustomerHandling))}`;
-if(step.key==='scheduling') modalBody.innerHTML = `${makeQuestion('scheduling','needed','Do customers usually need appointments?', singleCardGroup('appointmentsNeeded', [{value:'Yes, almost always'},{value:'Sometimes'},{value:'No, mostly inquiry only'}], stagedValue.appointmentsNeeded))}${makeQuestion('scheduling','who','How is scheduling handled today?', singleCardGroup('schedulingHandledBy', [{value:'I schedule everything manually'},{value:'My team handles scheduling'},{value:'Customers book themselves'},{value:'We do not have a structured process'}], stagedValue.schedulingHandledBy))}${makeQuestion('scheduling','hours','Business hours', renderBusinessHours())}${makeQuestion('scheduling','after','What should happen after hours?', singleCardGroup('afterHours', [{value:'Take a message'},{value:'Capture lead and follow up later'},{value:'Book next available slot'},{value:'Urgent calls only'},{value:'Do nothing'}], stagedValue.afterHours))}${makeQuestion('scheduling','same','Are same-day appointments possible?', singleCardGroup('sameDay', [{value:'Yes'},{value:'Sometimes'},{value:'No'}], stagedValue.sameDay))}${makeQuestion('scheduling','duration','How long is a typical appointment?', singleCardGroup('duration', [{value:'15 min'},{value:'30 min'},{value:'45 min'},{value:'60 min'},{value:'90+ min'},{value:'Varies by service'}], stagedValue.duration))}${makeQuestion('scheduling','buffer','Do you need buffer time between appointments?', singleCardGroup('buffer', [{value:'None'},{value:'15 min'},{value:'30 min'},{value:'60 min'}], stagedValue.buffer))}`;
-if(step.key==='team') modalBody.innerHTML = `${makeQuestion('team','size','How many people work for you?', singleCardGroup('teamSize', [{value:'Just me'},{value:'2–5'},{value:'6–15'},{value:'16+'}], stagedValue.teamSize))}${makeQuestion('team','roles','What kind of team do you have?', multiChipGroup('roles', ['Service workers','Salespeople','Office staff','Dispatchers','Estimators','Mixed roles'], stagedValue.roles))}${makeQuestion('team','answer','Who usually answers calls?', singleCardGroup('whoAnswersCalls', [{value:'I do'},{value:'Office team'},{value:'Sales team'},{value:'Whoever is available'},{value:'Nobody consistently'}], stagedValue.whoAnswersCalls))}${makeQuestion('team','receive','Who should receive leads or bookings?', singleCardGroup('whoReceivesLeads', [{value:'Always owner'},{value:'Round robin'},{value:'Office team first'},{value:'Sales team'},{value:'Best available person'}], stagedValue.whoReceivesLeads))}${makeQuestion('team','assign','Do workers manage their own schedule or are jobs assigned?', singleCardGroup('assignmentStyle', [{value:'Workers manage their own schedule'},{value:'Office assigns jobs'},{value:'Owner assigns jobs'},{value:'Mixed process'}], stagedValue.assignmentStyle))}`;
-if(step.key==='urgency') modalBody.innerHTML = `${makeQuestion('urgency','freq','Do you receive urgent or emergency calls?', singleCardGroup('urgencyFrequency', [{value:'Often'},{value:'Sometimes'},{value:'Rarely'},{value:'Never'}], stagedValue.urgencyFrequency))}${makeQuestion('urgency','types','What counts as urgent?', multiChipGroup('urgentTypes', getUrgenciesForIndustry(), stagedValue.urgentTypes), 'We’ll use this to determine escalation logic automatically.')}${makeQuestion('urgency','other','Other urgent scenario (optional)', `<input id="urgentOtherInput" class="text-input" type="text" placeholder="Describe another urgent case" value="${stagedValue.urgentTypesOther||''}" />`)}${makeQuestion('urgency','action','What should happen on urgent calls?', singleCardGroup('urgentAction', [{value:'Notify owner immediately'},{value:'Route to available worker'},{value:'Collect details and escalate'},{value:'Give instructions then escalate'}], stagedValue.urgentAction))}${makeQuestion('urgency','vip','Do you have priority customers?', singleCardGroup('vipCustomers', [{value:'Yes'},{value:'No'}], stagedValue.vipCustomers))}${makeQuestion('urgency','viphandling','If yes, how should they be handled?', singleCardGroup('vipHandling', [{value:'Escalate immediately'},{value:'Skip normal queue'},{value:'Notify owner'},{value:'Standard handling'}], stagedValue.vipHandling))}`;
-if(step.key==='serviceArea') modalBody.innerHTML = `${makeQuestion('serviceArea','areas','Where do you operate?', `<textarea id="areasInput" class="textarea-input" placeholder="Enter cities, regions, ZIPs, or a service radius">${stagedValue.areas||''}</textarea>`)}${makeQuestion('serviceArea','multi','Do you serve multiple locations?', singleCardGroup('multiLocation', [{value:'Yes'},{value:'No'}], stagedValue.multiLocation))}${makeQuestion('serviceArea','outside','What should happen if someone is outside your service area?', singleCardGroup('outsideAreaBehavior', [{value:'Politely decline'},{value:'Collect lead anyway'},{value:'Offer callback'},{value:'Redirect elsewhere'}], stagedValue.outsideAreaBehavior))}`;
-if(step.key==='pricing') modalBody.innerHTML = `${makeQuestion('pricing','asked','Do customers usually ask for pricing over the phone?', singleCardGroup('pricingAsked', [{value:'Yes, often'},{value:'Sometimes'},{value:'Rarely'}], stagedValue.pricingAsked))}${makeQuestion('pricing','immediate','Can pricing be given immediately?', singleCardGroup('pricingImmediate', [{value:'Yes'},{value:'Only rough estimates'},{value:'No, quote required after inspection'}], stagedValue.pricingImmediate))}${makeQuestion('pricing','fallback','If pricing cannot be given, what should happen?', singleCardGroup('quoteFallback', [{value:'Book estimate'},{value:'Collect details for callback'},{value:'Explain process and create lead'}], stagedValue.quoteFallback))}${makeQuestion('pricing','mention','Do you want pricing mentioned at all?', singleCardGroup('pricingMentioned', [{value:'Yes'},{value:'Only starting prices'},{value:'No'}], stagedValue.pricingMentioned))}`;
-if(step.key==='followUp') modalBody.innerHTML = `${makeQuestion('followUp','missed','Should missed callers receive automatic follow-up?', singleCardGroup('missedCallFollowUp', [{value:'Yes'},{value:'No'}], stagedValue.missedCallFollowUp))}${makeQuestion('followUp','customer','Should customers receive appointment reminders?', singleCardGroup('customerReminders', [{value:'Yes'},{value:'No'}], stagedValue.customerReminders))}${makeQuestion('followUp','team','Should your team receive reminders too?', singleCardGroup('teamReminders', [{value:'Yes'},{value:'No'}], stagedValue.teamReminders))}${makeQuestion('followUp','confirm','If someone does not confirm, what happens today?', singleCardGroup('noConfirmationBaseline', [{value:'We follow up manually'},{value:'We often find out too late'},{value:'It varies'},{value:'No clear process'}], stagedValue.noConfirmationBaseline))}${makeQuestion('followUp','delivery','How should summaries be delivered?', singleCardGroup('summaryDelivery', [{value:'SMS'},{value:'Email'},{value:'CRM only'},{value:'Owner only'}], stagedValue.summaryDelivery))}`;
-if(step.key==='specialNotes') modalBody.innerHTML = `${makeQuestion('specialNotes','notes','Anything special we should know about your business?', `<textarea id="notesInput" class="textarea-input" placeholder="Add any business-specific details, exceptions, or important notes">${stagedValue.notes||''}</textarea>`)}${makeQuestion('specialNotes','exclusions','Are there any calls you never want handled automatically? (optional)', `<textarea id="exclusionsInput" class="textarea-input" placeholder="Describe any call types that should never be automated">${stagedValue.exclusions||''}</textarea>`)}`;
+const bodies = {
+businessProfile: [
+questionCard('businessProfile','country','Let’s locate your business', renderCountrySearch(), 'Active countries continue normally. Coming soon and projected countries open a notify flow.'),
+questionCard('businessProfile','industry','Select your industry so we can model your call flows', `<input id="industrySearch" class="search" type="text" placeholder="Search industry" /><div class="search-list" id="industryList"></div>`),
+questionCard('businessProfile','name','What is your business name?', `<input id="businessNameInput" class="text-input" type="text" placeholder="Enter your business name" value="${stagedValue.businessName||''}" />`),
+questionCard('businessProfile','website','What is your business website? (optional)', `<input id="websiteInput" class="text-input" type="text" placeholder="https://yourbusiness.com" value="${stagedValue.website||''}" />`),
+questionCard('businessProfile','phone','What is your main phone number? (optional)', `<input id="phoneInput" class="phone-input" type="text" placeholder="(555) 555-5555" value="${stagedValue.phone||''}" />`)
+],
+services: [
+questionCard('services','offered','What services do you offer?', multiChipGroup('offered', serviceCatalog[state.values.businessProfile.industry] || serviceCatalog.default, stagedValue.offered), 'We’ll use this to map likely call outcomes and service-specific logic.'),
+questionCard('services','other','Other service (optional)', `<input id="offeredOtherInput" class="text-input" type="text" placeholder="Add another service" value="${stagedValue.offeredOther||''}" />`),
+questionCard('services','handled','Are all services handled the same way?', singleCardGroup('handledSameWay', [{value:'Yes'},{value:'No — some require booking'},{value:'No — some require follow-up'},{value:'No — some are urgent'}], stagedValue.handledSameWay)),
+questionCard('services','common','Which services are most common?', multiChipGroup('commonServices', stagedValue.offered.length ? stagedValue.offered : (serviceCatalog[state.values.businessProfile.industry] || serviceCatalog.default), stagedValue.commonServices))
+],
+customerIntent: [
+questionCard('customerIntent','reasons','Why do customers usually contact you?', multiChipGroup('reasons', ['Book appointment','Ask for price','Request urgent help','Ask general questions','Follow up on existing job','Reschedule or cancel','Leave a message'], stagedValue.reasons)),
+questionCard('customerIntent','priority','What matters most to your business?', singleCardGroup('topPriority', [{value:'Capture every lead'},{value:'Book more appointments'},{value:'Handle urgent calls correctly'},{value:'Reduce missed calls'},{value:'Save staff time'}], stagedValue.topPriority)),
+questionCard('customerIntent','goal','What outcome matters most on the first call?', singleCardGroup('firstCallGoal', [{value:'Booking'},{value:'Qualification'},{value:'Information'},{value:'Escalation'}], stagedValue.firstCallGoal))
+],
+currentWorkflow: [
+questionCard('currentWorkflow','calls','How are calls handled today?', singleCardGroup('callsHandledToday', [{value:'I answer them myself'},{value:'My team answers them'},{value:'It depends who is available'},{value:'Many calls are missed'},{value:'We use voicemail'}], stagedValue.callsHandledToday)),
+questionCard('currentWorkflow','missed','What happens when nobody answers?', singleCardGroup('missedCallBehavior', [{value:'We call back later'},{value:'We usually lose the lead'},{value:'We send a text'},{value:'Nothing consistent happens'}], stagedValue.missedCallBehavior)),
+questionCard('currentWorkflow','leads','How are new leads handled today?', singleCardGroup('newLeadHandling', [{value:'Call immediately'},{value:'Follow up later'},{value:'Team handles it manually'},{value:'No clear process'}], stagedValue.newLeadHandling)),
+questionCard('currentWorkflow','existing','How are existing customers handled?', singleCardGroup('existingCustomerHandling', [{value:'Same as new callers'},{value:'Prioritized'},{value:'Routed to team'},{value:'Depends on situation'}], stagedValue.existingCustomerHandling))
+],
+scheduling: [
+questionCard('scheduling','needed','Do customers usually need appointments?', singleCardGroup('appointmentsNeeded', [{value:'Yes, almost always'},{value:'Sometimes'},{value:'No, mostly inquiry only'}], stagedValue.appointmentsNeeded)),
+questionCard('scheduling','who','How is scheduling handled today?', singleCardGroup('schedulingHandledBy', [{value:'I schedule everything manually'},{value:'My team handles scheduling'},{value:'Customers book themselves'},{value:'We do not have a structured process'}], stagedValue.schedulingHandledBy)),
+questionCard('scheduling','hours','Business hours', renderBusinessHours()),
+questionCard('scheduling','after','What should happen after hours?', singleCardGroup('afterHours', [{value:'Take a message'},{value:'Capture lead and follow up later'},{value:'Book next available slot'},{value:'Urgent calls only'},{value:'Do nothing'}], stagedValue.afterHours)),
+questionCard('scheduling','same','Are same-day appointments possible?', singleCardGroup('sameDay', [{value:'Yes'},{value:'Sometimes'},{value:'No'}], stagedValue.sameDay)),
+questionCard('scheduling','duration','How long is a typical appointment?', singleCardGroup('duration', [{value:'15 min'},{value:'30 min'},{value:'45 min'},{value:'60 min'},{value:'90+ min'},{value:'Varies by service'}], stagedValue.duration)),
+questionCard('scheduling','buffer','Do you need buffer time between appointments?', singleCardGroup('buffer', [{value:'None'},{value:'15 min'},{value:'30 min'},{value:'60 min'}], stagedValue.buffer))
+],
+team: [
+questionCard('team','size','How many people work for you?', singleCardGroup('teamSize', [{value:'Just me'},{value:'2–5'},{value:'6–15'},{value:'16+'}], stagedValue.teamSize)),
+questionCard('team','roles','What kind of team do you have?', multiChipGroup('roles', ['Service workers','Salespeople','Office staff','Dispatchers','Estimators','Mixed roles'], stagedValue.roles)),
+questionCard('team','answer','Who usually answers calls?', singleCardGroup('whoAnswersCalls', [{value:'I do'},{value:'Office team'},{value:'Sales team'},{value:'Whoever is available'},{value:'Nobody consistently'}], stagedValue.whoAnswersCalls)),
+questionCard('team','receive','Who should receive leads or bookings?', singleCardGroup('whoReceivesLeads', [{value:'Always owner'},{value:'Round robin'},{value:'Office team first'},{value:'Sales team'},{value:'Best available person'}], stagedValue.whoReceivesLeads)),
+questionCard('team','assign','Do workers manage their own schedule or are jobs assigned?', singleCardGroup('assignmentStyle', [{value:'Workers manage their own schedule'},{value:'Office assigns jobs'},{value:'Owner assigns jobs'},{value:'Mixed process'}], stagedValue.assignmentStyle))
+],
+urgency: [
+questionCard('urgency','freq','Do you receive urgent or emergency calls?', singleCardGroup('urgencyFrequency', [{value:'Often'},{value:'Sometimes'},{value:'Rarely'},{value:'Never'}], stagedValue.urgencyFrequency)),
+questionCard('urgency','types','What counts as urgent?', multiChipGroup('urgentTypes', urgencyCatalog[state.values.businessProfile.industry] || urgencyCatalog.default, stagedValue.urgentTypes), 'We’ll use this to determine escalation logic automatically.'),
+questionCard('urgency','other','Other urgent scenario (optional)', `<input id="urgentOtherInput" class="text-input" type="text" placeholder="Describe another urgent case" value="${stagedValue.urgentTypesOther||''}" />`),
+questionCard('urgency','action','What should happen on urgent calls?', singleCardGroup('urgentAction', [{value:'Notify owner immediately'},{value:'Route to available worker'},{value:'Collect details and escalate'},{value:'Give instructions then escalate'}], stagedValue.urgentAction)),
+questionCard('urgency','vip','Do you have priority customers?', singleCardGroup('vipCustomers', [{value:'Yes'},{value:'No'}], stagedValue.vipCustomers)),
+questionCard('urgency','viphandling','If yes, how should they be handled?', singleCardGroup('vipHandling', [{value:'Escalate immediately'},{value:'Skip normal queue'},{value:'Notify owner'},{value:'Standard handling'}], stagedValue.vipHandling))
+],
+serviceArea: [
+questionCard('serviceArea','areas','Where do you operate?', `<textarea id="areasInput" class="textarea-input" placeholder="Enter cities, regions, ZIPs, or a service radius">${stagedValue.areas||''}</textarea>`),
+questionCard('serviceArea','multi','Do you serve multiple locations?', singleCardGroup('multiLocation', [{value:'Yes'},{value:'No'}], stagedValue.multiLocation)),
+questionCard('serviceArea','outside','What should happen if someone is outside your service area?', singleCardGroup('outsideAreaBehavior', [{value:'Politely decline'},{value:'Collect lead anyway'},{value:'Offer callback'},{value:'Redirect elsewhere'}], stagedValue.outsideAreaBehavior))
+],
+pricing: [
+questionCard('pricing','asked','Do customers usually ask for pricing over the phone?', singleCardGroup('pricingAsked', [{value:'Yes, often'},{value:'Sometimes'},{value:'Rarely'}], stagedValue.pricingAsked)),
+questionCard('pricing','immediate','Can pricing be given immediately?', singleCardGroup('pricingImmediate', [{value:'Yes'},{value:'Only rough estimates'},{value:'No, quote required after inspection'}], stagedValue.pricingImmediate)),
+questionCard('pricing','fallback','If pricing cannot be given, what should happen?', singleCardGroup('quoteFallback', [{value:'Book estimate'},{value:'Collect details for callback'},{value:'Explain process and create lead'}], stagedValue.quoteFallback)),
+questionCard('pricing','mention','Do you want pricing mentioned at all?', singleCardGroup('pricingMentioned', [{value:'Yes'},{value:'Only starting prices'},{value:'No'}], stagedValue.pricingMentioned))
+],
+followUp: [
+questionCard('followUp','missed','Should missed callers receive automatic follow-up?', singleCardGroup('missedCallFollowUp', [{value:'Yes'},{value:'No'}], stagedValue.missedCallFollowUp)),
+questionCard('followUp','customer','Should customers receive appointment reminders?', singleCardGroup('customerReminders', [{value:'Yes'},{value:'No'}], stagedValue.customerReminders)),
+questionCard('followUp','team','Should your team receive reminders too?', singleCardGroup('teamReminders', [{value:'Yes'},{value:'No'}], stagedValue.teamReminders)),
+questionCard('followUp','confirm','If someone does not confirm, what happens today?', singleCardGroup('noConfirmationBaseline', [{value:'We follow up manually'},{value:'We often find out too late'},{value:'It varies'},{value:'No clear process'}], stagedValue.noConfirmationBaseline)),
+questionCard('followUp','delivery','How should summaries be delivered?', singleCardGroup('summaryDelivery', [{value:'SMS'},{value:'Email'},{value:'CRM only'},{value:'Owner only'}], stagedValue.summaryDelivery))
+],
+specialNotes: [
+questionCard('specialNotes','notes','Anything special we should know about your business?', `<textarea id="notesInput" class="textarea-input" placeholder="Add any business-specific details, exceptions, or important notes">${stagedValue.notes||''}</textarea>`),
+questionCard('specialNotes','exclusions','Are there any calls you never want handled automatically? (optional)', `<textarea id="exclusionsInput" class="textarea-input" placeholder="Describe any call types that should never be automated">${stagedValue.exclusions||''}</textarea>`)
+]
+};
 
-if(step.key==='businessProfile'){ renderCountryList(''); renderIndustryList(''); bindBusinessProfile(); }
+modalBody.innerHTML = bodies[step.key].join('');
+
+if(step.key==='businessProfile') { renderCountryList(''); renderIndustryList(''); bindBusinessProfile(); }
 bindCommon();
 if(step.key==='scheduling') bindBusinessHours();
-if(step.key==='urgency'){
+if(step.key==='urgency') {
 const u=document.getElementById('urgentOtherInput');
 if(u) u.addEventListener('blur',()=>{ stagedValue.urgentTypesOther=u.value.trim(); refreshQuestionSummaries(); nextQuestionReveal(); });
 }
-if(step.key==='serviceArea'){
+if(step.key==='serviceArea') {
 const a=document.getElementById('areasInput');
 if(a) a.addEventListener('blur',()=>{ stagedValue.areas=a.value.trim(); refreshQuestionSummaries(); nextQuestionReveal(); });
 }
-if(step.key==='specialNotes'){
-const notes = document.getElementById('notesInput');
-const excl = document.getElementById('exclusionsInput');
+if(step.key==='specialNotes') {
+const notes=document.getElementById('notesInput');
+const excl=document.getElementById('exclusionsInput');
 if(notes) notes.addEventListener('blur',()=>{ stagedValue.notes=notes.value.trim(); refreshQuestionSummaries(); nextQuestionReveal(); });
 if(excl) excl.addEventListener('blur',()=>{ stagedValue.exclusions=excl.value.trim(); refreshQuestionSummaries(); validateCurrentStep(); });
 }
@@ -1243,7 +1137,6 @@ const industrySearch = document.getElementById('industrySearch');
 const businessNameInput = document.getElementById('businessNameInput');
 const websiteInput = document.getElementById('websiteInput');
 const phoneInput = document.getElementById('phoneInput');
-
 if(countrySearch) countrySearch.addEventListener('input', e=>renderCountryList(e.target.value));
 if(industrySearch) industrySearch.addEventListener('input', e=>renderIndustryList(e.target.value));
 if(businessNameInput) businessNameInput.addEventListener('blur', ()=>{ stagedValue.businessName=businessNameInput.value.trim(); refreshQuestionSummaries(); nextQuestionReveal(); });
@@ -1271,9 +1164,7 @@ stagedValue[name]=stagedValue[name].includes(val)
 : [...stagedValue[name],val];
 refreshQuestionSummaries();
 validateCurrentStep();
-
-const multiAutoAdvanceSteps = ['offered','reasons','roles','urgentTypes','commonServices'];
-if (multiAutoAdvanceSteps.includes(name) && stagedValue[name].length > 0) {
+if (stagedValue[name].length > 0 && ['offered','reasons','roles','urgentTypes','commonServices'].includes(name)) {
 nextQuestionReveal();
 }
 }));
@@ -1283,11 +1174,7 @@ if(other) other.addEventListener('blur',()=>{ stagedValue.offeredOther=other.val
 }
 
 function bindBusinessHours(){
-modalBody.querySelectorAll('[data-day-enabled]').forEach(cb=>cb.addEventListener('change',()=>{
-stagedValue.hours[cb.dataset.dayEnabled].enabled=cb.checked;
-refreshQuestionSummaries();
-validateCurrentStep();
-}));
+modalBody.querySelectorAll('[data-day-enabled]').forEach(cb=>cb.addEventListener('change',()=>{ stagedValue.hours[cb.dataset.dayEnabled].enabled=cb.checked; refreshQuestionSummaries(); validateCurrentStep(); }));
 modalBody.querySelectorAll('[data-day-open]').forEach(i=>i.addEventListener('change',()=>{ stagedValue.hours[i.dataset.dayOpen].open=i.value; refreshQuestionSummaries(); validateCurrentStep(); }));
 modalBody.querySelectorAll('[data-day-close]').forEach(i=>i.addEventListener('change',()=>{ stagedValue.hours[i.dataset.dayClose].close=i.value; refreshQuestionSummaries(); validateCurrentStep(); }));
 }
@@ -1299,20 +1186,14 @@ if(!wrap) return;
 wrap.innerHTML = Object.entries(countryData).map(([continent,items])=>{
 const filtered=items.filter(item=>item.name.toLowerCase().includes(q));
 if(!filtered.length) return '';
-return `<div><div class="group-title">${continent}</div>${filtered.map(item=>`<div class="search-option ${stagedValue.country===item.name?'selected':''}" data-country-value="${item.name}" data-country-status="${item.status}"><div><strong>${item.name}</strong><span>${item.status==='active'?'Available now':item.status==='soon'?'Coming soon':'Projected market'}</span></div><span class="badge ${item.status}">${item.status === 'active' ? 'Active' : item.status === 'soon' ? 'Coming soon' : 'Projected'}</span></div>`).join('')}</div>`;
+return `<div><div class="group-title">${continent}</div>${filtered.map(item=>`<div class="search-option ${stagedValue.country===item.name?'selected':''}" data-country-value="${item.name}" data-country-status="${item.status}"><div><strong>${item.name}</strong><span>${item.status==='active'?'Available now':item.status==='soon'?'Coming soon':'Projected market'}</span></div><span class="badge ${item.status}">${item.status==='active'?'Active':item.status==='soon'?'Coming soon':'Projected'}</span></div>`).join('')}</div>`;
 }).join('');
-
 wrap.querySelectorAll('[data-country-value]').forEach(opt=>opt.addEventListener('click',()=>{
 stagedValue.country=opt.dataset.countryValue;
 stagedValue.countryStatus=opt.dataset.countryStatus;
 refreshQuestionSummaries();
-if(stagedValue.countryStatus!=='active'){
-showWaitlistBox();
-validateCurrentStep();
-} else {
-removeWaitlistBox();
-nextQuestionReveal();
-}
+if(stagedValue.countryStatus!=='active') { showWaitlistBox(); validateCurrentStep(); }
+else { removeWaitlistBox(); nextQuestionReveal(); }
 renderCountryList(query);
 }));
 }
@@ -1384,9 +1265,7 @@ modalTitle.textContent=nextStep.label;
 modalDescription.textContent=nextStep.description;
 modalProgress.textContent=`${state.currentStepIndex+1} / ${steps.length}`;
 renderModalBody(nextStep);
-} else {
-closeModal();
-}
+} else closeModal();
 }
 
 cancelBtn.addEventListener('click', closeModal);
