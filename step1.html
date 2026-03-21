@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI CallPort — Step 3</title>
+<style>
+:root{
+--bg:#070606;
+--bg2:#0d0a08;
+--panel:#171310;
+--panel2:#1d1713;
+--line:rgba(255,255,255,.08);
+--text:#f6f2eb;
+--muted:rgba(246,242,235,.66);
+--soft:rgba(246,242,235,.82);
+--orange:#ff7a1a;
+--orange2:#ff9440;
+--orangeSoft:#f0a45d;
+--heroAccent:#ffad63;
+--blue:#5cbcff;
+--green:#5fd07a;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+margin:0;
+font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+color:var(--text);
+background:
+radial-gradient(circle at 20% 10%,rgba(255,122,26,.06),transparent 24%),
+radial-gradient(circle at 82% 18%,rgba(92,188,255,.05),transparent 18%),
+linear-gradient(180deg,var(--bg2),var(--bg));
+}
+
+.grid{
+position:fixed;
+inset:0;
+pointer-events:none;
+opacity:.3;
+background:
+linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);
+background-size:42px 42px;
+mask-image:radial-gradient(circle at center,black 42%,transparent 96%);
+}
+
+.page{
+min-height:100vh;
+padding:20px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.console{
+position:relative;
+width:min(1320px,calc(100vw - 40px));
+min-height:min(94vh,980px);
+padding:20px 22px 22px;
+border-radius:28px;
+border:1px solid rgba(255,255,255,.12);
+background:linear-gradient(180deg,#171210 0%,#120f0d 100%);
+box-shadow:0 40px 120px rgba(0,0,0,.56), inset 0 1px 0 rgba(255,255,255,.04);
+overflow:hidden;
+}
+
+.console::before{
+content:"";
+position:absolute;
+inset:0;
+pointer-events:none;
+background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgba(255,140,58,.11),transparent 55%);
+}
+
+.inner{
+position:relative;
+z-index:2;
+display:grid;
+grid-template-rows:auto auto auto 1fr auto;
+gap:14px;
+min-height:100%;
+}
+
+.topbar{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:20px;
+}
+
+.brand{display:flex;align-items:center;gap:10px}
+.dot{
+width:18px;height:18px;border-radius:6px;
+background:var(--orange);
+box-shadow:0 0 18px rgba(255,122,26,.35);
+}
+.brand strong{font-size:13px;font-weight:800}
+
+.meta{display:flex;align-items:center;gap:12px}
+.meta .title{
+font-size:11px;
+letter-spacing:.12em;
+text-transform:uppercase;
+color:rgba(246,242,235,.55);
+font-weight:700;
+}
+.progressWrap{display:flex;align-items:center;gap:10px}
+.progressText{font-size:11px;color:rgba(246,242,235,.64)}
+.progressBar{
+width:128px;height:7px;border-radius:999px;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.04);
+overflow:hidden;
+}
+.progressFill{width:100%;height:100%;background:var(--orange)}
+
+.statusStrip{
+display:grid;
+grid-template-columns:repeat(3,minmax(0,1fr));
+gap:12px;
+}
+.statusCard{
+border:1px solid rgba(255,255,255,.08);
+background:rgba(255,255,255,.02);
+border-radius:16px;
+padding:12px 14px;
+}
+.statusCard strong{
+display:block;
+font-size:12px;
+font-weight:800;
+margin-bottom:5px;
+}
+.statusCard span{
+font-size:12px;
+color:var(--muted);
+}
+.statusCard.done{
+border-color:rgba(95,208,122,.28);
+background:rgba(95,208,122,.05);
+}
+.statusCard.live{
+border-color:rgba(255,140,58,.28);
+background:rgba(255,122,26,.05);
+}
+
+.hero{
+display:grid;
+grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);
+gap:18px;
+align-items:stretch;
+}
+
+.heroMain,
+.heroSide{
+border:1px solid rgba(255,255,255,.1);
+border-radius:22px;
+background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.015));
+padding:20px;
+}
+
+.heroMain h1{
+margin:0;
+font-size:clamp(38px,5vw,62px);
+line-height:.95;
+letter-spacing:-.07em;
+font-weight:800;
+}
+.heroMain .white{color:var(--text)}
+.heroMain .orange{color:var(--heroAccent)}
+.heroMain p{
+margin:12px 0 0;
+max-width:760px;
+color:var(--muted);
+font-size:16px;
+line-height:1.5;
+}
+.eyebrow{
+font-size:11px;
+letter-spacing:.14em;
+text-transform:uppercase;
+color:var(--orange);
+font-weight:800;
+margin-bottom:10px;
+}
+
+.readiness{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-top:16px;
+}
+.pill{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:0 12px;
+min-height:34px;
+border-radius:999px;
+border:1px solid rgba(255,255,255,.08);
+background:rgba(255,255,255,.03);
+font-size:11px;
+font-weight:800;
+letter-spacing:.08em;
+text-transform:uppercase;
+color:rgba(246,242,235,.86);
+}
+.pill .mini{
+width:8px;height:8px;border-radius:999px;background:var(--orange);
+box-shadow:0 0 14px rgba(255,122,26,.45);
+}
+.pill.success{
+border-color:rgba(95,208,122,.26);
+background:rgba(95,208,122,.08);
+}
+.pill.success .mini{
+background:var(--green);
+box-shadow:0 0 14px rgba(95,208,122,.4);
+}
+
+.heroSide{
+display:grid;
+align-content:space-between;
+gap:16px;
+}
+.heroSide h3{
+margin:0;
+font-size:16px;
+font-weight:800;
+}
+.heroSide p{
+margin:6px 0 0;
+font-size:13px;
+line-height:1.45;
+color:var(--muted);
+}
+.kpiGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+.kpi{
+border:1px solid rgba(255,255,255,.08);
+border-radius:14px;
+padding:12px;
+background:#151311;
+}
+.kpi strong{
+display:block;
+font-size:22px;
+font-weight:900;
+letter-spacing:-.04em;
+}
+.kpi span{
+display:block;
+margin-top:3px;
+font-size:11px;
+color:var(--muted);
+}
+
+.main{
+display:grid;
+grid-template-columns:minmax(300px,360px) minmax(0,1fr);
+gap:18px;
+min-height:0;
+}
+
+.sidebar{
+display:grid;
+gap:14px;
+align-content:start;
+}
+.card{
+border:1px solid rgba(255,255,255,.1);
+background:var(--panel);
+border-radius:20px;
+padding:16px;
+}
+.cardTitle{
+font-size:11px;
+letter-spacing:.12em;
+text-transform:uppercase;
+color:rgba(255,213,186,.72);
+font-weight:800;
+margin-bottom:12px;
+}
+.summaryRows{
+display:grid;
+gap:9px;
+}
+.summaryRow{
+display:flex;
+justify-content:space-between;
+gap:12px;
+padding:8px 0;
+border-bottom:1px solid rgba(255,255,255,.05);
+font-size:12px;
+}
+.summaryRow:last-child{border-bottom:0}
+.summaryRow span{color:var(--muted)}
+.summaryRow b{color:var(--text);font-weight:700;text-align:right}
+
+.deploySteps{
+display:grid;
+gap:10px;
+}
+.deployStep{
+display:grid;
+grid-template-columns:36px minmax(0,1fr);
+gap:12px;
+align-items:start;
+}
+.deployNum{
+width:36px;height:36px;border-radius:12px;
+display:flex;align-items:center;justify-content:center;
+background:rgba(255,122,26,.09);
+border:1px solid rgba(255,140,58,.22);
+font-weight:900;
+color:var(--orangeSoft);
+}
+.deployText strong{
+display:block;
+font-size:13px;
+font-weight:800;
+margin-bottom:3px;
+}
+.deployText span{
+display:block;
+font-size:12px;
+line-height:1.45;
+color:var(--muted);
+}
+
+.recommend{
+padding:14px;
+border-radius:16px;
+border:1px solid rgba(95,208,122,.24);
+background:rgba(95,208,122,.06);
+}
+.recommend strong{
+display:block;
+font-size:13px;
+font-weight:800;
+margin-bottom:4px;
+}
+.recommend span{
+font-size:12px;
+line-height:1.45;
+color:rgba(246,242,235,.82);
+}
+
+.plans{
+display:grid;
+grid-template-columns:repeat(3,minmax(0,1fr));
+gap:16px;
+align-items:stretch;
+}
+
+.plan{
+position:relative;
+border-radius:22px;
+border:1px solid rgba(255,255,255,.1);
+background:linear-gradient(180deg,#181311,#13100d 100%);
+padding:18px;
+display:grid;
+grid-template-rows:auto auto auto 1fr auto;
+gap:14px;
+transition:.18s ease;
+cursor:pointer;
+}
+.plan:hover{transform:translateY(-2px);border-color:rgba(255,166,94,.34)}
+.plan.selected{
+border-color:rgba(255,180,118,.95);
+box-shadow:0 0 0 1px rgba(255,140,58,.18),0 0 26px rgba(255,122,26,.12);
+background:linear-gradient(180deg,rgba(255,122,26,.08),#15110f);
+}
+.plan.recommended{
+border-color:rgba(255,140,58,.44);
+}
+.badgeTop{
+position:absolute;
+top:12px;
+right:12px;
+min-height:28px;
+padding:0 10px;
+border-radius:999px;
+display:inline-flex;
+align-items:center;
+font-size:10px;
+font-weight:900;
+letter-spacing:.08em;
+text-transform:uppercase;
+}
+.badgeTop.popular{
+background:rgba(255,122,26,.12);
+color:#ffd6b8;
+border:1px solid rgba(255,122,26,.26);
+}
+.badgeTop.recommend{
+background:rgba(95,208,122,.13);
+color:#defee7;
+border:1px solid rgba(95,208,122,.24);
+}
+
+.planHead small{
+display:block;
+font-size:11px;
+letter-spacing:.12em;
+text-transform:uppercase;
+color:rgba(246,242,235,.5);
+font-weight:800;
+margin-bottom:8px;
+}
+.planHead h3{
+margin:0;
+font-size:26px;
+line-height:1;
+letter-spacing:-.05em;
+font-weight:800;
+}
+.planHead p{
+margin:8px 0 0;
+font-size:13px;
+line-height:1.45;
+color:var(--muted);
+}
+
+.price{
+display:flex;
+align-items:flex-end;
+gap:8px;
+}
+.price strong{
+font-size:44px;
+line-height:.95;
+letter-spacing:-.06em;
+font-weight:900;
+}
+.price span{
+font-size:13px;
+color:var(--muted);
+padding-bottom:5px;
+}
+
+.featureList{
+display:grid;
+gap:9px;
+}
+.feature{
+display:grid;
+grid-template-columns:18px minmax(0,1fr);
+gap:8px;
+align-items:start;
+font-size:12px;
+line-height:1.45;
+color:rgba(246,242,235,.84);
+}
+.check{
+width:18px;height:18px;border-radius:999px;
+display:flex;align-items:center;justify-content:center;
+background:rgba(95,208,122,.12);
+border:1px solid rgba(95,208,122,.18);
+font-size:11px;
+color:#dbffe4;
+}
+
+.planFoot{
+display:grid;
+gap:10px;
+}
+.meter{
+height:8px;
+border-radius:999px;
+background:rgba(255,255,255,.05);
+overflow:hidden;
+border:1px solid rgba(255,255,255,.04);
+}
+.meter > div{
+height:100%;
+background:var(--orange);
+}
+.planButton{
+width:100%;
+height:48px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,.08);
+background:rgba(255,255,255,.03);
+color:#fff;
+font-size:14px;
+font-weight:900;
+cursor:pointer;
+}
+.plan.selected .planButton,
+.plan.recommended .planButton{
+background:linear-gradient(180deg,#ff9950,#ff7a1a 58%,#ff6f12);
+border-color:rgba(255,170,110,.82);
+}
+
+.bottomBar{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:16px;
+padding:16px 18px;
+border:1px solid rgba(255,255,255,.1);
+border-radius:20px;
+background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.012));
+}
+
+.bottomMeta strong{
+display:block;
+font-size:17px;
+font-weight:800;
+margin-bottom:4px;
+}
+.bottomMeta span{
+display:block;
+font-size:13px;
+color:var(--muted);
+}
+
+.actions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+.btn{
+min-width:150px;
+height:50px;
+padding:0 18px;
+border-radius:14px;
+font-size:14px;
+font-weight:900;
+cursor:pointer;
+}
+.ghost{
+border:1px solid rgba(255,255,255,.08);
+background:rgba(255,255,255,.03);
+color:rgba(246,242,235,.92);
+}
+.primary{
+border:1px solid rgba(255,170,110,.84);
+background:linear-gradient(180deg,#ff9950,#ff7a1a 58%,#ff6f12);
+color:#fff;
+box-shadow:0 0 32px rgba(255,122,26,.18);
+}
+.primary:disabled{
+opacity:.45;
+cursor:not-allowed;
+background:linear-gradient(180deg,rgba(255,122,26,.18),rgba(255,122,26,.12));
+border-color:rgba(255,122,26,.28);
+box-shadow:none;
+}
+
+.notice{
+font-size:12px;
+color:rgba(246,242,235,.56);
+}
+
+@media (max-width:1200px){
+.hero{grid-template-columns:1fr}
+.main{grid-template-columns:1fr}
+.plans{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+body{overflow:auto}
+.page{padding:14px}
+.console{width:100%;padding:16px;border-radius:22px}
+.topbar,.bottomBar{flex-direction:column;align-items:flex-start}
+.statusStrip{grid-template-columns:1fr}
+.kpiGrid{grid-template-columns:1fr 1fr}
+.actions{width:100%}
+.actions .btn{width:100%}
+.heroMain h1{font-size:clamp(34px,10vw,50px)}
+}
+</style>
+</head>
+<body>
+<div class="grid"></div>
+
+<div class="page">
+  <div class="console" id="console">
+    <div class="inner">
+      <div class="topbar">
+        <div class="brand">
+          <div class="dot"></div>
+          <strong>AI CallPort</strong>
+        </div>
+        <div class="meta">
+          <div class="title">Step 3 — Choose Plan & Deploy</div>
+          <div class="progressWrap">
+            <div class="progressText">Step 3 of 3</div>
+            <div class="progressBar"><div class="progressFill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="statusStrip">
+        <div class="statusCard done">
+          <strong>Step 1 Complete</strong>
+          <span>Business logic configured</span>
+        </div>
+        <div class="statusCard done">
+          <strong>Step 2 Complete</strong>
+          <span>Demo call reviewed</span>
+        </div>
+        <div class="statusCard live">
+          <strong>Deployment Ready</strong>
+          <span>Choose plan and activate</span>
+        </div>
+      </div>
+
+      <div class="hero">
+        <section class="heroMain">
+          <div class="eyebrow">System Ready</div>
+          <h1><span class="white">Your AI Call</span> <span class="orange">System Is Ready</span></h1>
+          <p>Review your configured setup, choose the right deployment plan, and launch your AI receptionist, lead capture, booking flow, routing, and follow-up system.</p>
+          <div class="readiness">
+            <div class="pill success"><span class="mini"></span><span>Business configured</span></div>
+            <div class="pill success"><span class="mini"></span><span>Demo completed</span></div>
+            <div class="pill"><span class="mini"></span><span id="deployStatus">Plan not selected</span></div>
+          </div>
+        </section>
+
+        <aside class="heroSide">
+          <div>
+            <h3>Deployment Snapshot</h3>
+            <p>Your recommended plan is calculated from your Step 1 business configuration.</p>
+          </div>
+          <div class="kpiGrid">
+            <div class="kpi">
+              <strong id="kpiServices">0</strong>
+              <span>Services Configured</span>
+            </div>
+            <div class="kpi">
+              <strong id="kpiComplexity">Low</strong>
+              <span>Workflow Complexity</span>
+            </div>
+            <div class="kpi">
+              <strong id="kpiRouting">Basic</strong>
+              <span>Routing Logic</span>
+            </div>
+            <div class="kpi">
+              <strong id="kpiRecommended">Starter</strong>
+              <span>Recommended Plan</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="main">
+        <aside class="sidebar">
+          <div class="card">
+            <div class="cardTitle">Configured System Summary</div>
+            <div class="summaryRows" id="summaryRows"></div>
+          </div>
+
+          <div class="card">
+            <div class="cardTitle">Deployment Path</div>
+            <div class="deploySteps">
+              <div class="deployStep">
+                <div class="deployNum">1</div>
+                <div class="deployText">
+                  <strong>Choose your plan</strong>
+                  <span>Select the plan that matches your workflow complexity and expected call volume.</span>
+                </div>
+              </div>
+              <div class="deployStep">
+                <div class="deployNum">2</div>
+                <div class="deployText">
+                  <strong>Connect your business line</strong>
+                  <span>Forward or connect your business number to AI CallPort.</span>
+                </div>
+              </div>
+              <div class="deployStep">
+                <div class="deployNum">3</div>
+                <div class="deployText">
+                  <strong>Go live</strong>
+                  <span>Activate your AI receptionist, call flows, booking logic, and notifications.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="recommend" id="recommendBox">
+            <strong>Recommended for your setup: Growth</strong>
+            <span>Your current configuration includes scheduling, routing, and service-based call logic.</span>
+          </div>
+        </aside>
+
+        <section class="plans" id="plans">
+          <article class="plan" data-plan="starter">
+            <div class="planHead">
+              <small>Entry Plan</small>
+              <h3>Starter</h3>
+              <p>For solo operators and small businesses getting started with AI call handling.</p>
+            </div>
+            <div class="price">
+              <strong>$79</strong>
+              <span>/ month</span>
+            </div>
+            <div class="featureList">
+              <div class="feature"><div class="check">✓</div><div>AI call answering</div></div>
+              <div class="feature"><div class="check">✓</div><div>Missed call recovery</div></div>
+              <div class="feature"><div class="check">✓</div><div>Basic lead capture</div></div>
+              <div class="feature"><div class="check">✓</div><div>Email or SMS summaries</div></div>
+              <div class="feature"><div class="check">✓</div><div>1 business line</div></div>
+              <div class="feature"><div class="check">✓</div><div>Up to 200 minutes included</div></div>
+            </div>
+            <div class="planFoot">
+              <div class="meter"><div style="width:34%"></div></div>
+              <button class="planButton" type="button">Deploy Starter</button>
+            </div>
+          </article>
+
+          <article class="plan recommended" data-plan="growth">
+            <div class="badgeTop popular">Most Popular</div>
+            <div class="planHead">
+              <small>Main Plan</small>
+              <h3>Growth</h3>
+              <p>For businesses that want to capture, qualify, book, and route every real lead.</p>
+            </div>
+            <div class="price">
+              <strong>$199</strong>
+              <span>/ month</span>
+            </div>
+            <div class="featureList">
+              <div class="feature"><div class="check">✓</div><div>Everything in Starter</div></div>
+              <div class="feature"><div class="check">✓</div><div>Appointment booking</div></div>
+              <div class="feature"><div class="check">✓</div><div>Urgent call routing</div></div>
+              <div class="feature"><div class="check">✓</div><div>Service-specific workflows</div></div>
+              <div class="feature"><div class="check">✓</div><div>Team notifications</div></div>
+              <div class="feature"><div class="check">✓</div><div>CRM-style summaries</div></div>
+              <div class="feature"><div class="check">✓</div><div>Up to 1000 minutes included</div></div>
+            </div>
+            <div class="planFoot">
+              <div class="meter"><div style="width:68%"></div></div>
+              <button class="planButton" type="button">Deploy Growth</button>
+            </div>
+          </article>
+
+          <article class="plan" data-plan="pro">
+            <div class="planHead">
+              <small>Advanced Plan</small>
+              <h3>Pro</h3>
+              <p>For larger teams, multi-location operations, and advanced business logic.</p>
+            </div>
+            <div class="price">
+              <strong>$499</strong>
+              <span>/ month</span>
+            </div>
+            <div class="featureList">
+              <div class="feature"><div class="check">✓</div><div>Everything in Growth</div></div>
+              <div class="feature"><div class="check">✓</div><div>Multi-location support</div></div>
+              <div class="feature"><div class="check">✓</div><div>Advanced routing logic</div></div>
+              <div class="feature"><div class="check">✓</div><div>VIP handling</div></div>
+              <div class="feature"><div class="check">✓</div><div>Priority onboarding</div></div>
+              <div class="feature"><div class="check">✓</div><div>Higher-volume call handling</div></div>
+              <div class="feature"><div class="check">✓</div><div>Up to 2500 minutes included</div></div>
+            </div>
+            <div class="planFoot">
+              <div class="meter"><div style="width:100%"></div></div>
+              <button class="planButton" type="button">Deploy Pro</button>
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <div class="bottomBar">
+        <div class="bottomMeta">
+          <strong id="bottomTitle">Select a plan to activate your AI system</strong>
+          <span id="bottomSub">Your business-ready AI call workflow will be prepared for deployment as soon as you choose a plan.</span>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" id="backBtn" type="button">Back to Demo</button>
+          <button class="btn primary" id="deployBtn" type="button" disabled>Deploy My AI System</button>
+        </div>
+      </div>
+
+      <div class="notice">You can connect checkout, Stripe, or onboarding after this click flow is confirmed.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const consoleEl = document.getElementById("console");
+  if (consoleEl) {
+    consoleEl.addEventListener("mousemove", (e) => {
+      const r = consoleEl.getBoundingClientRect();
+      consoleEl.style.setProperty("--mx", ((e.clientX - r.left) / r.width) * 100 + "%");
+      consoleEl.style.setProperty("--my", ((e.clientY - r.top) / r.height) * 100 + "%");
+    });
+  }
+
+  const config = JSON.parse(localStorage.getItem("aiCallPortStep1Final") || "{}");
+
+  const summaryRowsEl = document.getElementById("summaryRows");
+  const plansEl = document.getElementById("plans");
+  const deployBtn = document.getElementById("deployBtn");
+  const deployStatusEl = document.getElementById("deployStatus");
+  const bottomTitleEl = document.getElementById("bottomTitle");
+  const bottomSubEl = document.getElementById("bottomSub");
+  const recommendBoxEl = document.getElementById("recommendBox");
+  const kpiServicesEl = document.getElementById("kpiServices");
+  const kpiComplexityEl = document.getElementById("kpiComplexity");
+  const kpiRoutingEl = document.getElementById("kpiRouting");
+  const kpiRecommendedEl = document.getElementById("kpiRecommended");
+  const backBtn = document.getElementById("backBtn");
+
+  let selectedPlan = localStorage.getItem("aiCallPortSelectedPlan") || "";
+
+  const services = Array.isArray(config.services?.offered) ? config.services.offered : [];
+  const hasScheduling = !!config.scheduling?.appointmentsNeeded && config.scheduling.appointmentsNeeded !== "No, mostly inquiry only";
+  const hasUrgency = !!config.urgency?.urgencyFrequency && config.urgency.urgencyFrequency !== "Never";
+  const hasTeam = !!config.team?.teamSize && config.team.teamSize !== "Just me";
+  const hasRouting = !!config.team?.whoReceivesLeads || !!config.currentWorkflow?.existingCustomerHandling;
+  const multiLocation = config.serviceArea?.multiLocation === "Yes";
+  const summaryDelivery = config.followUp?.summaryDelivery || "Pending";
+  const businessName = config.businessProfile?.businessName || "Your business";
+  const industry = config.businessProfile?.industry || "Pending";
+  const teamSize = config.team?.teamSize || "Pending";
+  const serviceArea = config.serviceArea?.areas || "Pending";
+  const urgencyFreq = config.urgency?.urgencyFrequency || "Pending";
+  const appointments = config.scheduling?.appointmentsNeeded || "Pending";
+
+  function getComplexity() {
+    let score = 0;
+    if (services.length >= 3) score += 1;
+    if (hasScheduling) score += 1;
+    if (hasUrgency) score += 1;
+    if (hasTeam) score += 1;
+    if (hasRouting) score += 1;
+    if (multiLocation) score += 2;
+
+    if (score >= 5) return "High";
+    if (score >= 3) return "Medium";
+    return "Low";
+  }
+
+  function getRoutingType() {
+    if (multiLocation) return "Advanced";
+    if (hasUrgency || hasTeam || hasRouting) return "Smart";
+    return "Basic";
+  }
+
+  function getRecommendedPlan() {
+    if (multiLocation) return "pro";
+    if (getComplexity() === "High") return "pro";
+    if (hasScheduling || hasUrgency || services.length >= 2 || hasTeam) return "growth";
+    return "starter";
+  }
+
+  function planLabel(plan) {
+    return { starter: "Starter", growth: "Growth", pro: "Pro" }[plan] || "";
+  }
+
+  function renderSummary() {
+    const rows = [
+      ["Business", businessName],
+      ["Industry", industry],
+      ["Services Configured", services.length ? String(services.length) : "0"],
+      ["Appointments", appointments],
+      ["Urgent Call Handling", urgencyFreq],
+      ["Team Structure", teamSize],
+      ["Service Area", serviceArea],
+      ["Summary Delivery", summaryDelivery]
+    ];
+
+    summaryRowsEl.innerHTML = rows.map(([label, value]) => {
+      return `<div class="summaryRow"><span>${label}</span><b>${value}</b></div>`;
+    }).join("");
+  }
+
+  function renderKpis() {
+    const recommended = getRecommendedPlan();
+    kpiServicesEl.textContent = String(services.length || 0);
+    kpiComplexityEl.textContent = getComplexity();
+    kpiRoutingEl.textContent = getRoutingType();
+    kpiRecommendedEl.textContent = planLabel(recommended);
+
+    const textMap = {
+      starter: {
+        title: "Recommended for your setup: Starter",
+        text: "Your current configuration is lean and efficient. Starter is a strong fit for smaller operations and simpler workflows."
+      },
+      growth: {
+        title: "Recommended for your setup: Growth",
+        text: "Your setup includes enough scheduling, routing, or service complexity to benefit from Growth."
+      },
+      pro: {
+        title: "Recommended for your setup: Pro",
+        text: "Your business configuration suggests a larger or more advanced deployment, especially for routing and scale."
+      }
+    };
+
+    recommendBoxEl.innerHTML = `<strong>${textMap[recommended].title}</strong><span>${textMap[recommended].text}</span>`;
+  }
+
+  function updateSelectionUI() {
+    const recommended = getRecommendedPlan();
+
+    document.querySelectorAll(".plan").forEach((card) => {
+      const plan = card.dataset.plan;
+      card.classList.toggle("selected", plan === selectedPlan);
+
+      let badge = card.querySelector(".badgeTop.recommend");
+      if (badge) badge.remove();
+
+      if (plan === recommended && plan !== "growth") {
+        const badgeEl = document.createElement("div");
+        badgeEl.className = "badgeTop recommend";
+        badgeEl.textContent = "Recommended";
+        card.appendChild(badgeEl);
+      }
+    });
+
+    if (selectedPlan) {
+      deployBtn.disabled = false;
+      deployStatusEl.textContent = `${planLabel(selectedPlan)} selected`;
+      bottomTitleEl.textContent = `${planLabel(selectedPlan)} plan selected for ${businessName}`;
+      bottomSubEl.textContent = `Your ${planLabel(selectedPlan)} deployment is ready. Connect checkout or onboarding to activate your AI call system.`;
+    } else {
+      deployBtn.disabled = true;
+      deployStatusEl.textContent = "Plan not selected";
+      bottomTitleEl.textContent = "Select a plan to activate your AI system";
+      bottomSubEl.textContent = "Your business-ready AI call workflow will be prepared for deployment as soon as you choose a plan.";
+    }
+  }
+
+  function choosePlan(plan) {
+    selectedPlan = plan;
+    localStorage.setItem("aiCallPortSelectedPlan", plan);
+    updateSelectionUI();
+  }
+
+  renderSummary();
+  renderKpis();
+
+  if (!selectedPlan) {
+    selectedPlan = getRecommendedPlan();
+    localStorage.setItem("aiCallPortSelectedPlan", selectedPlan);
+  }
+
+  updateSelectionUI();
+
+  plansEl.addEventListener("click", (e) => {
+    const card = e.target.closest(".plan");
+    if (!card) return;
+    choosePlan(card.dataset.plan);
+  });
+
+  deployBtn.addEventListener("click", () => {
+    if (!selectedPlan) return;
+
+    localStorage.setItem("aiCallPortSelectedPlan", selectedPlan);
+
+    alert(
+      `${planLabel(selectedPlan)} selected for ${businessName}.\n\n` +
+      `Next step: connect checkout, Stripe, or onboarding flow to deploy the system.`
+    );
+
+    // Example next steps:
+    // window.location.href = "/checkout.html";
+    // OR
+    // window.location.href = "/deploy.html";
+  });
+
+  backBtn.addEventListener("click", () => {
+    // Replace with your real Step 2 URL
+    // window.location.href = "/demo.html";
+    history.back();
+  });
+});
+</script>
+</body>
+</html>
