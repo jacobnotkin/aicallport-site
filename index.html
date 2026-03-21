@@ -40,6 +40,7 @@ position:fixed;
 inset:0;
 pointer-events:none;
 opacity:.32;
+z-index:0;
 background:
 linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),
 linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);
@@ -48,6 +49,8 @@ mask-image:radial-gradient(circle at center,black 42%,transparent 96%);
 }
 
 .page{
+position:relative;
+z-index:1;
 height:100vh;
 padding:18px 20px;
 display:flex;
@@ -65,6 +68,7 @@ border:1px solid rgba(255,255,255,.12);
 background:linear-gradient(180deg,#171210 0%,#120f0d 100%);
 box-shadow:0 40px 120px rgba(0,0,0,.56), inset 0 1px 0 rgba(255,255,255,.04);
 overflow:hidden;
+z-index:1;
 }
 
 .console::before{
@@ -72,16 +76,18 @@ content:"";
 position:absolute;
 inset:0;
 pointer-events:none;
+z-index:1;
 background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgba(255,140,58,.11),transparent 55%);
 }
 
 .inner{
 position:relative;
-z-index:2;
+z-index:10;
 height:100%;
 display:grid;
 grid-template-rows:auto 1fr auto;
 gap:10px;
+pointer-events:auto;
 }
 
 .topbar{
@@ -180,6 +186,7 @@ pointer-events:auto;
 appearance:none;
 -webkit-appearance:none;
 outline:none;
+z-index:11;
 }
 .step.locked{opacity:.25}
 .step.completed{
@@ -267,6 +274,9 @@ text-transform:uppercase;
 letter-spacing:.03em;
 cursor:pointer;
 transition:.18s ease;
+position:relative;
+z-index:11;
+pointer-events:auto;
 }
 .cta:disabled{
 opacity:.46;
@@ -288,6 +298,8 @@ padding:14px;
 display:grid;
 grid-template-rows:auto auto auto auto 1fr;
 gap:8px;
+position:relative;
+z-index:10;
 }
 .summaryTitle{
 font-size:11px;
@@ -365,8 +377,12 @@ padding:20px;
 background:rgba(3,2,2,.76);
 backdrop-filter:blur(10px);
 -webkit-backdrop-filter:blur(10px);
+pointer-events:none;
 }
-.overlay.show{display:flex}
+.overlay.show{
+display:flex;
+pointer-events:auto;
+}
 
 .modal{
 width:min(960px,100%);
@@ -379,6 +395,9 @@ box-shadow:0 38px 90px rgba(0,0,0,.60);
 display:flex;
 flex-direction:column;
 animation:modalIn .24s cubic-bezier(.22,.8,.24,1);
+position:relative;
+z-index:100;
+pointer-events:auto;
 }
 
 .modalHead{
@@ -451,6 +470,9 @@ padding:0 14px;
 font-size:14px;
 outline:none;
 transition:.18s ease;
+position:relative;
+z-index:110;
+pointer-events:auto;
 }
 .search,.text,.phone{height:52px}
 .textarea{min-height:106px;padding:12px 14px;resize:vertical}
@@ -495,6 +517,9 @@ border:1px solid rgba(255,255,255,.08);
 background:#151311;
 cursor:pointer;
 transition:.16s ease;
+position:relative;
+z-index:110;
+pointer-events:auto;
 }
 .option{border-radius:14px;padding:12px}
 .searchOption{
@@ -569,6 +594,9 @@ background:#0f0d0b;
 color:#fff;
 padding:0 10px;
 font-size:12px;
+position:relative;
+z-index:110;
+pointer-events:auto;
 }
 
 .notify{
@@ -603,6 +631,9 @@ font-size:14px;
 font-weight:800;
 border:1px solid rgba(255,255,255,.08);
 cursor:pointer;
+position:relative;
+z-index:110;
+pointer-events:auto;
 }
 .ghost{background:rgba(255,255,255,.03);color:rgba(246,242,235,.90)}
 .primary{border:1px solid rgba(255,122,26,.56);background:var(--orange);color:#fff}
@@ -723,6 +754,7 @@ body{overflow:auto}
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
 const STORAGE_KEY = "aiCallPortStep1";
 
 const consoleEl = document.getElementById("console");
@@ -1606,18 +1638,14 @@ nextBtn.addEventListener("click", () => {
 
 demoBtn.addEventListener("click", () => {
   if (demoBtn.disabled) return;
-
   localStorage.setItem("aiCallPortStep1Final", JSON.stringify(state.values));
   console.log("System configuration:", state.values);
-
-  // replace with your real step 2 URL
-  // window.location.href = "/demo-call.html";
-
-  alert("Step 1 complete. Configuration saved. Next: connect this to your Step 2 page.");
+  alert("Step 1 complete. Configuration saved.");
 });
 
 loadProgress();
 renderSteps();
+});
 </script>
 </body>
 </html>
