@@ -1,4 +1,4 @@
-aaa<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -17,7 +17,7 @@ aaa<!DOCTYPE html>
 --soft:rgba(246,242,235,.82);
 --orange:#ff7a1a;
 --orange2:#ff9440;
---orangeSoft:#f0a45d; 
+--orangeSoft:#f0a45d;
 --heroAccent:#ffad63;
 --green:#5fd07a;
 }
@@ -723,130 +723,134 @@ body{overflow:auto}
 </div>
 
 <script>
+const STORAGE_KEY = "aiCallPortStep1";
+
 const consoleEl = document.getElementById("console");
 consoleEl.addEventListener("mousemove", (e) => {
-const r = consoleEl.getBoundingClientRect();
-consoleEl.style.setProperty("--mx", ((e.clientX - r.left) / r.width) * 100 + "%");
-consoleEl.style.setProperty("--my", ((e.clientY - r.top) / r.height) * 100 + "%");
+  const r = consoleEl.getBoundingClientRect();
+  consoleEl.style.setProperty("--mx", ((e.clientX - r.left) / r.width) * 100 + "%");
+  consoleEl.style.setProperty("--my", ((e.clientY - r.top) / r.height) * 100 + "%");
 });
 
 const countryData = {
-"North America": [
-{ name: "Canada", status: "active" },
-{ name: "United States", status: "active" },
-{ name: "Mexico", status: "active" },
-{ name: "Jamaica", status: "soon" },
-{ name: "Dominican Republic", status: "projected" }
-],
-"South America": [
-{ name: "Brazil", status: "soon" },
-{ name: "Argentina", status: "projected" },
-{ name: "Chile", status: "projected" }
-],
-"Europe": [
-{ name: "United Kingdom", status: "active" },
-{ name: "Germany", status: "active" },
-{ name: "France", status: "active" },
-{ name: "Spain", status: "active" },
-{ name: "Italy", status: "soon" },
-{ name: "Netherlands", status: "active" },
-{ name: "Sweden", status: "projected" }
-],
-"Asia": [
-{ name: "China", status: "active" },
-{ name: "Japan", status: "active" },
-{ name: "India", status: "soon" },
-{ name: "Singapore", status: "active" },
-{ name: "United Arab Emirates", status: "active" }
-],
-"Africa": [
-{ name: "South Africa", status: "projected" },
-{ name: "Nigeria", status: "projected" }
-],
-"Oceania": [
-{ name: "Australia", status: "active" },
-{ name: "New Zealand", status: "active" }
-]
+  "North America": [
+    { name: "Canada", status: "active" },
+    { name: "United States", status: "active" },
+    { name: "Mexico", status: "active" },
+    { name: "Jamaica", status: "soon" },
+    { name: "Dominican Republic", status: "projected" }
+  ],
+  "South America": [
+    { name: "Brazil", status: "soon" },
+    { name: "Argentina", status: "projected" },
+    { name: "Chile", status: "projected" }
+  ],
+  "Europe": [
+    { name: "United Kingdom", status: "active" },
+    { name: "Germany", status: "active" },
+    { name: "France", status: "active" },
+    { name: "Spain", status: "active" },
+    { name: "Italy", status: "soon" },
+    { name: "Netherlands", status: "active" },
+    { name: "Sweden", status: "projected" }
+  ],
+  "Asia": [
+    { name: "China", status: "active" },
+    { name: "Japan", status: "active" },
+    { name: "India", status: "soon" },
+    { name: "Singapore", status: "active" },
+    { name: "United Arab Emirates", status: "active" }
+  ],
+  "Africa": [
+    { name: "South Africa", status: "projected" },
+    { name: "Nigeria", status: "projected" }
+  ],
+  "Oceania": [
+    { name: "Australia", status: "active" },
+    { name: "New Zealand", status: "active" }
+  ]
 };
 
 const industryData = {
-"Home Services": ["Plumbing","HVAC","Electrical","Roofing","Appliance Repair","Cleaning Services","Landscaping","Pest Control","Windows & Doors"],
-"Healthcare": ["Clinic","Dental","Physiotherapy","Chiropractic","Home Care","Veterinary"],
-"Professional Services": ["Real Estate","Law Firm","Accounting","Insurance","Consulting","Financial Services"],
-"Beauty & Wellness": ["Salon","Med Spa","Barbershop","Massage Therapy","Nail Studio"],
-"Automotive": ["Auto Repair","Tire Shop","Detailing","Collision Repair","Tow Service"],
-"Retail & Local": ["Retail Store","Restaurant","Catering","Education & Training","Security Services","Cleaning Company"]
+  "Home Services": ["Plumbing","HVAC","Electrical","Roofing","Appliance Repair","Cleaning Services","Landscaping","Pest Control","Windows & Doors"],
+  "Healthcare": ["Clinic","Dental","Physiotherapy","Chiropractic","Home Care","Veterinary"],
+  "Professional Services": ["Real Estate","Law Firm","Accounting","Insurance","Consulting","Financial Services"],
+  "Beauty & Wellness": ["Salon","Med Spa","Barbershop","Massage Therapy","Nail Studio"],
+  "Automotive": ["Auto Repair","Tire Shop","Detailing","Collision Repair","Tow Service"],
+  "Retail & Local": ["Retail Store","Restaurant","Catering","Education & Training","Security Services","Cleaning Company"]
 };
 
 const serviceCatalog = {
-Plumbing: ["Leak Repair","Drain Cleaning","Water Heater","Installation","Inspection","Emergency Service"],
-HVAC: ["Repair","Installation","Maintenance","Emergency Service","Inspection"],
-Electrical: ["Repair","Installation","Panel Upgrade","Inspection","Emergency Service"],
-"Windows & Doors": ["Estimate","Installation","Repair","Replacement","Commercial Project"],
-default: ["Consultation","Estimate","Repair","Installation","Emergency Service","General Service"]
+  Plumbing: ["Leak Repair","Drain Cleaning","Water Heater","Installation","Inspection","Emergency Service"],
+  HVAC: ["Repair","Installation","Maintenance","Emergency Service","Inspection"],
+  Electrical: ["Repair","Installation","Panel Upgrade","Inspection","Emergency Service"],
+  "Windows & Doors": ["Estimate","Installation","Repair","Replacement","Commercial Project"],
+  default: ["Consultation","Estimate","Repair","Installation","Emergency Service","General Service"]
 };
 
 const urgencyCatalog = {
-Plumbing: ["Burst pipe","No water","Overflow","Major leak"],
-HVAC: ["No heat","No cooling","Gas smell","System failure"],
-Electrical: ["Power outage","Burning smell","Sparking","Panel issue"],
-default: ["Urgent request","Customer stranded","Safety risk","Immediate response needed"]
+  Plumbing: ["Burst pipe","No water","Overflow","Major leak"],
+  HVAC: ["No heat","No cooling","Gas smell","System failure"],
+  Electrical: ["Power outage","Burning smell","Sparking","Panel issue"],
+  default: ["Urgent request","Customer stranded","Safety risk","Immediate response needed"]
 };
 
 const steps = [
-{ key:"businessProfile", label:"Business Profile", code:"1A", cta:"Answer", desc:"Tell us who you are and where your business operates." },
-{ key:"services", label:"Services", code:"1B", cta:"Answer", desc:"Help us understand what your business offers." },
-{ key:"customerIntent", label:"Customer Intent", code:"1C", cta:"Answer", desc:"Tell us why customers usually contact your business." },
-{ key:"currentWorkflow", label:"Current Workflow", code:"1D", cta:"Answer", desc:"Show us how your business handles calls today." },
-{ key:"scheduling", label:"Scheduling & Availability", code:"1E", cta:"Answer", desc:"Define appointment logic and business availability." },
-{ key:"team", label:"Team Structure", code:"1F", cta:"Answer", desc:"Tell us how your team is organized." },
-{ key:"urgency", label:"Urgency & Priority", code:"1G", cta:"Answer", desc:"Tell us how urgent calls and priority customers should be treated." },
-{ key:"serviceArea", label:"Service Area", code:"1H", cta:"Answer", desc:"Where do you operate and what happens outside your service area?" },
-{ key:"pricing", label:"Pricing & Quotes", code:"1I", cta:"Answer", desc:"Tell us how pricing and estimates are handled." },
-{ key:"followUp", label:"Communication & Follow-Up", code:"1J", cta:"Answer", desc:"Tell us how reminders, missed calls, and summaries should work." },
-{ key:"specialNotes", label:"Special Notes", code:"1K", cta:"Answer", desc:"Anything special we should know before generating your system?" }
+  { key:"businessProfile", label:"Business Profile", code:"1A", cta:"Answer", desc:"Tell us who you are and where your business operates." },
+  { key:"services", label:"Services", code:"1B", cta:"Answer", desc:"Help us understand what your business offers." },
+  { key:"customerIntent", label:"Customer Intent", code:"1C", cta:"Answer", desc:"Tell us why customers usually contact your business." },
+  { key:"currentWorkflow", label:"Current Workflow", code:"1D", cta:"Answer", desc:"Show us how your business handles calls today." },
+  { key:"scheduling", label:"Scheduling & Availability", code:"1E", cta:"Answer", desc:"Define appointment logic and business availability." },
+  { key:"team", label:"Team Structure", code:"1F", cta:"Answer", desc:"Tell us how your team is organized." },
+  { key:"urgency", label:"Urgency & Priority", code:"1G", cta:"Answer", desc:"Tell us how urgent calls and priority customers should be treated." },
+  { key:"serviceArea", label:"Service Area", code:"1H", cta:"Answer", desc:"Where do you operate and what happens outside your service area?" },
+  { key:"pricing", label:"Pricing & Quotes", code:"1I", cta:"Answer", desc:"Tell us how pricing and estimates are handled." },
+  { key:"followUp", label:"Communication & Follow-Up", code:"1J", cta:"Answer", desc:"Tell us how reminders, missed calls, and summaries should work." },
+  { key:"specialNotes", label:"Special Notes", code:"1K", cta:"Answer", desc:"Anything special we should know before generating your system?" }
 ];
 
 const labels = {
-businessProfile:"Business Profile",
-services:"Services",
-customerIntent:"Customer Intent",
-currentWorkflow:"Current Workflow",
-scheduling:"Scheduling & Availability",
-team:"Team Structure",
-urgency:"Urgency & Priority",
-serviceArea:"Service Area",
-pricing:"Pricing & Quotes",
-followUp:"Communication & Follow-Up",
-specialNotes:"Special Notes"
+  businessProfile:"Business Profile",
+  services:"Services",
+  customerIntent:"Customer Intent",
+  currentWorkflow:"Current Workflow",
+  scheduling:"Scheduling & Availability",
+  team:"Team Structure",
+  urgency:"Urgency & Priority",
+  serviceArea:"Service Area",
+  pricing:"Pricing & Quotes",
+  followUp:"Communication & Follow-Up",
+  specialNotes:"Special Notes"
 };
 
 const defaultHours = () => {
-const out = {};
-["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].forEach((d, i) => {
-out[d] = { enabled: i < 5, open: "09:00", close: "17:00" };
-});
-return out;
+  const out = {};
+  ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].forEach((d, i) => {
+    out[d] = { enabled: i < 5, open: "09:00", close: "17:00" };
+  });
+  return out;
 };
 
-const state = {
-activeStepIndex: 0,
-currentStepIndex: 0,
-lastCompletedKey: "",
-values: {
-businessProfile: { country:"", countryStatus:"", industry:"", businessName:"", website:"", phone:"", waitlistEmail:"", waitlistBusiness:"" },
-services: { offered:[], offeredOther:"", handledSameWay:"", commonServices:[] },
-customerIntent: { reasons:[], topPriority:"", firstCallGoal:"" },
-currentWorkflow: { callsHandledToday:"", missedCallBehavior:"", newLeadHandling:"", existingCustomerHandling:"" },
-scheduling: { appointmentsNeeded:"", schedulingHandledBy:"", hours:defaultHours(), afterHours:"", sameDay:"", duration:"", buffer:"" },
-team: { teamSize:"", roles:[], whoAnswersCalls:"", whoReceivesLeads:"", assignmentStyle:"" },
-urgency: { urgencyFrequency:"", urgentTypes:[], urgentTypesOther:"", urgentAction:"", vipCustomers:"", vipHandling:"" },
-serviceArea: { areas:"", multiLocation:"", outsideAreaBehavior:"" },
-pricing: { pricingAsked:"", pricingImmediate:"", quoteFallback:"", pricingMentioned:"" },
-followUp: { missedCallFollowUp:"", customerReminders:"", teamReminders:"", noConfirmationBaseline:"", summaryDelivery:"" },
-specialNotes: { notes:"", exclusions:"" }
-}
+const initialState = {
+  activeStepIndex: 0,
+  currentStepIndex: 0,
+  lastCompletedKey: "",
+  values: {
+    businessProfile: { country:"", countryStatus:"", industry:"", businessName:"", website:"", phone:"", waitlistEmail:"", waitlistBusiness:"" },
+    services: { offered:[], offeredOther:"", handledSameWay:"", commonServices:[] },
+    customerIntent: { reasons:[], topPriority:"", firstCallGoal:"" },
+    currentWorkflow: { callsHandledToday:"", missedCallBehavior:"", newLeadHandling:"", existingCustomerHandling:"" },
+    scheduling: { appointmentsNeeded:"", schedulingHandledBy:"", hours:defaultHours(), afterHours:"", sameDay:"", duration:"", buffer:"" },
+    team: { teamSize:"", roles:[], whoAnswersCalls:"", whoReceivesLeads:"", assignmentStyle:"" },
+    urgency: { urgencyFrequency:"", urgentTypes:[], urgentTypesOther:"", urgentAction:"", vipCustomers:"", vipHandling:"" },
+    serviceArea: { areas:"", multiLocation:"", outsideAreaBehavior:"" },
+    pricing: { pricingAsked:"", pricingImmediate:"", quoteFallback:"", pricingMentioned:"" },
+    followUp: { missedCallFollowUp:"", customerReminders:"", teamReminders:"", noConfirmationBaseline:"", summaryDelivery:"" },
+    specialNotes: { notes:"", exclusions:"" }
+  }
 };
+
+const state = JSON.parse(JSON.stringify(initialState));
 
 const stepsEl = document.getElementById("steps");
 const summaryRowsEl = document.getElementById("summaryRows");
@@ -870,659 +874,749 @@ let questionIndex = 0;
 
 const clone = (x) => JSON.parse(JSON.stringify(x));
 
-function isStepComplete(key) {
-const v = state.values[key];
-switch (key) {
-case "businessProfile":
-return !!(v.country && v.industry && v.businessName && (v.countryStatus === "active" || v.waitlistEmail));
-case "services":
-return v.offered.length > 0 && !!v.handledSameWay;
-case "customerIntent":
-return v.reasons.length > 0 && !!v.topPriority && !!v.firstCallGoal;
-case "currentWorkflow":
-return !!(v.callsHandledToday && v.missedCallBehavior && v.newLeadHandling && v.existingCustomerHandling);
-case "scheduling":
-return !!(v.appointmentsNeeded && v.schedulingHandledBy && v.afterHours && (v.appointmentsNeeded === "No, mostly inquiry only" || (v.sameDay && v.duration && v.buffer)));
-case "team":
-return !!(v.teamSize && v.roles.length && v.whoAnswersCalls && v.whoReceivesLeads && v.assignmentStyle);
-case "urgency":
-return !!v.urgencyFrequency && (v.urgencyFrequency === "Never" || (v.urgentAction && v.vipCustomers && (v.vipCustomers !== "Yes" || v.vipHandling)));
-case "serviceArea":
-return !!(v.areas && v.multiLocation && v.outsideAreaBehavior);
-case "pricing":
-return !!(v.pricingAsked && v.pricingImmediate && v.quoteFallback && v.pricingMentioned);
-case "followUp":
-return !!(v.missedCallFollowUp && v.customerReminders && v.teamReminders && v.noConfirmationBaseline && v.summaryDelivery);
-case "specialNotes":
-return !!(v.notes || v.exclusions);
-default:
-return false;
+function saveProgress() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
+
+function loadProgress() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.values) {
+      Object.assign(state, parsed);
+      if (!state.values.scheduling?.hours) {
+        state.values.scheduling.hours = defaultHours();
+      }
+    }
+  } catch (err) {
+    console.warn("Could not load saved progress", err);
+  }
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isStepCompleteValue(key, v) {
+  switch (key) {
+    case "businessProfile":
+      return !!(v.country && v.industry && v.businessName && (v.countryStatus === "active" || isValidEmail(v.waitlistEmail || "")));
+    case "services":
+      return v.offered.length > 0 && !!v.handledSameWay;
+    case "customerIntent":
+      return v.reasons.length > 0 && !!v.topPriority && !!v.firstCallGoal;
+    case "currentWorkflow":
+      return !!(v.callsHandledToday && v.missedCallBehavior && v.newLeadHandling && v.existingCustomerHandling);
+    case "scheduling":
+      return !!(
+        v.appointmentsNeeded &&
+        v.schedulingHandledBy &&
+        v.afterHours &&
+        (
+          v.appointmentsNeeded === "No, mostly inquiry only" ||
+          (v.sameDay && v.duration && v.buffer)
+        )
+      );
+    case "team":
+      return !!(v.teamSize && v.roles.length && v.whoAnswersCalls && v.whoReceivesLeads && v.assignmentStyle);
+    case "urgency":
+      return !!(
+        v.urgencyFrequency &&
+        (
+          v.urgencyFrequency === "Never" ||
+          (v.urgentAction && v.vipCustomers && (v.vipCustomers !== "Yes" || v.vipHandling))
+        )
+      );
+    case "serviceArea":
+      return !!(v.areas && v.multiLocation && v.outsideAreaBehavior);
+    case "pricing":
+      return !!(v.pricingAsked && v.pricingImmediate && v.quoteFallback && v.pricingMentioned);
+    case "followUp":
+      return !!(v.missedCallFollowUp && v.customerReminders && v.teamReminders && v.noConfirmationBaseline && v.summaryDelivery);
+    case "specialNotes":
+      return true;
+    default:
+      return false;
+  }
+}
+
+function isStepComplete(key) {
+  return isStepCompleteValue(key, state.values[key]);
 }
 
 function stepValue(key) {
-const v = state.values[key];
-switch (key) {
-case "businessProfile": return v.businessName || "Pending";
-case "services": return v.offered.length ? `${v.offered.length} selected` : "Pending";
-case "customerIntent": return v.topPriority || "Pending";
-case "currentWorkflow": return v.callsHandledToday || "Pending";
-case "scheduling": return v.appointmentsNeeded || "Pending";
-case "team": return v.teamSize || "Pending";
-case "urgency": return v.urgencyFrequency || "Pending";
-case "serviceArea": return v.areas || "Pending";
-case "pricing": return v.pricingImmediate || "Pending";
-case "followUp": return v.summaryDelivery || "Pending";
-case "specialNotes": return (v.notes || v.exclusions) ? "Added" : "Optional";
-default: return "Pending";
-}
+  const v = state.values[key];
+  switch (key) {
+    case "businessProfile": return v.businessName || "Pending";
+    case "services": return v.offered.length ? `${v.offered.length} selected` : "Pending";
+    case "customerIntent": return v.topPriority || "Pending";
+    case "currentWorkflow": return v.callsHandledToday || "Pending";
+    case "scheduling": return v.appointmentsNeeded || "Pending";
+    case "team": return v.teamSize || "Pending";
+    case "urgency": return v.urgencyFrequency || "Pending";
+    case "serviceArea": return v.areas || "Pending";
+    case "pricing": return v.pricingImmediate || "Pending";
+    case "followUp": return v.summaryDelivery || "Pending";
+    case "specialNotes": return (v.notes || v.exclusions) ? "Added" : "Optional";
+    default: return "Pending";
+  }
 }
 
 function updateSummary() {
-const done = steps.filter((s) => isStepComplete(s.key)).length;
-summaryCountEl.textContent = `${done} of ${steps.length} system components configured`;
-summarySubEl.textContent = done === steps.length
-? "All required inputs are complete. Your activation flow is ready to continue."
-: "Your system structure is being prepared as you complete each required step.";
-statusTextEl.textContent = done === steps.length ? "System status: ready for demo" : "System status: configuring";
-ctaNoteEl.textContent = done === steps.length ? "Your AI system is ready to simulate real calls" : "Complete Step 1 to unlock your live demo";
-demoBtn.disabled = done !== steps.length;
-demoBtn.classList.toggle("live", done === steps.length);
+  const done = steps.filter((s) => isStepComplete(s.key)).length;
+  summaryCountEl.textContent = `${done} of ${steps.length} system components configured`;
+  summarySubEl.textContent = done === steps.length
+    ? "All required inputs are complete. Your activation flow is ready to continue."
+    : "Your system structure is being prepared as you complete each required step.";
+  statusTextEl.textContent = done === steps.length ? "System status: ready for demo" : "System status: configuring";
+  ctaNoteEl.textContent = done === steps.length ? "Your AI system is ready to simulate real calls" : "Complete Step 1 to unlock your live demo";
+  demoBtn.disabled = done !== steps.length;
+  demoBtn.classList.toggle("live", done === steps.length);
 
-summaryRowsEl.innerHTML = steps.map((s) => {
-const active = isStepComplete(s.key);
-return `<div class="row ${active ? "active" : ""}"><span>${labels[s.key]}</span><b>${stepValue(s.key)}</b></div>`;
-}).join("");
+  summaryRowsEl.innerHTML = steps.map((s) => {
+    const active = isStepComplete(s.key);
+    return `<div class="row ${active ? "active" : ""}"><span>${labels[s.key]}</span><b>${stepValue(s.key)}</b></div>`;
+  }).join("");
 }
 
 function renderSteps() {
-stepsEl.innerHTML = steps.map((s, i) => {
-const completed = isStepComplete(s.key);
-const active = i === state.activeStepIndex && !completed;
-const currentDone = state.lastCompletedKey === s.key && completed;
-const locked = !(completed || i === state.activeStepIndex);
-const ping = active ? "live" : (completed ? "done" : "");
-return `
-<button type="button" class="step ${locked ? "locked" : ""} ${completed ? "completed" : ""} ${active ? "active" : ""} ${currentDone ? "current-done" : ""}" data-step="${i}">
-<div class="stepHead">
-<div class="stepCode">Step ${s.code}</div>
-<div class="stepPing ${ping}"></div>
-</div>
-<h3>${s.label}</h3>
-<div class="stepMeta">
-<div class="stepAction">${s.cta}</div>
-<div class="stepValue">${stepValue(s.key)}</div>
-</div>
-</button>
-`;
-}).join("");
+  stepsEl.innerHTML = steps.map((s, i) => {
+    const completed = isStepComplete(s.key);
+    const active = i === state.activeStepIndex && !completed;
+    const currentDone = state.lastCompletedKey === s.key && completed;
+    const locked = !(completed || i === state.activeStepIndex);
+    const ping = active ? "live" : (completed ? "done" : "");
+    return `
+      <button type="button" class="step ${locked ? "locked" : ""} ${completed ? "completed" : ""} ${active ? "active" : ""} ${currentDone ? "current-done" : ""}" data-step="${i}">
+        <div class="stepHead">
+          <div class="stepCode">Step ${s.code}</div>
+          <div class="stepPing ${ping}"></div>
+        </div>
+        <h3>${s.label}</h3>
+        <div class="stepMeta">
+          <div class="stepAction">${s.cta}</div>
+          <div class="stepValue">${stepValue(s.key)}</div>
+        </div>
+      </button>
+    `;
+  }).join("");
 
-document.querySelectorAll("[data-step]").forEach((btn) => {
-btn.addEventListener("click", () => openStep(Number(btn.dataset.step)));
-});
+  document.querySelectorAll("[data-step]").forEach((btn) => {
+    btn.addEventListener("click", () => openStep(Number(btn.dataset.step)));
+  });
 
-updateSummary();
+  updateSummary();
 }
 
 function openStep(index) {
-if (!(index === state.activeStepIndex || isStepComplete(steps[index].key))) return;
-state.currentStepIndex = index;
-stagedValue = clone(state.values[steps[index].key]);
-modalStepCode.textContent = `Step ${steps[index].code}`;
-modalTitle.textContent = steps[index].label;
-modalDesc.textContent = steps[index].desc;
-modalProgress.textContent = `${index + 1} / ${steps.length}`;
-renderStepQuestions(steps[index].key);
-overlay.classList.add("show");
+  if (!(index === state.activeStepIndex || isStepComplete(steps[index].key))) return;
+  state.currentStepIndex = index;
+  stagedValue = clone(state.values[steps[index].key]);
+  modalStepCode.textContent = `Step ${steps[index].code}`;
+  modalTitle.textContent = steps[index].label;
+  modalDesc.textContent = steps[index].desc;
+  modalProgress.textContent = `${index + 1} / ${steps.length}`;
+  renderStepQuestions(steps[index].key);
+  overlay.classList.add("show");
 }
 
 function questionSummary(stepKey, id) {
-const v = stagedValue || {};
-const count = (arr) => arr && arr.length ? `${arr.length} selected` : "";
-const map = {
-businessProfile_country: v.country ? `${v.country}${v.countryStatus === "active" ? " — Active" : " — Notify me"}` : "",
-businessProfile_industry: v.industry || "",
-businessProfile_name: v.businessName || "",
-businessProfile_website: v.website || "Optional",
-businessProfile_phone: v.phone || "Optional",
-services_offered: count(v.offered),
-services_other: v.offeredOther || "Optional",
-services_handled: v.handledSameWay || "",
-services_common: count(v.commonServices),
-customerIntent_reasons: count(v.reasons),
-customerIntent_priority: v.topPriority || "",
-customerIntent_goal: v.firstCallGoal || "",
-currentWorkflow_calls: v.callsHandledToday || "",
-currentWorkflow_missed: v.missedCallBehavior || "",
-currentWorkflow_leads: v.newLeadHandling || "",
-currentWorkflow_existing: v.existingCustomerHandling || "",
-scheduling_needed: v.appointmentsNeeded || "",
-scheduling_who: v.schedulingHandledBy || "",
-scheduling_hours: "Hours configured",
-scheduling_after: v.afterHours || "",
-scheduling_same: v.sameDay || "",
-scheduling_duration: v.duration || "",
-scheduling_buffer: v.buffer || "",
-team_size: v.teamSize || "",
-team_roles: count(v.roles),
-team_answer: v.whoAnswersCalls || "",
-team_receive: v.whoReceivesLeads || "",
-team_assign: v.assignmentStyle || "",
-urgency_freq: v.urgencyFrequency || "",
-urgency_types: count(v.urgentTypes),
-urgency_other: v.urgentTypesOther || "Optional",
-urgency_action: v.urgentAction || "",
-urgency_vip: v.vipCustomers || "",
-urgency_viphandling: v.vipHandling || "",
-serviceArea_areas: v.areas || "",
-serviceArea_multi: v.multiLocation || "",
-serviceArea_outside: v.outsideAreaBehavior || "",
-pricing_asked: v.pricingAsked || "",
-pricing_immediate: v.pricingImmediate || "",
-pricing_fallback: v.quoteFallback || "",
-pricing_mention: v.pricingMentioned || "",
-followUp_missed: v.missedCallFollowUp || "",
-followUp_customer: v.customerReminders || "",
-followUp_team: v.teamReminders || "",
-followUp_confirm: v.noConfirmationBaseline || "",
-followUp_delivery: v.summaryDelivery || "",
-specialNotes_notes: v.notes ? "Added" : "Optional",
-specialNotes_exclusions: v.exclusions ? "Added" : "Optional"
-};
-return map[`${stepKey}_${id}`] || "";
+  const v = stagedValue || {};
+  const count = (arr) => arr && arr.length ? `${arr.length} selected` : "";
+  const map = {
+    businessProfile_country: v.country ? `${v.country}${v.countryStatus === "active" ? " — Active" : " — Notify me"}` : "",
+    businessProfile_industry: v.industry || "",
+    businessProfile_name: v.businessName || "",
+    businessProfile_website: v.website || "Optional",
+    businessProfile_phone: v.phone || "Optional",
+    services_offered: count(v.offered),
+    services_other: v.offeredOther || "Optional",
+    services_handled: v.handledSameWay || "",
+    services_common: count(v.commonServices),
+    customerIntent_reasons: count(v.reasons),
+    customerIntent_priority: v.topPriority || "",
+    customerIntent_goal: v.firstCallGoal || "",
+    currentWorkflow_calls: v.callsHandledToday || "",
+    currentWorkflow_missed: v.missedCallBehavior || "",
+    currentWorkflow_leads: v.newLeadHandling || "",
+    currentWorkflow_existing: v.existingCustomerHandling || "",
+    scheduling_needed: v.appointmentsNeeded || "",
+    scheduling_who: v.schedulingHandledBy || "",
+    scheduling_hours: "Hours configured",
+    scheduling_after: v.afterHours || "",
+    scheduling_same: v.sameDay || "",
+    scheduling_duration: v.duration || "",
+    scheduling_buffer: v.buffer || "",
+    team_size: v.teamSize || "",
+    team_roles: count(v.roles),
+    team_answer: v.whoAnswersCalls || "",
+    team_receive: v.whoReceivesLeads || "",
+    team_assign: v.assignmentStyle || "",
+    urgency_freq: v.urgencyFrequency || "",
+    urgency_types: count(v.urgentTypes),
+    urgency_other: v.urgentTypesOther || "Optional",
+    urgency_action: v.urgentAction || "",
+    urgency_vip: v.vipCustomers || "",
+    urgency_viphandling: v.vipHandling || "",
+    serviceArea_areas: v.areas || "",
+    serviceArea_multi: v.multiLocation || "",
+    serviceArea_outside: v.outsideAreaBehavior || "",
+    pricing_asked: v.pricingAsked || "",
+    pricing_immediate: v.pricingImmediate || "",
+    pricing_fallback: v.quoteFallback || "",
+    pricing_mention: v.pricingMentioned || "",
+    followUp_missed: v.missedCallFollowUp || "",
+    followUp_customer: v.customerReminders || "",
+    followUp_team: v.teamReminders || "",
+    followUp_confirm: v.noConfirmationBaseline || "",
+    followUp_delivery: v.summaryDelivery || "",
+    specialNotes_notes: v.notes ? "Added" : "Optional",
+    specialNotes_exclusions: v.exclusions ? "Added" : "Optional"
+  };
+  return map[`${stepKey}_${id}`] || "";
 }
 
 function qCard(stepKey, id, title, html, note = "") {
-return `
-<div class="question" data-q="${id}">
-<div class="qHead">
-<div class="qTitle">${title}</div>
-<div class="qSummary" data-qs="${id}">${questionSummary(stepKey, id) || " "}</div>
-</div>
-${html}
-${note ? `<div class="qNote">${note}</div>` : ""}
-</div>
-`;
+  return `
+    <div class="question" data-q="${id}">
+      <div class="qHead">
+        <div class="qTitle">${title}</div>
+        <div class="qSummary" data-qs="${id}">${questionSummary(stepKey, id) || " "}</div>
+      </div>
+      ${html}
+      ${note ? `<div class="qNote">${note}</div>` : ""}
+    </div>
+  `;
 }
 
 function optionGrid(name, list, current) {
-return `
-<div class="optionGrid">
-${list.map((x) => `
-<div class="option ${current === x ? "selected" : ""}" data-single="${name}" data-value="${x}">
-<strong>${x}</strong>
-</div>
-`).join("")}
-</div>
-`;
+  return `
+    <div class="optionGrid">
+      ${list.map((x) => `
+        <div class="option ${current === x ? "selected" : ""}" data-single="${name}" data-value="${x}">
+          <strong>${x}</strong>
+        </div>
+      `).join("")}
+    </div>
+  `;
 }
 
 function hoursHtml() {
-return `
-<div class="hoursGrid">
-${Object.entries(stagedValue.hours).map(([day, cfg]) => `
-<div class="day">
-<div class="dayHead">
-<strong>${day}</strong>
-<label><input type="checkbox" data-day-enabled="${day}" ${cfg.enabled ? "checked" : ""}/> Open</label>
-</div>
-<div class="timeGrid">
-<input type="time" data-day-open="${day}" value="${cfg.open}" ${cfg.enabled ? "" : "disabled"}/>
-<input type="time" data-day-close="${day}" value="${cfg.close}" ${cfg.enabled ? "" : "disabled"}/>
-</div>
-</div>
-`).join("")}
-</div>
-`;
+  return `
+    <div class="hoursGrid">
+      ${Object.entries(stagedValue.hours).map(([day, cfg]) => `
+        <div class="day">
+          <div class="dayHead">
+            <strong>${day}</strong>
+            <label><input type="checkbox" data-day-enabled="${day}" ${cfg.enabled ? "checked" : ""}/> Open</label>
+          </div>
+          <div class="timeGrid">
+            <input type="time" data-day-open="${day}" value="${cfg.open}" ${cfg.enabled ? "" : "disabled"} />
+            <input type="time" data-day-close="${day}" value="${cfg.close}" ${cfg.enabled ? "" : "disabled"} />
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
 }
 
 function renderStepQuestions(stepKey) {
-questionOrder = {
-businessProfile: ["country","industry","name","website","phone"],
-services: ["offered","other","handled","common"],
-customerIntent: ["reasons","priority","goal"],
-currentWorkflow: ["calls","missed","leads","existing"],
-scheduling: ["needed","who","hours","after","same","duration","buffer"],
-team: ["size","roles","answer","receive","assign"],
-urgency: ["freq","types","other","action","vip","viphandling"],
-serviceArea: ["areas","multi","outside"],
-pricing: ["asked","immediate","fallback","mention"],
-followUp: ["missed","customer","team","confirm","delivery"],
-specialNotes: ["notes","exclusions"]
-}[stepKey] || [];
+  questionOrder = {
+    businessProfile: ["country","industry","name","website","phone"],
+    services: ["offered","other","handled","common"],
+    customerIntent: ["reasons","priority","goal"],
+    currentWorkflow: ["calls","missed","leads","existing"],
+    scheduling: ["needed","who","hours","after","same","duration","buffer"],
+    team: ["size","roles","answer","receive","assign"],
+    urgency: ["freq","types","other","action","vip","viphandling"],
+    serviceArea: ["areas","multi","outside"],
+    pricing: ["asked","immediate","fallback","mention"],
+    followUp: ["missed","customer","team","confirm","delivery"],
+    specialNotes: ["notes","exclusions"]
+  }[stepKey] || [];
 
-questionIndex = 0;
+  questionIndex = 0;
 
-const industry = state.values.businessProfile.industry || "default";
-const services = serviceCatalog[industry] || serviceCatalog.default;
-const urgentTypes = urgencyCatalog[industry] || urgencyCatalog.default;
+  const industry = stagedValue.industry || state.values.businessProfile.industry || "default";
+  const services = serviceCatalog[industry] || serviceCatalog.default;
+  const urgentTypes = urgencyCatalog[industry] || urgencyCatalog.default;
 
-const html = {
-businessProfile: [
-qCard(stepKey, "country", "Let’s locate your business", `<input id="countrySearch" class="search" placeholder="Search country" /><div class="searchList" id="countryList"></div>`, "Active countries continue normally. Coming soon and projected countries open a notify flow."),
-qCard(stepKey, "industry", "Select your industry so we can model your call flows", `<input id="industrySearch" class="search" placeholder="Search industry" /><div class="searchList" id="industryList"></div>`),
-qCard(stepKey, "name", "What is your business name?", `<input id="businessName" class="text" placeholder="Enter your business name" value="${stagedValue.businessName || ""}" />`),
-qCard(stepKey, "website", "What is your business website? (optional)", `<input id="website" class="text" placeholder="https://yourbusiness.com" value="${stagedValue.website || ""}" />`),
-qCard(stepKey, "phone", "What is your main phone number? (optional)", `<input id="phone" class="phone" placeholder="(555) 555-5555" value="${stagedValue.phone || ""}" />`)
-],
-services: [
-qCard(stepKey, "offered", "What services do you offer?", `<div class="chips">${services.map((x) => `<div class="chip ${stagedValue.offered.includes(x) ? "selected" : ""}" data-multi="offered" data-value="${x}">${x}</div>`).join("")}</div>`, "We’ll use this to map likely call outcomes and service-specific logic."),
-qCard(stepKey, "other", "Other service (optional)", `<input id="offeredOther" class="text" placeholder="Add another service" value="${stagedValue.offeredOther || ""}" />`),
-qCard(stepKey, "handled", "Are all services handled the same way?", optionGrid("handledSameWay", ["Yes","No — some require booking","No — some require follow-up","No — some are urgent"], stagedValue.handledSameWay)),
-qCard(stepKey, "common", "Which services are most common?", `<div class="chips">${(stagedValue.offered.length ? stagedValue.offered : services).map((x) => `<div class="chip ${stagedValue.commonServices.includes(x) ? "selected" : ""}" data-multi="commonServices" data-value="${x}">${x}</div>`).join("")}</div>`)
-],
-customerIntent: [
-qCard(stepKey, "reasons", "Why do customers usually contact you?", `<div class="chips">${["Book appointment","Ask for price","Request urgent help","Ask general questions","Follow up on existing job","Reschedule or cancel","Leave a message"].map((x) => `<div class="chip ${stagedValue.reasons.includes(x) ? "selected" : ""}" data-multi="reasons" data-value="${x}">${x}</div>`).join("")}</div>`),
-qCard(stepKey, "priority", "What matters most to your business?", optionGrid("topPriority", ["Capture every lead","Book more appointments","Handle urgent calls correctly","Reduce missed calls","Save staff time"], stagedValue.topPriority)),
-qCard(stepKey, "goal", "What outcome matters most on the first call?", optionGrid("firstCallGoal", ["Booking","Qualification","Information","Escalation"], stagedValue.firstCallGoal))
-],
-currentWorkflow: [
-qCard(stepKey, "calls", "How are calls handled today?", optionGrid("callsHandledToday", ["I answer them myself","My team answers them","It depends who is available","Many calls are missed","We use voicemail"], stagedValue.callsHandledToday)),
-qCard(stepKey, "missed", "What happens when nobody answers?", optionGrid("missedCallBehavior", ["We call back later","We usually lose the lead","We send a text","Nothing consistent happens"], stagedValue.missedCallBehavior)),
-qCard(stepKey, "leads", "How are new leads handled today?", optionGrid("newLeadHandling", ["Call immediately","Follow up later","Team handles it manually","No clear process"], stagedValue.newLeadHandling)),
-qCard(stepKey, "existing", "How are existing customers handled?", optionGrid("existingCustomerHandling", ["Same as new callers","Prioritized","Routed to team","Depends on situation"], stagedValue.existingCustomerHandling))
-],
-scheduling: [
-qCard(stepKey, "needed", "Do customers usually need appointments?", optionGrid("appointmentsNeeded", ["Yes, almost always","Sometimes","No, mostly inquiry only"], stagedValue.appointmentsNeeded)),
-qCard(stepKey, "who", "How is scheduling handled today?", optionGrid("schedulingHandledBy", ["I schedule everything manually","My team handles scheduling","Customers book themselves","We do not have a structured process"], stagedValue.schedulingHandledBy)),
-qCard(stepKey, "hours", "Business hours", hoursHtml()),
-qCard(stepKey, "after", "What should happen after hours?", optionGrid("afterHours", ["Take a message","Capture lead and follow up later","Book next available slot","Urgent calls only","Do nothing"], stagedValue.afterHours)),
-qCard(stepKey, "same", "Are same-day appointments possible?", optionGrid("sameDay", ["Yes","Sometimes","No"], stagedValue.sameDay)),
-qCard(stepKey, "duration", "How long is a typical appointment?", optionGrid("duration", ["15 min","30 min","45 min","60 min","90+ min","Varies by service"], stagedValue.duration)),
-qCard(stepKey, "buffer", "Do you need buffer time between appointments?", optionGrid("buffer", ["None","15 min","30 min","60 min"], stagedValue.buffer))
-],
-team: [
-qCard(stepKey, "size", "How many people work for you?", optionGrid("teamSize", ["Just me","2–5","6–15","16+"], stagedValue.teamSize)),
-qCard(stepKey, "roles", "What kind of team do you have?", `<div class="chips">${["Service workers","Salespeople","Office staff","Dispatchers","Estimators","Mixed roles"].map((x) => `<div class="chip ${stagedValue.roles.includes(x) ? "selected" : ""}" data-multi="roles" data-value="${x}">${x}</div>`).join("")}</div>`),
-qCard(stepKey, "answer", "Who usually answers calls?", optionGrid("whoAnswersCalls", ["I do","Office team","Sales team","Whoever is available","Nobody consistently"], stagedValue.whoAnswersCalls)),
-qCard(stepKey, "receive", "Who should receive leads or bookings?", optionGrid("whoReceivesLeads", ["Always owner","Round robin","Office team first","Sales team","Best available person"], stagedValue.whoReceivesLeads)),
-qCard(stepKey, "assign", "Do workers manage their own schedule or are jobs assigned?", optionGrid("assignmentStyle", ["Workers manage their own schedule","Office assigns jobs","Owner assigns jobs","Mixed process"], stagedValue.assignmentStyle))
-],
-urgency: [
-qCard(stepKey, "freq", "Do you receive urgent or emergency calls?", optionGrid("urgencyFrequency", ["Often","Sometimes","Rarely","Never"], stagedValue.urgencyFrequency)),
-qCard(stepKey, "types", "What counts as urgent?", `<div class="chips">${urgentTypes.map((x) => `<div class="chip ${stagedValue.urgentTypes.includes(x) ? "selected" : ""}" data-multi="urgentTypes" data-value="${x}">${x}</div>`).join("")}</div>`, "We’ll use this to determine escalation logic automatically."),
-qCard(stepKey, "other", "Other urgent scenario (optional)", `<input id="urgentOther" class="text" placeholder="Describe another urgent case" value="${stagedValue.urgentTypesOther || ""}" />`),
-qCard(stepKey, "action", "What should happen on urgent calls?", optionGrid("urgentAction", ["Notify owner immediately","Route to available worker","Collect details and escalate","Give instructions then escalate"], stagedValue.urgentAction)),
-qCard(stepKey, "vip", "Do you have priority customers?", optionGrid("vipCustomers", ["Yes","No"], stagedValue.vipCustomers)),
-qCard(stepKey, "viphandling", "If yes, how should they be handled?", optionGrid("vipHandling", ["Escalate immediately","Skip normal queue","Notify owner","Standard handling"], stagedValue.vipHandling))
-],
-serviceArea: [
-qCard(stepKey, "areas", "Where do you operate?", `<textarea id="areas" class="textarea" placeholder="Enter cities, regions, ZIPs, or a service radius">${stagedValue.areas || ""}</textarea>`),
-qCard(stepKey, "multi", "Do you serve multiple locations?", optionGrid("multiLocation", ["Yes","No"], stagedValue.multiLocation)),
-qCard(stepKey, "outside", "What should happen if someone is outside your service area?", optionGrid("outsideAreaBehavior", ["Politely decline","Collect lead anyway","Offer callback","Redirect elsewhere"], stagedValue.outsideAreaBehavior))
-],
-pricing: [
-qCard(stepKey, "asked", "Do customers usually ask for pricing over the phone?", optionGrid("pricingAsked", ["Yes, often","Sometimes","Rarely"], stagedValue.pricingAsked)),
-qCard(stepKey, "immediate", "Can pricing be given immediately?", optionGrid("pricingImmediate", ["Yes","Only rough estimates","No, quote required after inspection"], stagedValue.pricingImmediate)),
-qCard(stepKey, "fallback", "If pricing cannot be given, what should happen?", optionGrid("quoteFallback", ["Book estimate","Collect details for callback","Explain process and create lead"], stagedValue.quoteFallback)),
-qCard(stepKey, "mention", "Do you want pricing mentioned at all?", optionGrid("pricingMentioned", ["Yes","Only starting prices","No"], stagedValue.pricingMentioned))
-],
-followUp: [
-qCard(stepKey, "missed", "Should missed callers receive automatic follow-up?", optionGrid("missedCallFollowUp", ["Yes","No"], stagedValue.missedCallFollowUp)),
-qCard(stepKey, "customer", "Should customers receive appointment reminders?", optionGrid("customerReminders", ["Yes","No"], stagedValue.customerReminders)),
-qCard(stepKey, "team", "Should your team receive reminders too?", optionGrid("teamReminders", ["Yes","No"], stagedValue.teamReminders)),
-qCard(stepKey, "confirm", "If someone does not confirm, what happens today?", optionGrid("noConfirmationBaseline", ["We follow up manually","We often find out too late","It varies","No clear process"], stagedValue.noConfirmationBaseline)),
-qCard(stepKey, "delivery", "How should summaries be delivered?", optionGrid("summaryDelivery", ["SMS","Email","CRM only","Owner only"], stagedValue.summaryDelivery))
-],
-specialNotes: [
-qCard(stepKey, "notes", "Anything special we should know about your business?", `<textarea id="notes" class="textarea" placeholder="Add any business-specific details, exceptions, or important notes">${stagedValue.notes || ""}</textarea>`),
-qCard(stepKey, "exclusions", "Are there any calls you never want handled automatically? (optional)", `<textarea id="exclusions" class="textarea" placeholder="Describe any call types that should never be automated">${stagedValue.exclusions || ""}</textarea>`)
-]
-};
+  const html = {
+    businessProfile: [
+      qCard(stepKey, "country", "Let’s locate your business", `<input id="countrySearch" class="search" placeholder="Search country" /><div class="searchList" id="countryList"></div>`, "Active countries continue normally. Coming soon and projected countries open a notify flow."),
+      qCard(stepKey, "industry", "Select your industry so we can model your call flows", `<input id="industrySearch" class="search" placeholder="Search industry" /><div class="searchList" id="industryList"></div>`),
+      qCard(stepKey, "name", "What is your business name?", `<input id="businessName" class="text" placeholder="Enter your business name" value="${stagedValue.businessName || ""}" />`),
+      qCard(stepKey, "website", "What is your business website? (optional)", `<input id="website" class="text" placeholder="https://yourbusiness.com" value="${stagedValue.website || ""}" />`),
+      qCard(stepKey, "phone", "What is your main phone number? (optional)", `<input id="phone" class="phone" placeholder="(555) 555-5555" value="${stagedValue.phone || ""}" />`)
+    ],
+    services: [
+      qCard(stepKey, "offered", "What services do you offer?", `<div class="chips">${services.map((x) => `<div class="chip ${stagedValue.offered.includes(x) ? "selected" : ""}" data-multi="offered" data-value="${x}">${x}</div>`).join("")}</div>`, "We’ll use this to map likely call outcomes and service-specific logic."),
+      qCard(stepKey, "other", "Other service (optional)", `<input id="offeredOther" class="text" placeholder="Add another service" value="${stagedValue.offeredOther || ""}" />`),
+      qCard(stepKey, "handled", "Are all services handled the same way?", optionGrid("handledSameWay", ["Yes","No — some require booking","No — some require follow-up","No — some are urgent"], stagedValue.handledSameWay)),
+      qCard(stepKey, "common", "Which services are most common?", `<div class="chips">${(stagedValue.offered.length ? stagedValue.offered : services).map((x) => `<div class="chip ${stagedValue.commonServices.includes(x) ? "selected" : ""}" data-multi="commonServices" data-value="${x}">${x}</div>`).join("")}</div>`)
+    ],
+    customerIntent: [
+      qCard(stepKey, "reasons", "Why do customers usually contact you?", `<div class="chips">${["Book appointment","Ask for price","Request urgent help","Ask general questions","Follow up on existing job","Reschedule or cancel","Leave a message"].map((x) => `<div class="chip ${stagedValue.reasons.includes(x) ? "selected" : ""}" data-multi="reasons" data-value="${x}">${x}</div>`).join("")}</div>`),
+      qCard(stepKey, "priority", "What matters most to your business?", optionGrid("topPriority", ["Capture every lead","Book more appointments","Handle urgent calls correctly","Reduce missed calls","Save staff time"], stagedValue.topPriority)),
+      qCard(stepKey, "goal", "What outcome matters most on the first call?", optionGrid("firstCallGoal", ["Booking","Qualification","Information","Escalation"], stagedValue.firstCallGoal))
+    ],
+    currentWorkflow: [
+      qCard(stepKey, "calls", "How are calls handled today?", optionGrid("callsHandledToday", ["I answer them myself","My team answers them","It depends who is available","Many calls are missed","We use voicemail"], stagedValue.callsHandledToday)),
+      qCard(stepKey, "missed", "What happens when nobody answers?", optionGrid("missedCallBehavior", ["We call back later","We usually lose the lead","We send a text","Nothing consistent happens"], stagedValue.missedCallBehavior)),
+      qCard(stepKey, "leads", "How are new leads handled today?", optionGrid("newLeadHandling", ["Call immediately","Follow up later","Team handles it manually","No clear process"], stagedValue.newLeadHandling)),
+      qCard(stepKey, "existing", "How are existing customers handled?", optionGrid("existingCustomerHandling", ["Same as new callers","Prioritized","Routed to team","Depends on situation"], stagedValue.existingCustomerHandling))
+    ],
+    scheduling: [
+      qCard(stepKey, "needed", "Do customers usually need appointments?", optionGrid("appointmentsNeeded", ["Yes, almost always","Sometimes","No, mostly inquiry only"], stagedValue.appointmentsNeeded)),
+      qCard(stepKey, "who", "How is scheduling handled today?", optionGrid("schedulingHandledBy", ["I schedule everything manually","My team handles scheduling","Customers book themselves","We do not have a structured process"], stagedValue.schedulingHandledBy)),
+      qCard(stepKey, "hours", "Business hours", hoursHtml()),
+      qCard(stepKey, "after", "What should happen after hours?", optionGrid("afterHours", ["Take a message","Capture lead and follow up later","Book next available slot","Urgent calls only","Do nothing"], stagedValue.afterHours)),
+      qCard(stepKey, "same", "Are same-day appointments possible?", optionGrid("sameDay", ["Yes","Sometimes","No"], stagedValue.sameDay)),
+      qCard(stepKey, "duration", "How long is a typical appointment?", optionGrid("duration", ["15 min","30 min","45 min","60 min","90+ min","Varies by service"], stagedValue.duration)),
+      qCard(stepKey, "buffer", "Do you need buffer time between appointments?", optionGrid("buffer", ["None","15 min","30 min","60 min"], stagedValue.buffer))
+    ],
+    team: [
+      qCard(stepKey, "size", "How many people work for you?", optionGrid("teamSize", ["Just me","2–5","6–15","16+"], stagedValue.teamSize)),
+      qCard(stepKey, "roles", "What kind of team do you have?", `<div class="chips">${["Service workers","Salespeople","Office staff","Dispatchers","Estimators","Mixed roles"].map((x) => `<div class="chip ${stagedValue.roles.includes(x) ? "selected" : ""}" data-multi="roles" data-value="${x}">${x}</div>`).join("")}</div>`),
+      qCard(stepKey, "answer", "Who usually answers calls?", optionGrid("whoAnswersCalls", ["I do","Office team","Sales team","Whoever is available","Nobody consistently"], stagedValue.whoAnswersCalls)),
+      qCard(stepKey, "receive", "Who should receive leads or bookings?", optionGrid("whoReceivesLeads", ["Always owner","Round robin","Office team first","Sales team","Best available person"], stagedValue.whoReceivesLeads)),
+      qCard(stepKey, "assign", "Do workers manage their own schedule or are jobs assigned?", optionGrid("assignmentStyle", ["Workers manage their own schedule","Office assigns jobs","Owner assigns jobs","Mixed process"], stagedValue.assignmentStyle))
+    ],
+    urgency: [
+      qCard(stepKey, "freq", "Do you receive urgent or emergency calls?", optionGrid("urgencyFrequency", ["Often","Sometimes","Rarely","Never"], stagedValue.urgencyFrequency)),
+      qCard(stepKey, "types", "What counts as urgent?", `<div class="chips">${urgentTypes.map((x) => `<div class="chip ${stagedValue.urgentTypes.includes(x) ? "selected" : ""}" data-multi="urgentTypes" data-value="${x}">${x}</div>`).join("")}</div>`, "We’ll use this to determine escalation logic automatically."),
+      qCard(stepKey, "other", "Other urgent scenario (optional)", `<input id="urgentOther" class="text" placeholder="Describe another urgent case" value="${stagedValue.urgentTypesOther || ""}" />`),
+      qCard(stepKey, "action", "What should happen on urgent calls?", optionGrid("urgentAction", ["Notify owner immediately","Route to available worker","Collect details and escalate","Give instructions then escalate"], stagedValue.urgentAction)),
+      qCard(stepKey, "vip", "Do you have priority customers?", optionGrid("vipCustomers", ["Yes","No"], stagedValue.vipCustomers)),
+      qCard(stepKey, "viphandling", "If yes, how should they be handled?", optionGrid("vipHandling", ["Escalate immediately","Skip normal queue","Notify owner","Standard handling"], stagedValue.vipHandling))
+    ],
+    serviceArea: [
+      qCard(stepKey, "areas", "Where do you operate?", `<textarea id="areas" class="textarea" placeholder="Enter cities, regions, ZIPs, or a service radius">${stagedValue.areas || ""}</textarea>`),
+      qCard(stepKey, "multi", "Do you serve multiple locations?", optionGrid("multiLocation", ["Yes","No"], stagedValue.multiLocation)),
+      qCard(stepKey, "outside", "What should happen if someone is outside your service area?", optionGrid("outsideAreaBehavior", ["Politely decline","Collect lead anyway","Offer callback","Redirect elsewhere"], stagedValue.outsideAreaBehavior))
+    ],
+    pricing: [
+      qCard(stepKey, "asked", "Do customers usually ask for pricing over the phone?", optionGrid("pricingAsked", ["Yes, often","Sometimes","Rarely"], stagedValue.pricingAsked)),
+      qCard(stepKey, "immediate", "Can pricing be given immediately?", optionGrid("pricingImmediate", ["Yes","Only rough estimates","No, quote required after inspection"], stagedValue.pricingImmediate)),
+      qCard(stepKey, "fallback", "If pricing cannot be given, what should happen?", optionGrid("quoteFallback", ["Book estimate","Collect details for callback","Explain process and create lead"], stagedValue.quoteFallback)),
+      qCard(stepKey, "mention", "Do you want pricing mentioned at all?", optionGrid("pricingMentioned", ["Yes","Only starting prices","No"], stagedValue.pricingMentioned))
+    ],
+    followUp: [
+      qCard(stepKey, "missed", "Should missed callers receive automatic follow-up?", optionGrid("missedCallFollowUp", ["Yes","No"], stagedValue.missedCallFollowUp)),
+      qCard(stepKey, "customer", "Should customers receive appointment reminders?", optionGrid("customerReminders", ["Yes","No"], stagedValue.customerReminders)),
+      qCard(stepKey, "team", "Should your team receive reminders too?", optionGrid("teamReminders", ["Yes","No"], stagedValue.teamReminders)),
+      qCard(stepKey, "confirm", "If someone does not confirm, what happens today?", optionGrid("noConfirmationBaseline", ["We follow up manually","We often find out too late","It varies","No clear process"], stagedValue.noConfirmationBaseline)),
+      qCard(stepKey, "delivery", "How should summaries be delivered?", optionGrid("summaryDelivery", ["SMS","Email","CRM only","Owner only"], stagedValue.summaryDelivery))
+    ],
+    specialNotes: [
+      qCard(stepKey, "notes", "Anything special we should know about your business?", `<textarea id="notes" class="textarea" placeholder="Add any business-specific details, exceptions, or important notes">${stagedValue.notes || ""}</textarea>`),
+      qCard(stepKey, "exclusions", "Are there any calls you never want handled automatically? (optional)", `<textarea id="exclusions" class="textarea" placeholder="Describe any call types that should never be automated">${stagedValue.exclusions || ""}</textarea>`)
+    ]
+  };
 
-modalBody.innerHTML = html[stepKey].join("");
-bindQuestionInteractions(stepKey);
-refreshQuestionSummaries();
-showQuestion();
-validateModalButton();
+  modalBody.innerHTML = html[stepKey].join("");
+  bindQuestionInteractions(stepKey);
+  refreshQuestionSummaries();
+  showQuestion();
+  validateModalButton();
 }
 
 function bindQuestionInteractions(stepKey) {
-if (stepKey === "businessProfile") {
-renderCountryList("");
-renderIndustryList("");
-document.getElementById("countrySearch").addEventListener("input", (e) => renderCountryList(e.target.value));
-document.getElementById("industrySearch").addEventListener("input", (e) => renderIndustryList(e.target.value));
-document.getElementById("businessName").addEventListener("blur", (e) => {
-stagedValue.businessName = e.target.value.trim();
-refreshQuestionSummaries();
-nextQuestion();
-});
-document.getElementById("website").addEventListener("blur", (e) => {
-stagedValue.website = e.target.value.trim();
-refreshQuestionSummaries();
-nextQuestion();
-});
-document.getElementById("phone").addEventListener("blur", (e) => {
-stagedValue.phone = e.target.value.trim();
-refreshQuestionSummaries();
-validateModalButton();
-});
-}
+  if (stepKey === "businessProfile") {
+    renderCountryList("");
+    renderIndustryList("");
 
-modalBody.querySelectorAll("[data-single]").forEach((el) => {
-el.addEventListener("click", () => {
-const name = el.dataset.single;
-modalBody.querySelectorAll(`[data-single='${name}']`).forEach((x) => x.classList.remove("selected"));
-el.classList.add("selected");
-stagedValue[name] = el.dataset.value;
-refreshQuestionSummaries();
-nextQuestion();
-});
-});
+    document.getElementById("countrySearch").addEventListener("input", (e) => renderCountryList(e.target.value));
+    document.getElementById("industrySearch").addEventListener("input", (e) => renderIndustryList(e.target.value));
 
-modalBody.querySelectorAll("[data-multi]").forEach((el) => {
-el.addEventListener("click", () => {
-const name = el.dataset.multi;
-const value = el.dataset.value;
-if (!Array.isArray(stagedValue[name])) stagedValue[name] = [];
-if (stagedValue[name].includes(value)) {
-stagedValue[name] = stagedValue[name].filter((v) => v !== value);
-el.classList.remove("selected");
-} else {
-stagedValue[name].push(value);
-el.classList.add("selected");
-}
-refreshQuestionSummaries();
-validateModalButton();
-if (stagedValue[name].length > 0 && ["offered","reasons","roles","urgentTypes","commonServices"].includes(name)) {
-nextQuestion();
-}
-});
-});
+    document.getElementById("businessName").addEventListener("blur", (e) => {
+      stagedValue.businessName = e.target.value.trim();
+      refreshQuestionSummaries();
+      nextQuestion();
+    });
 
-const bindBlur = (id, key, auto = true) => {
-const el = document.getElementById(id);
-if (!el) return;
-el.addEventListener("blur", (e) => {
-stagedValue[key] = e.target.value.trim();
-refreshQuestionSummaries();
-if (auto) nextQuestion();
-else validateModalButton();
-});
-};
+    document.getElementById("website").addEventListener("blur", (e) => {
+      stagedValue.website = e.target.value.trim();
+      refreshQuestionSummaries();
+      nextQuestion();
+    });
 
-bindBlur("offeredOther", "offeredOther");
-bindBlur("urgentOther", "urgentTypesOther");
-bindBlur("areas", "areas");
-bindBlur("notes", "notes");
-bindBlur("exclusions", "exclusions", false);
+    document.getElementById("phone").addEventListener("blur", (e) => {
+      stagedValue.phone = e.target.value.trim();
+      refreshQuestionSummaries();
+      validateModalButton();
+    });
+  }
 
-modalBody.querySelectorAll("[data-day-enabled]").forEach((el) => {
-el.addEventListener("change", (e) => {
-stagedValue.hours[e.target.dataset.dayEnabled].enabled = e.target.checked;
-renderStepQuestions("scheduling");
-});
-});
-modalBody.querySelectorAll("[data-day-open]").forEach((el) => {
-el.addEventListener("change", (e) => {
-stagedValue.hours[e.target.dataset.dayOpen].open = e.target.value;
-refreshQuestionSummaries();
-validateModalButton();
-});
-});
-modalBody.querySelectorAll("[data-day-close]").forEach((el) => {
-el.addEventListener("change", (e) => {
-stagedValue.hours[e.target.dataset.dayClose].close = e.target.value;
-refreshQuestionSummaries();
-validateModalButton();
-});
-});
+  modalBody.querySelectorAll("[data-single]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const name = el.dataset.single;
+      modalBody.querySelectorAll(`[data-single='${name}']`).forEach((x) => x.classList.remove("selected"));
+      el.classList.add("selected");
+      stagedValue[name] = el.dataset.value;
+      refreshQuestionSummaries();
+      nextQuestion();
+    });
+  });
+
+  modalBody.querySelectorAll("[data-multi]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const name = el.dataset.multi;
+      const value = el.dataset.value;
+      if (!Array.isArray(stagedValue[name])) stagedValue[name] = [];
+      if (stagedValue[name].includes(value)) {
+        stagedValue[name] = stagedValue[name].filter((v) => v !== value);
+        el.classList.remove("selected");
+      } else {
+        stagedValue[name].push(value);
+        el.classList.add("selected");
+      }
+      refreshQuestionSummaries();
+      validateModalButton();
+    });
+  });
+
+  const bindBlur = (id, key, auto = true) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("blur", (e) => {
+      stagedValue[key] = e.target.value.trim();
+      refreshQuestionSummaries();
+      if (auto) nextQuestion();
+      else validateModalButton();
+    });
+  };
+
+  bindBlur("offeredOther", "offeredOther");
+  bindBlur("urgentOther", "urgentTypesOther");
+  bindBlur("areas", "areas");
+  bindBlur("notes", "notes");
+  bindBlur("exclusions", "exclusions", false);
+
+  modalBody.querySelectorAll("[data-day-enabled]").forEach((el) => {
+    el.addEventListener("change", (e) => {
+      const day = e.target.dataset.dayEnabled;
+      stagedValue.hours[day].enabled = e.target.checked;
+
+      const dayCard = e.target.closest(".day");
+      if (dayCard) {
+        dayCard.querySelectorAll("input[type='time']").forEach((input) => {
+          input.disabled = !e.target.checked;
+        });
+      }
+
+      refreshQuestionSummaries();
+      validateModalButton();
+    });
+  });
+
+  modalBody.querySelectorAll("[data-day-open]").forEach((el) => {
+    el.addEventListener("change", (e) => {
+      stagedValue.hours[e.target.dataset.dayOpen].open = e.target.value;
+      refreshQuestionSummaries();
+      validateModalButton();
+    });
+  });
+
+  modalBody.querySelectorAll("[data-day-close]").forEach((el) => {
+    el.addEventListener("change", (e) => {
+      stagedValue.hours[e.target.dataset.dayClose].close = e.target.value;
+      refreshQuestionSummaries();
+      validateModalButton();
+    });
+  });
 }
 
 function renderCountryList(query) {
-const q = query.trim().toLowerCase();
-const el = document.getElementById("countryList");
-if (!el) return;
+  const q = query.trim().toLowerCase();
+  const el = document.getElementById("countryList");
+  if (!el) return;
 
-el.innerHTML = Object.entries(countryData).map(([continent, items]) => {
-const filtered = items.filter((x) => x.name.toLowerCase().includes(q));
-if (!filtered.length) return "";
-return `
-<div>
-<div class="groupTitle">${continent}</div>
-${filtered.map((item) => `
-<div class="searchOption ${stagedValue.country === item.name ? "selected" : ""}" data-country="${item.name}" data-status="${item.status}">
-<div>
-<strong>${item.name}</strong>
-<span>${item.status === "active" ? "Available now" : item.status === "soon" ? "Coming soon" : "Projected market"}</span>
-</div>
-<span class="badge ${item.status}">${item.status === "active" ? "Active" : item.status === "soon" ? "Coming soon" : "Projected"}</span>
-</div>
-`).join("")}
-</div>
-`;
-}).join("");
+  el.innerHTML = Object.entries(countryData).map(([continent, items]) => {
+    const filtered = items.filter((x) => x.name.toLowerCase().includes(q));
+    if (!filtered.length) return "";
+    return `
+      <div>
+        <div class="groupTitle">${continent}</div>
+        ${filtered.map((item) => `
+          <div class="searchOption ${stagedValue.country === item.name ? "selected" : ""}" data-country="${item.name}" data-status="${item.status}">
+            <div>
+              <strong>${item.name}</strong>
+              <span>${item.status === "active" ? "Available now" : item.status === "soon" ? "Coming soon" : "Projected market"}</span>
+            </div>
+            <span class="badge ${item.status}">${item.status === "active" ? "Active" : item.status === "soon" ? "Coming soon" : "Projected"}</span>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }).join("");
 
-el.querySelectorAll("[data-country]").forEach((x) => {
-x.addEventListener("click", () => {
-stagedValue.country = x.dataset.country;
-stagedValue.countryStatus = x.dataset.status;
-refreshQuestionSummaries();
-if (stagedValue.countryStatus !== "active") {
-showNotifyBox();
-validateModalButton();
-} else {
-removeNotifyBox();
-nextQuestion();
-}
-renderCountryList(query);
-});
-});
+  el.querySelectorAll("[data-country]").forEach((x) => {
+    x.addEventListener("click", () => {
+      stagedValue.country = x.dataset.country;
+      stagedValue.countryStatus = x.dataset.status;
+      refreshQuestionSummaries();
+
+      if (stagedValue.countryStatus !== "active") {
+        showNotifyBox();
+        validateModalButton();
+      } else {
+        stagedValue.waitlistEmail = "";
+        stagedValue.waitlistBusiness = "";
+        removeNotifyBox();
+        nextQuestion();
+      }
+
+      renderCountryList(query);
+    });
+  });
 }
 
 function showNotifyBox() {
-removeNotifyBox();
-const q = modalBody.querySelector("[data-q='country']");
-if (!q) return;
-const box = document.createElement("div");
-box.id = "notifyBox";
-box.className = "notify";
-box.innerHTML = `
-<strong>${stagedValue.country} is not active yet</strong>
-<p>We’ll notify you as soon as your country becomes active.</p>
-<div class="notifyGrid">
-<input id="notifyEmail" class="text" placeholder="Enter your email" value="${stagedValue.waitlistEmail || ""}" />
-<input id="notifyBusiness" class="text" placeholder="Business name (optional)" value="${stagedValue.waitlistBusiness || stagedValue.businessName || ""}" />
-</div>
-`;
-q.appendChild(box);
+  removeNotifyBox();
+  const q = modalBody.querySelector("[data-q='country']");
+  if (!q) return;
 
-document.getElementById("notifyEmail").addEventListener("blur", (e) => {
-stagedValue.waitlistEmail = e.target.value.trim();
-refreshQuestionSummaries();
-nextQuestion();
-});
-document.getElementById("notifyBusiness").addEventListener("input", (e) => {
-stagedValue.waitlistBusiness = e.target.value.trim();
-});
+  const box = document.createElement("div");
+  box.id = "notifyBox";
+  box.className = "notify";
+  box.innerHTML = `
+    <strong>${stagedValue.country} is not active yet</strong>
+    <p>We’ll notify you as soon as your country becomes active.</p>
+    <div class="notifyGrid">
+      <input id="notifyEmail" class="text" placeholder="Enter your email" value="${stagedValue.waitlistEmail || ""}" />
+      <input id="notifyBusiness" class="text" placeholder="Business name (optional)" value="${stagedValue.waitlistBusiness || stagedValue.businessName || ""}" />
+    </div>
+  `;
+  q.appendChild(box);
+
+  document.getElementById("notifyEmail").addEventListener("blur", (e) => {
+    stagedValue.waitlistEmail = e.target.value.trim();
+    refreshQuestionSummaries();
+    if (isValidEmail(stagedValue.waitlistEmail)) nextQuestion();
+    else validateModalButton();
+  });
+
+  document.getElementById("notifyBusiness").addEventListener("input", (e) => {
+    stagedValue.waitlistBusiness = e.target.value.trim();
+  });
 }
 
 function removeNotifyBox() {
-const x = document.getElementById("notifyBox");
-if (x) x.remove();
+  const x = document.getElementById("notifyBox");
+  if (x) x.remove();
 }
 
 function renderIndustryList(query) {
-const q = query.trim().toLowerCase();
-const el = document.getElementById("industryList");
-if (!el) return;
+  const q = query.trim().toLowerCase();
+  const el = document.getElementById("industryList");
+  if (!el) return;
 
-el.innerHTML = Object.entries(industryData).map(([group, items]) => {
-const filtered = items.filter((x) => x.toLowerCase().includes(q));
-if (!filtered.length) return "";
-return `
-<div>
-<div class="groupTitle">${group}</div>
-<div class="optionGrid">
-${filtered.map((item) => `
-<div class="option ${stagedValue.industry === item ? "selected" : ""}" data-industry="${item}">
-<strong>${item}</strong>
-<span>${group}</span>
-</div>
-`).join("")}
-</div>
-</div>
-`;
-}).join("");
+  el.innerHTML = Object.entries(industryData).map(([group, items]) => {
+    const filtered = items.filter((x) => x.toLowerCase().includes(q));
+    if (!filtered.length) return "";
+    return `
+      <div>
+        <div class="groupTitle">${group}</div>
+        <div class="optionGrid">
+          ${filtered.map((item) => `
+            <div class="option ${stagedValue.industry === item ? "selected" : ""}" data-industry="${item}">
+              <strong>${item}</strong>
+              <span>${group}</span>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }).join("");
 
-el.querySelectorAll("[data-industry]").forEach((x) => {
-x.addEventListener("click", () => {
-stagedValue.industry = x.dataset.industry;
-refreshQuestionSummaries();
-nextQuestion();
-});
-});
+  el.querySelectorAll("[data-industry]").forEach((x) => {
+    x.addEventListener("click", () => {
+      stagedValue.industry = x.dataset.industry;
+      refreshQuestionSummaries();
+      nextQuestion();
+    });
+  });
 }
 
 function showQuestion() {
-modalBody.querySelectorAll(".question").forEach((x) => x.classList.remove("active"));
-const id = questionOrder[questionIndex];
-const q = modalBody.querySelector(`[data-q='${id}']`);
-if (q) q.classList.add("active");
-const input = q && q.querySelector("input, textarea");
-if (input) input.focus();
-validateModalButton();
+  modalBody.querySelectorAll(".question").forEach((x) => x.classList.remove("active"));
+  const id = questionOrder[questionIndex];
+  const q = modalBody.querySelector(`[data-q='${id}']`);
+  if (q) q.classList.add("active");
+  const input = q && q.querySelector("input, textarea");
+  if (input) input.focus();
+  validateModalButton();
 }
 
 function nextQuestion() {
-refreshQuestionSummaries();
-validateModalButton();
-if (questionIndex < questionOrder.length - 1) {
-setTimeout(() => {
-questionIndex += 1;
-showQuestion();
-}, 220);
-}
+  refreshQuestionSummaries();
+  validateModalButton();
+  if (questionIndex < questionOrder.length - 1) {
+    setTimeout(() => {
+      questionIndex += 1;
+      showQuestion();
+    }, 180);
+  }
 }
 
 function refreshQuestionSummaries() {
-const stepKey = steps[state.currentStepIndex].key;
-modalBody.querySelectorAll("[data-qs]").forEach((el) => {
-el.textContent = questionSummary(stepKey, el.dataset.qs) || " ";
-});
+  const stepKey = steps[state.currentStepIndex].key;
+  modalBody.querySelectorAll("[data-qs]").forEach((el) => {
+    el.textContent = questionSummary(stepKey, el.dataset.qs) || " ";
+  });
 }
 
 function currentQuestionValid() {
-const stepKey = steps[state.currentStepIndex].key;
-const q = questionOrder[questionIndex];
-const v = stagedValue;
+  const stepKey = steps[state.currentStepIndex].key;
+  const q = questionOrder[questionIndex];
+  const v = stagedValue;
 
-if (stepKey === "businessProfile") {
-if (q === "country") return !!(v.country && (v.countryStatus === "active" || v.waitlistEmail));
-if (q === "industry") return !!v.industry;
-if (q === "name") return !!v.businessName;
-return true;
-}
-if (stepKey === "services") {
-if (q === "offered") return v.offered.length > 0;
-if (q === "handled") return !!v.handledSameWay;
-return true;
-}
-if (stepKey === "customerIntent") {
-if (q === "reasons") return v.reasons.length > 0;
-if (q === "priority") return !!v.topPriority;
-if (q === "goal") return !!v.firstCallGoal;
-}
-if (stepKey === "currentWorkflow") {
-if (q === "calls") return !!v.callsHandledToday;
-if (q === "missed") return !!v.missedCallBehavior;
-if (q === "leads") return !!v.newLeadHandling;
-if (q === "existing") return !!v.existingCustomerHandling;
-}
-if (stepKey === "scheduling") {
-if (q === "needed") return !!v.appointmentsNeeded;
-if (q === "who") return !!v.schedulingHandledBy;
-if (q === "hours") return true;
-if (q === "after") return !!v.afterHours;
-if (q === "same") return !!v.sameDay;
-if (q === "duration") return v.appointmentsNeeded === "No, mostly inquiry only" ? true : !!v.duration;
-if (q === "buffer") return v.appointmentsNeeded === "No, mostly inquiry only" ? true : !!v.buffer;
-}
-if (stepKey === "team") {
-if (q === "size") return !!v.teamSize;
-if (q === "roles") return v.roles.length > 0;
-if (q === "answer") return !!v.whoAnswersCalls;
-if (q === "receive") return !!v.whoReceivesLeads;
-if (q === "assign") return !!v.assignmentStyle;
-}
-if (stepKey === "urgency") {
-if (q === "freq") return !!v.urgencyFrequency;
-if (q === "types") return v.urgencyFrequency === "Never" ? true : v.urgentTypes.length > 0;
-if (q === "action") return v.urgencyFrequency === "Never" ? true : !!v.urgentAction;
-if (q === "vip") return v.urgencyFrequency === "Never" ? true : !!v.vipCustomers;
-if (q === "viphandling") return v.vipCustomers === "Yes" ? !!v.vipHandling : true;
-return true;
-}
-if (stepKey === "serviceArea") {
-if (q === "areas") return !!v.areas;
-if (q === "multi") return !!v.multiLocation;
-if (q === "outside") return !!v.outsideAreaBehavior;
-}
-if (stepKey === "pricing") {
-if (q === "asked") return !!v.pricingAsked;
-if (q === "immediate") return !!v.pricingImmediate;
-if (q === "fallback") return !!v.quoteFallback;
-if (q === "mention") return !!v.pricingMentioned;
-}
-if (stepKey === "followUp") {
-if (q === "missed") return !!v.missedCallFollowUp;
-if (q === "customer") return !!v.customerReminders;
-if (q === "team") return !!v.teamReminders;
-if (q === "confirm") return !!v.noConfirmationBaseline;
-if (q === "delivery") return !!v.summaryDelivery;
-}
-return true;
+  if (stepKey === "businessProfile") {
+    if (q === "country") {
+      if (!v.country) return false;
+      if (v.countryStatus === "active") return true;
+      return isValidEmail(v.waitlistEmail || "");
+    }
+    if (q === "industry") return !!v.industry;
+    if (q === "name") return !!v.businessName;
+    return true;
+  }
+
+  if (stepKey === "services") {
+    if (q === "offered") return v.offered.length > 0;
+    if (q === "handled") return !!v.handledSameWay;
+    return true;
+  }
+
+  if (stepKey === "customerIntent") {
+    if (q === "reasons") return v.reasons.length > 0;
+    if (q === "priority") return !!v.topPriority;
+    if (q === "goal") return !!v.firstCallGoal;
+    return true;
+  }
+
+  if (stepKey === "currentWorkflow") {
+    if (q === "calls") return !!v.callsHandledToday;
+    if (q === "missed") return !!v.missedCallBehavior;
+    if (q === "leads") return !!v.newLeadHandling;
+    if (q === "existing") return !!v.existingCustomerHandling;
+    return true;
+  }
+
+  if (stepKey === "scheduling") {
+    if (q === "needed") return !!v.appointmentsNeeded;
+    if (q === "who") return !!v.schedulingHandledBy;
+    if (q === "hours") return true;
+    if (q === "after") return !!v.afterHours;
+    if (q === "same") return !!v.sameDay;
+    if (q === "duration") return v.appointmentsNeeded === "No, mostly inquiry only" ? true : !!v.duration;
+    if (q === "buffer") return v.appointmentsNeeded === "No, mostly inquiry only" ? true : !!v.buffer;
+    return true;
+  }
+
+  if (stepKey === "team") {
+    if (q === "size") return !!v.teamSize;
+    if (q === "roles") return v.roles.length > 0;
+    if (q === "answer") return !!v.whoAnswersCalls;
+    if (q === "receive") return !!v.whoReceivesLeads;
+    if (q === "assign") return !!v.assignmentStyle;
+    return true;
+  }
+
+  if (stepKey === "urgency") {
+    if (q === "freq") return !!v.urgencyFrequency;
+    if (q === "types") return v.urgencyFrequency === "Never" ? true : v.urgentTypes.length > 0;
+    if (q === "action") return v.urgencyFrequency === "Never" ? true : !!v.urgentAction;
+    if (q === "vip") return v.urgencyFrequency === "Never" ? true : !!v.vipCustomers;
+    if (q === "viphandling") return v.vipCustomers === "Yes" ? !!v.vipHandling : true;
+    return true;
+  }
+
+  if (stepKey === "serviceArea") {
+    if (q === "areas") return !!v.areas;
+    if (q === "multi") return !!v.multiLocation;
+    if (q === "outside") return !!v.outsideAreaBehavior;
+    return true;
+  }
+
+  if (stepKey === "pricing") {
+    if (q === "asked") return !!v.pricingAsked;
+    if (q === "immediate") return !!v.pricingImmediate;
+    if (q === "fallback") return !!v.quoteFallback;
+    if (q === "mention") return !!v.pricingMentioned;
+    return true;
+  }
+
+  if (stepKey === "followUp") {
+    if (q === "missed") return !!v.missedCallFollowUp;
+    if (q === "customer") return !!v.customerReminders;
+    if (q === "team") return !!v.teamReminders;
+    if (q === "confirm") return !!v.noConfirmationBaseline;
+    if (q === "delivery") return !!v.summaryDelivery;
+    return true;
+  }
+
+  return true;
 }
 
 function stepValid() {
-const key = steps[state.currentStepIndex].key;
-return key === "specialNotes" ? true : isStepComplete(key);
+  const key = steps[state.currentStepIndex].key;
+  return isStepCompleteValue(key, stagedValue);
 }
 
 function validateModalButton() {
-const onLast = questionIndex >= questionOrder.length - 1;
-nextBtn.textContent = onLast ? "Next" : "Continue";
-nextBtn.disabled = onLast ? !stepValid() : !currentQuestionValid();
+  const onLast = questionIndex >= questionOrder.length - 1;
+  nextBtn.textContent = onLast ? "Next" : "Continue";
+  nextBtn.disabled = onLast ? !stepValid() : !currentQuestionValid();
 }
 
 cancelBtn.addEventListener("click", () => overlay.classList.remove("show"));
 overlay.addEventListener("click", (e) => {
-if (e.target === overlay) overlay.classList.remove("show");
+  if (e.target === overlay) overlay.classList.remove("show");
 });
 
 nextBtn.addEventListener("click", () => {
-if (questionIndex < questionOrder.length - 1) {
-questionIndex += 1;
-showQuestion();
-return;
-}
+  if (questionIndex < questionOrder.length - 1) {
+    questionIndex += 1;
+    showQuestion();
+    return;
+  }
 
-const key = steps[state.currentStepIndex].key;
-state.values[key] = clone(stagedValue);
-state.lastCompletedKey = key;
+  const key = steps[state.currentStepIndex].key;
+  state.values[key] = clone(stagedValue);
+  state.lastCompletedKey = key;
 
-if (state.currentStepIndex < steps.length - 1) {
-state.activeStepIndex = Math.max(state.activeStepIndex, state.currentStepIndex + 1);
-}
+  if (state.currentStepIndex < steps.length - 1) {
+    state.activeStepIndex = Math.max(state.activeStepIndex, state.currentStepIndex + 1);
+  }
 
-renderSteps();
+  saveProgress();
+  renderSteps();
 
-if (state.currentStepIndex < steps.length - 1) {
-const nextIndex = state.currentStepIndex + 1;
-overlay.classList.remove("show");
-setTimeout(() => openStep(nextIndex), 80);
-} else {
-overlay.classList.remove("show");
-}
+  if (state.currentStepIndex < steps.length - 1) {
+    const nextIndex = state.currentStepIndex + 1;
+    overlay.classList.remove("show");
+    setTimeout(() => openStep(nextIndex), 80);
+  } else {
+    overlay.classList.remove("show");
+  }
 });
 
 demoBtn.addEventListener("click", () => {
-if (demoBtn.disabled) return;
-alert("Step 1 complete. Proceeding to Step 2 — Demo Call.");
-console.log("System configuration:", state.values);
+  if (demoBtn.disabled) return;
+
+  localStorage.setItem("aiCallPortStep1Final", JSON.stringify(state.values));
+  console.log("System configuration:", state.values);
+
+  // replace with your real step 2 URL
+  // window.location.href = "/demo-call.html";
+
+  alert("Step 1 complete. Configuration saved. Next: connect this to your Step 2 page.");
 });
 
+loadProgress();
 renderSteps();
 </script>
 </body>
