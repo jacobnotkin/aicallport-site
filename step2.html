@@ -4,18 +4,1262 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Call Port — Step 2</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --bg:#06080f;
+      --panel:rgba(12,14,21,.94);
+      --border:rgba(255,255,255,.10);
+      --border-soft:rgba(255,255,255,.06);
+      --text:rgba(255,255,255,.96);
+      --muted:rgba(203,213,225,.82);
+      --muted2:rgba(148,163,184,.68);
+      --orange:#f97316;
+      --orange2:#ea580c;
+      --green:#22c55e;
+      --blue:#38bdf8;
+    }
+
+    *{
+      box-sizing:border-box;
+      min-width:0;
+    }
+
+    html,body{
+      height:100%;
+      max-width:100%;
+      overflow-x:hidden;
+    }
+
+    body{
+      margin:0;
+      overflow-x:hidden;
+      background:
+        radial-gradient(circle at 20% 14%, rgba(249,115,22,.05), transparent 22%),
+        radial-gradient(circle at 82% 18%, rgba(249,115,22,.035), transparent 18%),
+        linear-gradient(180deg, #080a11 0%, #06080f 100%);
+      color:var(--text);
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .grid-bg{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.18;
+      background:
+        linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(circle at center, black 42%, transparent 96%);
+    }
+
+    .screen{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px;
+      width:100%;
+      max-width:100%;
+    }
+
+    .shell{
+      width:min(1380px, calc(100vw - 24px));
+      max-width:100%;
+      height:min(94vh, 940px);
+      border-radius:30px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(17,19,28,.96), rgba(10,12,18,.98));
+      box-shadow:0 10px 40px rgba(0,0,0,.40);
+      overflow:hidden;
+    }
+
+    .content{
+      height:100%;
+      display:grid;
+      grid-template-rows:auto auto 1fr auto;
+      gap:12px;
+      padding:18px 20px 16px;
+    }
+
+    .topbar{
+      display:grid;
+      grid-template-columns:220px 1fr 220px;
+      align-items:start;
+      gap:14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:16px;
+      height:16px;
+      border-radius:5px;
+      background:var(--orange);
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+
+    .brand-name{
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:.02em;
+      text-transform:uppercase;
+      white-space:nowrap;
+      color:#fff;
+    }
+
+    .beta-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      height:22px;
+      padding:0 8px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.24);
+      background:rgba(249,115,22,.08);
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .title-wrap{
+      text-align:center;
+      padding-top:2px;
+    }
+
+    .title-wrap .step{
+      display:block;
+      color:rgba(249,115,22,.90);
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    .title-wrap h1{
+      margin:0;
+      font-size:clamp(30px,4vw,52px);
+      line-height:.95;
+      font-weight:900;
+      letter-spacing:-.07em;
+      color:var(--orange);
+    }
+
+    .title-wrap p{
+      margin:10px auto 0;
+      max-width:760px;
+      font-size:18px;
+      line-height:1.35;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .progress-meta{
+      text-align:right;
+      padding-top:6px;
+    }
+
+    .progress-meta .small{
+      display:block;
+      font-size:15px;
+      font-weight:900;
+      color:var(--muted2);
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    .progress-bar{
+      width:100%;
+      max-width:180px;
+      height:10px;
+      margin-left:auto;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.04);
+    }
+
+    .progress-fill{
+      height:100%;
+      width:50%;
+      background:linear-gradient(90deg,var(--orange),#fb923c);
+      transition:width .35s ease;
+    }
+
+    .intro-strip{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:12px 18px;
+      border-radius:18px;
+      border:1px solid var(--border-soft);
+      background:rgba(255,255,255,.02);
+    }
+
+    .intro-strip strong{
+      font-size:18px;
+      font-weight:900;
+      color:var(--orange);
+      display:block;
+      margin-bottom:4px;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+
+    .intro-strip span{
+      font-size:16px;
+      line-height:1.35;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .intro-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      min-height:40px;
+      padding:0 16px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.16);
+      background:rgba(249,115,22,.05);
+      color:#fff;
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .intro-pill .dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--orange);
+    }
+
+    .main{
+      min-height:0;
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:14px;
+    }
+
+    .panel{
+      min-height:0;
+      border-radius:24px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,.016));
+      overflow:hidden;
+      display:grid;
+      grid-template-rows:auto 1fr;
+    }
+
+    .panel-head{
+      padding:16px 18px 10px;
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+
+    .panel-head strong{
+      display:block;
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:-.04em;
+      margin-bottom:6px;
+      color:#fff;
+    }
+
+    .panel-head strong::after{
+      content:"";
+      display:block;
+      width:42px;
+      height:2px;
+      margin-top:8px;
+      background:rgba(249,115,22,.78);
+      border-radius:2px;
+    }
+
+    .panel-head span{
+      display:block;
+      font-size:15px;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.35;
+    }
+
+    .panel-body{
+      min-height:0;
+      overflow:auto;
+      padding:18px;
+      display:grid;
+      gap:16px;
+      align-content:start;
+    }
+
+    .field-card{
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      border-radius:20px;
+      padding:16px;
+      display:grid;
+      gap:12px;
+    }
+
+    .field-card strong{
+      font-size:20px;
+      font-weight:900;
+      letter-spacing:-.03em;
+      color:#fff;
+      display:block;
+    }
+
+    .field-card span{
+      font-size:15px;
+      line-height:1.4;
+      color:var(--muted);
+      font-weight:700;
+      display:block;
+    }
+
+    .field{
+      width:100%;
+      height:58px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      color:#fff;
+      font-size:18px;
+      font-weight:700;
+      padding:0 16px;
+      outline:none;
+      direction:ltr;
+      text-align:left;
+    }
+
+    .field:focus{
+      border-color:rgba(249,115,22,.50);
+      box-shadow:0 0 0 3px rgba(249,115,22,.06);
+      background:rgba(255,255,255,.04);
+    }
+
+    .primary-btn,
+    .ghost-btn,
+    .scenario-btn{
+      border:none;
+      cursor:pointer;
+      transition:.18s ease;
+      font-family:inherit;
+    }
+
+    .primary-btn{
+      height:56px;
+      border-radius:16px;
+      background:linear-gradient(90deg,var(--orange),var(--orange2));
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      border:1px solid rgba(255,255,255,.16);
+    }
+
+    .primary-btn:disabled{
+      cursor:not-allowed;
+      opacity:.4;
+      background:linear-gradient(90deg, rgba(249,115,22,.20), rgba(234,88,12,.18));
+      border-color:rgba(249,115,22,.20);
+    }
+
+    .ghost-btn{
+      height:52px;
+      border-radius:16px;
+      background:rgba(255,255,255,.03);
+      color:#fff;
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .scenario-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .scenario-btn{
+      min-height:132px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.09);
+      background:rgba(255,255,255,.03);
+      padding:16px;
+      color:#fff;
+      text-align:left;
+      display:grid;
+      gap:10px;
+      align-content:start;
+    }
+
+    .scenario-btn:hover{
+      border-color:rgba(255,255,255,.14);
+      background:rgba(255,255,255,.05);
+      transform:translateY(-1px);
+    }
+
+    .scenario-btn.selected{
+      border-color:rgba(249,115,22,.65);
+      background:rgba(249,115,22,.10);
+    }
+
+    .scenario-tag{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:24px;
+      padding:0 8px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      background:rgba(249,115,22,.10);
+      color:rgba(249,115,22,.96);
+      border:1px solid rgba(249,115,22,.18);
+      width:max-content;
+    }
+
+    .scenario-btn strong{
+      font-size:22px;
+      line-height:1;
+      letter-spacing:-.04em;
+      font-weight:900;
+      display:block;
+    }
+
+    .scenario-btn span{
+      font-size:15px;
+      line-height:1.38;
+      color:var(--muted);
+      font-weight:700;
+      display:block;
+    }
+
+    .status-card{
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      border-radius:20px;
+      padding:16px;
+      display:grid;
+      gap:14px;
+    }
+
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      min-height:38px;
+      padding:0 14px;
+      border-radius:999px;
+      border:1px solid rgba(56,189,248,.20);
+      background:rgba(56,189,248,.08);
+      color:#fff;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      width:max-content;
+    }
+
+    .status-chip .dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--blue);
+    }
+
+    .call-ready{
+      display:grid;
+      gap:10px;
+    }
+
+    .call-ready strong{
+      font-size:24px;
+      line-height:1.05;
+      letter-spacing:-.04em;
+      font-weight:900;
+      color:#fff;
+    }
+
+    .call-ready span{
+      font-size:15px;
+      line-height:1.4;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .meta-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .mini-card{
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.02);
+      border-radius:16px;
+      padding:14px;
+      display:grid;
+      gap:6px;
+    }
+
+    .mini-card .label{
+      font-size:12px;
+      color:var(--muted2);
+      font-weight:900;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+    }
+
+    .mini-card .value{
+      font-size:19px;
+      color:#fff;
+      font-weight:900;
+      letter-spacing:-.03em;
+      line-height:1.1;
+    }
+
+    .role-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .role-row{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:12px;
+      align-items:center;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.02);
+    }
+
+    .role-row.active{
+      border-color:rgba(249,115,22,.45);
+      background:rgba(249,115,22,.08);
+    }
+
+    .role-dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.18);
+    }
+
+    .role-row.active .role-dot{
+      background:var(--orange);
+      animation:pulseDot 1.1s ease-in-out infinite;
+    }
+
+    .role-main{
+      display:grid;
+      gap:4px;
+    }
+
+    .role-main strong{
+      font-size:17px;
+      line-height:1.05;
+      font-weight:900;
+      letter-spacing:-.03em;
+      color:#fff;
+    }
+
+    .role-main span{
+      font-size:14px;
+      line-height:1.35;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .role-state{
+      font-size:12px;
+      color:var(--muted2);
+      font-weight:900;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+    }
+
+    .role-row.active .role-state{
+      color:#fff;
+    }
+
+    .prompt-group{
+      display:grid;
+      gap:10px;
+    }
+
+    .prompt-title{
+      font-size:18px;
+      font-weight:900;
+      color:#fff;
+      letter-spacing:-.03em;
+    }
+
+    .prompt-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .prompt-item{
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.02);
+      font-size:15px;
+      line-height:1.4;
+      color:#fff;
+      font-weight:700;
+    }
+
+    .prompt-item span{
+      color:var(--muted2);
+      font-weight:800;
+    }
+
+    .call-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .count-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.02);
+    }
+
+    .count-row strong{
+      font-size:18px;
+      font-weight:900;
+      color:#fff;
+      letter-spacing:-.03em;
+    }
+
+    .count-row span{
+      font-size:14px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .bottom{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding-top:10px;
+      border-top:1px solid rgba(255,255,255,.06);
+    }
+
+    .bottom-note{
+      font-size:18px;
+      color:#fff;
+      font-weight:800;
+      line-height:1.3;
+    }
+
+    .bottom-note span{
+      color:rgba(249,115,22,.92);
+      font-weight:900;
+    }
+
+    .helper-note{
+      color:var(--muted2);
+      font-size:15px;
+      font-weight:700;
+    }
+
+    .next-btn{
+      min-width:280px;
+      height:58px;
+      border-radius:18px;
+      background:linear-gradient(90deg,var(--orange),var(--orange2));
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      border:1px solid rgba(255,255,255,.16);
+      cursor:pointer;
+    }
+
+    .next-btn:disabled{
+      opacity:.4;
+      cursor:not-allowed;
+      background:linear-gradient(90deg, rgba(249,115,22,.20), rgba(234,88,12,.18));
+      border-color:rgba(249,115,22,.20);
+    }
+
+    @keyframes pulseDot{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.35)}
+    }
+
+    @media (max-width:1100px){
+      .screen{
+        align-items:flex-start;
+        padding:12px;
+      }
+
+      .shell{
+        height:auto;
+        min-height:calc(100vh - 24px);
+        width:calc(100vw - 24px);
+        max-width:calc(100vw - 24px);
+      }
+
+      .content{
+        height:auto;
+      }
+
+      .main{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:760px){
+      .screen{
+        padding:8px;
+        align-items:flex-start;
+      }
+
+      .shell{
+        width:calc(100vw - 16px);
+        max-width:calc(100vw - 16px);
+        min-height:calc(100vh - 16px);
+        height:auto;
+        border-radius:20px;
+      }
+
+      .content{
+        height:auto;
+        padding:14px 14px 16px;
+        gap:10px;
+      }
+
+      .topbar{
+        grid-template-columns:1fr;
+        gap:10px;
+      }
+
+      .brand{
+        flex-wrap:wrap;
+      }
+
+      .title-wrap{
+        text-align:left;
+      }
+
+      .title-wrap h1{
+        font-size:34px;
+      }
+
+      .title-wrap p{
+        font-size:16px;
+        max-width:100%;
+      }
+
+      .progress-meta{
+        text-align:left;
+        width:100%;
+      }
+
+      .progress-bar{
+        margin-left:0;
+        max-width:100%;
+      }
+
+      .intro-strip{
+        flex-direction:column;
+        align-items:flex-start;
+        padding:12px 14px;
+      }
+
+      .intro-pill{
+        width:100%;
+        white-space:normal;
+        justify-content:flex-start;
+        padding:10px 14px;
+        min-height:auto;
+      }
+
+      .panel-head{
+        padding:12px 14px 8px;
+      }
+
+      .panel-head strong{
+        font-size:20px;
+      }
+
+      .panel-head span{
+        font-size:15px;
+      }
+
+      .panel-body{
+        padding:14px;
+      }
+
+      .scenario-grid,
+      .meta-grid,
+      .call-actions{
+        grid-template-columns:1fr;
+      }
+
+      .bottom{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
+      }
+
+      .bottom-note{
+        font-size:16px;
+      }
+
+      .helper-note{
+        font-size:14px;
+      }
+
+      .next-btn{
+        width:100%;
+        min-width:0;
+      }
+    }
+  </style>
 </head>
-<body class="bg-black text-white min-h-screen flex items-center justify-center">
-  <div class="text-center px-6">
-    <div class="text-orange-500 text-sm font-bold uppercase tracking-widest mb-4">Step 2</div>
-    <h1 class="text-4xl font-bold mb-4">Demo Call</h1>
-    <p class="text-gray-400 max-w-xl mb-8">
-      This page will simulate your AI call flow before deployment.
-    </p>
-    <a href="/step3.html" class="bg-orange-500 px-6 py-3 rounded-lg font-bold hover:bg-orange-600 transition">
-      Continue to Step 3
-    </a>
+<body>
+  <div class="grid-bg"></div>
+
+  <div class="screen">
+    <div class="shell">
+      <div class="content">
+        <div class="topbar">
+          <div class="brand">
+            <div class="brand-mark"></div>
+            <div class="brand-name">AI Call Port</div>
+            <div class="beta-badge">Beta</div>
+          </div>
+
+          <div class="title-wrap">
+            <span class="step">Step 2</span>
+            <h1>Live Demo</h1>
+            <p>Test your AI system on a real phone call.</p>
+          </div>
+
+          <div class="progress-meta">
+            <span class="small" id="metaProgress">2 Demo Calls Available</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="intro-strip">
+          <div>
+            <strong>Call your own business number</strong>
+            <span>Pretend you are a customer and test how your configured system responds.</span>
+          </div>
+          <div class="intro-pill"><span class="dot"></span><span id="topStatus">Demo not started</span></div>
+        </div>
+
+        <div class="main">
+          <section class="panel">
+            <div class="panel-head">
+              <strong>Demo Setup</strong>
+              <span>Save your business phone number, choose a scenario, then call that number from your phone.</span>
+            </div>
+
+            <div class="panel-body">
+              <div class="field-card">
+                <strong>Business Phone Number</strong>
+                <span>Enter the number you want to test. You will call this number as if you were your own customer.</span>
+                <input id="phoneInput" class="field" type="tel" placeholder="+1 (555) 123-4567" />
+                <button id="savePhoneBtn" class="primary-btn" type="button">Save Demo Number</button>
+              </div>
+
+              <div class="field-card">
+                <strong>Choose Demo Scenario</strong>
+                <span>Run one standard call and one urgent call so you can hear different agent roles activate automatically.</span>
+
+                <div class="scenario-grid">
+                  <button type="button" class="scenario-btn" data-scenario="standard">
+                    <div class="scenario-tag">Demo 1</div>
+                    <strong>Standard Call</strong>
+                    <span>Test service questions, booking flow, hours, and normal customer intake.</span>
+                  </button>
+
+                  <button type="button" class="scenario-btn" data-scenario="urgent">
+                    <div class="scenario-tag">Demo 2</div>
+                    <strong>Urgent Call</strong>
+                    <span>Test priority routing, after-hours logic, escalation behavior, and urgent intent handling.</span>
+                  </button>
+                </div>
+
+                <div class="call-actions">
+                  <button id="startDemoBtn" class="primary-btn" type="button" disabled>Start Guided Demo</button>
+                  <button id="endDemoBtn" class="ghost-btn" type="button" disabled>End Demo</button>
+                </div>
+              </div>
+
+              <div class="status-card">
+                <div class="status-chip"><span class="dot"></span><span id="callState">System Ready State</span></div>
+
+                <div class="call-ready">
+                  <strong id="callHeadline">Save your phone number to prepare the live test</strong>
+                  <span id="callInstructions">After saving your number, select a scenario and call your business number from your phone. Speak exactly like a real customer.</span>
+                </div>
+
+                <div class="meta-grid">
+                  <div class="mini-card">
+                    <div class="label">Saved Number</div>
+                    <div class="value" id="savedNumber">Not saved</div>
+                  </div>
+                  <div class="mini-card">
+                    <div class="label">Selected Scenario</div>
+                    <div class="value" id="selectedScenario">Not selected</div>
+                  </div>
+                  <div class="mini-card">
+                    <div class="label">Demo Calls Left</div>
+                    <div class="value" id="callsLeft">2</div>
+                  </div>
+                  <div class="mini-card">
+                    <div class="label">Call Limit</div>
+                    <div class="value">1 Minute Each</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <strong>Live Guidance</strong>
+              <span>Use these prompts while calling. Watch how the system changes roles during the conversation.</span>
+            </div>
+
+            <div class="panel-body">
+              <div class="prompt-group">
+                <div class="prompt-title">What to say on the call</div>
+                <div class="prompt-list" id="promptList"></div>
+              </div>
+
+              <div class="prompt-group">
+                <div class="prompt-title">Active Agent Roles</div>
+                <div class="role-list" id="roleList"></div>
+              </div>
+
+              <div class="count-row">
+                <div>
+                  <strong id="demoClock">00:00</strong>
+                  <span>Live demo timer</span>
+                </div>
+                <div>
+                  <strong id="demoMode">Not running</strong>
+                  <span>Scenario state</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="bottom">
+          <div>
+            <div class="bottom-note">Each business gets <span>2 demo calls</span> with a <span>1-minute limit</span> per call.</div>
+            <div class="helper-note">The owner should call their own company number and act like a real customer.</div>
+          </div>
+          <button id="nextBtn" class="next-btn" type="button" disabled>Continue to Step 3</button>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <script>
+    const step1Data = JSON.parse(localStorage.getItem("aiCallPortStep1Final") || "{}");
+
+    const phoneInput = document.getElementById("phoneInput");
+    const savePhoneBtn = document.getElementById("savePhoneBtn");
+    const startDemoBtn = document.getElementById("startDemoBtn");
+    const endDemoBtn = document.getElementById("endDemoBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    const savedNumber = document.getElementById("savedNumber");
+    const selectedScenario = document.getElementById("selectedScenario");
+    const callsLeft = document.getElementById("callsLeft");
+    const callState = document.getElementById("callState");
+    const callHeadline = document.getElementById("callHeadline");
+    const callInstructions = document.getElementById("callInstructions");
+    const promptList = document.getElementById("promptList");
+    const roleList = document.getElementById("roleList");
+    const demoClock = document.getElementById("demoClock");
+    const demoMode = document.getElementById("demoMode");
+    const topStatus = document.getElementById("topStatus");
+    const metaProgress = document.getElementById("metaProgress");
+    const progressFill = document.getElementById("progressFill");
+
+    const state = {
+      savedPhone: "",
+      selectedScenario: "",
+      callsRemaining: 2,
+      completedScenarios: new Set(),
+      demoRunning: false,
+      timer: null,
+      seconds: 0,
+      activeRole: "intake"
+    };
+
+    const scenarioData = {
+      standard: {
+        label: "Standard Call",
+        prompts: [
+          "Hi, I’d like to book a service.",
+          "What services do you offer?",
+          "Do you have availability this week?",
+          "What information do you need from me?",
+          "Can you schedule me for an appointment?"
+        ],
+        roles: [
+          ["intake", "Intake Agent", "Greets caller and identifies business context."],
+          ["qualification", "Qualification Agent", "Understands service need and collects details."],
+          ["booking", "Booking Agent", "Handles scheduling and appointment flow."],
+          ["communication", "Communication Agent", "Confirms next steps and reminders."]
+        ]
+      },
+      urgent: {
+        label: "Urgent Call",
+        prompts: [
+          "Hi, I need urgent help today.",
+          "This is an emergency and I need someone as soon as possible.",
+          "Do you handle after-hours requests?",
+          "Can this be prioritized right now?",
+          "What happens next if this is urgent?"
+        ],
+        roles: [
+          ["intake", "Intake Agent", "Greets caller and verifies issue type."],
+          ["urgency", "Urgency Agent", "Detects priority and switches the call path."],
+          ["dispatch", "Priority Routing Agent", "Handles urgent escalation or priority routing."],
+          ["communication", "Communication Agent", "Confirms urgency handling and next action."]
+        ]
+      }
+    };
+
+    const roleStateOrder = {
+      standard: ["intake", "qualification", "booking", "communication"],
+      urgent: ["intake", "urgency", "dispatch", "communication"]
+    };
+
+    function isValidPhone(phone) {
+      const digits = phone.replace(/\D/g, "");
+      return digits.length >= 10;
+    }
+
+    function formatClock(seconds) {
+      const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+      const s = String(seconds % 60).padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function renderPrompts() {
+      if (!state.selectedScenario) {
+        promptList.innerHTML = `
+          <div class="prompt-item"><span>Next step:</span> Save your business number and choose a demo scenario.</div>
+        `;
+        return;
+      }
+
+      const scenario = scenarioData[state.selectedScenario];
+      promptList.innerHTML = scenario.prompts.map(p => `
+        <div class="prompt-item">${p}</div>
+      `).join("");
+    }
+
+    function renderRoles() {
+      if (!state.selectedScenario) {
+        roleList.innerHTML = `
+          <div class="role-row">
+            <div class="role-dot"></div>
+            <div class="role-main">
+              <strong>Agent roles will appear here</strong>
+              <span>Select a scenario to see which agents activate during the call.</span>
+            </div>
+            <div class="role-state">Idle</div>
+          </div>
+        `;
+        return;
+      }
+
+      const scenario = scenarioData[state.selectedScenario];
+      roleList.innerHTML = scenario.roles.map(([key, title, desc]) => `
+        <div class="role-row ${state.activeRole === key ? "active" : ""}">
+          <div class="role-dot"></div>
+          <div class="role-main">
+            <strong>${title}</strong>
+            <span>${desc}</span>
+          </div>
+          <div class="role-state">${state.activeRole === key ? "Active" : "Waiting"}</div>
+        </div>
+      `).join("");
+    }
+
+    function updateStatusText() {
+      savedNumber.textContent = state.savedPhone || "Not saved";
+      selectedScenario.textContent = state.selectedScenario ? scenarioData[state.selectedScenario].label : "Not selected";
+      callsLeft.textContent = String(state.callsRemaining);
+      metaProgress.textContent = `${state.callsRemaining} Demo Calls Available`;
+      progressFill.style.width = `${(state.callsRemaining / 2) * 100}%`;
+
+      if (!state.savedPhone) {
+        callState.textContent = "System Ready State";
+        callHeadline.textContent = "Save your phone number to prepare the live test";
+        callInstructions.textContent = "After saving your number, select a scenario and call your business number from your phone. Speak exactly like a real customer.";
+        topStatus.textContent = "Demo not started";
+      } else if (!state.selectedScenario) {
+        callState.textContent = "Phone Number Saved";
+        callHeadline.textContent = "Choose a scenario to begin the live test";
+        callInstructions.textContent = `Call ${state.savedPhone} from your phone after selecting either Standard Call or Urgent Call.`;
+        topStatus.textContent = "Number saved";
+      } else if (!state.demoRunning) {
+        callState.textContent = "Ready To Call";
+        callHeadline.textContent = `${scenarioData[state.selectedScenario].label} is ready`;
+        callInstructions.textContent = `Call ${state.savedPhone} now and act like a real customer. Listen for your business name, service logic, booking flow, and role switching.`;
+        topStatus.textContent = "Ready to call";
+      } else {
+        callState.textContent = "Live Demo In Progress";
+        callHeadline.textContent = `${scenarioData[state.selectedScenario].label} is running`;
+        callInstructions.textContent = `You are now testing ${state.savedPhone}. Keep asking questions naturally and listen for the role changes.`;
+        topStatus.textContent = "Live call in progress";
+      }
+
+      startDemoBtn.disabled = !(state.savedPhone && state.selectedScenario && !state.demoRunning && state.callsRemaining > 0);
+      endDemoBtn.disabled = !state.demoRunning;
+      nextBtn.disabled = state.completedScenarios.size < 2;
+      demoMode.textContent = state.demoRunning ? scenarioData[state.selectedScenario].label : "Not running";
+    }
+
+    function rotateRoles() {
+      if (!state.demoRunning || !state.selectedScenario) return;
+      const order = roleStateOrder[state.selectedScenario];
+      const currentIndex = order.indexOf(state.activeRole);
+      const nextIndex = (currentIndex + 1) % order.length;
+      state.activeRole = order[nextIndex];
+      renderRoles();
+    }
+
+    function startDemo() {
+      if (!state.savedPhone || !state.selectedScenario || state.callsRemaining <= 0) return;
+
+      state.demoRunning = true;
+      state.seconds = 0;
+      state.activeRole = roleStateOrder[state.selectedScenario][0];
+      demoClock.textContent = "00:00";
+
+      renderRoles();
+      updateStatusText();
+
+      state.timer = setInterval(() => {
+        state.seconds += 1;
+        demoClock.textContent = formatClock(state.seconds);
+
+        if (state.seconds === 12 || state.seconds === 24 || state.seconds === 38) {
+          rotateRoles();
+        }
+
+        if (state.seconds >= 60) {
+          endDemo(true);
+        }
+      }, 1000);
+    }
+
+    function endDemo(autoEnded = false) {
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
+      }
+
+      if (state.demoRunning && state.selectedScenario) {
+        state.callsRemaining = Math.max(0, state.callsRemaining - 1);
+        state.completedScenarios.add(state.selectedScenario);
+      }
+
+      state.demoRunning = false;
+      state.activeRole = "intake";
+      demoClock.textContent = "00:00";
+
+      renderRoles();
+      updateStatusText();
+
+      if (autoEnded) {
+        callState.textContent = "Demo Time Complete";
+        callHeadline.textContent = "1-minute demo finished";
+        callInstructions.textContent = "Choose the other scenario to complete the second live demo.";
+        topStatus.textContent = "Demo complete";
+      }
+    }
+
+    savePhoneBtn.addEventListener("click", () => {
+      const value = phoneInput.value.trim();
+      if (!isValidPhone(value)) {
+        callState.textContent = "Phone Number Required";
+        callHeadline.textContent = "Enter a valid business phone number";
+        callInstructions.textContent = "Use the real number your customers would call.";
+        return;
+      }
+
+      state.savedPhone = value;
+      updateStatusText();
+    });
+
+    document.querySelectorAll("[data-scenario]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (state.demoRunning) return;
+        document.querySelectorAll("[data-scenario]").forEach(x => x.classList.remove("selected"));
+        btn.classList.add("selected");
+        state.selectedScenario = btn.dataset.scenario;
+        state.activeRole = roleStateOrder[state.selectedScenario][0];
+        renderPrompts();
+        renderRoles();
+        updateStatusText();
+      });
+    });
+
+    startDemoBtn.addEventListener("click", startDemo);
+    endDemoBtn.addEventListener("click", () => endDemo(false));
+
+    nextBtn.addEventListener("click", () => {
+      if (nextBtn.disabled) return;
+      localStorage.setItem("aiCallPortStep2Final", JSON.stringify({
+        savedPhone: state.savedPhone,
+        completedScenarios: Array.from(state.completedScenarios)
+      }));
+      window.location.href = "/step3.html";
+    });
+
+    renderPrompts();
+    renderRoles();
+    updateStatusText();
+  </script>
 </body>
-</html> 
+</html>
