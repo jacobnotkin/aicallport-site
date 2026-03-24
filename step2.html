@@ -304,6 +304,8 @@
       grid-template-rows:repeat(3, minmax(0, 1fr));
       gap:22px 26px;
       align-content:stretch;
+      position:relative;
+      z-index:1;
     }
 
     .step-btn{
@@ -322,6 +324,7 @@
       transition:.18s ease;
       text-align:left;
       outline:none;
+      pointer-events:auto;
     }
 
     .step-btn:hover{
@@ -1223,7 +1226,6 @@
       currentStepIndex:0,
       currentQuestionIndex:0,
       values:{},
-      demoTimers:{},
       demoSeconds:0,
       demoInterval:null,
       demoRoleIndex:0,
@@ -1254,6 +1256,15 @@
     function isValidPhone(phone){
       const digits = phone.replace(/\D/g,"");
       return digits.length >= 10;
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
     function isStepComplete(stepIndex){
@@ -1341,26 +1352,29 @@
 
       stepsList.innerHTML = buttonHtml + nextHtml;
 
-      [...document.querySelectorAll("[data-step]")].forEach(btn => {
-        btn.addEventListener("click", () => {
-          const index = Number(btn.dataset.step);
-          const isComplete = isStepComplete(index);
-const isActive = index === state.activeStepIndex;
-const isUnlocked = index < state.activeStepIndex;
+      stepsList.onclick = (e) => {
+        const btn = e.target.closest("button");
+        if (!btn) return;
 
-if (!(isComplete || isActive || isUnlocked)) return;
-          openStep(index);
-        });
-      });
+        if (btn.id === "step3Btn") {
+          if (!allComplete()) return;
+          localStorage.setItem("aiCallPortStep2Final", JSON.stringify(state.values));
+          window.location.href = "/step3.html";
+          return;
+        }
 
-      const step3Btn = document.getElementById("step3Btn");
+        const stepAttr = btn.dataset.step;
+        if (stepAttr == null) return;
 
-step3Btn.addEventListener("click", () => {
-  if (!allComplete()) return;
+        const index = Number(stepAttr);
+        const isComplete = isStepComplete(index);
+        const isActive = index === state.activeStepIndex;
+        const isUnlocked = index < state.activeStepIndex;
 
-  localStorage.setItem("aiCallPortStep2Final", JSON.stringify(state.values));
-  window.location.href = "/step3.html";
-});
+        if (!(isComplete || isActive || isUnlocked)) return;
+
+        openStep(index);
+      };
 
       updateProgress();
     }
@@ -1423,8 +1437,8 @@ step3Btn.addEventListener("click", () => {
       const businessName = step1Data?.businessProfile?.businessName || "your business";
       modalBody.innerHTML = `
         <div class="question active">
-          <div class="q-title">Call ${phone} now</div>
-          <div class="q-sub">Pretend you are a real customer calling ${businessName}. Follow the exact guidance below.</div>
+          <div class="q-title">Call ${escapeHtml(phone)} now</div>
+          <div class="q-sub">Pretend you are a real customer calling ${escapeHtml(businessName)}. Follow the exact guidance below.</div>
           <div class="prompt-box">
             <div class="prompt-item">1. Call your business number from your phone.</div>
             <div class="prompt-item">2. Speak like a real customer, not like a tester.</div>
@@ -1462,7 +1476,7 @@ step3Btn.addEventListener("click", () => {
           <div class="q-sub">Call your own number now and use these exact lines. The active roles below show how the system shifts during the conversation.</div>
 
           <div class="prompt-box">
-            ${prompts.map(p => `<div class="prompt-item">${p}</div>`).join("")}
+            ${prompts.map(p => `<div class="prompt-item">${escapeHtml(p)}</div>`).join("")}
           </div>
 
           <div class="role-box">
@@ -1470,8 +1484,8 @@ step3Btn.addEventListener("click", () => {
               <div class="role-row ${i === roleIndex ? "active" : ""}">
                 <div class="role-dot"></div>
                 <div class="role-main">
-                  <strong>${role[1]}</strong>
-                  <span>${role[2]}</span>
+                  <strong>${escapeHtml(role[1])}</strong>
+                  <span>${escapeHtml(role[2])}</span>
                 </div>
                 <div class="role-state">${i === roleIndex ? "Active" : "Waiting"}</div>
               </div>
@@ -1479,28 +1493,6 @@ step3Btn.addEventListener("click", () => {
           </div>
 
           <div class="timer-box">
-  <div class="mini-card">
-    <span class="label">Demo Timer</span>
-    <span class="value" id="demoTimer">${formatClock(seconds)}</span>
-  </div>
-  <div class="mini-card">
-    <span class="label">Call Limit</span>
-    <span class="value">01:00</span>
-  </div>
-</div>
-<div style="margin-top:18px;">
-  
-
-<div style="margin-top:18px;">
-  <button
-    type="button"
-    class="primary-btn"
-    onclick="finishDemoCall('${step.key}','${question.key}')"
-  >
-    I Completed This Call
-  </button>
-</div>
-</div>
             <div class="mini-card">
               <span class="label">Demo Timer</span>
               <span class="value" id="demoTimer">${formatClock(seconds)}</span>
@@ -1510,9 +1502,18 @@ step3Btn.addEventListener("click", () => {
               <span class="value">01:00</span>
             </div>
           </div>
+
+          <div style="margin-top:18px;">
+            <button
+              type="button"
+              class="primary-btn"
+              onclick="finishDemoCall('${step.key}','${question.key}')"
+            >
+              I Completed This Call
+            </button>
+          </div>
         </div>
       `;
-     
 
       stopDemoTimer();
       state.demoSeconds = 0;
@@ -1537,7 +1538,6 @@ step3Btn.addEventListener("click", () => {
     }
 
     function renderCompleteScreen(step, question){
-      const scenarioFirst = state.values.demoType.scenario || "your first demo";
       modalBody.innerHTML = `
         <div class="question active">
           <div class="q-title">Live demo complete</div>
@@ -1663,11 +1663,13 @@ step3Btn.addEventListener("click", () => {
         stopDemoTimer();
       }
     });
-window.finishDemoCall = function(stepKey, questionKey) {
-  stopDemoTimer();
-  state.values[stepKey][questionKey] = true;
-  validateModal();
-};
+
+    window.finishDemoCall = function(stepKey, questionKey) {
+      stopDemoTimer();
+      state.values[stepKey][questionKey] = true;
+      validateModal();
+    };
+
     renderSteps();
   </script>
 </body>
