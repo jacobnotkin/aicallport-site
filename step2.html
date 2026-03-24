@@ -1344,16 +1344,23 @@
       [...document.querySelectorAll("[data-step]")].forEach(btn => {
         btn.addEventListener("click", () => {
           const index = Number(btn.dataset.step);
-          if (index > state.activeStepIndex && !isStepComplete(index)) return;
+          const isComplete = isStepComplete(index);
+const isActive = index === state.activeStepIndex;
+const isUnlocked = index < state.activeStepIndex;
+
+if (!(isComplete || isActive || isUnlocked)) return;
           openStep(index);
         });
       });
 
-      document.getElementById("step3Btn").addEventListener("click", () => {
-        if (!nextReady) return;
-        localStorage.setItem("aiCallPortStep2Final", JSON.stringify(state.values));
-        window.location.href = "/step3.html";
-      });
+      const step3Btn = document.getElementById("step3Btn");
+
+step3Btn.addEventListener("click", () => {
+  if (!allComplete()) return;
+
+  localStorage.setItem("aiCallPortStep2Final", JSON.stringify(state.values));
+  window.location.href = "/step3.html";
+});
 
       updateProgress();
     }
@@ -1472,6 +1479,22 @@
           </div>
 
           <div class="timer-box">
+  <div class="mini-card">
+    <span class="label">Demo Timer</span>
+    <span class="value" id="demoTimer">${formatClock(seconds)}</span>
+  </div>
+  <div class="mini-card">
+    <span class="label">Call Limit</span>
+    <span class="value">01:00</span>
+  </div>
+</div>
+
+<div style="margin-top:18px;">
+  <button type="button" class="primary-btn" id="finishDemoBtn">
+    I Completed This Call
+  </button>
+</div>
+</div>
             <div class="mini-card">
               <span class="label">Demo Timer</span>
               <span class="value" id="demoTimer">${formatClock(seconds)}</span>
