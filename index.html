@@ -632,6 +632,9 @@
       padding:0 18px;
       outline:none;
       transition:.18s ease;
+      direction:ltr;
+      text-align:left;
+      unicode-bidi:plaintext;
     }
 
     .textarea{
@@ -639,6 +642,9 @@
       height:auto;
       padding:16px 18px;
       resize:none;
+      direction:ltr;
+      text-align:left;
+      unicode-bidi:plaintext;
     }
 
     .field:focus{
@@ -668,6 +674,9 @@
       font-weight:700;
       padding:0 16px;
       outline:none;
+      direction:ltr;
+      text-align:left;
+      unicode-bidi:plaintext;
     }
 
     .searchbar:focus{
@@ -968,8 +977,8 @@
 
         <div class="intro-strip">
           <div>
-            <strong>Complete the highlighted step</strong>
-            <span>The system guides the next action automatically.</span>
+            <strong id="introTitle">Complete the highlighted step</strong>
+            <span id="introText">The system guides the next action automatically.</span>
           </div>
           <div class="intro-pill"><span class="dot"></span><span id="nextLabel">Next Step: Business Profile</span></div>
         </div>
@@ -986,8 +995,8 @@
 
         <div class="bottom">
           <div>
-            <div class="bottom-note">Complete the highlighted step to unlock <span>Step 2 — Live Demo</span></div>
-            <div class="helper-note">The bottom-right button becomes active when all configuration steps are complete.</div>
+            <div class="bottom-note" id="bottomNote">Complete the highlighted step to unlock <span>Step 2 — Live Demo</span></div>
+            <div class="helper-note" id="helperNote">The bottom-right button becomes active when all configuration steps are complete.</div>
           </div>
         </div>
       </div>
@@ -1016,123 +1025,240 @@
   </div>
 
   <script>
-    const countryData = {
-      "North America": [
-        { name:"United States", status:"active" },
-        { name:"Canada", status:"active" },
-        { name:"Mexico", status:"active" },
-        { name:"Jamaica", status:"soon" },
-        { name:"Dominican Republic", status:"projected" },
-        { name:"Costa Rica", status:"active" },
-        { name:"Panama", status:"active" },
-        { name:"Guatemala", status:"soon" }
-      ],
-      "South America": [
-        { name:"Brazil", status:"soon" },
-        { name:"Argentina", status:"projected" },
-        { name:"Chile", status:"projected" },
-        { name:"Colombia", status:"active" },
-        { name:"Peru", status:"active" },
-        { name:"Uruguay", status:"active" },
-        { name:"Ecuador", status:"soon" }
-      ],
-      "Europe": [
-        { name:"United Kingdom", status:"active" },
-        { name:"Ireland", status:"active" },
-        { name:"Germany", status:"active" },
-        { name:"France", status:"active" },
-        { name:"Spain", status:"active" },
-        { name:"Italy", status:"soon" },
-        { name:"Netherlands", status:"active" },
-        { name:"Belgium", status:"active" },
-        { name:"Portugal", status:"active" },
-        { name:"Sweden", status:"projected" },
-        { name:"Norway", status:"active" },
-        { name:"Denmark", status:"active" },
-        { name:"Finland", status:"active" },
-        { name:"Poland", status:"active" },
-        { name:"Austria", status:"active" },
-        { name:"Switzerland", status:"active" },
-        { name:"Czech Republic", status:"active" },
-        { name:"Romania", status:"soon" },
-        { name:"Greece", status:"soon" },
-        { name:"Ukraine", status:"projected" }
-      ],
-      "Asia": [
-        { name:"Japan", status:"active" },
-        { name:"Singapore", status:"active" },
-        { name:"United Arab Emirates", status:"active" },
-        { name:"Saudi Arabia", status:"active" },
-        { name:"India", status:"soon" },
-        { name:"South Korea", status:"active" },
-        { name:"Malaysia", status:"active" },
-        { name:"Thailand", status:"active" },
-        { name:"Philippines", status:"active" },
-        { name:"Indonesia", status:"soon" },
-        { name:"Vietnam", status:"active" },
-        { name:"Israel", status:"active" },
-        { name:"Qatar", status:"active" },
-        { name:"Kuwait", status:"active" },
-        { name:"Turkey", status:"active" },
-        { name:"Hong Kong", status:"active" }
-      ],
-      "Africa": [
-        { name:"South Africa", status:"projected" },
-        { name:"Nigeria", status:"projected" },
-        { name:"Kenya", status:"soon" },
-        { name:"Egypt", status:"active" },
-        { name:"Morocco", status:"active" },
-        { name:"Ghana", status:"soon" }
-      ],
-      "Oceania": [
-        { name:"Australia", status:"active" },
-        { name:"New Zealand", status:"active" },
-        { name:"Fiji", status:"projected" }
-      ]
-    };
+    const countries = [
+      // North America (20)
+      { name:"United States", continent:"North America", status:"active" },
+      { name:"Canada", continent:"North America", status:"active" },
+      { name:"Mexico", continent:"North America", status:"active" },
+      { name:"Costa Rica", continent:"North America", status:"active" },
+      { name:"Panama", continent:"North America", status:"active" },
+      { name:"Dominican Republic", continent:"North America", status:"active" },
+      { name:"Jamaica", continent:"North America", status:"active" },
+      { name:"Puerto Rico", continent:"North America", status:"active" },
+      { name:"Guatemala", continent:"North America", status:"soon" },
+      { name:"Honduras", continent:"North America", status:"soon" },
+      { name:"El Salvador", continent:"North America", status:"soon" },
+      { name:"Nicaragua", continent:"North America", status:"soon" },
+      { name:"Belize", continent:"North America", status:"soon" },
+      { name:"Trinidad and Tobago", continent:"North America", status:"soon" },
+      { name:"Bahamas", continent:"North America", status:"projected" },
+      { name:"Barbados", continent:"North America", status:"projected" },
+      { name:"Cuba", continent:"North America", status:"projected" },
+      { name:"Haiti", continent:"North America", status:"projected" },
+      { name:"Antigua and Barbuda", continent:"North America", status:"projected" },
+      { name:"Saint Lucia", continent:"North America", status:"projected" },
 
-    const industryData = {
+      // South America (12)
+      { name:"Brazil", continent:"South America", status:"active" },
+      { name:"Colombia", continent:"South America", status:"active" },
+      { name:"Peru", continent:"South America", status:"active" },
+      { name:"Chile", continent:"South America", status:"active" },
+      { name:"Argentina", continent:"South America", status:"active" },
+      { name:"Uruguay", continent:"South America", status:"active" },
+      { name:"Ecuador", continent:"South America", status:"active" },
+      { name:"Paraguay", continent:"South America", status:"active" },
+      { name:"Bolivia", continent:"South America", status:"active" },
+      { name:"Venezuela", continent:"South America", status:"active" },
+      { name:"Guyana", continent:"South America", status:"soon" },
+      { name:"Suriname", continent:"South America", status:"projected" },
+
+      // Europe (35)
+      { name:"United Kingdom", continent:"Europe", status:"active" },
+      { name:"Ireland", continent:"Europe", status:"active" },
+      { name:"Germany", continent:"Europe", status:"active" },
+      { name:"France", continent:"Europe", status:"active" },
+      { name:"Spain", continent:"Europe", status:"active" },
+      { name:"Italy", continent:"Europe", status:"active" },
+      { name:"Netherlands", continent:"Europe", status:"active" },
+      { name:"Belgium", continent:"Europe", status:"active" },
+      { name:"Portugal", continent:"Europe", status:"active" },
+      { name:"Switzerland", continent:"Europe", status:"active" },
+      { name:"Austria", continent:"Europe", status:"active" },
+      { name:"Sweden", continent:"Europe", status:"active" },
+      { name:"Norway", continent:"Europe", status:"active" },
+      { name:"Denmark", continent:"Europe", status:"active" },
+      { name:"Finland", continent:"Europe", status:"active" },
+      { name:"Poland", continent:"Europe", status:"active" },
+      { name:"Czech Republic", continent:"Europe", status:"active" },
+      { name:"Slovakia", continent:"Europe", status:"active" },
+      { name:"Hungary", continent:"Europe", status:"active" },
+      { name:"Romania", continent:"Europe", status:"active" },
+      { name:"Bulgaria", continent:"Europe", status:"active" },
+      { name:"Croatia", continent:"Europe", status:"active" },
+      { name:"Slovenia", continent:"Europe", status:"active" },
+      { name:"Greece", continent:"Europe", status:"active" },
+      { name:"Estonia", continent:"Europe", status:"active" },
+      { name:"Latvia", continent:"Europe", status:"soon" },
+      { name:"Lithuania", continent:"Europe", status:"soon" },
+      { name:"Luxembourg", continent:"Europe", status:"soon" },
+      { name:"Malta", continent:"Europe", status:"soon" },
+      { name:"Cyprus", continent:"Europe", status:"soon" },
+      { name:"Serbia", continent:"Europe", status:"soon" },
+      { name:"Ukraine", continent:"Europe", status:"projected" },
+      { name:"Bosnia and Herzegovina", continent:"Europe", status:"projected" },
+      { name:"Albania", continent:"Europe", status:"projected" },
+      { name:"North Macedonia", continent:"Europe", status:"projected" },
+
+      // Asia (35)
+      { name:"Japan", continent:"Asia", status:"active" },
+      { name:"South Korea", continent:"Asia", status:"active" },
+      { name:"Singapore", continent:"Asia", status:"active" },
+      { name:"United Arab Emirates", continent:"Asia", status:"active" },
+      { name:"Saudi Arabia", continent:"Asia", status:"active" },
+      { name:"Qatar", continent:"Asia", status:"active" },
+      { name:"Kuwait", continent:"Asia", status:"active" },
+      { name:"Bahrain", continent:"Asia", status:"active" },
+      { name:"Oman", continent:"Asia", status:"active" },
+      { name:"Turkey", continent:"Asia", status:"active" },
+      { name:"Israel", continent:"Asia", status:"active" },
+      { name:"Hong Kong", continent:"Asia", status:"active" },
+      { name:"Malaysia", continent:"Asia", status:"active" },
+      { name:"Thailand", continent:"Asia", status:"active" },
+      { name:"Philippines", continent:"Asia", status:"active" },
+      { name:"Vietnam", continent:"Asia", status:"active" },
+      { name:"Indonesia", continent:"Asia", status:"active" },
+      { name:"India", continent:"Asia", status:"active" },
+      { name:"Taiwan", continent:"Asia", status:"active" },
+      { name:"Kazakhstan", continent:"Asia", status:"active" },
+      { name:"Pakistan", continent:"Asia", status:"soon" },
+      { name:"Bangladesh", continent:"Asia", status:"soon" },
+      { name:"Sri Lanka", continent:"Asia", status:"soon" },
+      { name:"Nepal", continent:"Asia", status:"soon" },
+      { name:"Uzbekistan", continent:"Asia", status:"soon" },
+      { name:"Georgia", continent:"Asia", status:"soon" },
+      { name:"Armenia", continent:"Asia", status:"soon" },
+      { name:"Cambodia", continent:"Asia", status:"soon" },
+      { name:"Jordan", continent:"Asia", status:"soon" },
+      { name:"Iraq", continent:"Asia", status:"projected" },
+      { name:"Lebanon", continent:"Asia", status:"projected" },
+      { name:"Mongolia", continent:"Asia", status:"projected" },
+      { name:"Azerbaijan", continent:"Asia", status:"projected" },
+      { name:"Kyrgyzstan", continent:"Asia", status:"projected" },
+      { name:"Tajikistan", continent:"Asia", status:"projected" },
+
+      // Africa (28)
+      { name:"South Africa", continent:"Africa", status:"active" },
+      { name:"Egypt", continent:"Africa", status:"active" },
+      { name:"Morocco", continent:"Africa", status:"active" },
+      { name:"Kenya", continent:"Africa", status:"active" },
+      { name:"Nigeria", continent:"Africa", status:"active" },
+      { name:"Ghana", continent:"Africa", status:"active" },
+      { name:"Tunisia", continent:"Africa", status:"active" },
+      { name:"Ethiopia", continent:"Africa", status:"soon" },
+      { name:"Tanzania", continent:"Africa", status:"soon" },
+      { name:"Uganda", continent:"Africa", status:"soon" },
+      { name:"Rwanda", continent:"Africa", status:"soon" },
+      { name:"Senegal", continent:"Africa", status:"soon" },
+      { name:"Ivory Coast", continent:"Africa", status:"soon" },
+      { name:"Zambia", continent:"Africa", status:"soon" },
+      { name:"Angola", continent:"Africa", status:"soon" },
+      { name:"Namibia", continent:"Africa", status:"soon" },
+      { name:"Botswana", continent:"Africa", status:"soon" },
+      { name:"Algeria", continent:"Africa", status:"projected" },
+      { name:"Libya", continent:"Africa", status:"projected" },
+      { name:"Sudan", continent:"Africa", status:"projected" },
+      { name:"Cameroon", continent:"Africa", status:"projected" },
+      { name:"Zimbabwe", continent:"Africa", status:"projected" },
+      { name:"Mozambique", continent:"Africa", status:"projected" },
+      { name:"Malawi", continent:"Africa", status:"projected" },
+      { name:"Mali", continent:"Africa", status:"projected" },
+      { name:"Niger", continent:"Africa", status:"projected" },
+      { name:"Benin", continent:"Africa", status:"projected" },
+      { name:"Madagascar", continent:"Africa", status:"projected" },
+
+      // Oceania (20)
+      { name:"Australia", continent:"Oceania", status:"active" },
+      { name:"New Zealand", continent:"Oceania", status:"active" },
+      { name:"Fiji", continent:"Oceania", status:"active" },
+      { name:"Papua New Guinea", continent:"Oceania", status:"active" },
+      { name:"Samoa", continent:"Oceania", status:"active" },
+      { name:"Tonga", continent:"Oceania", status:"soon" },
+      { name:"Vanuatu", continent:"Oceania", status:"soon" },
+      { name:"Solomon Islands", continent:"Oceania", status:"soon" },
+      { name:"New Caledonia", continent:"Oceania", status:"soon" },
+      { name:"French Polynesia", continent:"Oceania", status:"soon" },
+      { name:"Guam", continent:"Oceania", status:"soon" },
+      { name:"Northern Mariana Islands", continent:"Oceania", status:"soon" },
+      { name:"Palau", continent:"Oceania", status:"soon" },
+      { name:"Kiribati", continent:"Oceania", status:"projected" },
+      { name:"Marshall Islands", continent:"Oceania", status:"projected" },
+      { name:"Micronesia", continent:"Oceania", status:"projected" },
+      { name:"Nauru", continent:"Oceania", status:"projected" },
+      { name:"Tuvalu", continent:"Oceania", status:"projected" },
+      { name:"Cook Islands", continent:"Oceania", status:"projected" },
+      { name:"Niue", continent:"Oceania", status:"projected" }
+    ];
+
+    const industries = {
       "Home Services": [
         "Plumbing","HVAC","Electrical","Roofing","Windows & Doors","Flooring","Painting",
         "Appliance Repair","Landscaping","Pest Control","Cleaning Services","Pool Services",
-        "Garage Doors","Heating Services","Solar Installation","General Contracting"
+        "Garage Doors","Solar Installation","Handyman","General Contracting","Masonry",
+        "Locksmith","Junk Removal","Insulation","Pressure Washing","Gutter Services",
+        "Drywall Services","Cabinet Installation"
       ],
       "Healthcare": [
         "Medical Clinic","Dental","Physiotherapy","Chiropractic","Veterinary","Home Care",
-        "Mental Health Practice","Optometry","Wellness Clinic","Pharmacy"
-      ],
-      "Professional Services": [
-        "Law Firm","Accounting","Insurance","Consulting","Financial Services","Real Estate",
-        "Mortgage Brokerage","Tax Services","Architecture","Engineering"
+        "Mental Health Practice","Optometry","Wellness Clinic","Pharmacy","Occupational Therapy",
+        "Speech Therapy","Urgent Care","Podiatry","Hearing Clinic","Rehabilitation Center"
       ],
       "Beauty & Wellness": [
         "Salon","Med Spa","Barbershop","Massage Therapy","Nail Studio","Skin Care Clinic",
-        "Cosmetic Studio","Wellness Spa"
+        "Cosmetic Studio","Wellness Spa","Hair Removal","Tattoo Studio","Makeup Studio"
+      ],
+      "Professional Services": [
+        "Law Firm","Accounting","Bookkeeping","Insurance","Consulting","Financial Services",
+        "Tax Services","Architecture","Engineering","Marketing Agency","IT Services",
+        "HR Services","Business Coaching","Translation Services","Virtual Assistant Services"
+      ],
+      "Real Estate & Property": [
+        "Real Estate Agency","Mortgage Brokerage","Property Management","Home Inspection",
+        "Commercial Real Estate","Leasing Office","Real Estate Investing Office","Appraisal Services"
       ],
       "Automotive": [
         "Auto Repair","Tire Shop","Detailing","Collision Repair","Tow Service","Car Wash",
-        "Auto Glass","Dealership Service"
+        "Auto Glass","Dealership Service","Oil Change","Mobile Mechanic","Vehicle Inspection"
       ],
-      "Retail & Local": [
-        "Retail Store","Restaurant","Catering","Bakery","Education & Training","Security Services",
-        "Cleaning Company","Pet Services","Photography Studio","Printing Services"
+      "Retail & Local Business": [
+        "Retail Store","Convenience Store","Specialty Shop","Gift Shop","Electronics Store",
+        "Furniture Store","Clothing Store","Pet Store","Flower Shop","Printing Services",
+        "Phone Repair Shop","Computer Repair Shop"
       ],
-      "Hospitality": [
-        "Hotel","Motel","Short-Term Rental","Event Venue","Travel Service","Tour Operator"
+      "Food & Hospitality": [
+        "Restaurant","Cafe","Bakery","Catering","Food Delivery Kitchen","Hotel","Motel",
+        "Event Venue","Banquet Hall","Bar / Lounge","Bed and Breakfast"
+      ],
+      "Education & Training": [
+        "Tutoring Center","Education & Training","Driving School","Music School","Daycare",
+        "Language School","Test Prep Center","Online Course Business","Learning Center"
       ],
       "Fitness & Recreation": [
-        "Gym","Personal Training","Yoga Studio","Sports Facility","Dance Studio","Martial Arts"
-      ],
-      "Logistics & Moving": [
-        "Moving Company","Delivery Service","Courier Service","Storage Facility","Freight Services"
+        "Gym","Personal Training","Yoga Studio","Dance Studio","Martial Arts","Sports Facility",
+        "Swimming School","Recreation Center","Pilates Studio"
       ],
       "Reservations & Appointments": [
         "Restaurant Reservations","Clinic Appointments","Spa Reservations","Event Bookings",
-        "Rental Bookings","Consultation Bookings"
+        "Rental Bookings","Consultation Bookings","Tour Reservations","Facility Reservations"
+      ],
+      "Logistics & Moving": [
+        "Moving Company","Delivery Service","Courier Service","Storage Facility","Freight Services",
+        "Last-Mile Delivery","Packing Service","Warehousing Services"
+      ],
+      "Security & Field Services": [
+        "Security Services","Alarm Monitoring","CCTV Installation","Patrol Service",
+        "Fire Protection Services","Access Control Services","Guard Services"
+      ],
+      "B2B & Office Services": [
+        "Staffing Agency","Call Center Services","Office Cleaning","Document Services",
+        "Managed Services Provider","Commercial Maintenance","Wholesale Business",
+        "Procurement Services","Office Support Services"
+      ],
+      "Nonprofit & Community": [
+        "Nonprofit","Community Organization","Church Office","Association Office","Charity Services"
       ],
       "Other SMB": [
-        "Nonprofit","Church Office","Community Organization","Manufacturing Office",
-        "B2B Services","Custom Services","Other Local Business"
+        "Custom Services","Local Service Business","Franchise Location","Multi-Service Business",
+        "Manufacturing Office","Other Small Business"
       ]
     };
 
@@ -1141,7 +1267,7 @@
         key:"businessProfile",
         code:"1A",
         title:"Business Profile",
-        desc:"Select your country, your industry, and your business name to start the system build.",
+        desc:"Select your country, industry, and business name to start the system build.",
         questions:[
           { type:"countrySelector", label:"Select your country", key:"country" },
           { type:"industrySelector", label:"Select your industry", key:"industry" },
@@ -1247,7 +1373,8 @@
       values:{},
       demoWasUnlocked:false,
       countrySearch:"",
-      industrySearch:""
+      industrySearch:"",
+      waitlistJoined:false
     };
 
     steps.forEach(step => state.values[step.key] = {});
@@ -1256,6 +1383,10 @@
     const metaProgress = document.getElementById("metaProgress");
     const progressFill = document.getElementById("progressFill");
     const nextLabel = document.getElementById("nextLabel");
+    const introTitle = document.getElementById("introTitle");
+    const introText = document.getElementById("introText");
+    const bottomNote = document.getElementById("bottomNote");
+    const helperNote = document.getElementById("helperNote");
 
     const overlay = document.getElementById("overlay");
     const modalBody = document.getElementById("modalBody");
@@ -1267,12 +1398,34 @@
     const modalBack = document.getElementById("modalBack");
     const modalNext = document.getElementById("modalNext");
 
+    function normalizeText(value) {
+      return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+    }
+
+    function validEmail(email){
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function countryGroups() {
+      const groups = {};
+      for (const country of countries) {
+        if (!groups[country.continent]) groups[country.continent] = [];
+        groups[country.continent].push(country);
+      }
+      return groups;
+    }
+
     function isStepComplete(stepIndex){
+      if (state.waitlistJoined) return false;
       const step = steps[stepIndex];
       const v = state.values[step.key];
       return step.questions.every(item => {
         if (item.type === "countrySelector") {
-          return !!v.country && !!v.countryStatus && (v.countryStatus === "active" || validEmail(v.waitlistEmail || ""));
+          return !!v.country && v.countryStatus === "active";
         }
         const value = v[item.key];
         return typeof value === "string" ? value.trim().length > 0 : !!value;
@@ -1280,82 +1433,13 @@
     }
 
     function allComplete(){
+      if (state.waitlistJoined) return false;
       return steps.every((_, i) => isStepComplete(i));
     }
 
     function currentQuestion(){
       const step = steps[state.currentStepIndex];
       return step.questions[state.currentQuestionIndex];
-    }
-
-    function validEmail(email){
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function renderSteps(){
-      const buttonHtml = steps.map((step, i) => {
-        const complete = isStepComplete(i);
-        const active = i === state.activeStepIndex && !complete;
-        const locked = i > state.activeStepIndex && !complete;
-        const status = complete ? "Complete" : active ? "Next Step" : locked ? "Locked" : "Ready";
-
-        return `
-          <button type="button" class="step-btn ${complete ? "complete" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}" data-step="${i}">
-            <div class="row-top">
-              <div class="step-code">${step.code}</div>
-              <div class="step-status">${status}</div>
-            </div>
-            <div class="step-title">${step.title}</div>
-            <div class="step-footer">
-              <div class="step-hint">${complete ? stepSummary(i) : active ? "Press to continue" : "Available next"}</div>
-              <div class="step-dot"></div>
-            </div>
-          </button>
-        `;
-      }).join("");
-
-      const demoReady = allComplete();
-
-      const demoHtml = `
-        <button type="button" class="step-btn demo-btn ${demoReady ? "active" : "locked"} ${demoReady && !state.demoWasUnlocked ? "unlocked-once" : ""}" id="demoBtn">
-          <div class="row-top">
-            <div class="step-code">Step 2</div>
-            <div class="step-status">${demoReady ? "Unlocked" : "Locked"}</div>
-          </div>
-          <div class="step-title">Live Demo</div>
-          <div class="step-footer">
-            <div class="step-hint">${demoReady ? "Press to begin" : "Complete all steps"}</div>
-            <div class="step-dot"></div>
-          </div>
-        </button>
-      `;
-
-      stepsList.innerHTML = buttonHtml + demoHtml;
-
-      [...document.querySelectorAll("[data-step]")].forEach(btn => {
-        btn.addEventListener("click", () => {
-          const index = Number(btn.dataset.step);
-          if (index > state.activeStepIndex && !isStepComplete(index)) return;
-          openStep(index);
-        });
-      });
-
-      const demoBtn = document.getElementById("demoBtn");
-      demoBtn.addEventListener("click", () => {
-        if (!demoReady) return;
-        localStorage.setItem("aiCallPortStep1Final", JSON.stringify(state.values));
-        window.location.href = "/step2.html";
-      });
-
-      if (demoReady && !state.demoWasUnlocked) {
-        state.demoWasUnlocked = true;
-        setTimeout(() => {
-          const liveBtn = document.getElementById("demoBtn");
-          if (liveBtn) liveBtn.classList.remove("unlocked-once");
-        }, 450);
-      }
-
-      updateProgress();
     }
 
     function stepSummary(stepIndex){
@@ -1389,12 +1473,97 @@
       }
     }
 
+    function renderSteps(){
+      const buttonHtml = steps.map((step, i) => {
+        const complete = isStepComplete(i);
+        const active = !state.waitlistJoined && i === state.activeStepIndex && !complete;
+        const locked = state.waitlistJoined || (i > state.activeStepIndex && !complete);
+        const status = complete ? "Complete" : active ? "Next Step" : locked ? "Locked" : "Ready";
+
+        return `
+          <button type="button" class="step-btn ${complete ? "complete" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}" data-step="${i}">
+            <div class="row-top">
+              <div class="step-code">${step.code}</div>
+              <div class="step-status">${status}</div>
+            </div>
+            <div class="step-title">${step.title}</div>
+            <div class="step-footer">
+              <div class="step-hint">${complete ? stepSummary(i) : active ? "Press to continue" : state.waitlistJoined ? "Waitlist only" : "Available next"}</div>
+              <div class="step-dot"></div>
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      const demoReady = allComplete();
+
+      const demoHtml = `
+        <button type="button" class="step-btn demo-btn ${demoReady ? "active" : "locked"} ${demoReady && !state.demoWasUnlocked ? "unlocked-once" : ""}" id="demoBtn">
+          <div class="row-top">
+            <div class="step-code">Step 2</div>
+            <div class="step-status">${demoReady ? "Unlocked" : "Locked"}</div>
+          </div>
+          <div class="step-title">Live Demo</div>
+          <div class="step-footer">
+            <div class="step-hint">${demoReady ? "Press to begin" : state.waitlistJoined ? "Unavailable on waitlist" : "Complete all steps"}</div>
+            <div class="step-dot"></div>
+          </div>
+        </button>
+      `;
+
+      stepsList.innerHTML = buttonHtml + demoHtml;
+
+      [...document.querySelectorAll("[data-step]")].forEach(btn => {
+        btn.addEventListener("click", () => {
+          const index = Number(btn.dataset.step);
+          if (state.waitlistJoined) return;
+          if (index > state.activeStepIndex && !isStepComplete(index)) return;
+          openStep(index);
+        });
+      });
+
+      const demoBtn = document.getElementById("demoBtn");
+      demoBtn.addEventListener("click", () => {
+        if (!demoReady) return;
+        localStorage.setItem("aiCallPortStep1Final", JSON.stringify(state.values));
+        window.location.href = "/step2.html";
+      });
+
+      if (demoReady && !state.demoWasUnlocked) {
+        state.demoWasUnlocked = true;
+        setTimeout(() => {
+          const liveBtn = document.getElementById("demoBtn");
+          if (liveBtn) liveBtn.classList.remove("unlocked-once");
+        }, 450);
+      }
+
+      updateProgress();
+    }
+
     function updateProgress(){
       const done = steps.filter((_, i) => isStepComplete(i)).length;
+
+      if (state.waitlistJoined) {
+        metaProgress.textContent = "Waitlist Joined";
+        progressFill.style.width = "0%";
+        const country = state.values.businessProfile.country || "your country";
+        nextLabel.textContent = `We will notify you when ${country} becomes active`;
+        introTitle.textContent = "Waitlist request received";
+        introText.textContent = "Your country is not active yet. We will notify you as soon as activation becomes available.";
+        bottomNote.innerHTML = `Your country is currently on the <span>waitlist</span>`;
+        helperNote.textContent = "Activation steps remain locked until your country becomes active.";
+        return;
+      }
+
       metaProgress.textContent = `${done} of ${steps.length} Complete`;
       progressFill.style.width = `${(done / steps.length) * 100}%`;
+
       const nextStep = steps.find((_, i) => !isStepComplete(i));
       nextLabel.textContent = nextStep ? `Next Step: ${nextStep.title}` : "Step 1 Complete";
+      introTitle.textContent = "Complete the highlighted step";
+      introText.textContent = "The system guides the next action automatically.";
+      bottomNote.innerHTML = `Complete the highlighted step to unlock <span>Step 2 — Live Demo</span>`;
+      helperNote.textContent = "The bottom-right button becomes active when all configuration steps are complete.";
     }
 
     function openStep(stepIndex){
@@ -1421,7 +1590,7 @@
           <div class="question active">
             <div class="q-title">${question.label}</div>
             <div class="q-sub">Give us the exact information so we can configure this part of the system correctly.</div>
-            <input class="field" id="answerField" type="text" value="${escapeHtml(value)}" placeholder="${question.placeholder || ""}">
+            <input class="field" id="answerField" type="text" value="${escapeHtml(value)}" placeholder="${question.placeholder || ""}" dir="ltr">
           </div>
         `;
         const input = document.getElementById("answerField");
@@ -1434,7 +1603,7 @@
           <div class="question active">
             <div class="q-title">${question.label}</div>
             <div class="q-sub">Add anything important we should account for before the system is finalized.</div>
-            <textarea class="field textarea" id="answerField" placeholder="${question.placeholder || ""}">${escapeHtml(value)}</textarea>
+            <textarea class="field textarea" id="answerField" placeholder="${question.placeholder || ""}" dir="ltr">${escapeHtml(value)}</textarea>
           </div>
         `;
         const input = document.getElementById("answerField");
@@ -1480,10 +1649,11 @@
     function renderCountryQuestion(){
       const step = steps[state.currentStepIndex];
       const v = state.values[step.key];
-      const search = state.countrySearch.trim().toLowerCase();
+      const q = normalizeText(state.countrySearch);
+      const grouped = countryGroups();
 
-      const groups = Object.entries(countryData).map(([continent, items]) => {
-        const filtered = items.filter(item => item.name.toLowerCase().includes(search));
+      const groupHtml = Object.entries(grouped).map(([continent, items]) => {
+        const filtered = items.filter(item => normalizeText(item.name).includes(q));
         if (!filtered.length) return "";
         return `
           <div class="group-block">
@@ -1495,7 +1665,7 @@
                     <strong>${item.name}</strong>
                     <span>${countryStatusText(item.status)}</span>
                   </div>
-                  <div class="status-badge ${item.status}">${item.status}</div>
+                  <div class="status-badge ${item.status}">${item.status === "active" ? "Active" : item.status === "soon" ? "Coming Soon" : "Projected"}</div>
                 </button>
               `).join("")}
             </div>
@@ -1508,8 +1678,8 @@
           <div class="q-title">Select your country</div>
           <div class="q-sub">Only active countries can continue to activation. Coming soon and projected countries can join the waitlist.</div>
           <div class="selector-shell">
-            <input class="searchbar" id="countrySearch" type="text" placeholder="Search country" value="${escapeHtml(state.countrySearch)}">
-            <div class="selector-list">${groups || `<div class="group-block"><div class="group-title">No results</div></div>`}</div>
+            <input class="searchbar" id="countrySearch" type="text" placeholder="Search country" value="${escapeHtml(state.countrySearch)}" dir="ltr" autocapitalize="off" autocomplete="off" spellcheck="false">
+            <div class="selector-list">${groupHtml || `<div class="group-block"><div class="group-title">No Results</div></div>`}</div>
           </div>
           ${v.country && v.countryStatus && v.countryStatus !== "active" ? `
             <div class="waitlist-box">
@@ -1518,8 +1688,8 @@
                 <p>Join the waitlist and we will notify you as soon as your country is activated.</p>
               </div>
               <div class="waitlist-grid">
-                <input class="field" id="waitlistEmail" type="email" placeholder="Your email" value="${escapeHtml(v.waitlistEmail || "")}">
-                <input class="field" id="waitlistBusiness" type="text" placeholder="Business name" value="${escapeHtml(v.waitlistBusiness || v.businessName || "")}">
+                <input class="field" id="waitlistEmail" type="email" placeholder="Your email" value="${escapeHtml(v.waitlistEmail || "")}" dir="ltr">
+                <input class="field" id="waitlistBusiness" type="text" placeholder="Business name (optional)" value="${escapeHtml(v.waitlistBusiness || v.businessName || "")}" dir="ltr">
               </div>
             </div>
           ` : ``}
@@ -1528,6 +1698,7 @@
 
       const input = document.getElementById("countrySearch");
       input.focus();
+      input.selectionStart = input.selectionEnd = input.value.length;
       input.addEventListener("input", (e) => {
         state.countrySearch = e.target.value;
         renderCountryQuestion();
@@ -1547,16 +1718,17 @@
         });
       });
 
-      const waitEmail = document.getElementById("waitlistEmail");
-      const waitBusiness = document.getElementById("waitlistBusiness");
-      if (waitEmail) {
-        waitEmail.addEventListener("input", (e) => {
+      const emailInput = document.getElementById("waitlistEmail");
+      const businessInput = document.getElementById("waitlistBusiness");
+
+      if (emailInput) {
+        emailInput.addEventListener("input", (e) => {
           v.waitlistEmail = e.target.value.trim();
           validateModal();
         });
       }
-      if (waitBusiness) {
-        waitBusiness.addEventListener("input", (e) => {
+      if (businessInput) {
+        businessInput.addEventListener("input", (e) => {
           v.waitlistBusiness = e.target.value.trim();
         });
       }
@@ -1565,10 +1737,10 @@
     function renderIndustryQuestion(){
       const step = steps[state.currentStepIndex];
       const v = state.values[step.key];
-      const search = state.industrySearch.trim().toLowerCase();
+      const q = normalizeText(state.industrySearch);
 
-      const groups = Object.entries(industryData).map(([group, items]) => {
-        const filtered = items.filter(item => item.toLowerCase().includes(search));
+      const groupHtml = Object.entries(industries).map(([group, items]) => {
+        const filtered = items.filter(item => normalizeText(item).includes(q));
         if (!filtered.length) return "";
         return `
           <div class="group-block">
@@ -1580,7 +1752,7 @@
                     <strong>${item}</strong>
                     <span>${group}</span>
                   </div>
-                  <div class="status-badge active">Active</div>
+                  <div class="status-badge active">Select</div>
                 </button>
               `).join("")}
             </div>
@@ -1593,14 +1765,15 @@
           <div class="q-title">Select your industry</div>
           <div class="q-sub">Choose the industry that best matches your business so the system can apply the correct logic and language.</div>
           <div class="selector-shell">
-            <input class="searchbar" id="industrySearch" type="text" placeholder="Search industry" value="${escapeHtml(state.industrySearch)}">
-            <div class="selector-list">${groups || `<div class="group-block"><div class="group-title">No results</div></div>`}</div>
+            <input class="searchbar" id="industrySearch" type="text" placeholder="Search industry" value="${escapeHtml(state.industrySearch)}" dir="ltr" autocapitalize="off" autocomplete="off" spellcheck="false">
+            <div class="selector-list">${groupHtml || `<div class="group-block"><div class="group-title">No Results</div></div>`}</div>
           </div>
         </div>
       `;
 
       const input = document.getElementById("industrySearch");
       input.focus();
+      input.selectionStart = input.selectionEnd = input.value.length;
       input.addEventListener("input", (e) => {
         state.industrySearch = e.target.value;
         renderIndustryQuestion();
@@ -1616,17 +1789,11 @@
       });
     }
 
-    function countryStatusText(status){
-      if (status === "active") return "Available now";
-      if (status === "soon") return "Coming soon";
-      return "Projected market";
-    }
-
     function validateModal(){
       const step = steps[state.currentStepIndex];
       const question = currentQuestion();
-      let valid = false;
       const v = state.values[step.key];
+      let valid = false;
 
       if(question.type === "text" || question.type === "textarea"){
         const field = document.getElementById("answerField");
@@ -1645,8 +1812,13 @@
         }
       }
 
+      if (question.type === "countrySelector" && v.countryStatus && v.countryStatus !== "active") {
+        modalNext.textContent = "Join Waitlist";
+      } else {
+        modalNext.textContent = state.currentQuestionIndex === step.questions.length - 1 ? "Save Step" : "Continue";
+      }
+
       modalNext.disabled = !valid;
-      modalNext.textContent = state.currentQuestionIndex === step.questions.length - 1 ? "Save Step" : "Continue";
     }
 
     function saveCurrentAnswer(){
@@ -1660,7 +1832,18 @@
 
     modalNext.addEventListener("click", () => {
       saveCurrentAnswer();
+
       const step = steps[state.currentStepIndex];
+      const question = currentQuestion();
+      const v = state.values[step.key];
+
+      // Country waitlist branch blocks further setup
+      if (question.type === "countrySelector" && v.countryStatus && v.countryStatus !== "active") {
+        state.waitlistJoined = true;
+        overlay.classList.remove("show");
+        renderSteps();
+        return;
+      }
 
       if(state.currentQuestionIndex < step.questions.length - 1){
         state.currentQuestionIndex += 1;
@@ -1690,6 +1873,12 @@
     overlay.addEventListener("click", (e) => {
       if(e.target === overlay) overlay.classList.remove("show");
     });
+
+    function countryStatusText(status){
+      if (status === "active") return "Available now";
+      if (status === "soon") return "Coming soon";
+      return "Projected market";
+    }
 
     function optionDescription(key, option){
       const map = {
