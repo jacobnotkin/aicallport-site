@@ -1,3 +1,7 @@
+Gmail	Jacob Notkin <jacobhomeplex@gmail.com>
+(no subject)
+Jacob Notkin <jacobhomeplex@gmail.com>	Tue, Mar 24, 2026 at 5:23 PM
+To: Jacob Notkin <jacobhomeplex@gmail.com>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +19,7 @@
 --muted2:rgba(148,163,184,.68);
 --orange:#f97316;
 --orange2:#ea580c;
+--green:#22c55e;
 --blue:#38bdf8;
 }
 
@@ -869,6 +874,84 @@ color:#fff;
 font-weight:700;
 }
 
+.doc-links{
+display:grid;
+gap:12px;
+max-width:700px;
+margin:0 auto 18px;
+}
+
+.doc-btn{
+width:100%;
+min-height:56px;
+border-radius:16px;
+border:1px solid rgba(255,255,255,.08);
+background:rgba(255,255,255,.03);
+color:#fff;
+font-size:15px;
+font-weight:900;
+letter-spacing:.04em;
+cursor:pointer;
+text-align:left;
+padding:0 16px;
+}
+
+.doc-btn:hover{
+border-color:rgba(255,255,255,.14);
+background:rgba(255,255,255,.05);
+}
+
+.doc-view{
+max-width:760px;
+margin:0 auto;
+text-align:left;
+display:grid;
+gap:16px;
+}
+
+.doc-scroll{
+max-height:48vh;
+overflow:auto;
+border:1px solid rgba(255,255,255,.08);
+background:rgba(255,255,255,.03);
+border-radius:18px;
+padding:18px;
+}
+
+.doc-scroll h3{
+margin:0 0 12px;
+font-size:24px;
+color:var(--orange);
+letter-spacing:-.03em;
+}
+
+.doc-scroll p{
+margin:0 0 12px;
+font-size:15px;
+line-height:1.5;
+color:#fff;
+font-weight:600;
+}
+
+.doc-scroll ul{
+margin:0 0 14px 18px;
+padding:0;
+}
+
+.doc-scroll li{
+margin:0 0 10px;
+font-size:15px;
+line-height:1.5;
+color:#fff;
+font-weight:600;
+}
+
+.doc-actions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
 .modal-foot{
 padding:18px 26px 22px;
 border-top:1px solid rgba(255,255,255,.06);
@@ -1072,7 +1155,8 @@ font-size:16px;
 }
 
 .options,
-.timer-box{
+.timer-box,
+.doc-actions{
 grid-template-columns:1fr;
 }
 
@@ -1174,6 +1258,64 @@ min-width:0;
 <script>
 const step1Data = JSON.parse(localStorage.getItem("aiCallPortStep1Final") || "{}");
 
+const legalDocs = {
+beta: {
+title: "Beta Access Terms",
+html: `
+<h3>Beta Access Terms</h3>
+<p>AI Call Port is currently offered as a beta service. By continuing, you understand that features, call behavior, dashboards, CRM elements, routing logic, reporting, and integrations may change during the beta period.</p>
+<ul>
+<li>Beta access is provided for evaluation, testing, onboarding, and configuration purposes.</li>
+<li>Features may be updated, suspended, removed, or reconfigured without notice during the beta stage.</li>
+<li>Demo behavior may differ from final production behavior after review and activation.</li>
+<li>Access to beta functionality does not guarantee permanent availability of any specific feature.</li>
+</ul>
+<p>These terms are intended to set expectations for testing, access, and early use of the system.</p>
+`
+},
+privacy: {
+title: "Privacy and Data Use",
+html: `
+<h3>Privacy and Data Use</h3>
+<p>AI Call Port uses the information you provide to configure, test, document, and prepare your AI call system for activation.</p>
+<ul>
+<li>We may store business details, service information, routing preferences, scheduling rules, communication settings, and user contact details.</li>
+<li>We may process demo-related call data, system notes, workflow selections, and onboarding inputs to prepare your account.</li>
+<li>Business information submitted during onboarding is used only for setup, review, support, service delivery, and activation preparation.</li>
+<li>You confirm that the information you submit is accurate and that you are authorized to provide it for company use.</li>
+</ul>
+<p>Any final production privacy terms may be expanded at activation.</p>
+`
+},
+security: {
+title: "Security and Access Rules",
+html: `
+<h3>Security and Access Rules</h3>
+<p>To protect both your company and AI Call Port, access and setup rules apply during onboarding, demo access, and activation.</p>
+<ul>
+<li>You are responsible for protecting your login credentials and limiting access to authorized personnel.</li>
+<li>You confirm that the business phone number, operational information, and business workflow details submitted are authorized for use.</li>
+<li>You agree not to misuse, reverse engineer, disrupt, or attempt to interfere with platform logic, routing, or security controls.</li>
+<li>Administrative access, CRM access, and future production access may be limited or revoked in cases of misuse or unauthorized activity.</li>
+</ul>
+<p>Activation may require additional access verification and account approval.</p>
+`
+},
+authorization: {
+title: "Business Authorization Acknowledgment",
+html: `
+<h3>Business Authorization Acknowledgment</h3>
+<p>By continuing, you confirm that you are authorized by your company or business to submit the business name, phone number, workflow information, operational details, and service preferences used to configure this AI system.</p>
+<ul>
+<li>You have authority to request testing, setup, or activation for this business.</li>
+<li>You have authority to connect or test the listed business phone number.</li>
+<li>You understand that activation proceeds only after review, approval, and final commercial confirmation.</li>
+</ul>
+<p>This acknowledgment helps protect both your company and AI Call Port from unauthorized configuration requests.</p>
+`
+}
+};
+
 const scenarioPrompts = {
 standard: [
 "Hi, I’d like to book a service.",
@@ -1220,7 +1362,7 @@ questions:[
 key:"documentationAgreement",
 code:"2B",
 title:"Documentation Agreement",
-desc:"Accept terms before accessing the live demo.",
+desc:"Review the required documents and accept the agreement before demo access.",
 questions:[
 { type:"agreement", key:"accepted" }
 ]
@@ -1280,10 +1422,13 @@ values:{},
 demoSeconds:0,
 demoInterval:null,
 demoRoleIndex:0,
-currentScenario:""
+currentScenario:"",
+activeDocKey:null,
+docsOpened:{}
 };
 
 steps.forEach(step => state.values[step.key] = {});
+Object.keys(legalDocs).forEach(key => state.docsOpened[key] = false);
 
 const stepsList = document.getElementById("stepsList");
 const metaProgress = document.getElementById("metaProgress");
@@ -1324,6 +1469,10 @@ return String(str)
 .replaceAll("'", "&#039;");
 }
 
+function hasViewedAllDocs(){
+return Object.values(state.docsOpened).every(Boolean);
+}
+
 function isStepComplete(stepIndex){
 const step = steps[stepIndex];
 const v = state.values[step.key];
@@ -1333,8 +1482,8 @@ if (q.type === "text") return !!v[q.key] && v[q.key].trim().length > 0;
 if (q.type === "options") return !!v[q.key];
 if (q.type === "callInstructions") return v[q.key] === true;
 if (q.type === "guidedDemo") return v[q.key] === true;
-if (q.type === "signup") return !!v.email && isValidEmail(v.email) && !!v.fullName && !!v.password && v.password.length >= 6;
-if (q.type === "agreement") return v.accepted === true;
+if (q.type === "signup") return !!v.email && isValidEmail(v.email) && !!v.fullName && !!v.password && v.password.length >= 6 && !!v.businessName;
+if (q.type === "agreement") return v.accepted === true && hasViewedAllDocs();
 return false;
 });
 }
@@ -1451,7 +1600,7 @@ if (nextStep?.key === "signUp") {
 introTitle.textContent = "Create your account first";
 introText.textContent = "Sign up is required before the live demo is available.";
 } else if (nextStep?.key === "documentationAgreement") {
-introTitle.textContent = "Accept the agreement";
+introTitle.textContent = "Review and accept required documents";
 introText.textContent = "Documentation agreement unlocks the demo access steps.";
 } else {
 introTitle.textContent = "Complete the highlighted access step";
@@ -1462,6 +1611,7 @@ introText.textContent = "The system guides the next action automatically.";
 function openStep(stepIndex){
 state.currentStepIndex = stepIndex;
 state.currentQuestionIndex = 0;
+state.activeDocKey = null;
 updateModal();
 overlay.classList.add("show");
 }
@@ -1528,28 +1678,73 @@ document.getElementById(id).addEventListener("input", validateModal);
 }
 
 function renderAgreementQuestion(){
+if (state.activeDocKey) {
+const doc = legalDocs[state.activeDocKey];
 modalBody.innerHTML = `
 <div class="question active">
-<div class="q-title">Before you continue</div>
-<div class="q-sub">Quick confirmation before unlocking your live demo.</div>
+<div class="q-title">${escapeHtml(doc.title)}</div>
+<div class="q-sub">Read the document below, then return to the agreement step.</div>
+
+<div class="doc-view">
+<div class="doc-scroll">${doc.html}</div>
+<div class="doc-actions">
+<button type="button" class="ghost-btn" id="docBackBtn">Back to Agreement</button>
+<button type="button" class="primary-btn" id="docMarkBtn">Mark as Read</button>
+</div>
+</div>
+</div>
+`;
+
+document.getElementById("docBackBtn").addEventListener("click", () => {
+state.activeDocKey = null;
+renderAgreementQuestion();
+validateModal();
+});
+
+document.getElementById("docMarkBtn").addEventListener("click", () => {
+state.docsOpened[state.activeDocKey] = true;
+state.activeDocKey = null;
+renderAgreementQuestion();
+validateModal();
+});
+return;
+}
+
+modalBody.innerHTML = `
+<div class="question active">
+<div class="q-title">Documentation Agreement</div>
+<div class="q-sub">Review the required documents below. All documents must be marked as read before you can accept and continue.</div>
+
+<div class="doc-links">
+<button type="button" class="doc-btn" data-doc="beta">Open Beta Access Terms ${state.docsOpened.beta ? "✓" : ""}</button>
+<button type="button" class="doc-btn" data-doc="privacy">Open Privacy and Data Use ${state.docsOpened.privacy ? "✓" : ""}</button>
+<button type="button" class="doc-btn" data-doc="security">Open Security and Access Rules ${state.docsOpened.security ? "✓" : ""}</button>
+<button type="button" class="doc-btn" data-doc="authorization">Open Business Authorization Acknowledgment ${state.docsOpened.authorization ? "✓" : ""}</button>
+</div>
 
 <div class="agreement-wrap">
 <div class="prompt-box" style="text-align:left;">
-<div class="prompt-item">We use your setup data to configure your AI system.</div>
-<div class="prompt-item">Your demo behavior reflects your actual business inputs.</div>
-<div class="prompt-item">You confirm you are authorized to use this business information.</div>
-<div class="prompt-item">Activation happens after review and approval.</div>
+<div class="prompt-item">Required documents reviewed: ${Object.values(state.docsOpened).filter(Boolean).length} of ${Object.keys(legalDocs).length}</div>
+<div class="prompt-item">You must review all standard documents before proceeding to the live demo.</div>
 </div>
 
 <div class="agreement-check">
 <label>
 <input id="agreementCheck" type="checkbox" ${state.values.documentationAgreement.accepted ? "checked" : ""}>
-<span>I agree and want to continue</span>
+<span>I have reviewed the required documents and I agree to continue.</span>
 </label>
 </div>
 </div>
 </div>
 `;
+
+[...document.querySelectorAll("[data-doc]")].forEach(btn => {
+btn.addEventListener("click", () => {
+state.activeDocKey = btn.dataset.doc;
+renderAgreementQuestion();
+validateModal();
+});
+});
 
 document.getElementById("agreementCheck").addEventListener("change", e=>{
 state.values.documentationAgreement.accepted = e.target.checked;
@@ -1708,7 +1903,7 @@ const pass = document.getElementById("signupPassword")?.value.trim() || "";
 const business = document.getElementById("signupBusiness")?.value.trim() || "";
 valid = name.length > 0 && isValidEmail(email) && pass.length >= 6 && business.length > 0;
 } else if (question.type === "agreement") {
-valid = state.values.documentationAgreement.accepted === true;
+valid = state.values.documentationAgreement.accepted === true && hasViewedAllDocs() && !state.activeDocKey;
 }
 
 modalNext.disabled = !valid;
@@ -1772,6 +1967,13 @@ renderSteps();
 });
 
 modalBack.addEventListener("click", () => {
+if (state.activeDocKey) {
+state.activeDocKey = null;
+renderAgreementQuestion();
+validateModal();
+return;
+}
+
 if (state.currentQuestionIndex === 0){
 overlay.classList.remove("show");
 stopDemoTimer();
@@ -1785,12 +1987,14 @@ updateModal();
 modalClose.addEventListener("click", () => {
 overlay.classList.remove("show");
 stopDemoTimer();
+state.activeDocKey = null;
 });
 
 overlay.addEventListener("click", (e) => {
 if (e.target === overlay) {
 overlay.classList.remove("show");
 stopDemoTimer();
+state.activeDocKey = null;
 }
 });
 
