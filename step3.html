@@ -1,1156 +1,1156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Call Port — Beta</title>
-<style>
-:root{
---bg:#06080f;
---bg2:#0a0d14;
---panel:rgba(12,14,21,.92);
---panel-2:rgba(255,255,255,.03);
---border:rgba(255,255,255,.08);
---border-soft:rgba(255,255,255,.05);
---text:rgba(255,255,255,.96);
---muted:rgba(203,213,225,.78);
---muted2:rgba(148,163,184,.62);
---orange:#f97316;
---orange2:#ea580c;
---shadow:0 24px 60px rgba(0,0,0,.34);
---radius-xl:30px;
---radius-lg:22px;
---radius-md:16px;
-}
-
-*{
-box-sizing:border-box;
-min-width:0;
-}
-
-html,body{
-margin:0;
-padding:0;
-min-height:100%;
-scroll-behavior:smooth;
-overflow-x:hidden;
-}
-
-body{
-font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-color:var(--text);
-background:
-radial-gradient(circle at 18% 14%, rgba(249,115,22,.07), transparent 20%),
-radial-gradient(circle at 82% 10%, rgba(249,115,22,.05), transparent 16%),
-linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
-}
-
-.grid-bg{
-position:fixed;
-inset:0;
-pointer-events:none;
-opacity:.18;
-background:
-linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
-linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
-background-size:42px 42px;
-mask-image:radial-gradient(circle at center, black 38%, transparent 96%);
-z-index:0;
-}
-
-.page{
-position:relative;
-z-index:1;
-}
-
-.shell{
-width:min(1380px, calc(100vw - 28px));
-margin:18px auto;
-border-radius:32px;
-border:1px solid rgba(255,255,255,.10);
-background:linear-gradient(180deg, rgba(17,19,28,.96), rgba(10,12,18,.98));
-box-shadow:0 10px 40px rgba(0,0,0,.38);
-overflow:hidden;
-}
-
-.topbar{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:16px;
-padding:20px 28px 0;
-}
-
-.brand{
-display:flex;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-}
-
-.brand-mark{
-width:16px;
-height:16px;
-border-radius:5px;
-background:var(--orange);
-box-shadow:0 0 18px rgba(249,115,22,.34);
-}
-
-.brand-name{
-font-size:15px;
-font-weight:900;
-letter-spacing:.03em;
-text-transform:uppercase;
-color:#fff;
-}
-
-.beta{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-height:22px;
-padding:0 8px;
-border-radius:999px;
-border:1px solid rgba(249,115,22,.22);
-background:rgba(249,115,22,.08);
-font-size:10px;
-font-weight:900;
-letter-spacing:.16em;
-text-transform:uppercase;
-color:#fff;
-}
-
-.top-actions{
-display:flex;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-}
-
-.mini-btn{
-min-height:42px;
-padding:0 16px;
-border-radius:14px;
-border:1px solid var(--border);
-background:rgba(255,255,255,.03);
-color:#fff;
-text-decoration:none;
-display:inline-flex;
-align-items:center;
-justify-content:center;
-font-size:12px;
-font-weight:900;
-letter-spacing:.12em;
-text-transform:uppercase;
-transition:.18s ease;
-}
-
-.mini-btn:hover{
-background:rgba(255,255,255,.05);
-transform:translateY(-1px);
-}
-
-.hero{
-display:grid;
-grid-template-columns:1.02fr .98fr;
-gap:26px;
-align-items:center;
-padding:28px 28px 34px;
-}
-
-.copy{
-padding:6px 8px 6px 0;
-}
-
-.eyebrow{
-display:inline-flex;
-align-items:center;
-gap:10px;
-min-height:34px;
-padding:0 14px;
-border-radius:999px;
-border:1px solid rgba(249,115,22,.18);
-background:rgba(249,115,22,.06);
-color:#fff;
-font-size:11px;
-font-weight:900;
-letter-spacing:.16em;
-text-transform:uppercase;
-margin-bottom:18px;
-}
-
-.eyebrow-dot{
-width:8px;
-height:8px;
-border-radius:999px;
-background:var(--orange);
-animation:eyebrowPulse 1.8s ease-in-out infinite;
-}
-
-h1{
-margin:0;
-font-size:clamp(42px,6vw,88px);
-line-height:.92;
-letter-spacing:-.08em;
-font-weight:900;
-color:#fff;
-}
-
-.headline-accent{
-display:block;
-color:var(--orange);
-}
-
-.sub{
-margin:18px 0 0;
-max-width:760px;
-font-size:clamp(18px,2.1vw,24px);
-line-height:1.42;
-color:var(--muted);
-font-weight:700;
-}
-
-.micro{
-margin-top:18px;
-max-width:760px;
-font-size:15px;
-line-height:1.48;
-color:var(--muted2);
-font-weight:700;
-}
-
-.cta-row{
-display:flex;
-flex-wrap:wrap;
-gap:14px;
-margin-top:30px;
-}
-
-.btn{
-min-height:56px;
-padding:0 22px;
-border-radius:16px;
-border:1px solid rgba(255,255,255,.10);
-text-decoration:none;
-display:inline-flex;
-align-items:center;
-justify-content:center;
-font-size:14px;
-font-weight:900;
-letter-spacing:.12em;
-text-transform:uppercase;
-transition:.18s ease;
-}
-
-.btn-primary{
-background:linear-gradient(90deg,var(--orange),var(--orange2));
-color:#fff;
-box-shadow:0 10px 30px rgba(249,115,22,.18);
-}
-
-.btn-primary:hover{
-transform:translateY(-1px);
-filter:brightness(1.05);
-}
-
-.btn-secondary{
-background:rgba(255,255,255,.03);
-color:#fff;
-}
-
-.btn-secondary:hover{
-transform:translateY(-1px);
-background:rgba(255,255,255,.05);
-}
-
-.stats{
-display:grid;
-grid-template-columns:repeat(3,minmax(0,1fr));
-gap:12px;
-margin-top:28px;
-max-width:760px;
-}
-
-.stat{
-border:1px solid var(--border);
-background:rgba(255,255,255,.03);
-border-radius:18px;
-padding:16px;
-}
-
-.stat strong{
-display:block;
-font-size:28px;
-line-height:1;
-letter-spacing:-.05em;
-font-weight:900;
-color:#fff;
-}
-
-.stat span{
-display:block;
-margin-top:7px;
-font-size:13px;
-line-height:1.35;
-color:var(--muted);
-font-weight:800;
-letter-spacing:.08em;
-text-transform:uppercase;
-}
-
-.visual-wrap{
-position:relative;
-min-height:620px;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.visual-panel{
-position:relative;
-width:min(100%, 720px);
-aspect-ratio:1/1;
-border-radius:32px;
-border:1px solid rgba(255,255,255,.08);
-background:
-linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),
-rgba(10,12,18,.76);
-overflow:hidden;
-box-shadow:var(--shadow);
-}
-
-.visual-glow{
-position:absolute;
-inset:auto auto -18% -10%;
-width:55%;
-height:55%;
-background:radial-gradient(circle, rgba(249,115,22,.16), transparent 65%);
-pointer-events:none;
-filter:blur(10px);
-}
-
-.hero-image{
-position:absolute;
-inset:0;
-width:100%;
-height:100%;
-object-fit:cover;
-opacity:.56;
-transform:scale(1.04);
-filter:saturate(.92) contrast(1.03) brightness(.86);
-animation:imageIn 1.4s ease-out both;
-}
-
-.image-scrim{
-position:absolute;
-inset:0;
-background:
-radial-gradient(circle at center, transparent 25%, rgba(6,8,15,.18) 65%, rgba(6,8,15,.56) 100%),
-linear-gradient(180deg, rgba(6,8,15,.18), rgba(6,8,15,.38));
-}
-
-.system-title{
-position:absolute;
-top:18px;
-left:20px;
-right:20px;
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:14px;
-z-index:3;
-}
-
-.system-chip{
-display:inline-flex;
-align-items:center;
-gap:10px;
-min-height:34px;
-padding:0 14px;
-border-radius:999px;
-border:1px solid rgba(255,255,255,.10);
-background:rgba(9,11,17,.45);
-backdrop-filter:blur(10px);
-font-size:12px;
-font-weight:900;
-letter-spacing:.12em;
-text-transform:uppercase;
-color:#fff;
-}
-
-.system-chip .pulse{
-width:8px;
-height:8px;
-border-radius:999px;
-background:var(--orange);
-animation:chipPulse 1.5s ease-in-out infinite;
-}
-
-.system-chip.alt{
-color:var(--muted);
-}
-
-.lines-svg{
-position:absolute;
-inset:0;
-width:100%;
-height:100%;
-z-index:2;
-pointer-events:none;
-}
-
-.flow-line{
-stroke:rgba(249,115,22,.18);
-stroke-width:1.6;
-fill:none;
-stroke-linecap:round;
-stroke-dasharray:8 10;
-animation:lineFlow 5.2s linear infinite;
-}
-
-.flow-line.active{
-stroke:rgba(249,115,22,.45);
-animation-duration:2.6s;
-}
-
-.node{
-position:absolute;
-z-index:4;
-width:18px;
-height:18px;
-border-radius:999px;
-border:2px solid rgba(255,255,255,.14);
-background:rgba(8,10,17,.78);
-box-shadow:0 0 0 0 rgba(249,115,22,0);
-transform:translate(-50%,-50%);
-}
-
-.node::after{
-content:"";
-position:absolute;
-inset:3px;
-border-radius:999px;
-background:rgba(255,255,255,.12);
-}
-
-.node.active{
-border-color:rgba(249,115,22,.72);
-box-shadow:0 0 24px rgba(249,115,22,.40), 0 0 0 10px rgba(249,115,22,0);
-animation:nodePulse 1.8s ease-in-out infinite;
-}
-
-.node.active::after{
-background:var(--orange);
-}
-
-.node-label{
-position:absolute;
-z-index:5;
-min-width:150px;
-max-width:210px;
-padding:10px 12px;
-border-radius:14px;
-border:1px solid rgba(255,255,255,.08);
-background:rgba(9,11,17,.74);
-backdrop-filter:blur(10px);
-opacity:0;
-transform:translateY(8px);
-animation:labelIn .7s ease forwards;
-box-shadow:0 16px 30px rgba(0,0,0,.28);
-}
-
-.node-label strong{
-display:block;
-font-size:13px;
-line-height:1.05;
-letter-spacing:.03em;
-text-transform:uppercase;
-color:#fff;
-font-weight:900;
-}
-
-.node-label span{
-display:block;
-margin-top:4px;
-font-size:12px;
-line-height:1.35;
-color:var(--muted);
-font-weight:800;
-}
-
-.node-label.active strong{
-color:var(--orange);
-}
-
-.orbit-ring{
-position:absolute;
-inset:9%;
-border-radius:999px;
-border:1px solid rgba(255,255,255,.05);
-z-index:1;
-}
-
-.orbit-ring.r2{
-inset:19%;
-border-color:rgba(255,255,255,.04);
-}
-
-.orbit-ring.r3{
-inset:31%;
-border-color:rgba(249,115,22,.06);
-}
-
-.section{
-padding:0 28px 28px;
-}
-
-.system-section{
-border-top:1px solid rgba(255,255,255,.06);
-padding-top:26px;
-}
-
-.section-card{
-border:1px solid rgba(255,255,255,.08);
-border-radius:28px;
-background:linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,.016));
-padding:28px;
-overflow:hidden;
-}
-
-.section-head{
-text-align:center;
-max-width:940px;
-margin:0 auto 28px;
-}
-
-.section-eyebrow{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-min-height:32px;
-padding:0 14px;
-border-radius:999px;
-border:1px solid rgba(249,115,22,.18);
-background:rgba(249,115,22,.06);
-color:#fff;
-font-size:11px;
-font-weight:900;
-letter-spacing:.16em;
-text-transform:uppercase;
-margin-bottom:16px;
-}
-
-.section-head h2{
-margin:0;
-font-size:clamp(34px,5vw,68px);
-line-height:.96;
-letter-spacing:-.07em;
-font-weight:900;
-color:#fff;
-}
-
-.section-head h2 span{
-color:var(--orange);
-}
-
-.section-head p{
-margin:16px auto 0;
-max-width:820px;
-font-size:18px;
-line-height:1.45;
-color:var(--muted);
-font-weight:700;
-}
-
-.chips{
-display:flex;
-flex-wrap:wrap;
-gap:10px;
-justify-content:center;
-margin-top:24px;
-}
-
-.chip{
-min-height:34px;
-padding:0 12px;
-border-radius:999px;
-border:1px solid rgba(255,255,255,.08);
-background:rgba(255,255,255,.03);
-color:var(--muted);
-display:inline-flex;
-align-items:center;
-justify-content:center;
-font-size:11px;
-font-weight:900;
-letter-spacing:.12em;
-text-transform:uppercase;
-}
-
-.ai-grid{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:14px;
-margin-top:28px;
-}
-
-.ai-col{
-background:rgba(255,255,255,.02);
-border:1px solid rgba(255,255,255,.06);
-border-radius:20px;
-padding:16px;
-opacity:.42;
-transform:translateY(10px);
-transition:.4s ease;
-min-height:290px;
-display:flex;
-flex-direction:column;
-gap:10px;
-}
-
-.ai-col.active{
-opacity:1;
-border-color:rgba(249,115,22,.5);
-box-shadow:0 0 25px rgba(249,115,22,.12);
-transform:translateY(0);
-}
-
-.ai-col-top{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:10px;
-}
-
-.ai-col-num{
-font-size:11px;
-color:var(--muted2);
-font-weight:900;
-letter-spacing:.12em;
-text-transform:uppercase;
-}
-
-.ai-col-arrow{
-color:var(--orange);
-font-size:16px;
-font-weight:900;
-}
-
-.ai-col-title{
-font-size:22px;
-line-height:1.05;
-font-weight:900;
-letter-spacing:-.04em;
-color:#fff;
-margin-top:2px;
-}
-
-.ai-col-sub{
-font-size:13px;
-line-height:1.4;
-color:var(--muted2);
-font-weight:700;
-min-height:52px;
-}
-
-.ai-agent{
-font-size:13px;
-padding:10px 10px 11px;
-border-radius:12px;
-background:rgba(255,255,255,.03);
-border:1px solid rgba(255,255,255,.06);
-display:grid;
-gap:4px;
-}
-
-.ai-agent small{
-display:block;
-color:rgba(249,115,22,.82);
-font-size:10px;
-font-weight:900;
-letter-spacing:.16em;
-text-transform:uppercase;
-}
-
-.ai-agent span{
-display:block;
-color:#fff;
-font-weight:800;
-line-height:1.32;
-font-size:13px;
-}
-
-.ai-cta{
-display:flex;
-justify-content:center;
-margin-top:28px;
-}
-
-.footer-strip{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:16px;
-padding:20px 28px 26px;
-border-top:1px solid rgba(255,255,255,.06);
-}
-
-.footer-note{
-font-size:14px;
-line-height:1.4;
-color:var(--muted2);
-font-weight:700;
-}
-
-.footer-note span{
-color:var(--orange);
-font-weight:900;
-}
-
-@keyframes imageIn{
-from{ opacity:0; transform:scale(1.08); }
-to{ opacity:.56; transform:scale(1.04); }
-}
-
-@keyframes labelIn{
-to{ opacity:1; transform:translateY(0); }
-}
-
-@keyframes nodePulse{
-0%,100%{ transform:translate(-50%,-50%) scale(1); }
-50%{ transform:translate(-50%,-50%) scale(1.16); }
-}
-
-@keyframes lineFlow{
-from{ stroke-dashoffset:0; }
-to{ stroke-dashoffset:-72; }
-}
-
-@keyframes chipPulse{
-0%,100%{ transform:scale(1); opacity:1; }
-50%{ transform:scale(1.35); opacity:.88; }
-}
-
-@keyframes eyebrowPulse{
-0%,100%{ transform:scale(1); opacity:1; }
-50%{ transform:scale(1.25); opacity:.85; }
-}
-
-@media (max-width: 1180px){
-.hero{
-grid-template-columns:1fr;
-gap:22px;
-}
-
-.copy{
-padding-right:0;
-}
-
-.visual-wrap{
-min-height:unset;
-}
-
-.visual-panel{
-max-width:760px;
-}
-
-.ai-grid{
-grid-template-columns:repeat(3,1fr);
-}
-}
-
-@media (max-width: 760px){
-.shell{
-width:calc(100vw - 16px);
-margin:8px auto;
-border-radius:22px;
-}
-
-.topbar,
-.hero,
-.section,
-.footer-strip{
-padding-left:14px;
-padding-right:14px;
-}
-
-.topbar{
-flex-wrap:wrap;
-}
-
-h1{
-font-size:44px;
-}
-
-.sub{
-font-size:18px;
-}
-
-.stats{
-grid-template-columns:1fr;
-}
-
-.visual-panel{
-border-radius:24px;
-}
-
-.system-title{
-flex-direction:column;
-align-items:flex-start;
-}
-
-.node-label{
-min-width:120px;
-max-width:160px;
-padding:8px 10px;
-}
-
-.section-card{
-padding:18px;
-border-radius:22px;
-}
-
-.ai-grid{
-grid-template-columns:1fr;
-}
-
-.footer-strip{
-flex-direction:column;
-align-items:flex-start;
-}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Call Port — Beta</title>
+  <style>
+    :root{
+      --bg:#06080f;
+      --bg2:#0a0d14;
+      --panel:rgba(12,14,21,.92);
+      --panel-2:rgba(255,255,255,.03);
+      --border:rgba(255,255,255,.08);
+      --border-soft:rgba(255,255,255,.05);
+      --text:rgba(255,255,255,.96);
+      --muted:rgba(203,213,225,.78);
+      --muted2:rgba(148,163,184,.62);
+      --orange:#f97316;
+      --orange2:#ea580c;
+      --shadow:0 24px 60px rgba(0,0,0,.34);
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:16px;
+    }
+
+    *{
+      box-sizing:border-box;
+      min-width:0;
+    }
+
+    html,body{
+      margin:0;
+      padding:0;
+      min-height:100%;
+      scroll-behavior:smooth;
+      overflow-x:hidden;
+    }
+
+    body{
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 18% 14%, rgba(249,115,22,.07), transparent 20%),
+        radial-gradient(circle at 82% 10%, rgba(249,115,22,.05), transparent 16%),
+        linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+    }
+
+    .grid-bg{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.18;
+      background:
+        linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(circle at center, black 38%, transparent 96%);
+      z-index:0;
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+    }
+
+    .shell{
+      width:min(1380px, calc(100vw - 28px));
+      margin:18px auto;
+      border-radius:32px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(17,19,28,.96), rgba(10,12,18,.98));
+      box-shadow:0 10px 40px rgba(0,0,0,.38);
+      overflow:hidden;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:20px 28px 0;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .brand-mark{
+      width:16px;
+      height:16px;
+      border-radius:5px;
+      background:var(--orange);
+      box-shadow:0 0 18px rgba(249,115,22,.34);
+    }
+
+    .brand-name{
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+      color:#fff;
+    }
+
+    .beta{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      height:22px;
+      padding:0 8px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.22);
+      background:rgba(249,115,22,.08);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#fff;
+    }
+
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .mini-btn{
+      min-height:42px;
+      padding:0 16px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      color:#fff;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      transition:.18s ease;
+    }
+
+    .mini-btn:hover{
+      background:rgba(255,255,255,.05);
+      transform:translateY(-1px);
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.02fr .98fr;
+      gap:26px;
+      align-items:center;
+      padding:28px 28px 34px;
+    }
+
+    .copy{
+      padding:6px 8px 6px 0;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      min-height:34px;
+      padding:0 14px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.18);
+      background:rgba(249,115,22,.06);
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      margin-bottom:18px;
+    }
+
+    .eyebrow-dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--orange);
+      animation:eyebrowPulse 1.8s ease-in-out infinite;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(42px,6vw,88px);
+      line-height:.92;
+      letter-spacing:-.08em;
+      font-weight:900;
+      color:#fff;
+    }
+
+    .headline-accent{
+      display:block;
+      color:var(--orange);
+    }
+
+    .sub{
+      margin:18px 0 0;
+      max-width:760px;
+      font-size:clamp(18px,2.1vw,24px);
+      line-height:1.42;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .micro{
+      margin-top:18px;
+      max-width:760px;
+      font-size:15px;
+      line-height:1.48;
+      color:var(--muted2);
+      font-weight:700;
+    }
+
+    .cta-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-top:30px;
+    }
+
+    .btn{
+      min-height:56px;
+      padding:0 22px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      transition:.18s ease;
+    }
+
+    .btn-primary{
+      background:linear-gradient(90deg,var(--orange),var(--orange2));
+      color:#fff;
+      box-shadow:0 10px 30px rgba(249,115,22,.18);
+    }
+
+    .btn-primary:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.05);
+    }
+
+    .btn-secondary{
+      background:rgba(255,255,255,.03);
+      color:#fff;
+    }
+
+    .btn-secondary:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.05);
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+      margin-top:28px;
+      max-width:760px;
+    }
+
+    .stat{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      border-radius:18px;
+      padding:16px;
+    }
+
+    .stat strong{
+      display:block;
+      font-size:28px;
+      line-height:1;
+      letter-spacing:-.05em;
+      font-weight:900;
+      color:#fff;
+    }
+
+    .stat span{
+      display:block;
+      margin-top:7px;
+      font-size:13px;
+      line-height:1.35;
+      color:var(--muted);
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .visual-wrap{
+      position:relative;
+      min-height:620px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .visual-panel{
+      position:relative;
+      width:min(100%, 720px);
+      aspect-ratio:1/1;
+      border-radius:32px;
+      border:1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),
+        rgba(10,12,18,.76);
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .visual-glow{
+      position:absolute;
+      inset:auto auto -18% -10%;
+      width:55%;
+      height:55%;
+      background:radial-gradient(circle, rgba(249,115,22,.16), transparent 65%);
+      pointer-events:none;
+      filter:blur(10px);
+    }
+
+    .hero-image{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      opacity:.56;
+      transform:scale(1.04);
+      filter:saturate(.92) contrast(1.03) brightness(.86);
+      animation:imageIn 1.4s ease-out both;
+    }
+
+    .image-scrim{
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at center, transparent 25%, rgba(6,8,15,.18) 65%, rgba(6,8,15,.56) 100%),
+        linear-gradient(180deg, rgba(6,8,15,.18), rgba(6,8,15,.38));
+    }
+
+    .system-title{
+      position:absolute;
+      top:18px;
+      left:20px;
+      right:20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      z-index:3;
+    }
+
+    .system-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      min-height:34px;
+      padding:0 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(9,11,17,.45);
+      backdrop-filter:blur(10px);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#fff;
+    }
+
+    .system-chip .pulse{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--orange);
+      animation:chipPulse 1.5s ease-in-out infinite;
+    }
+
+    .system-chip.alt{
+      color:var(--muted);
+    }
+
+    .lines-svg{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:2;
+      pointer-events:none;
+    }
+
+    .flow-line{
+      stroke:rgba(249,115,22,.18);
+      stroke-width:1.6;
+      fill:none;
+      stroke-linecap:round;
+      stroke-dasharray:8 10;
+      animation:lineFlow 5.2s linear infinite;
+    }
+
+    .flow-line.active{
+      stroke:rgba(249,115,22,.45);
+      animation-duration:2.6s;
+    }
+
+    .node{
+      position:absolute;
+      z-index:4;
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      border:2px solid rgba(255,255,255,.14);
+      background:rgba(8,10,17,.78);
+      box-shadow:0 0 0 0 rgba(249,115,22,0);
+      transform:translate(-50%,-50%);
+    }
+
+    .node::after{
+      content:"";
+      position:absolute;
+      inset:3px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+    }
+
+    .node.active{
+      border-color:rgba(249,115,22,.72);
+      box-shadow:0 0 24px rgba(249,115,22,.40), 0 0 0 10px rgba(249,115,22,0);
+      animation:nodePulse 1.8s ease-in-out infinite;
+    }
+
+    .node.active::after{
+      background:var(--orange);
+    }
+
+    .node-label{
+      position:absolute;
+      z-index:5;
+      min-width:150px;
+      max-width:210px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(9,11,17,.74);
+      backdrop-filter:blur(10px);
+      opacity:0;
+      transform:translateY(8px);
+      animation:labelIn .7s ease forwards;
+      box-shadow:0 16px 30px rgba(0,0,0,.28);
+    }
+
+    .node-label strong{
+      display:block;
+      font-size:13px;
+      line-height:1.05;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+      color:#fff;
+      font-weight:900;
+    }
+
+    .node-label span{
+      display:block;
+      margin-top:4px;
+      font-size:12px;
+      line-height:1.35;
+      color:var(--muted);
+      font-weight:800;
+    }
+
+    .node-label.active strong{
+      color:var(--orange);
+    }
+
+    .orbit-ring{
+      position:absolute;
+      inset:9%;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.05);
+      z-index:1;
+    }
+
+    .orbit-ring.r2{
+      inset:19%;
+      border-color:rgba(255,255,255,.04);
+    }
+
+    .orbit-ring.r3{
+      inset:31%;
+      border-color:rgba(249,115,22,.06);
+    }
+
+    .section{
+      padding:0 28px 28px;
+    }
+
+    .system-section{
+      border-top:1px solid rgba(255,255,255,.06);
+      padding-top:26px;
+    }
+
+    .section-card{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:28px;
+      background:linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,.016));
+      padding:28px;
+      overflow:hidden;
+    }
+
+    .section-head{
+      text-align:center;
+      max-width:940px;
+      margin:0 auto 28px;
+    }
+
+    .section-eyebrow{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:32px;
+      padding:0 14px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.18);
+      background:rgba(249,115,22,.06);
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      margin-bottom:16px;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:clamp(34px,5vw,68px);
+      line-height:.96;
+      letter-spacing:-.07em;
+      font-weight:900;
+      color:#fff;
+    }
+
+    .section-head h2 span{
+      color:var(--orange);
+    }
+
+    .section-head p{
+      margin:16px auto 0;
+      max-width:820px;
+      font-size:18px;
+      line-height:1.45;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:center;
+      margin-top:24px;
+    }
+
+    .chip{
+      min-height:34px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .ai-grid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:14px;
+      margin-top:28px;
+    }
+
+    .ai-col{
+      background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:20px;
+      padding:16px;
+      opacity:.42;
+      transform:translateY(10px);
+      transition:.4s ease;
+      min-height:290px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .ai-col.active{
+      opacity:1;
+      border-color:rgba(249,115,22,.5);
+      box-shadow:0 0 25px rgba(249,115,22,.12);
+      transform:translateY(0);
+    }
+
+    .ai-col-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .ai-col-num{
+      font-size:11px;
+      color:var(--muted2);
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .ai-col-arrow{
+      color:var(--orange);
+      font-size:16px;
+      font-weight:900;
+    }
+
+    .ai-col-title{
+      font-size:22px;
+      line-height:1.05;
+      font-weight:900;
+      letter-spacing:-.04em;
+      color:#fff;
+      margin-top:2px;
+    }
+
+    .ai-col-sub{
+      font-size:13px;
+      line-height:1.4;
+      color:var(--muted2);
+      font-weight:700;
+      min-height:52px;
+    }
+
+    .ai-agent{
+      font-size:13px;
+      padding:10px 10px 11px;
+      border-radius:12px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      display:grid;
+      gap:4px;
+    }
+
+    .ai-agent small{
+      display:block;
+      color:rgba(249,115,22,.82);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .ai-agent span{
+      display:block;
+      color:#fff;
+      font-weight:800;
+      line-height:1.32;
+      font-size:13px;
+    }
+
+    .ai-cta{
+      display:flex;
+      justify-content:center;
+      margin-top:28px;
+    }
+
+    .footer-strip{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:20px 28px 26px;
+      border-top:1px solid rgba(255,255,255,.06);
+    }
+
+    .footer-note{
+      font-size:14px;
+      line-height:1.4;
+      color:var(--muted2);
+      font-weight:700;
+    }
+
+    .footer-note span{
+      color:var(--orange);
+      font-weight:900;
+    }
+
+    @keyframes imageIn{
+      from{ opacity:0; transform:scale(1.08); }
+      to{ opacity:.56; transform:scale(1.04); }
+    }
+
+    @keyframes labelIn{
+      to{ opacity:1; transform:translateY(0); }
+    }
+
+    @keyframes nodePulse{
+      0%,100%{ transform:translate(-50%,-50%) scale(1); }
+      50%{ transform:translate(-50%,-50%) scale(1.16); }
+    }
+
+    @keyframes lineFlow{
+      from{ stroke-dashoffset:0; }
+      to{ stroke-dashoffset:-72; }
+    }
+
+    @keyframes chipPulse{
+      0%,100%{ transform:scale(1); opacity:1; }
+      50%{ transform:scale(1.35); opacity:.88; }
+    }
+
+    @keyframes eyebrowPulse{
+      0%,100%{ transform:scale(1); opacity:1; }
+      50%{ transform:scale(1.25); opacity:.85; }
+    }
+
+    @media (max-width: 1180px){
+      .hero{
+        grid-template-columns:1fr;
+        gap:22px;
+      }
+
+      .copy{
+        padding-right:0;
+      }
+
+      .visual-wrap{
+        min-height:unset;
+      }
+
+      .visual-panel{
+        max-width:760px;
+      }
+
+      .ai-grid{
+        grid-template-columns:repeat(3,1fr);
+      }
+    }
+
+    @media (max-width: 760px){
+      .shell{
+        width:calc(100vw - 16px);
+        margin:8px auto;
+        border-radius:22px;
+      }
+
+      .topbar,
+      .hero,
+      .section,
+      .footer-strip{
+        padding-left:14px;
+        padding-right:14px;
+      }
+
+      .topbar{
+        flex-wrap:wrap;
+      }
+
+      h1{
+        font-size:44px;
+      }
+
+      .sub{
+        font-size:18px;
+      }
+
+      .stats{
+        grid-template-columns:1fr;
+      }
+
+      .visual-panel{
+        border-radius:24px;
+      }
+
+      .system-title{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .node-label{
+        min-width:120px;
+        max-width:160px;
+        padding:8px 10px;
+      }
+
+      .section-card{
+        padding:18px;
+        border-radius:22px;
+      }
+
+      .ai-grid{
+        grid-template-columns:1fr;
+      }
+
+      .footer-strip{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="grid-bg"></div>
+  <div class="grid-bg"></div>
 
-<div class="page">
-<main class="shell">
-<div class="topbar">
-<div class="brand">
-<div class="brand-mark"></div>
-<div class="brand-name">AI Call Port</div>
-<div class="beta">Beta</div>
-</div>
+  <div class="page">
+    <main class="shell">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark"></div>
+          <div class="brand-name">AI Call Port</div>
+          <div class="beta">Beta</div>
+        </div>
 
-<div class="top-actions">
-<a class="mini-btn" href="#system">See System</a>
-<a class="mini-btn" href="step1.html">Enter The System</a>
-</div>
-</div>
+        <div class="top-actions">
+          <a class="mini-btn" href="#system">See System</a>
+          <a class="mini-btn" href="step1.html">Enter The System</a>
+        </div>
+      </div>
 
-<section class="hero">
-<div class="copy">
-<div class="eyebrow">
-<span class="eyebrow-dot"></span>
-<span>Welcome to AI Call Port</span>
-</div>
+      <section class="hero">
+        <div class="copy">
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            <span>Welcome to AI Call Port</span>
+          </div>
 
-<h1>
-12 AI agents
-<span class="headline-accent">working together</span>
-to run your daily operations
-</h1>
+          <h1>
+            12 AI agents
+            <span class="headline-accent">working together</span>
+            to run your daily operations
+          </h1>
 
-<p class="sub">
-We help your business handle phone calls, bookings, scheduling, after-hours requests, inventory questions, lead qualification, and customer communication through one connected AI call system.
-</p>
+          <p class="sub">
+            We help your business handle phone calls, bookings, scheduling, after-hours requests, inventory questions, lead qualification, and customer communication through one connected AI call system.
+          </p>
 
-<p class="micro">
-The system is self-operated, optimized, and built to communicate with you, your customers, and your employees — while we custom-build a simple CRM around your business.
-</p>
+          <p class="micro">
+            The system is self-operated, optimized, and built to communicate with you, your customers, and your employees — while we custom-build a simple CRM around your business.
+          </p>
 
-<div class="cta-row">
-<a class="btn btn-primary" href="step1.html">Enter The System</a>
-<a class="btn btn-secondary" href="#system">See How It Works</a>
-</div>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="step1.html">Enter The System</a>
+            <a class="btn btn-secondary" href="#system">See How It Works</a>
+          </div>
 
-<div class="stats">
-<div class="stat">
-<strong>12</strong>
-<span>Connected AI Agents</span>
-</div>
-<div class="stat">
-<strong>24/7</strong>
-<span>Call Coverage</span>
-</div>
-<div class="stat">
-<strong>1</strong>
-<span>Guided Business System</span>
-</div>
-</div>
-</div>
+          <div class="stats">
+            <div class="stat">
+              <strong>12</strong>
+              <span>Connected AI Agents</span>
+            </div>
+            <div class="stat">
+              <strong>24/7</strong>
+              <span>Call Coverage</span>
+            </div>
+            <div class="stat">
+              <strong>1</strong>
+              <span>Guided Business System</span>
+            </div>
+          </div>
+        </div>
 
-<div class="visual-wrap">
-<div class="visual-panel">
-<div class="visual-glow"></div>
+        <div class="visual-wrap">
+          <div class="visual-panel">
+            <div class="visual-glow"></div>
 
-<img
-class="hero-image"
-src="YOUR_IMAGE_URL_HERE"
-alt="AI agents working together"
-/>
+            <img
+              class="hero-image"
+              src="YOUR_IMAGE_URL_HERE"
+              alt="AI agents working together"
+            />
 
-<div class="image-scrim"></div>
+            <div class="image-scrim"></div>
 
-<div class="system-title">
-<div class="system-chip">
-<span class="pulse"></span>
-<span>Live Multi-Agent System</span>
-</div>
-<div class="system-chip alt">
-<span>Business Logic Active</span>
-</div>
-</div>
+            <div class="system-title">
+              <div class="system-chip">
+                <span class="pulse"></span>
+                <span>Live Multi-Agent System</span>
+              </div>
+              <div class="system-chip alt">
+                <span>Business Logic Active</span>
+              </div>
+            </div>
 
-<div class="orbit-ring"></div>
-<div class="orbit-ring r2"></div>
-<div class="orbit-ring r3"></div>
+            <div class="orbit-ring"></div>
+            <div class="orbit-ring r2"></div>
+            <div class="orbit-ring r3"></div>
 
-<svg class="lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-<path class="flow-line active" d="M50 50 L20 24" />
-<path class="flow-line" d="M50 50 L33 17" />
-<path class="flow-line" d="M50 50 L52 12" />
-<path class="flow-line active" d="M50 50 L72 18" />
-<path class="flow-line" d="M50 50 L84 28" />
-<path class="flow-line" d="M50 50 L89 49" />
-<path class="flow-line active" d="M50 50 L82 70" />
-<path class="flow-line" d="M50 50 L68 84" />
-<path class="flow-line" d="M50 50 L49 90" />
-<path class="flow-line active" d="M50 50 L29 82" />
-<path class="flow-line" d="M50 50 L14 72" />
-<path class="flow-line" d="M50 50 L10 50" />
-</svg>
+            <svg class="lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path class="flow-line active" d="M50 50 L20 24" />
+              <path class="flow-line" d="M50 50 L33 17" />
+              <path class="flow-line" d="M50 50 L52 12" />
+              <path class="flow-line active" d="M50 50 L72 18" />
+              <path class="flow-line" d="M50 50 L84 28" />
+              <path class="flow-line" d="M50 50 L89 49" />
+              <path class="flow-line active" d="M50 50 L82 70" />
+              <path class="flow-line" d="M50 50 L68 84" />
+              <path class="flow-line" d="M50 50 L49 90" />
+              <path class="flow-line active" d="M50 50 L29 82" />
+              <path class="flow-line" d="M50 50 L14 72" />
+              <path class="flow-line" d="M50 50 L10 50" />
+            </svg>
 
-<div class="node active" style="left:50%;top:50%;"></div>
+            <div class="node active" style="left:50%;top:50%;"></div>
 
-<div class="node active" style="left:20%;top:24%; animation-delay:.2s;"></div>
-<div class="node" style="left:33%;top:17%;"></div>
-<div class="node" style="left:52%;top:12%;"></div>
-<div class="node active" style="left:72%;top:18%; animation-delay:.35s;"></div>
-<div class="node" style="left:84%;top:28%;"></div>
-<div class="node" style="left:89%;top:49%;"></div>
-<div class="node active" style="left:82%;top:70%; animation-delay:.5s;"></div>
-<div class="node" style="left:68%;top:84%;"></div>
-<div class="node" style="left:49%;top:90%;"></div>
-<div class="node active" style="left:29%;top:82%; animation-delay:.65s;"></div>
-<div class="node" style="left:14%;top:72%;"></div>
-<div class="node" style="left:10%;top:50%;"></div>
+            <div class="node active" style="left:20%;top:24%; animation-delay:.2s;"></div>
+            <div class="node" style="left:33%;top:17%;"></div>
+            <div class="node" style="left:52%;top:12%;"></div>
+            <div class="node active" style="left:72%;top:18%; animation-delay:.35s;"></div>
+            <div class="node" style="left:84%;top:28%;"></div>
+            <div class="node" style="left:89%;top:49%;"></div>
+            <div class="node active" style="left:82%;top:70%; animation-delay:.5s;"></div>
+            <div class="node" style="left:68%;top:84%;"></div>
+            <div class="node" style="left:49%;top:90%;"></div>
+            <div class="node active" style="left:29%;top:82%; animation-delay:.65s;"></div>
+            <div class="node" style="left:14%;top:72%;"></div>
+            <div class="node" style="left:10%;top:50%;"></div>
 
-<div class="node-label active" style="left:13%; top:14%; animation-delay:.35s;">
-<strong>Lead Qualification</strong>
-<span>Understands intent instantly</span>
-</div>
+            <div class="node-label active" style="left:13%; top:14%; animation-delay:.35s;">
+              <strong>Lead Qualification</strong>
+              <span>Understands intent instantly</span>
+            </div>
 
-<div class="node-label active" style="left:67%; top:8%; animation-delay:.75s;">
-<strong>Booking Agent</strong>
-<span>Schedules services automatically</span>
-</div>
+            <div class="node-label active" style="left:67%; top:8%; animation-delay:.75s;">
+              <strong>Booking Agent</strong>
+              <span>Schedules services automatically</span>
+            </div>
 
-<div class="node-label active" style="left:72%; top:71%; animation-delay:1.15s;">
-<strong>After Hours</strong>
-<span>Handles calls when your team is offline</span>
-</div>
+            <div class="node-label active" style="left:72%; top:71%; animation-delay:1.15s;">
+              <strong>After Hours</strong>
+              <span>Handles calls when your team is offline</span>
+            </div>
 
-<div class="node-label active" style="left:13%; top:79%; animation-delay:1.55s;">
-<strong>Inventory Agent</strong>
-<span>Answers availability and stock questions</span>
-</div>
+            <div class="node-label active" style="left:13%; top:79%; animation-delay:1.55s;">
+              <strong>Inventory Agent</strong>
+              <span>Answers availability and stock questions</span>
+            </div>
 
-<div class="node-label active" style="left:38%; top:42%; animation-delay:1.95s;">
-<strong>CRM Sync</strong>
-<span>Updates your business system in real time</span>
-</div>
-</div>
-</div>
-</section>
+            <div class="node-label active" style="left:38%; top:42%; animation-delay:1.95s;">
+              <strong>CRM Sync</strong>
+              <span>Updates your business system in real time</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-<section class="section system-section" id="system">
-<div class="section-card">
-<div class="section-head">
-<div class="section-eyebrow">Global AI Workforce</div>
-<h2>
-12 AI agents <span>handling every part</span><br>
-of your business calls
-</h2>
-<p>
-From the first ring to final follow-up — everything is handled automatically. The system includes a built-in CRM for SMBs, appointment and reminder logic, multilingual handling, owner reporting, and continuous optimization.
-</p>
+      <section class="section system-section" id="system">
+        <div class="section-card">
+          <div class="section-head">
+            <div class="section-eyebrow">Global AI Workforce</div>
+            <h2>
+              12 AI agents <span>handling every part</span><br>
+              of your business calls
+            </h2>
+            <p>
+              From the first ring to final follow-up — everything is handled automatically. The system includes a built-in CRM for SMBs, appointment and reminder logic, multilingual handling, owner reporting, and continuous optimization.
+            </p>
 
-<div class="chips">
-<div class="chip">Fully Automatic</div>
-<div class="chip">Built-In CRM</div>
-<div class="chip">Self-Optimizing</div>
-<div class="chip">Monthly Reports</div>
-<div class="chip">Appointments & Reminders</div>
-<div class="chip">Any Business Type</div>
-<div class="chip">Global Operation</div>
-<div class="chip">English</div>
-<div class="chip">Spanish</div>
-<div class="chip">French</div>
-<div class="chip">Arabic</div>
-<div class="chip">Portuguese</div>
-<div class="chip">German</div>
-<div class="chip">Multi-Country Operation</div>
-</div>
-</div>
+            <div class="chips">
+              <div class="chip">Fully Automatic</div>
+              <div class="chip">Built-In CRM</div>
+              <div class="chip">Self-Optimizing</div>
+              <div class="chip">Monthly Reports</div>
+              <div class="chip">Appointments & Reminders</div>
+              <div class="chip">Any Business Type</div>
+              <div class="chip">Global Operation</div>
+              <div class="chip">English</div>
+              <div class="chip">Spanish</div>
+              <div class="chip">French</div>
+              <div class="chip">Arabic</div>
+              <div class="chip">Portuguese</div>
+              <div class="chip">German</div>
+              <div class="chip">Multi-Country Operation</div>
+            </div>
+          </div>
 
-<div class="ai-grid">
-<div class="ai-col active">
-<div class="ai-col-top">
-<div class="ai-col-num">01</div>
-<div class="ai-col-arrow">→</div>
-</div>
-<div class="ai-col-title">Input & Access</div>
-<div class="ai-col-sub">How requests enter the platform</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Call Intake Agent</span>
-</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Country Detection Agent</span>
-</div>
-</div>
+          <div class="ai-grid">
+            <div class="ai-col active">
+              <div class="ai-col-top">
+                <div class="ai-col-num">01</div>
+                <div class="ai-col-arrow">→</div>
+              </div>
+              <div class="ai-col-title">Input & Access</div>
+              <div class="ai-col-sub">How requests enter the platform</div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Call Intake Agent</span>
+              </div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Country Detection Agent</span>
+              </div>
+            </div>
 
-<div class="ai-col">
-<div class="ai-col-top">
-<div class="ai-col-num">02</div>
-<div class="ai-col-arrow">→</div>
-</div>
-<div class="ai-col-title">System Control</div>
-<div class="ai-col-sub">How the platform decides what happens next</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Orchestrator Agent</span>
-</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Workflow Control Agent</span>
-</div>
-</div>
+            <div class="ai-col">
+              <div class="ai-col-top">
+                <div class="ai-col-num">02</div>
+                <div class="ai-col-arrow">→</div>
+              </div>
+              <div class="ai-col-title">System Control</div>
+              <div class="ai-col-sub">How the platform decides what happens next</div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Orchestrator Agent</span>
+              </div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Workflow Control Agent</span>
+              </div>
+            </div>
 
-<div class="ai-col">
-<div class="ai-col-top">
-<div class="ai-col-num">03</div>
-<div class="ai-col-arrow">→</div>
-</div>
-<div class="ai-col-title">Language & Understanding</div>
-<div class="ai-col-sub">How the system understands each caller</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Language Detection Agent</span>
-</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Translation Agent</span>
-</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Voice Interface Agent</span>
-</div>
-</div>
+            <div class="ai-col">
+              <div class="ai-col-top">
+                <div class="ai-col-num">03</div>
+                <div class="ai-col-arrow">→</div>
+              </div>
+              <div class="ai-col-title">Language & Understanding</div>
+              <div class="ai-col-sub">How the system understands each caller</div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Language Detection Agent</span>
+              </div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Translation Agent</span>
+              </div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Voice Interface Agent</span>
+              </div>
+            </div>
 
-<div class="ai-col">
-<div class="ai-col-top">
-<div class="ai-col-num">04</div>
-<div class="ai-col-arrow">→</div>
-</div>
-<div class="ai-col-title">Context & Intelligence</div>
-<div class="ai-col-sub">How the system personalizes and evaluates the call</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Context Memory Agent</span>
-</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Sentiment Analysis Agent</span>
-</div>
-</div>
+            <div class="ai-col">
+              <div class="ai-col-top">
+                <div class="ai-col-num">04</div>
+                <div class="ai-col-arrow">→</div>
+              </div>
+              <div class="ai-col-title">Context & Intelligence</div>
+              <div class="ai-col-sub">How the system personalizes and evaluates the call</div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Context Memory Agent</span>
+              </div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Sentiment Analysis Agent</span>
+              </div>
+            </div>
 
-<div class="ai-col">
-<div class="ai-col-top">
-<div class="ai-col-num">05</div>
-<div class="ai-col-arrow">→</div>
-</div>
-<div class="ai-col-title">Call Execution</div>
-<div class="ai-col-sub">How the system handles the actual interaction</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Inbound Call Agent</span>
-</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Outbound Call Agent</span>
-</div>
-</div>
+            <div class="ai-col">
+              <div class="ai-col-top">
+                <div class="ai-col-num">05</div>
+                <div class="ai-col-arrow">→</div>
+              </div>
+              <div class="ai-col-title">Call Execution</div>
+              <div class="ai-col-sub">How the system handles the actual interaction</div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Inbound Call Agent</span>
+              </div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Outbound Call Agent</span>
+              </div>
+            </div>
 
-<div class="ai-col">
-<div class="ai-col-top">
-<div class="ai-col-num">06</div>
-<div class="ai-col-arrow">→</div>
-</div>
-<div class="ai-col-title">Business Actions</div>
-<div class="ai-col-sub">How business tasks are completed</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Sales Agent</span>
-</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Customer Support Agent</span>
-</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Scheduler Agent</span>
-</div>
-</div>
+            <div class="ai-col">
+              <div class="ai-col-top">
+                <div class="ai-col-num">06</div>
+                <div class="ai-col-arrow">→</div>
+              </div>
+              <div class="ai-col-title">Business Actions</div>
+              <div class="ai-col-sub">How business tasks are completed</div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Sales Agent</span>
+              </div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Customer Support Agent</span>
+              </div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Scheduler Agent</span>
+              </div>
+            </div>
 
-<div class="ai-col">
-<div class="ai-col-top">
-<div class="ai-col-num">07</div>
-<div class="ai-col-arrow">→</div>
-</div>
-<div class="ai-col-title">Control & Output</div>
-<div class="ai-col-sub">How the system stays compliant and completes the workflow</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Compliance / QA Agent</span>
-</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>CRM Integration Agent</span>
-</div>
-<div class="ai-agent">
-<small>Agent</small>
-<span>Automation Agent</span>
-</div>
-</div>
-</div>
+            <div class="ai-col">
+              <div class="ai-col-top">
+                <div class="ai-col-num">07</div>
+                <div class="ai-col-arrow">→</div>
+              </div>
+              <div class="ai-col-title">Control & Output</div>
+              <div class="ai-col-sub">How the system stays compliant and completes the workflow</div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Compliance / QA Agent</span>
+              </div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>CRM Integration Agent</span>
+              </div>
+              <div class="ai-agent">
+                <small>Agent</small>
+                <span>Automation Agent</span>
+              </div>
+            </div>
+          </div>
 
-<div class="ai-cta">
-<a href="step1.html" class="btn btn-primary">Start Your Setup</a>
-</div>
-</div>
-</section>
+          <div class="ai-cta">
+            <a href="step1.html" class="btn btn-primary">Start Your Setup</a>
+          </div>
+        </div>
+      </section>
 
-<div class="footer-strip">
-<div class="footer-note">
-<span>AI Call Port Beta</span> gives SMB owners one guided system for calls, bookings, scheduling, customer communication, and CRM support.
-</div>
-<a class="mini-btn" href="step1.html">Enter The System</a>
-</div>
-</main>
-</div>
+      <div class="footer-strip">
+        <div class="footer-note">
+          <span>AI Call Port Beta</span> gives SMB owners one guided system for calls, bookings, scheduling, customer communication, and CRM support.
+        </div>
+        <a class="mini-btn" href="step1.html">Enter The System</a>
+      </div>
+    </main>
+  </div>
 
-<script>
-const cols = document.querySelectorAll(".ai-col");
-let colIndex = 0;
+  <script>
+    const cols = document.querySelectorAll(".ai-col");
+    let colIndex = 0;
 
-setInterval(() => {
-cols.forEach(col => col.classList.remove("active"));
-cols[colIndex].classList.add("active");
-colIndex = (colIndex + 1) % cols.length;
-}, 1200);
-</script>
+    setInterval(() => {
+      cols.forEach(col => col.classList.remove("active"));
+      cols[colIndex].classList.add("active");
+      colIndex = (colIndex + 1) % cols.length;
+    }, 1200);
+  </script>
 </body>
 </html>
