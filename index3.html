@@ -1,201 +1,337 @@
-export default function AICallAgentsModal() {
-  const pipeline = [
-    {
-      step: "01",
-      title: "Input & Access",
-      subtitle: "How requests enter the platform",
-      agents: [
-        "Call Intake Agent",
-        "Country Detection Agent",
-      ],
-    },
-    {
-      step: "02",
-      title: "System Control",
-      subtitle: "How the platform decides what happens next",
-      agents: [
-        "Orchestrator Agent",
-        "Workflow Control Agent",
-      ],
-    },
-    {
-      step: "03",
-      title: "Language & Understanding",
-      subtitle: "How the system understands each caller",
-      agents: [
-        "Language Detection Agent",
-        "Translation Agent",
-        "Voice Interface Agent",
-      ],
-    },
-    {
-      step: "04",
-      title: "Context & Intelligence",
-      subtitle: "How the system personalizes and evaluates the call",
-      agents: [
-        "Context Memory Agent",
-        "Sentiment Analysis Agent",
-      ],
-    },
-    {
-      step: "05",
-      title: "Call Execution",
-      subtitle: "How the system handles the actual interaction",
-      agents: [
-        "Inbound Call Agent",
-        "Outbound Call Agent",
-      ],
-    },
-    {
-      step: "06",
-      title: "Business Actions",
-      subtitle: "How business tasks are completed",
-      agents: [
-        "Sales Agent",
-        "Customer Support Agent",
-        "Scheduler Agent",
-      ],
-    },
-    {
-      step: "07",
-      title: "Control & Output",
-      subtitle: "How the system stays compliant and completes the workflow",
-      agents: [
-        "Compliance / QA Agent",
-        "CRM Integration Agent",
-        "Automation Agent",
-      ],
-    },
-  ];
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Call Port - Presentation Flow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #05070d;
+      }
 
-  return (
-    <div className="min-h-screen bg-[#05070d] text-white flex items-center justify-center p-6">
-      <div className="relative w-full max-w-7xl rounded-[34px] border border-white/10 bg-[radial-gradient(circle_at_left,rgba(255,115,0,0.14),transparent_28%),radial-gradient(circle_at_right,rgba(25,85,255,0.12),transparent_30%),linear-gradient(180deg,#09101d_0%,#04070d_100%)] shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_30px_80px_rgba(0,0,0,0.55)] overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.02),transparent)] opacity-30 pointer-events-none" />
+      .app-shell {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        color: white;
+        background: #05070d;
+      }
 
-        <div className="relative px-8 md:px-10 pt-8 pb-5 flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-4 w-4 rounded-md bg-[#ff7a1a] shadow-[0_0_18px_rgba(255,122,26,0.65)]" />
-            <div className="flex items-center gap-3">
-              <span className="text-[28px] font-black tracking-tight">AI CALL PORT</span>
-              <span className="rounded-full border border-[#ff7a1a]/35 bg-[#ff7a1a]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#ffb37a]">
-                Beta
-              </span>
+      .modal-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 1280px;
+        overflow: hidden;
+        border-radius: 34px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background:
+          radial-gradient(circle at left, rgba(255, 115, 0, 0.14), transparent 28%),
+          radial-gradient(circle at right, rgba(25, 85, 255, 0.12), transparent 30%),
+          linear-gradient(180deg, #09101d 0%, #04070d 100%);
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.03),
+          0 30px 80px rgba(0, 0, 0, 0.55);
+      }
+
+      .modal-wrap::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.3;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.02), transparent);
+      }
+
+      .glass-panel {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 30px;
+        backdrop-filter: blur(10px);
+        background:
+          radial-gradient(circle at top, rgba(255, 120, 30, 0.1), transparent 32%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      }
+
+      .stage-card {
+        position: relative;
+        min-height: 275px;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 14px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      }
+
+      .agent-card {
+        border-radius: 16px;
+        border: 1px solid rgba(255, 122, 26, 0.15);
+        padding: 10px;
+        background: linear-gradient(180deg, rgba(255, 122, 26, 0.1), rgba(255, 255, 255, 0.03));
+      }
+
+      .feature-pill {
+        border-radius: 9999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.45);
+      }
+
+      .arrow-line {
+        position: relative;
+        height: 3px;
+        width: 28px;
+        border-radius: 9999px;
+        background: linear-gradient(to right, #ff7a1a, rgba(255, 255, 255, 0.2));
+      }
+
+      .arrow-line::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        border-left: 8px solid #ff7a1a;
+      }
+
+      @media (max-width: 767px) {
+        .stage-card {
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <section class="modal-wrap">
+        <header class="relative flex items-start justify-between px-8 pt-8 pb-5 md:px-10">
+          <div class="flex items-center gap-3">
+            <div class="h-4 w-4 rounded-md bg-[#ff7a1a] shadow-[0_0_18px_rgba(255,122,26,0.65)]"></div>
+            <div class="flex items-center gap-3">
+              <span class="text-[28px] font-black tracking-tight">AI CALL PORT</span>
+              <span class="rounded-full border border-[#ff7a1a]/35 bg-[#ff7a1a]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#ffb37a]">Beta</span>
             </div>
           </div>
 
-          <div className="text-center">
-            <p className="text-[11px] font-semibold tracking-[0.45em] uppercase text-[#ff8a2a]">Welcome</p>
-            <h1 className="mt-2 text-4xl md:text-5xl font-black tracking-tight text-white">Presentation Flow</h1>
+          <div class="text-center">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.45em] text-[#ff8a2a]">Welcome</p>
+            <h1 class="mt-2 text-4xl font-black tracking-tight text-white md:text-5xl">Presentation Flow</h1>
           </div>
 
-          <div className="pt-2 text-[11px] font-semibold tracking-[0.35em] uppercase text-white/30">
-            Slide 07 of 32
-          </div>
-        </div>
+          <div class="pt-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/30">Slide 07 of 32</div>
+        </header>
 
-        <div className="relative px-8 md:px-10 pt-2 pb-8 min-h-[585px] flex items-center justify-center">
-          <div className="w-full max-w-[1180px] rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_top,rgba(255,120,30,0.10),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] shadow-[0_20px_50px_rgba(0,0,0,0.45)] px-6 md:px-8 py-7 md:py-8 backdrop-blur-sm">
-            <div className="flex justify-center mb-4">
-              <div className="rounded-full border border-[#ff7a1a]/35 bg-[#ff7a1a]/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#ffb37a]">
+        <main class="relative flex min-h-[585px] items-center justify-center px-8 pt-2 pb-8 md:px-10">
+          <div class="glass-panel w-full max-w-[1180px] px-6 py-7 md:px-8 md:py-8">
+            <div class="mb-4 flex justify-center">
+              <div class="rounded-full border border-[#ff7a1a]/35 bg-[#ff7a1a]/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#ffb37a]">
                 ● Global AI Workforce
               </div>
             </div>
 
-            <div className="text-center max-w-4xl mx-auto">
-              <h2 className="text-[42px] md:text-[68px] font-black tracking-[-0.06em] leading-[0.94]">
-                <span className="text-[#ff7a1a]">12 AI call agents</span>{" "}
-                <span className="text-[#f4f1ed]">clearly mapped by role</span>
+            <div class="mx-auto max-w-4xl text-center">
+              <h2 class="text-[42px] font-black leading-[0.94] tracking-[-0.06em] md:text-[68px]">
+                <span class="text-[#ff7a1a]">12 AI call agents</span>
+                <span class="text-[#f4f1ed]"> clearly mapped by role</span>
               </h2>
-              <p className="mt-4 text-sm md:text-[15px] leading-6 text-white/60 max-w-3xl mx-auto">
+              <p class="mx-auto mt-4 max-w-3xl text-sm leading-6 text-white/60 md:text-[15px]">
                 Fully autonomous AI call system designed for any business globally. It includes a built-in CRM for SMBs, automatically optimizes performance, schedules appointments, sends reminders to customers and staff, and generates monthly reports for owners. The system continuously improves itself and can implement owner suggestions when they are logical and beneficial.
               </p>
             </div>
 
-            <div className="mt-5 flex items-center justify-center gap-3 flex-wrap text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Fully Automatic</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Built-in CRM</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Self-Optimizing</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Monthly Reports</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Appointments & Reminders</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Any Business Type</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Global Operation</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">English</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Spanish</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">French</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Arabic</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Portuguese</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">German</span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">Multi-country operation</span>
+            <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+              <span class="feature-pill">Fully Automatic</span>
+              <span class="feature-pill">Built-in CRM</span>
+              <span class="feature-pill">Self-Optimizing</span>
+              <span class="feature-pill">Monthly Reports</span>
+              <span class="feature-pill">Appointments &amp; Reminders</span>
+              <span class="feature-pill">Any Business Type</span>
+              <span class="feature-pill">Global Operation</span>
+              <span class="feature-pill">English</span>
+              <span class="feature-pill">Spanish</span>
+              <span class="feature-pill">French</span>
+              <span class="feature-pill">Arabic</span>
+              <span class="feature-pill">Portuguese</span>
+              <span class="feature-pill">German</span>
+              <span class="feature-pill">Multi-country operation</span>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-7 gap-3">
-              {pipeline.map((column, index) => (
-                <div
-                  key={column.title}
-                  className="relative rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.025))] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] min-h-[275px]"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-[9px] uppercase tracking-[0.32em] text-white/35">
-                      {column.step}
-                    </div>
-                    {index < pipeline.length - 1 && (
-                      <div className="hidden md:flex items-center">
-                        <div className="relative h-[3px] w-7 rounded-full bg-gradient-to-r from-[#ff7a1a] to-white/20">
-                          <div className="absolute right-0 top-1/2 -translate-y-1/2 h-0 w-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-[#ff7a1a]" />
-                        </div>
-                      </div>
-                    )}
+            <div class="mt-6 grid grid-cols-1 gap-3 md:grid-cols-7">
+              <article class="stage-card">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="text-[9px] uppercase tracking-[0.32em] text-white/35">01</div>
+                  <div class="hidden items-center md:flex"><div class="arrow-line"></div></div>
+                </div>
+                <h3 class="mt-2 text-[17px] font-bold leading-tight tracking-tight text-white">Input &amp; Access</h3>
+                <p class="mt-2 min-h-[48px] text-[11px] leading-[1.45] text-white/45">How requests enter the platform</p>
+                <div class="mt-4 space-y-2">
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Call Intake Agent</div>
                   </div>
-
-                  <h3 className="mt-2 text-[17px] font-bold tracking-tight text-white leading-tight">
-                    {column.title}
-                  </h3>
-                  <p className="mt-2 text-[11px] leading-[1.45] text-white/45 min-h-[48px]">
-                    {column.subtitle}
-                  </p>
-
-                  <div className="mt-4 space-y-2">
-                    {column.agents.map((agent) => (
-                      <div
-                        key={agent}
-                        className="rounded-[16px] border border-[#ff7a1a]/15 bg-[linear-gradient(180deg,rgba(255,122,26,0.10),rgba(255,255,255,0.03))] px-2.5 py-2.5"
-                      >
-                        <div className="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">
-                          Agent
-                        </div>
-                        <div className="mt-1 text-[12px] leading-[1.2] font-semibold text-white/88">
-                          {agent}
-                        </div>
-                      </div>
-                    ))}
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Country Detection Agent</div>
                   </div>
                 </div>
-              ))}
+              </article>
+
+              <article class="stage-card">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="text-[9px] uppercase tracking-[0.32em] text-white/35">02</div>
+                  <div class="hidden items-center md:flex"><div class="arrow-line"></div></div>
+                </div>
+                <h3 class="mt-2 text-[17px] font-bold leading-tight tracking-tight text-white">System Control</h3>
+                <p class="mt-2 min-h-[48px] text-[11px] leading-[1.45] text-white/45">How the platform decides what happens next</p>
+                <div class="mt-4 space-y-2">
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Orchestrator Agent</div>
+                  </div>
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Workflow Control Agent</div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="stage-card">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="text-[9px] uppercase tracking-[0.32em] text-white/35">03</div>
+                  <div class="hidden items-center md:flex"><div class="arrow-line"></div></div>
+                </div>
+                <h3 class="mt-2 text-[17px] font-bold leading-tight tracking-tight text-white">Language &amp; Understanding</h3>
+                <p class="mt-2 min-h-[48px] text-[11px] leading-[1.45] text-white/45">How the system understands each caller</p>
+                <div class="mt-4 space-y-2">
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Language Detection Agent</div>
+                  </div>
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Translation Agent</div>
+                  </div>
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Voice Interface Agent</div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="stage-card">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="text-[9px] uppercase tracking-[0.32em] text-white/35">04</div>
+                  <div class="hidden items-center md:flex"><div class="arrow-line"></div></div>
+                </div>
+                <h3 class="mt-2 text-[17px] font-bold leading-tight tracking-tight text-white">Context &amp; Intelligence</h3>
+                <p class="mt-2 min-h-[48px] text-[11px] leading-[1.45] text-white/45">How the system personalizes and evaluates the call</p>
+                <div class="mt-4 space-y-2">
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Context Memory Agent</div>
+                  </div>
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Sentiment Analysis Agent</div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="stage-card">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="text-[9px] uppercase tracking-[0.32em] text-white/35">05</div>
+                  <div class="hidden items-center md:flex"><div class="arrow-line"></div></div>
+                </div>
+                <h3 class="mt-2 text-[17px] font-bold leading-tight tracking-tight text-white">Call Execution</h3>
+                <p class="mt-2 min-h-[48px] text-[11px] leading-[1.45] text-white/45">How the system handles the actual interaction</p>
+                <div class="mt-4 space-y-2">
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Inbound Call Agent</div>
+                  </div>
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Outbound Call Agent</div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="stage-card">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="text-[9px] uppercase tracking-[0.32em] text-white/35">06</div>
+                  <div class="hidden items-center md:flex"><div class="arrow-line"></div></div>
+                </div>
+                <h3 class="mt-2 text-[17px] font-bold leading-tight tracking-tight text-white">Business Actions</h3>
+                <p class="mt-2 min-h-[48px] text-[11px] leading-[1.45] text-white/45">How business tasks are completed</p>
+                <div class="mt-4 space-y-2">
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Sales Agent</div>
+                  </div>
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Customer Support Agent</div>
+                  </div>
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Scheduler Agent</div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="stage-card">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="text-[9px] uppercase tracking-[0.32em] text-white/35">07</div>
+                </div>
+                <h3 class="mt-2 text-[17px] font-bold leading-tight tracking-tight text-white">Control &amp; Output</h3>
+                <p class="mt-2 min-h-[48px] text-[11px] leading-[1.45] text-white/45">How the system stays compliant and completes the workflow</p>
+                <div class="mt-4 space-y-2">
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Compliance / QA Agent</div>
+                  </div>
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">CRM Integration Agent</div>
+                  </div>
+                  <div class="agent-card">
+                    <div class="text-[10px] uppercase tracking-[0.24em] text-[#ffb37a]">Agent</div>
+                    <div class="mt-1 text-[12px] font-semibold leading-[1.2] text-white/88">Automation Agent</div>
+                  </div>
+                </div>
+              </article>
             </div>
           </div>
-        </div>
+        </main>
 
-        <div className="relative border-t border-white/8 px-8 md:px-10 py-5 flex items-center gap-4">
-          {['Back', 'Play', 'Next'].map((label) => (
-            <button
-              key={label}
-              className="h-12 min-w-[104px] rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] px-6 text-sm font-bold uppercase tracking-[0.24em] text-white/90 shadow-[0_10px_25px_rgba(0,0,0,0.25)]"
-            >
-              {label}
-            </button>
-          ))}
+        <footer class="relative flex items-center gap-4 border-t border-white/8 px-8 py-5 md:px-10">
+          <button class="h-12 min-w-[104px] rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] px-6 text-sm font-bold uppercase tracking-[0.24em] text-white/90 shadow-[0_10px_25px_rgba(0,0,0,0.25)]">Back</button>
+          <button class="h-12 min-w-[104px] rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] px-6 text-sm font-bold uppercase tracking-[0.24em] text-white/90 shadow-[0_10px_25px_rgba(0,0,0,0.25)]">Play</button>
+          <button class="h-12 min-w-[104px] rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] px-6 text-sm font-bold uppercase tracking-[0.24em] text-white/90 shadow-[0_10px_25px_rgba(0,0,0,0.25)]">Next</button>
 
-          <div className="ml-2 flex-1 flex items-center gap-4">
-            <div className="relative h-3 flex-1 rounded-full bg-white/6 overflow-hidden">
-              <div className="absolute inset-y-0 left-0 w-[22%] bg-gradient-to-r from-[#ff7a1a] to-[#ffb15c]" />
+          <div class="ml-2 flex flex-1 items-center gap-4">
+            <div class="relative h-3 flex-1 overflow-hidden rounded-full bg-white/6">
+              <div class="absolute inset-y-0 left-0 w-[22%] bg-gradient-to-r from-[#ff7a1a] to-[#ffb15c]"></div>
             </div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/30 whitespace-nowrap">
+            <div class="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.28em] text-white/30">
               Multi-Language Global Presentation Flow
             </div>
           </div>
-        </div>
-      </div>
+        </footer>
+      </section>
     </div>
-  );
-}
+  </body>
+</html>
