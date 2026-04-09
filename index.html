@@ -10,8 +10,8 @@
       --bg:#06080f;
       --bg2:#0a0d14;
       --text:rgba(255,255,255,.96);
-      --muted:rgba(255,255,255,.74);
-      --muted2:rgba(148,163,184,.56);
+      --muted:rgba(255,255,255,.80);
+      --muted2:rgba(148,163,184,.72);
       --orange:#f97316;
       --orange2:#ea580c;
       --blue:#28b7ff;
@@ -83,13 +83,39 @@
     }
 
     .topbar{
-      display:grid;
-      grid-template-columns:270px 1fr 180px;
-      align-items:start;
-      gap:16px;
+      position:relative;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      min-height:66px;
+      padding:10px 16px;
+      box-shadow:0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .topbar::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(
+          to right,
+          rgba(0,0,0,0.96),
+          rgba(0,0,0,0.88),
+          rgba(0,0,0,0.96)
+        );
+      border-radius:18px;
+      pointer-events:none;
+    }
+
+    .topbar > *{
+      position:relative;
+      z-index:1;
     }
 
     .brand{
+      position:absolute;
+      left:16px;
+      top:10px;
       display:flex;
       align-items:center;
       gap:12px;
@@ -155,7 +181,6 @@
 
     .page-title{
       text-align:center;
-      align-self:start;
       padding-top:2px;
     }
 
@@ -179,13 +204,15 @@
     }
 
     .counter{
+      position:absolute;
+      right:16px;
+      top:18px;
       text-align:right;
       color:var(--muted2);
       font-size:11px;
       font-weight:900;
       letter-spacing:.14em;
       text-transform:uppercase;
-      padding-top:8px;
     }
 
     .stage{
@@ -311,7 +338,7 @@
       margin:8px 0 0;
       font-size:14px;
       line-height:1.35;
-      color:rgba(255,255,255,.82);
+      color:rgba(255,255,255,.72);
       font-weight:800;
       letter-spacing:.01em;
       max-width:740px;
@@ -331,7 +358,7 @@
 
     .scene-note{
       margin-top:10px;
-      color:var(--muted2);
+      color:rgba(148,163,184,.72);
       font-size:10px;
       font-weight:900;
       letter-spacing:.14em;
@@ -694,38 +721,6 @@
         height:min(94vh, 940px);
       }
 
-      .topbar{
-        grid-template-columns:1fr;
-        gap:10px;
-      }
-
-      .counter{
-        display:none;
-      }
-
-      .page-title{
-        text-align:left;
-      }
-
-      .bottombar{
-        grid-template-columns:1fr;
-      }
-
-      .bottom-hint{
-        text-align:left;
-      }
-
-      .persistent-enter{
-        left:20px;
-        right:20px;
-        width:auto;
-        min-width:unset;
-      }
-
-      .scene-card{
-        height:560px;
-      }
-
       .feature-grid,
       .steps-grid,
       .metric-row,
@@ -738,6 +733,10 @@
       .step-box,
       .ref-box{
         min-height:unset;
+      }
+
+      .scene-card{
+        height:560px;
       }
     }
 
@@ -755,6 +754,27 @@
       .content{
         padding:12px 12px 14px;
         gap:8px;
+      }
+
+      .topbar{
+        display:grid;
+        grid-template-columns:1fr;
+        min-height:auto;
+        gap:8px;
+        padding:10px 12px;
+      }
+
+      .topbar::before{
+        border-radius:14px;
+      }
+
+      .brand,
+      .counter{
+        position:static;
+      }
+
+      .brand{
+        gap:10px;
       }
 
       .logo-wrap{
@@ -779,8 +799,17 @@
         height:18px;
       }
 
+      .page-title{
+        text-align:center;
+        padding-top:0;
+      }
+
       .page-title h1{
         font-size:clamp(18px,5vw,22px);
+      }
+
+      .counter{
+        display:none;
       }
 
       .slide{
@@ -911,6 +940,11 @@
       .bottombar{
         gap:8px;
         padding-top:8px;
+        grid-template-columns:1fr;
+      }
+
+      .bottom-hint{
+        text-align:left;
       }
 
       .bottom-label,
@@ -1227,7 +1261,6 @@
       slides.forEach((slide, i) => {
         slide.classList.toggle("active", i === current);
       });
-
       counter.textContent = `Scene ${current + 1} of ${slides.length}`;
       progressFill.style.width = `${((current + 1) / slides.length) * 100}%`;
     }
