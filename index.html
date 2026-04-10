@@ -1,3 +1,19 @@
+Yes — this is the right move.
+
+Below is a **completely new landing page**:
+
+* no cinematic slides
+* no arrows for scene navigation
+* one strong hero
+* short 3-step guided section
+* blinking arrow pointing to **Step 1**
+* only **Step 1** is active/clickable
+* custom price is clearly mentioned
+* mobile layout is simplified
+
+Replace your current `index.html` with this:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +25,7 @@
     :root{
       --bg-main:#05070b;
       --bg-panel:#0b0f17;
-      --bg-elevated:#101826;
+      --bg-card:#0d1118;
 
       --text-primary:#ffffff;
       --text-secondary:#cbd5e1;
@@ -20,6 +36,9 @@
       --orange:#f97316;
       --orange-soft:#fb923c;
       --gold:#ffbf2f;
+
+      --border:rgba(255,255,255,.08);
+      --border-soft:rgba(255,255,255,.06);
     }
 
     *{box-sizing:border-box}
@@ -27,11 +46,11 @@
 
     body{
       margin:0;
-      overflow:hidden;
       color:var(--text-primary);
       font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:linear-gradient(180deg, #06080d 0%, var(--bg-main) 100%);
       position:relative;
+      overflow-x:hidden;
     }
 
     body::before{
@@ -40,8 +59,8 @@
       inset:0;
       pointer-events:none;
       background:
-        radial-gradient(circle at 18% 26%, rgba(59,130,246,0.10), transparent 32%),
-        radial-gradient(circle at 82% 72%, rgba(249,115,22,0.10), transparent 34%);
+        radial-gradient(circle at 18% 22%, rgba(59,130,246,0.10), transparent 30%),
+        radial-gradient(circle at 82% 74%, rgba(249,115,22,0.10), transparent 34%);
       z-index:0;
     }
 
@@ -58,20 +77,16 @@
       z-index:0;
     }
 
-    .screen{
+    .page{
       position:relative;
       z-index:1;
       min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
       padding:18px;
     }
 
     .shell{
-      position:relative;
       width:min(1320px, calc(100vw - 36px));
-      height:min(92vh, 920px);
+      margin:0 auto;
       border-radius:32px;
       border:1px solid rgba(255,255,255,.10);
       background:linear-gradient(180deg, rgba(10,13,19,.96), rgba(7,9,14,.98));
@@ -79,6 +94,7 @@
         0 40px 120px rgba(0,0,0,.60),
         inset 0 1px 0 rgba(255,255,255,.04);
       overflow:hidden;
+      position:relative;
     }
 
     .shell::before{
@@ -87,18 +103,14 @@
       inset:0;
       pointer-events:none;
       background:
-        radial-gradient(340px circle at var(--mx,50%) var(--my,40%), rgba(249,115,22,.10), transparent 60%);
-      z-index:1;
+        radial-gradient(420px circle at 50% 0%, rgba(249,115,22,.06), transparent 55%);
+      z-index:0;
     }
 
-    .content{
+    .inner{
       position:relative;
-      z-index:2;
-      height:100%;
-      display:grid;
-      grid-template-rows:auto 1fr auto;
-      gap:10px;
-      padding:18px 20px 18px;
+      z-index:1;
+      padding:18px 20px 28px;
     }
 
     .topbar{
@@ -108,7 +120,7 @@
       justify-content:center;
       min-height:66px;
       padding:10px 16px;
-      box-shadow:0 1px 0 rgba(255,255,255,0.04);
+      margin-bottom:24px;
     }
 
     .topbar::before{
@@ -152,8 +164,6 @@
       justify-content:center;
       flex:0 0 62px;
       background:transparent;
-      border:none;
-      box-shadow:none;
       overflow:visible;
     }
 
@@ -164,7 +174,6 @@
       display:block;
       filter:drop-shadow(0 0 8px rgba(249,115,22,.22));
       animation:logoGlow 3s ease-in-out infinite;
-      transform:translateY(1px);
     }
 
     .brand-stack{
@@ -179,7 +188,6 @@
       align-items:flex-end;
       gap:6px;
       line-height:1;
-      transform:translateY(1px);
     }
 
     .brand-ai{
@@ -222,12 +230,12 @@
       text-transform:uppercase;
     }
 
-    .page-title{
+    .top-title{
       text-align:center;
       padding-top:2px;
     }
 
-    .page-title small{
+    .top-title small{
       display:block;
       color:rgba(249,115,22,.96);
       font-size:11px;
@@ -237,7 +245,7 @@
       margin-bottom:6px;
     }
 
-    .page-title h1{
+    .top-title h1{
       margin:0;
       font-size:clamp(20px,2vw,26px);
       line-height:1.1;
@@ -246,89 +254,18 @@
       color:#fff;
     }
 
-    .counter{
-      position:absolute;
-      right:16px;
-      top:18px;
-      text-align:right;
-      color:var(--text-muted);
-      font-size:11px;
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-    }
-
-    .stage{
-      position:relative;
-      min-height:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
-
-    .slides-wrap{
-      position:relative;
-      width:100%;
-      height:100%;
-      max-width:1040px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .slide{
-      position:absolute;
-      inset:0;
-      display:grid;
-      align-items:center;
-      justify-items:center;
-      padding:10px 14px 18px;
-      opacity:0;
-      transform:translateY(20px) scale(.985);
-      pointer-events:none;
-      transition:opacity .65s ease, transform .65s ease;
-    }
-
-    .slide.active{
-      opacity:1;
-      transform:translateY(0) scale(1);
-      pointer-events:auto;
-    }
-
-    .scene-card{
-      width:min(920px,100%);
-      height:500px;
-      border-radius:30px;
-      border:1px solid rgba(255,255,255,.08);
-      background:#000;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.03),
-        0 30px 80px rgba(0,0,0,.62);
-      position:relative;
-      overflow:hidden;
-      padding:24px 24px 18px;
-      display:grid;
-      grid-template-rows:auto auto auto 1fr auto;
-      justify-items:center;
+    .hero{
+      padding:18px 0 12px;
       text-align:center;
+      max-width:980px;
+      margin:0 auto;
     }
 
-    .scene-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(520px 180px at 18% 0%, rgba(59,130,246,.08), transparent 60%),
-        radial-gradient(520px 180px at 82% 0%, rgba(249,115,22,.08), transparent 60%);
-    }
-
-    .scene-kicker{
+    .eyebrow{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      min-height:30px;
+      min-height:32px;
       padding:0 14px;
       border-radius:999px;
       border:1px solid rgba(249,115,22,.24);
@@ -338,11 +275,10 @@
       font-weight:900;
       letter-spacing:.18em;
       text-transform:uppercase;
-      margin-bottom:14px;
-      z-index:2;
+      margin-bottom:18px;
     }
 
-    .scene-kicker .dot{
+    .eyebrow .dot{
       width:7px;
       height:7px;
       border-radius:999px;
@@ -350,43 +286,33 @@
       box-shadow:0 0 12px rgba(249,115,22,.42);
     }
 
-    .scene-title{
+    .hero-title{
       margin:0;
-      font-size:clamp(30px,5vw,58px);
-      line-height:.94;
-      font-weight:900;
-      letter-spacing:-.07em;
-      color:#fff;
-      text-wrap:balance;
-      max-width:780px;
-      z-index:2;
-    }
-
-    .scene-title .accent{
-      color:var(--orange);
-      text-shadow:0 0 18px rgba(249,115,22,.18);
-    }
-
-    .hero-wordmark{
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      gap:12px;
-      margin:-2px 0 0;
-      flex-wrap:wrap;
-      z-index:2;
-    }
-
-    .hero-wordmark .hw-ai,
-    .hero-wordmark .hw-callport{
-      font-weight:900;
       line-height:1;
-      letter-spacing:-.06em;
-      text-transform:uppercase;
-      font-size:clamp(26px,4vw,46px);
     }
 
-    .hero-wordmark .hw-ai{
+    .hero-title .hero-top{
+      display:block;
+      font-size:clamp(24px,3vw,34px);
+      font-weight:800;
+      letter-spacing:-.04em;
+      color:#fff;
+      margin-bottom:4px;
+    }
+
+    .hero-title .hero-main{
+      display:flex;
+      justify-content:center;
+      align-items:flex-end;
+      gap:12px;
+      flex-wrap:wrap;
+      font-size:clamp(34px,6vw,78px);
+      font-weight:900;
+      letter-spacing:-.08em;
+      line-height:.92;
+    }
+
+    .hero-title .hero-ai{
       background:linear-gradient(180deg, #6fd8ff, var(--blue));
       -webkit-background-clip:text;
       background-clip:text;
@@ -394,175 +320,151 @@
       text-shadow:0 0 12px rgba(56,189,248,.25);
     }
 
-    .hero-wordmark .hw-callport{
+    .hero-title .hero-callport{
       color:var(--orange);
-      text-shadow:0 0 12px rgba(249,115,22,.35);
+      text-shadow:0 0 14px rgba(249,115,22,.30);
     }
 
-    .scene-desc{
-      margin:8px 0 0;
-      font-size:clamp(15px,1.7vw,20px);
-      line-height:1.28;
+    .hero-sub{
+      margin:18px auto 0;
+      max-width:850px;
+      font-size:clamp(18px,2vw,26px);
+      line-height:1.2;
+      color:#fff;
+      font-weight:800;
+      text-wrap:balance;
+    }
+
+    .hero-proof{
+      margin:14px auto 0;
+      max-width:760px;
+      font-size:clamp(16px,1.6vw,20px);
+      line-height:1.25;
       color:var(--text-secondary);
       font-weight:700;
       text-wrap:balance;
+    }
+
+    .hero-body{
+      margin:14px auto 0;
+      max-width:860px;
+      font-size:clamp(15px,1.35vw,18px);
+      line-height:1.45;
+      color:var(--text-secondary);
+      font-weight:700;
+      text-wrap:balance;
+    }
+
+    .hero-price-note{
+      margin:16px auto 0;
       max-width:760px;
-      z-index:2;
-    }
-
-    .scene-support{
-      margin:4px 0 0;
-      font-size:14px;
+      font-size:clamp(14px,1.2vw,16px);
       line-height:1.35;
-      color:rgba(255,255,255,.72);
-      font-weight:800;
-      letter-spacing:.01em;
-      max-width:740px;
-      z-index:2;
-    }
-
-    .scene-main{
-      width:100%;
-      height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:2;
-      padding-top:14px;
-      min-height:0;
-    }
-
-    .scene-note{
-      margin-top:10px;
-      color:rgba(148,163,184,.82);
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      z-index:2;
-    }
-
-    .signal-row{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      gap:10px;
-      max-width:700px;
-    }
-
-    .signal-chip{
-      min-height:36px;
-      padding:0 14px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.03);
       color:#fff;
+      font-weight:900;
+      text-wrap:balance;
+    }
+
+    .hero-price-note .accent{
+      color:var(--orange);
+    }
+
+    .steps-section{
+      margin:34px auto 0;
+      max-width:1100px;
+    }
+
+    .steps-head{
+      text-align:center;
+      margin-bottom:20px;
+    }
+
+    .steps-head h2{
+      margin:0;
+      font-size:clamp(22px,2.4vw,34px);
+      line-height:1.08;
+      font-weight:900;
+      letter-spacing:-.05em;
+      color:#fff;
+    }
+
+    .steps-head p{
+      margin:8px 0 0;
+      font-size:15px;
+      line-height:1.4;
+      color:var(--text-muted);
+      font-weight:700;
+    }
+
+    .steps-row{
+      position:relative;
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:14px;
+      align-items:stretch;
+    }
+
+    .step-arrow{
+      position:absolute;
+      top:-14px;
+      left:16.666%;
+      transform:translateX(-50%);
+      font-size:24px;
+      color:var(--orange);
+      text-shadow:0 0 18px rgba(249,115,22,.35);
+      animation:arrowPulse 1.3s ease-in-out infinite;
+      pointer-events:none;
+      z-index:2;
+    }
+
+    .step-card{
+      position:relative;
+      border-radius:24px;
+      padding:22px 18px 20px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border-soft);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      min-height:190px;
+      text-align:left;
+      transition:.2s ease;
+    }
+
+    .step-card.active{
+      border-color:rgba(249,115,22,.34);
+      box-shadow:
+        0 0 24px rgba(249,115,22,.10),
+        inset 0 1px 0 rgba(255,255,255,.04);
+      background:linear-gradient(180deg, rgba(249,115,22,.08), rgba(255,255,255,.03));
+    }
+
+    .step-card.inactive{
+      opacity:.78;
+    }
+
+    .step-label{
       display:inline-flex;
       align-items:center;
-      gap:8px;
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      transition:all .25s ease;
-    }
-
-    .signal-chip:hover{
-      border-color:rgba(59,130,246,.24);
-      box-shadow:0 0 18px rgba(59,130,246,.08);
-    }
-
-    .signal-dot{
-      width:8px;
-      height:8px;
+      justify-content:center;
+      min-width:72px;
+      height:28px;
+      padding:0 12px;
       border-radius:999px;
-      background:var(--orange);
-      box-shadow:0 0 10px rgba(249,115,22,.35);
-      flex:0 0 8px;
-    }
-
-    .feature-grid,
-    .steps-grid,
-    .metric-row,
-    .pricing-grid,
-    .referral-grid{
-      width:100%;
-      align-self:center;
-    }
-
-    .feature-grid{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:10px;
-    }
-
-    .feature-box,
-    .step-box,
-    .price-card,
-    .metric-box,
-    .ref-box{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      transition:all .25s ease;
-    }
-
-    .feature-box:hover,
-    .step-box:hover,
-    .price-card:hover,
-    .metric-box:hover,
-    .ref-box:hover{
-      border-color:rgba(59,130,246,.25);
-      box-shadow:0 0 20px rgba(59,130,246,.08);
-    }
-
-    .feature-box{
-      border-radius:18px;
-      padding:14px 12px;
-      text-align:left;
-      min-height:102px;
-    }
-
-    .feature-box strong{
-      display:block;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
       font-size:10px;
       font-weight:900;
       letter-spacing:.16em;
       text-transform:uppercase;
-      color:#fff;
-      margin-bottom:8px;
+      margin-bottom:14px;
     }
 
-    .feature-box span{
-      display:block;
-      color:var(--text-secondary);
-      font-size:13px;
-      font-weight:700;
-      line-height:1.35;
+    .step-card.active .step-label{
+      background:rgba(249,115,22,.14);
+      border-color:rgba(249,115,22,.32);
     }
 
-    .steps-grid{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:12px;
-    }
-
-    .step-box{
-      border-radius:20px;
-      padding:16px 14px;
-      min-height:164px;
-      text-align:left;
-    }
-
-    .step-num{
-      color:#ff8a2a;
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      margin-bottom:10px;
-    }
-
-    .step-box h3{
+    .step-title{
       margin:0;
       font-size:24px;
       line-height:1;
@@ -571,227 +473,81 @@
       color:#fff;
     }
 
-    .step-box p{
+    .step-sub{
       margin:10px 0 0;
-      color:var(--text-secondary);
       font-size:14px;
-      line-height:1.4;
+      line-height:1.38;
+      color:var(--text-secondary);
       font-weight:700;
     }
 
-    .pricing-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:12px;
-      max-width:740px;
-    }
-
-    .price-card{
-      border-radius:22px;
-      padding:22px 18px;
-    }
-
-    .price-label{
-      display:block;
-      color:var(--text-muted);
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      margin-bottom:10px;
-    }
-
-    .price-value{
-      display:block;
-      color:#fff;
-      font-size:42px;
-      line-height:1;
-      font-weight:900;
-      letter-spacing:-.06em;
-    }
-
-    .price-value.orange{
-      color:var(--orange);
-      text-shadow:0 0 18px rgba(249,115,22,.18);
-    }
-
-    .price-sub{
-      display:block;
-      margin-top:10px;
-      color:var(--text-secondary);
-      font-size:13px;
-      font-weight:800;
-      line-height:1.32;
-    }
-
-    .price-urgency{
-      display:block;
-      margin-top:10px;
-      color:#fff;
+    .step-mini{
+      margin-top:14px;
       font-size:11px;
+      line-height:1.25;
+      color:var(--text-muted);
       font-weight:900;
       letter-spacing:.12em;
       text-transform:uppercase;
     }
 
-    .metric-row{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:12px;
-      max-width:800px;
-    }
-
-    .metric-box{
-      border-radius:20px;
-      padding:20px 16px;
-    }
-
-    .metric-box strong{
-      display:block;
-      color:#fff;
-      font-size:34px;
-      line-height:1;
-      letter-spacing:-.05em;
-      font-weight:900;
-    }
-
-    .metric-box span{
-      display:block;
-      margin-top:9px;
-      color:var(--text-secondary);
-      font-size:12px;
-      font-weight:800;
-      line-height:1.3;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-
-    .referral-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:12px;
-      max-width:740px;
-    }
-
-    .ref-box{
-      border-radius:20px;
-      padding:20px 18px;
-      text-align:left;
-      min-height:160px;
-    }
-
-    .ref-box strong{
-      display:block;
-      color:#fff;
-      font-size:26px;
-      line-height:1.05;
-      letter-spacing:-.04em;
-      font-weight:900;
-      margin-bottom:12px;
-    }
-
-    .ref-box span{
-      display:block;
-      color:var(--text-secondary);
-      font-size:14px;
-      line-height:1.4;
-      font-weight:700;
-    }
-
-    .nav-arrow{
-      position:absolute;
-      top:50%;
-      transform:translateY(-50%);
-      width:64px;
-      height:64px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.04);
-      color:#fff;
+    .step-cta-wrap{
       display:flex;
+      justify-content:center;
+      margin-top:26px;
+    }
+
+    .step1-btn{
+      display:inline-flex;
       align-items:center;
       justify-content:center;
-      font-size:28px;
-      font-weight:900;
-      cursor:pointer;
-      z-index:5;
-      transition:.18s ease;
-      user-select:none;
-      backdrop-filter:blur(8px);
-    }
-
-    .nav-arrow:hover{
-      background:rgba(59,130,246,.10);
-      border-color:rgba(59,130,246,.28);
-      transform:translateY(-50%) scale(1.03);
-    }
-
-    .nav-arrow.left{ left:18px; }
-    .nav-arrow.right{ right:18px; }
-
-    .persistent-enter{
-      position:absolute;
-      right:24px;
-      bottom:84px;
-      z-index:6;
-      min-width:226px;
-      height:56px;
+      min-width:260px;
+      height:58px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.16);
       background:linear-gradient(135deg, var(--orange), var(--orange-soft));
       color:#fff;
+      text-decoration:none;
       font-size:13px;
       font-weight:900;
       letter-spacing:.16em;
       text-transform:uppercase;
-      cursor:pointer;
       box-shadow:0 10px 30px rgba(249,115,22,.30);
-      animation:enterPulse 1.8s ease-in-out infinite;
       transition:.18s ease;
     }
 
-    .persistent-enter:hover{
-      filter:brightness(1.04);
+    .step1-btn:hover{
       transform:translateY(-2px);
+      filter:brightness(1.04);
       box-shadow:0 15px 40px rgba(249,115,22,.50);
     }
 
-    .bottombar{
-      display:grid;
-      grid-template-columns:180px 1fr 180px;
-      align-items:center;
-      gap:14px;
+    .bottom-strip{
+      margin-top:30px;
+      padding-top:14px;
       border-top:1px solid rgba(255,255,255,.06);
-      padding-top:10px;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+      align-items:start;
     }
 
-    .bottom-label,
-    .bottom-hint{
+    .bottom-item{
       color:var(--text-muted);
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.14em;
+      font-size:11px;
+      line-height:1.4;
+      font-weight:800;
       text-transform:uppercase;
+      letter-spacing:.12em;
     }
 
-    .bottom-hint{
-      text-align:right;
-    }
-
-    .progress{
-      height:8px;
-      border-radius:999px;
-      overflow:hidden;
-      background:#111827;
-      border:1px solid rgba(255,255,255,.05);
-      position:relative;
-    }
-
-    .progress-fill{
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg, var(--orange), var(--orange-soft));
-      transition:width .45s ease;
+    .bottom-item strong{
+      display:block;
+      color:#fff;
+      font-size:13px;
+      letter-spacing:.04em;
+      text-transform:none;
+      margin-bottom:4px;
     }
 
     @keyframes logoGlow{
@@ -799,75 +555,44 @@
       50%{ filter:drop-shadow(0 0 16px rgba(249,115,22,.36)); }
     }
 
-    @keyframes enterPulse{
+    @keyframes arrowPulse{
       0%,100%{
-        box-shadow:0 0 20px rgba(249,115,22,.18);
-        transform:scale(1);
+        transform:translateX(-50%) translateY(0);
+        opacity:.75;
       }
       50%{
-        box-shadow:0 0 34px rgba(249,115,22,.32);
-        transform:scale(1.015);
+        transform:translateX(-50%) translateY(6px);
+        opacity:1;
       }
     }
 
     @media (max-width:1024px){
-      .shell{
-        width:calc(100vw - 22px);
-        height:min(94vh, 940px);
-      }
-
-      .feature-grid,
-      .steps-grid,
-      .metric-row,
-      .pricing-grid,
-      .referral-grid{
+      .steps-row{
         grid-template-columns:1fr;
       }
 
-      .feature-box,
-      .step-box,
-      .ref-box{
-        min-height:unset;
+      .step-arrow{
+        left:50%;
+        top:-10px;
       }
 
-      .scene-card{
-        height:560px;
+      .bottom-strip{
+        grid-template-columns:1fr;
       }
     }
 
     @media (max-width:720px){
-      html, body{
-        height:auto;
-        min-height:100%;
-        overflow-x:hidden;
-        overflow-y:auto;
-      }
-
-      body{
-        overflow-x:hidden;
-        overflow-y:auto;
-      }
-
-      .screen{
-        padding:10px 10px 24px;
-        min-height:auto;
-        align-items:flex-start;
+      .page{
+        padding:10px;
       }
 
       .shell{
         width:calc(100vw - 20px);
-        height:auto;
-        min-height:calc(100vh - 20px);
         border-radius:24px;
-        overflow:visible;
       }
 
-      .content{
-        padding:12px 12px 88px;
-        gap:10px;
-        height:auto;
-        min-height:calc(100vh - 20px);
-        display:block;
+      .inner{
+        padding:12px 12px 22px;
       }
 
       .topbar{
@@ -876,20 +601,15 @@
         min-height:auto;
         gap:10px;
         padding:12px;
-        margin-bottom:10px;
+        margin-bottom:18px;
       }
 
       .topbar::before{
         border-radius:16px;
       }
 
-      .brand,
-      .counter{
-        position:static;
-      }
-
       .brand{
-        gap:10px;
+        position:static;
       }
 
       .logo-wrap{
@@ -915,237 +635,117 @@
         height:18px;
       }
 
-      .page-title{
-        text-align:center;
+      .top-title{
         padding-top:0;
       }
 
-      .page-title small{
+      .top-title small{
         margin-bottom:4px;
       }
 
-      .page-title h1{
-        font-size:clamp(18px,5.5vw,22px);
+      .top-title h1{
+        font-size:clamp(18px,5.4vw,22px);
         line-height:1.08;
       }
 
-      .counter{
-        display:none;
+      .hero{
+        padding:8px 0 6px;
       }
 
-      .stage{
-        position:relative;
-        min-height:auto;
-        overflow:visible;
-        display:block;
-      }
-
-      .slides-wrap{
-        position:relative;
-        width:100%;
-        height:auto;
-        max-width:none;
-        display:block;
-      }
-
-      .slide{
-        position:absolute;
-        inset:auto;
-        width:100%;
-        padding:0;
-        opacity:0;
-        pointer-events:none;
-        transform:none;
-        display:none;
-      }
-
-      .slide.active{
-        position:relative;
-        display:block;
-        opacity:1;
-        pointer-events:auto;
-      }
-
-      .scene-card{
-        width:100%;
-        height:auto;
-        min-height:auto;
-        padding:18px 14px 18px;
-        border-radius:22px;
-        display:block;
-      }
-
-      .scene-kicker{
+      .eyebrow{
         min-height:28px;
         padding:0 12px;
         font-size:9px;
-        margin-bottom:12px;
+        margin-bottom:14px;
       }
 
-      .scene-title{
-        font-size:clamp(24px,9vw,40px);
-        line-height:.96;
-        max-width:none;
+      .hero-title .hero-top{
+        font-size:clamp(20px,6vw,26px);
+        margin-bottom:2px;
       }
 
-      .hero-wordmark{
+      .hero-title .hero-main{
         gap:10px;
-        margin:0;
+        font-size:clamp(28px,10vw,48px);
       }
 
-      .hero-wordmark .hw-ai,
-      .hero-wordmark .hw-callport{
-        font-size:clamp(24px,8vw,36px);
+      .hero-sub{
+        margin-top:14px;
+        font-size:clamp(18px,6vw,24px);
+        line-height:1.12;
       }
 
-      .scene-desc{
-        margin:10px 0 0;
-        font-size:clamp(15px,5.2vw,18px);
+      .hero-proof{
+        margin-top:10px;
+        font-size:clamp(15px,4.8vw,18px);
         line-height:1.18;
-        max-width:none;
       }
 
-      .scene-support{
-        margin:8px 0 0;
-        font-size:clamp(13px,4.4vw,16px);
-        line-height:1.24;
-        max-width:none;
-      }
-
-      .scene-main{
-        display:block;
-        width:100%;
-        height:auto;
-        min-height:auto;
-        padding-top:14px;
-      }
-
-      .scene-note{
+      .hero-body{
         margin-top:12px;
-        font-size:9px;
-        line-height:1.2;
+        font-size:14px;
+        line-height:1.42;
       }
 
-      .signal-row{
-        gap:8px;
-        justify-content:center;
+      .hero-price-note{
+        margin-top:14px;
+        font-size:14px;
+        line-height:1.3;
       }
 
-      .signal-chip{
-        min-height:34px;
-        padding:0 12px;
-        font-size:10px;
+      .steps-section{
+        margin-top:26px;
       }
 
-      .feature-grid,
-      .steps-grid,
-      .metric-row,
-      .pricing-grid,
-      .referral-grid{
-        display:grid;
-        grid-template-columns:1fr;
-        gap:12px;
+      .steps-head{
+        margin-bottom:16px;
       }
 
-      .feature-box,
-      .step-box,
-      .price-card,
-      .metric-box,
-      .ref-box{
+      .steps-head h2{
+        font-size:clamp(20px,7vw,28px);
+      }
+
+      .steps-head p{
+        font-size:13px;
+      }
+
+      .step-card{
         min-height:auto;
-        padding:14px 14px;
-        border-radius:18px;
+        padding:18px 14px 16px;
+        border-radius:20px;
       }
 
-      .feature-box strong,
-      .step-num,
-      .price-label{
-        font-size:10px;
+      .step-title{
+        font-size:20px;
       }
 
-      .feature-box span,
-      .step-box p,
-      .price-sub,
-      .ref-box span{
+      .step-sub{
         font-size:13px;
         line-height:1.34;
       }
 
-      .step-box h3,
-      .ref-box strong{
-        font-size:18px;
-        line-height:1.06;
-      }
-
-      .metric-box strong{
-        font-size:22px;
-      }
-
-      .metric-box span{
+      .step-mini{
         font-size:10px;
       }
 
-      .price-value{
-        font-size:28px;
-      }
-
-      .nav-arrow{
-        width:52px;
-        height:52px;
-        font-size:24px;
-        top:auto;
-        bottom:118px;
-        transform:none;
-        z-index:7;
-        background:rgba(10,10,10,.82);
-        backdrop-filter:blur(8px);
-      }
-
-      .nav-arrow:hover{
-        transform:none;
-      }
-
-      .nav-arrow.left{
-        left:10px;
-      }
-
-      .nav-arrow.right{
-        right:10px;
-      }
-
-      .persistent-enter{
-        position:fixed;
-        left:12px;
-        right:12px;
-        bottom:96px;
-        width:auto;
+      .step1-btn{
+        width:100%;
         min-width:unset;
-        height:56px;
-        border-radius:20px;
-        font-size:11px;
-        letter-spacing:.16em;
-        z-index:20;
+        height:54px;
+        font-size:12px;
       }
 
-      .bottombar{
-        display:grid;
-        grid-template-columns:1fr;
-        gap:8px;
-        padding-top:12px;
-        margin-top:12px;
+      .bottom-strip{
+        margin-top:24px;
+        gap:10px;
       }
 
-      .bottom-hint{
-        text-align:left;
+      .bottom-item{
+        font-size:10px;
       }
 
-      .bottom-label,
-      .bottom-hint{
-        font-size:9px;
-      }
-
-      .progress{
-        height:10px;
+      .bottom-item strong{
+        font-size:12px;
       }
     }
   </style>
@@ -1153,14 +753,10 @@
 <body>
   <div class="grid-bg"></div>
 
-  <div class="screen">
+  <div class="page">
     <div class="shell" id="shell">
-      <button class="persistent-enter" id="persistentEnter" type="button">Start Your System</button>
+      <div class="inner">
 
-      <div class="nav-arrow left" id="backArrow" aria-label="Previous scene">‹</div>
-      <div class="nav-arrow right" id="nextArrow" aria-label="Next scene">›</div>
-
-      <div class="content">
         <div class="topbar">
           <div class="brand">
             <div class="logo-wrap">
@@ -1175,318 +771,112 @@
             </div>
           </div>
 
-          <div class="page-title">
-            <small>Welcome</small>
-            <h1>Cinematic System Preview</h1>
-          </div>
-
-          <div class="counter" id="counter">Scene 1 of 10</div>
-        </div>
-
-        <div class="stage">
-          <div class="slides-wrap">
-
-            <section class="slide active">
-              <div class="scene-card">
-                <div class="scene-kicker"><span class="dot"></span>Built for Small & Mid-Size Businesses</div>
-                <h2 class="scene-title">WELCOME TO</h2>
-                <div class="hero-wordmark">
-                  <span class="hw-ai">AI</span>
-                  <span class="hw-callport">CALL PORT</span>
-                </div>
-                <p class="scene-desc">
-                  We handle calls, bookings, scheduling, and customer communication
-                  so your business runs without constant manual work.
-                </p>
-                <p class="scene-support">Built for service businesses, contractors, clinics, and local teams.</p>
-                <div class="scene-main">
-                  <div class="signal-row">
-                    <div class="signal-chip"><span class="signal-dot"></span>Calls</div>
-                    <div class="signal-chip"><span class="signal-dot"></span>Bookings</div>
-                    <div class="signal-chip"><span class="signal-dot"></span>Scheduling</div>
-                    <div class="signal-chip"><span class="signal-dot"></span>Client Communication</div>
-                  </div>
-                </div>
-                <div class="scene-note">Custom-built for your business • not a generic tool</div>
-              </div>
-            </section>
-
-            <section class="slide">
-              <div class="scene-card">
-                <div class="scene-kicker"><span class="dot"></span>System Structure</div>
-                <h2 class="scene-title">Everything your business needs<br>in <span class="accent">one system</span></h2>
-                <p class="scene-desc">
-                  Calls, scheduling, follow-ups, and reporting —
-                  all working together inside one connected system.
-                </p>
-                <div class="scene-main">
-                  <div class="feature-grid">
-                    <div class="feature-box"><strong>AI Agents</strong><span>Handles calls, routing, scheduling, and follow-ups automatically.</span></div>
-                    <div class="feature-box"><strong>Built-In CRM</strong><span>Stores client activity, notes, and history in one place.</span></div>
-                    <div class="feature-box"><strong>Scheduling</strong><span>Automated, assisted, or manual booking based on your workflow.</span></div>
-                    <div class="feature-box"><strong>Reminders</strong><span>Sends text, email, or call reminders with follow-up logic.</span></div>
-                    <div class="feature-box"><strong>Reports</strong><span>Tracks performance, activity, and business insights.</span></div>
-                    <div class="feature-box"><strong>Global Support</strong><span>Works across countries with multilingual communication.</span></div>
-                  </div>
-                </div>
-                <div class="scene-note">One connected system for daily business operations</div>
-              </div>
-            </section>
-
-            <section class="slide">
-              <div class="scene-card">
-                <div class="scene-kicker"><span class="dot"></span>Activation</div>
-                <h2 class="scene-title">Get your system live<br>in <span class="accent">three steps</span></h2>
-                <p class="scene-desc">
-                  We don’t give you tools to set up.
-                  We build the system for you and activate it around your business.
-                </p>
-                <p class="scene-support">No setup • No technical work • No configuration</p>
-                <div class="scene-main">
-                  <div class="steps-grid">
-                    <div class="step-box">
-                      <div class="step-num">Step 1</div>
-                      <h3>Business Setup</h3>
-                      <p>Tell us about your business and how you operate. We design the system around it.</p>
-                    </div>
-                    <div class="step-box">
-                      <div class="step-num">Step 2</div>
-                      <h3>System + Demo</h3>
-                      <p>We show your configured system and run a live demo call so you can test how it works.</p>
-                    </div>
-                    <div class="step-box">
-                      <div class="step-num">Step 3</div>
-                      <h3>Activation</h3>
-                      <p>You receive your custom price, activate the system, and your dashboard goes live.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="scene-note">Simple process • full system outcome</div>
-              </div>
-            </section>
-
-            <section class="slide">
-              <div class="scene-card">
-                <div class="scene-kicker"><span class="dot"></span>Step 1</div>
-                <h2 class="scene-title">We start with<br><span class="accent">your business</span></h2>
-                <p class="scene-desc">
-                  Tell us how your business works — we design the system around it.
-                </p>
-                <p class="scene-support">We guide you through everything — no setup or technical work required.</p>
-                <div class="scene-main">
-                  <div class="feature-grid">
-                    <div class="feature-box"><strong>Country</strong><span>We check availability and supported markets automatically.</span></div>
-                    <div class="feature-box"><strong>Industry</strong><span>Your system is matched to your business type and workflow.</span></div>
-                    <div class="feature-box"><strong>Team Size</strong><span>The system adjusts to how many people run your operations.</span></div>
-                    <div class="feature-box"><strong>Language</strong><span>Supports your primary language and detects spoken languages automatically.</span></div>
-                    <div class="feature-box"><strong>Reminders</strong><span>Choose how clients are reminded — text, email, call, or a mix.</span></div>
-                    <div class="feature-box"><strong>Scheduling Mode</strong><span>Automated, assisted, or manual scheduling based on how you prefer to work.</span></div>
-                  </div>
-                </div>
-                <div class="scene-note">The system is tailored to how your business actually runs</div>
-              </div>
-            </section>
-
-            <section class="slide">
-              <div class="scene-card">
-                <div class="scene-kicker"><span class="dot"></span>Step 2</div>
-                <h2 class="scene-title">See your system<br>before you <span class="accent">activate</span></h2>
-                <p class="scene-desc">
-                  You see your full system and test it with a live demo call before activation.
-                </p>
-                <p class="scene-support">No risk — you test everything before activation.</p>
-                <div class="scene-main">
-                  <div class="steps-grid">
-                    <div class="step-box">
-                      <div class="step-num">System Summary</div>
-                      <h3>Configured Output</h3>
-                      <p>See how your system is structured and how everything works together.</p>
-                    </div>
-                    <div class="step-box">
-                      <div class="step-num">Demo Call</div>
-                      <h3>Live Test</h3>
-                      <p>Test how the system answers, understands, and responds in real time.</p>
-                    </div>
-                    <div class="step-box">
-                      <div class="step-num">Refinement</div>
-                      <h3>Adjustments</h3>
-                      <p>Request changes and adjustments before your system goes live.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="scene-note">See your system before you commit</div>
-              </div>
-            </section>
-
-            <section class="slide">
-              <div class="scene-card">
-                <div class="scene-kicker"><span class="dot"></span>Step 3</div>
-                <h2 class="scene-title">You only pay for<br>what you <span class="accent">need</span></h2>
-                <p class="scene-desc">
-                  No generic plans — your pricing is based on how your business actually operates.
-                </p>
-                <p class="scene-support">No hidden fees • No unnecessary features</p>
-                <div class="scene-main">
-                  <div class="pricing-grid">
-                    <div class="price-card">
-                      <span class="price-label">Typical System Value</span>
-                      <span class="price-value">$980</span>
-                      <span class="price-sub">What businesses usually pay for this level of setup</span>
-                    </div>
-                    <div class="price-card">
-                      <span class="price-label">Your Beta Price</span>
-                      <span class="price-value orange">$340</span>
-                      <span class="price-sub">Early access pricing for first businesses onboarded</span>
-                      <span class="price-urgency">Limited spots available</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="scene-note">Price locked for 12 months • no surprise changes</div>
-              </div>
-            </section>
-
-            <section class="slide">
-              <div class="scene-card">
-                <div class="scene-kicker"><span class="dot"></span>Global System</div>
-                <h2 class="scene-title">Operate like a<br><span class="accent">global business</span></h2>
-                <p class="scene-desc">
-                  Serve customers in different countries, languages, and regions — automatically.
-                </p>
-                <p class="scene-support">Designed for growing businesses — not just large enterprises.</p>
-                <div class="scene-main">
-                  <div class="metric-row">
-                    <div class="metric-box">
-                      <strong>75+</strong>
-                      <span>Active countries</span>
-                    </div>
-                    <div class="metric-box">
-                      <strong>20+</strong>
-                      <span>Languages supported</span>
-                    </div>
-                    <div class="metric-box">
-                      <strong>Automatic</strong>
-                      <span>Language detection</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="scene-note">Expand beyond your local market — without extra work</div>
-              </div>
-            </section>
-
-            <section class="slide">
-              <div class="scene-card">
-                <div class="scene-kicker"><span class="dot"></span>Referral Program</div>
-                <h2 class="scene-title">Your system can<br><span class="accent">pay for itself</span></h2>
-                <p class="scene-desc">
-                  Invite other businesses and earn credits that reduce your monthly payment.
-                </p>
-                <p class="scene-support">A few active referrals can fully cover your monthly cost.</p>
-                <div class="scene-main">
-                  <div class="referral-grid">
-                    <div class="ref-box">
-                      <strong>Earn $10/month per referral</strong>
-                      <span>Each active referral reduces your monthly cost.</span>
-                    </div>
-                    <div class="ref-box">
-                      <strong>Partner level at 10 referrals</strong>
-                      <span>Unlock higher rewards and priority benefits.</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="scene-note">Credits are automatically applied to your monthly bill</div>
-              </div>
-            </section>
-
-            <section class="slide">
-              <div class="scene-card">
-                <div class="scene-kicker"><span class="dot"></span>Dashboard Outcome</div>
-                <h2 class="scene-title">Everything runs from<br>one <span class="accent">dashboard</span></h2>
-                <p class="scene-desc">
-                  Manage your operations, calls, clients, and growth — all in one place.
-                </p>
-                <p class="scene-support">No switching tools. No complexity. Just one system.</p>
-                <div class="scene-main">
-                  <div class="feature-grid">
-                    <div class="feature-box"><strong>Owner View</strong><span>See everything in one place — activity, clients, reports, and system performance.</span></div>
-                    <div class="feature-box"><strong>Employee View</strong><span>Simple task view with calls, schedules, and notifications — no training needed.</span></div>
-                    <div class="feature-box"><strong>Expansion</strong><span>Add team members, increase capacity, and grow without changing systems.</span></div>
-                  </div>
-                </div>
-                <div class="scene-note">One system that grows with your business</div>
-              </div>
-            </section>
-
-            <section class="slide">
-              <div class="scene-card">
-                <div class="scene-kicker"><span class="dot"></span>Final Scene</div>
-                <h2 class="scene-title">We build it.<br>We run <span class="accent">it.</span></h2>
-                <p class="scene-desc">
-                  You focus on your business — we handle everything else.
-                </p>
-                <p class="scene-support">No setup. No technical work. No ongoing management.</p>
-                <div class="scene-main"></div>
-                <div class="scene-note">Start your system when you're ready</div>
-              </div>
-            </section>
-
+          <div class="top-title">
+            <small>Guided Setup</small>
+            <h1>Built for Small & Mid-Size Businesses</h1>
           </div>
         </div>
 
-        <div class="bottombar">
-          <div class="bottom-label">Manual cinematic flow</div>
-          <div class="progress">
-            <div class="progress-fill" id="progressFill"></div>
+        <section class="hero">
+          <div class="eyebrow">
+            <span class="dot"></span>
+            Fully Guided Setup
           </div>
-          <div class="bottom-hint">Use arrows or keyboard</div>
+
+          <h2 class="hero-title">
+            <span class="hero-top">WELCOME TO</span>
+            <span class="hero-main">
+              <span class="hero-ai">AI</span>
+              <span class="hero-callport">CALL PORT</span>
+            </span>
+          </h2>
+
+          <div class="hero-sub">
+            A fully automated business system in 3 simple steps
+          </div>
+
+          <div class="hero-proof">
+            No human agents. No setup. No waiting.
+          </div>
+
+          <div class="hero-body">
+            We instantly build your call handling, CRM, scheduling, team communication, and client communication into one system — ready to run worldwide from day one.
+          </div>
+
+          <div class="hero-price-note">
+            <span class="accent">You will receive your custom price after your system is built.</span>
+          </div>
+        </section>
+
+        <section class="steps-section">
+          <div class="steps-head">
+            <h2>How it works</h2>
+            <p>Start with Step 1. The rest of the process is guided for you.</p>
+          </div>
+
+          <div class="steps-row">
+            <div class="step-arrow">↓</div>
+
+            <div class="step-card active">
+              <div class="step-label">Step 1</div>
+              <h3 class="step-title">Enter your business details</h3>
+              <p class="step-sub">
+                Give us simple input about your business, services, workflow, and communication needs.
+              </p>
+              <div class="step-mini">Start here</div>
+            </div>
+
+            <div class="step-card inactive">
+              <div class="step-label">Step 2</div>
+              <h3 class="step-title">We build your system</h3>
+              <p class="step-sub">
+                Your AI call handling, CRM, scheduling, team communication, and client communication system is created automatically.
+              </p>
+              <div class="step-mini">Built instantly</div>
+            </div>
+
+            <div class="step-card inactive">
+              <div class="step-label">Step 3</div>
+              <h3 class="step-title">Review, get your price, go live</h3>
+              <p class="step-sub">
+                See your system, receive your custom price, and activate it when you are ready.
+              </p>
+              <div class="step-mini">Custom price after build</div>
+            </div>
+          </div>
+
+          <div class="step-cta-wrap">
+            <a class="step1-btn" href="step1.html">Go to Step 1</a>
+          </div>
+        </section>
+
+        <div class="bottom-strip">
+          <div class="bottom-item">
+            <strong>Done-for-you system</strong>
+            Not just AI agents — a full business communication and operations system.
+          </div>
+          <div class="bottom-item">
+            <strong>Built around your business</strong>
+            CRM, scheduling, team communication, and client communication in one flow.
+          </div>
+          <div class="bottom-item">
+            <strong>Worldwide availability</strong>
+            Designed to run globally from day one.
+          </div>
         </div>
+
       </div>
     </div>
   </div>
 
   <script>
     const shell = document.getElementById("shell");
+
     shell.addEventListener("mousemove", (e) => {
       const r = shell.getBoundingClientRect();
       shell.style.setProperty("--mx", ((e.clientX - r.left) / r.width) * 100 + "%");
       shell.style.setProperty("--my", ((e.clientY - r.top) / r.height) * 100 + "%");
     });
-
-    const slides = Array.from(document.querySelectorAll(".slide"));
-    const counter = document.getElementById("counter");
-    const progressFill = document.getElementById("progressFill");
-    const backArrow = document.getElementById("backArrow");
-    const nextArrow = document.getElementById("nextArrow");
-    const persistentEnter = document.getElementById("persistentEnter");
-
-    let current = 0;
-
-    function updateUI(){
-      slides.forEach((slide, i) => {
-        slide.classList.toggle("active", i === current);
-      });
-      counter.textContent = `Scene ${current + 1} of ${slides.length}`;
-      progressFill.style.width = `${((current + 1) / slides.length) * 100}%`;
-    }
-
-    function goTo(index){
-      current = Math.max(0, Math.min(index, slides.length - 1));
-      updateUI();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    backArrow.addEventListener("click", () => goTo(current - 1));
-    nextArrow.addEventListener("click", () => goTo(current + 1));
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowRight") goTo(current + 1);
-      if (e.key === "ArrowLeft") goTo(current - 1);
-    });
-
-    persistentEnter.addEventListener("click", () => {
-      window.location.href = "step1.html";
-    });
-
-    updateUI();
   </script>
 </body>
 </html>
