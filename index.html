@@ -22,7 +22,658 @@
       --gold:#ffbf2f;
 
       --border:rgba(255,255,255,.08);
+      --border-soft:rgba(255,255,255,.06);a```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Call Port</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --bg-main:#05070b;
+      --bg-panel:#0b0f17;
+      --bg-card:#0b0d12;
+
+      --text-primary:#ffffff;
+      --text-secondary:#d6dee8;
+      --text-muted:#92a0b3;
+
+      --blue:#3b82f6;
+      --blue-soft:#61c8ff;
+      --orange:#f97316;
+      --orange-soft:#fb923c;
+      --gold:#ffbf2f;
+
+      --border:rgba(255,255,255,.08);
       --border-soft:rgba(255,255,255,.06);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      color:var(--text-primary);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(180deg,#05070b 0%, #04060a 100%);
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(59,130,246,.08), transparent 28%),
+        radial-gradient(circle at 82% 78%, rgba(249,115,22,.08), transparent 32%);
+      z-index:0;
+    }
+
+    .grid-bg{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.12;
+      background:
+        linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(circle at center, black 42%, transparent 96%);
+      z-index:0;
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      min-height:100vh;
+      padding:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .shell{
+      width:min(1240px, calc(100vw - 36px));
+      border-radius:30px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(8,11,17,.96), rgba(6,8,13,.98));
+      box-shadow:
+        0 36px 100px rgba(0,0,0,.58),
+        inset 0 1px 0 rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(360px circle at 50% 0%, rgba(249,115,22,.05), transparent 56%);
+      z-index:0;
+    }
+
+    .inner{
+      position:relative;
+      z-index:1;
+      padding:18px 20px 26px;
+    }
+
+    .topbar{
+      position:relative;
+      min-height:66px;
+      padding:10px 16px;
+      margin-bottom:28px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+    }
+
+    .topbar::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:18px;
+      background:
+        linear-gradient(
+          90deg,
+          rgba(59,130,246,.05),
+          rgba(0,0,0,.92) 22%,
+          rgba(0,0,0,.92) 78%,
+          rgba(249,115,22,.05)
+        );
+      pointer-events:none;
+    }
+
+    .topbar > *{
+      position:relative;
+      z-index:1;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .logo-wrap{
+      width:62px;
+      height:62px;
+      min-width:62px;
+      min-height:62px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 62px;
+      background:transparent;
+      overflow:visible;
+    }
+
+    .logo{
+      width:54px;
+      height:54px;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 0 8px rgba(249,115,22,.22));
+      animation:logoGlow 3s ease-in-out infinite;
+    }
+
+    .brand-stack{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .brand-wordmark{
+      display:flex;
+      align-items:flex-end;
+      gap:6px;
+      line-height:1;
+    }
+
+    .brand-ai{
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      background:linear-gradient(180deg, var(--blue-soft), var(--blue));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow:0 0 14px rgba(59,130,246,.16);
+    }
+
+    .brand-callport{
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.02em;
+      text-transform:uppercase;
+      background:linear-gradient(180deg, var(--gold), var(--orange));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow:0 0 16px rgba(249,115,22,.16);
+    }
+
+    .beta-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      height:20px;
+      padding:0 8px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.32);
+      background:rgba(249,115,22,.12);
+      color:#fff;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .hero{
+      max-width:920px;
+      margin:0 auto;
+      text-align:center;
+      padding:4px 0 0;
+    }
+
+    .hero-title{
+      margin:0;
+      font-size:clamp(32px,5.3vw,72px);
+      line-height:.95;
+      font-weight:900;
+      letter-spacing:-.075em;
+      color:#fff;
+      text-wrap:balance;
+    }
+
+    .hero-sub{
+      margin:18px auto 0;
+      max-width:760px;
+      font-size:clamp(20px,2vw,28px);
+      line-height:1.15;
+      color:#fff;
+      font-weight:850;
+      text-wrap:balance;
+    }
+
+    .hero-proof{
+      margin:14px auto 0;
+      max-width:700px;
+      font-size:clamp(17px,1.45vw,21px);
+      line-height:1.22;
+      color:#fff;
+      font-weight:800;
+      text-wrap:balance;
+    }
+
+    .hero-body{
+      margin:14px auto 0;
+      max-width:840px;
+      font-size:clamp(15px,1.2vw,18px);
+      line-height:1.42;
+      color:var(--text-secondary);
+      font-weight:700;
+      text-wrap:balance;
+    }
+
+    .hero-price-note{
+      margin:14px auto 0;
+      max-width:740px;
+      font-size:clamp(14px,1.1vw,16px);
+      line-height:1.35;
+      color:var(--orange);
+      font-weight:900;
+      text-wrap:balance;
+    }
+
+    .flow-intro{
+      margin:26px auto 0;
+      max-width:680px;
+      text-align:center;
+      font-size:15px;
+      line-height:1.4;
+      color:var(--text-muted);
+      font-weight:800;
+    }
+
+    .steps-section{
+      margin:18px auto 0;
+      max-width:1120px;
+    }
+
+    .steps-row{
+      position:relative;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+      align-items:stretch;
+    }
+
+    .step-arrow{
+      position:absolute;
+      top:-10px;
+      left:16.666%;
+      transform:translateX(-50%);
+      font-size:32px;
+      font-weight:900;
+      color:var(--orange);
+      text-shadow:0 0 18px rgba(249,115,22,.40);
+      animation:arrowPulse 1.2s ease-in-out infinite;
+      pointer-events:none;
+      z-index:2;
+      line-height:1;
+    }
+
+    .step-card{
+      position:relative;
+      border-radius:24px;
+      padding:22px 18px 20px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border-soft);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      min-height:208px;
+      text-align:left;
+      transition:.2s ease;
+    }
+
+    .step-card.active{
+      background:linear-gradient(180deg, rgba(249,115,22,.08), rgba(255,255,255,.03));
+      border-color:rgba(249,115,22,.34);
+      box-shadow:
+        0 0 24px rgba(249,115,22,.10),
+        inset 0 1px 0 rgba(255,255,255,.04);
+      transform:scale(1.02);
+    }
+
+    .step-card.inactive{
+      opacity:.66;
+      box-shadow:none;
+    }
+
+    .step-label{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:72px;
+      height:28px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      margin-bottom:14px;
+    }
+
+    .step-card.active .step-label{
+      background:rgba(249,115,22,.14);
+      border-color:rgba(249,115,22,.32);
+    }
+
+    .step-title{
+      margin:0;
+      font-size:22px;
+      line-height:1.04;
+      font-weight:900;
+      letter-spacing:-.05em;
+      color:#fff;
+      text-wrap:balance;
+    }
+
+    .step-sub{
+      margin:10px 0 0;
+      font-size:14px;
+      line-height:1.38;
+      color:var(--text-secondary);
+      font-weight:700;
+    }
+
+    .step-mini{
+      margin-top:14px;
+      font-size:11px;
+      line-height:1.25;
+      color:var(--text-muted);
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .step-card.active .step-mini{
+      color:#ffd2b0;
+    }
+
+    .step-cta-wrap{
+      display:flex;
+      justify-content:center;
+      margin-top:18px;
+    }
+
+    .step1-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:280px;
+      height:58px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.16);
+      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
+      color:#fff;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      box-shadow:0 10px 30px rgba(249,115,22,.30);
+      transition:.18s ease;
+    }
+
+    .step1-btn:hover{
+      transform:translateY(-2px);
+      filter:brightness(1.04);
+      box-shadow:0 15px 40px rgba(249,115,22,.50);
+    }
+
+    @keyframes logoGlow{
+      0%,100%{ filter:drop-shadow(0 0 8px rgba(249,115,22,.20)); }
+      50%{ filter:drop-shadow(0 0 16px rgba(249,115,22,.36)); }
+    }
+
+    @keyframes arrowPulse{
+      0%,100%{
+        transform:translateX(-50%) translateY(0);
+        opacity:.75;
+      }
+      50%{
+        transform:translateX(-50%) translateY(7px);
+        opacity:1;
+      }
+    }
+
+    @media (max-width:1024px){
+      .steps-row{
+        grid-template-columns:1fr;
+      }
+
+      .step-arrow{
+        left:50%;
+        top:-8px;
+      }
+
+      .step-card.active{
+        transform:none;
+      }
+    }
+
+    @media (max-width:720px){
+      .page{
+        padding:10px;
+        align-items:flex-start;
+      }
+
+      .shell{
+        width:calc(100vw - 20px);
+        border-radius:24px;
+      }
+
+      .inner{
+        padding:12px 12px 20px;
+      }
+
+      .topbar{
+        padding:12px;
+        margin-bottom:18px;
+      }
+
+      .topbar::before{
+        border-radius:16px;
+      }
+
+      .logo-wrap{
+        width:50px;
+        height:50px;
+        min-width:50px;
+        min-height:50px;
+        flex:0 0 50px;
+      }
+
+      .logo{
+        width:42px;
+        height:42px;
+      }
+
+      .brand-ai,
+      .brand-callport{
+        font-size:12px;
+      }
+
+      .beta-badge{
+        font-size:8px;
+        height:18px;
+      }
+
+      .hero-title{
+        font-size:clamp(28px,10vw,46px);
+        line-height:.95;
+      }
+
+      .hero-sub{
+        margin-top:14px;
+        font-size:clamp(18px,6vw,24px);
+        line-height:1.14;
+      }
+
+      .hero-proof{
+        margin-top:12px;
+        font-size:clamp(15px,5vw,18px);
+        line-height:1.2;
+      }
+
+      .hero-body{
+        margin-top:12px;
+        font-size:14px;
+        line-height:1.42;
+      }
+
+      .hero-price-note{
+        margin-top:12px;
+        font-size:14px;
+      }
+
+      .flow-intro{
+        margin-top:20px;
+        font-size:14px;
+      }
+
+      .steps-row{
+        gap:12px;
+      }
+
+      .step-card{
+        min-height:auto;
+        padding:18px 14px 16px;
+        border-radius:20px;
+      }
+
+      .step-title{
+        font-size:20px;
+      }
+
+      .step-sub{
+        font-size:13px;
+        line-height:1.34;
+      }
+
+      .step-mini{
+        font-size:10px;
+      }
+
+      .step1-btn{
+        width:100%;
+        min-width:unset;
+        height:54px;
+        font-size:12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <div class="page">
+    <div class="shell">
+      <div class="inner">
+
+        <div class="topbar">
+          <div class="brand">
+            <div class="logo-wrap">
+              <img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo">
+            </div>
+            <div class="brand-stack">
+              <div class="brand-wordmark">
+                <span class="brand-ai">AI</span>
+                <span class="brand-callport">CALL PORT</span>
+              </div>
+              <div class="beta-badge">Beta</div>
+            </div>
+          </div>
+        </div>
+
+        <section class="hero">
+          <h1 class="hero-title">A fully automated business system in 3 simple steps</h1>
+
+          <div class="hero-sub">
+            No human agents. No setup. No waiting.
+          </div>
+
+          <div class="hero-body">
+            We build your call handling, CRM, scheduling, team communication, and client communication into one system — ready to run worldwide.
+          </div>
+
+          <div class="hero-price-note">
+            You get your custom price after your system is built.
+          </div>
+        </section>
+
+        <div class="flow-intro">
+          Start with Step 1. The rest is handled for you.
+        </div>
+
+        <section class="steps-section">
+          <div class="steps-row">
+            <div class="step-arrow">↓</div>
+
+            <div class="step-card active">
+              <div class="step-label">Step 1</div>
+              <h2 class="step-title">Enter your business details</h2>
+              <p class="step-sub">
+                Give simple input about your business, services, workflow, and communication needs.
+              </p>
+              <div class="step-mini">Start here</div>
+            </div>
+
+            <div class="step-card inactive">
+              <div class="step-label">Step 2</div>
+              <h2 class="step-title">We build your system</h2>
+              <p class="step-sub">
+                Your AI call handling, CRM, scheduling, team communication, and client communication system is created automatically.
+              </p>
+              <div class="step-mini">Built instantly</div>
+            </div>
+
+            <div class="step-card inactive">
+              <div class="step-label">Step 3</div>
+              <h2 class="step-title">Review, get your price, go live</h2>
+              <p class="step-sub">
+                See your system, receive your custom price, and activate it when you are ready.
+              </p>
+              <div class="step-mini">Custom price after build</div>
+            </div>
+          </div>
+
+          <div class="step-cta-wrap">
+            <a class="step1-btn" href="step1.html">Go to Step 1</a>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+```
+
     }
 
     *{box-sizing:border-box}
