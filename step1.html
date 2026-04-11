@@ -9,8 +9,8 @@
     :root{
       --bg-main:#05070b;
       --bg-shell:#080b11;
-      --bg-panel:#0a1019;
       --bg-card:#0d1118;
+      --bg-soft:#0a1019;
 
       --text-primary:#ffffff;
       --text-secondary:#d7e0ea;
@@ -69,12 +69,13 @@
       min-height:100vh;
       padding:18px;
       display:flex;
-      align-items:flex-start;
+      align-items:center;
       justify-content:center;
     }
 
     .shell{
       width:min(1120px, calc(100vw - 36px));
+      min-height:min(90vh, 860px);
       border-radius:30px;
       border:1px solid rgba(255,255,255,.10);
       background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));
@@ -98,14 +99,17 @@
     .inner{
       position:relative;
       z-index:1;
-      padding:18px 20px 28px;
+      padding:18px 20px 24px;
+      min-height:min(90vh, 860px);
+      display:grid;
+      grid-template-rows:auto auto 1fr auto;
+      gap:18px;
     }
 
     .topbar{
       position:relative;
       min-height:66px;
       padding:10px 16px;
-      margin-bottom:26px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -128,10 +132,7 @@
       pointer-events:none;
     }
 
-    .topbar > *{
-      position:relative;
-      z-index:1;
-    }
+    .topbar > *{ position:relative; z-index:1; }
 
     .brand{
       display:flex;
@@ -218,7 +219,7 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:92px;
+      min-width:98px;
       height:30px;
       padding:0 12px;
       border-radius:999px;
@@ -233,15 +234,14 @@
     }
 
     .hero{
-      max-width:840px;
-      margin:0 auto 24px;
       text-align:center;
-      padding:6px 8px 0;
+      max-width:760px;
+      margin:0 auto;
     }
 
     .hero-title{
       margin:0;
-      font-size:clamp(24px,3.8vw,44px);
+      font-size:clamp(24px,3.7vw,42px);
       line-height:1.06;
       font-weight:800;
       letter-spacing:-.05em;
@@ -250,48 +250,51 @@
     }
 
     .hero-sub{
-      margin:14px auto 0;
-      max-width:760px;
-      font-size:clamp(16px,1.45vw,20px);
-      line-height:1.3;
-      color:rgba(255,255,255,.9);
-      font-weight:650;
+      margin:12px auto 0;
+      max-width:700px;
+      font-size:clamp(15px,1.35vw,18px);
+      line-height:1.4;
+      color:var(--text-secondary);
+      font-weight:600;
       text-wrap:balance;
     }
 
-    .layout{
+    .wizard-area{
       display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:18px;
-      align-items:start;
+      place-items:center;
+      min-height:0;
     }
 
-    .form-panel,
-    .info-panel{
-      border-radius:24px;
+    .wizard-card{
+      width:min(760px, 100%);
+      min-height:430px;
+      border-radius:28px;
       border:1px solid var(--border-soft);
-      background:rgba(255,255,255,.03);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.03),
+        0 22px 60px rgba(0,0,0,.32);
+      padding:30px 28px 24px;
+      position:relative;
+      overflow:hidden;
     }
 
-    .form-panel{
-      padding:22px 20px 20px;
+    .wizard-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(260px circle at 80% 0%, rgba(249,115,22,.05), transparent 48%),
+        radial-gradient(260px circle at 10% 0%, rgba(59,130,246,.05), transparent 48%);
     }
 
-    .info-panel{
-      padding:20px 18px;
-      background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));
-      border-color:rgba(103,212,255,.10);
-      position:sticky;
-      top:18px;
-    }
-
-    .section-kicker{
+    .question-kicker{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:74px;
-      height:28px;
+      min-width:88px;
+      height:30px;
       padding:0 12px;
       border-radius:999px;
       background:rgba(249,115,22,.12);
@@ -301,62 +304,56 @@
       font-weight:900;
       letter-spacing:.16em;
       text-transform:uppercase;
-      margin-bottom:14px;
+      margin-bottom:16px;
+      position:relative;
+      z-index:1;
     }
 
-    .panel-title{
+    .question-slide{
+      display:none;
+      animation:fadeSlide .28s ease;
+      position:relative;
+      z-index:1;
+    }
+
+    .question-slide.active{
+      display:block;
+    }
+
+    .question-title{
       margin:0;
-      font-size:28px;
-      line-height:1.05;
+      font-size:clamp(28px,4vw,44px);
+      line-height:1.06;
       font-weight:800;
-      letter-spacing:-.04em;
+      letter-spacing:-.05em;
       color:#fff;
+      text-wrap:balance;
     }
 
-    .panel-sub{
-      margin:10px 0 0;
-      font-size:15px;
+    .question-help{
+      margin:12px 0 0;
+      font-size:16px;
       line-height:1.45;
       color:var(--text-secondary);
       font-weight:600;
+      max-width:620px;
     }
 
-    .form-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      margin-top:20px;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-
-    .field.full{
-      grid-column:1 / -1;
-    }
-
-    .label{
-      font-size:11px;
-      line-height:1.2;
-      color:#fff;
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
+    .answer-wrap{
+      margin-top:26px;
     }
 
     .input,
     .select,
     .textarea{
       width:100%;
-      border-radius:16px;
+      border-radius:18px;
       border:1px solid rgba(255,255,255,.08);
       background:var(--field-bg);
       color:#fff;
-      padding:14px 14px;
+      padding:18px 18px;
       font:inherit;
+      font-size:18px;
       outline:none;
       transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
     }
@@ -375,14 +372,14 @@
     }
 
     .textarea{
-      min-height:118px;
+      min-height:180px;
       resize:vertical;
     }
 
     .chip-group{
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
+      gap:12px;
     }
 
     .radio-chip{
@@ -399,13 +396,13 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-height:40px;
-      padding:0 14px;
+      min-height:48px;
+      padding:0 18px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.08);
       background:rgba(255,255,255,.03);
       color:#fff;
-      font-size:13px;
+      font-size:15px;
       font-weight:700;
       cursor:pointer;
       transition:.18s ease;
@@ -414,32 +411,46 @@
     .radio-chip input:checked + span{
       background:rgba(249,115,22,.12);
       border-color:rgba(249,115,22,.32);
-      color:#fff;
       box-shadow:0 0 0 3px rgba(249,115,22,.06);
     }
 
-    .actions{
-      display:flex;
+    .footer{
+      display:grid;
+      grid-template-columns:140px 1fr 220px;
       align-items:center;
-      justify-content:space-between;
       gap:14px;
-      margin-top:22px;
-      padding-top:18px;
-      border-top:1px solid rgba(255,255,255,.06);
+      padding-top:6px;
     }
 
-    .back-link{
+    .back-btn{
       display:inline-flex;
       align-items:center;
+      justify-content:flex-start;
+      border:none;
+      background:transparent;
       color:var(--text-muted);
-      text-decoration:none;
       font-size:13px;
       font-weight:700;
+      cursor:pointer;
+      padding:0;
       transition:color .18s ease;
     }
 
-    .back-link:hover{
-      color:#fff;
+    .back-btn:hover{ color:#fff; }
+
+    .progress-line{
+      height:8px;
+      border-radius:999px;
+      overflow:hidden;
+      background:#111827;
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    .progress-fill{
+      height:100%;
+      width:12.5%;
+      background:linear-gradient(90deg, var(--orange), var(--orange-soft));
+      transition:width .28s ease;
     }
 
     .next-btn{
@@ -459,7 +470,7 @@
       cursor:pointer;
       box-shadow:0 10px 30px rgba(249,115,22,.28);
       transition:.18s ease;
-      animation:buttonPulse 1.8s ease-in-out infinite;
+      justify-self:end;
     }
 
     .next-btn:hover{
@@ -468,57 +479,24 @@
       box-shadow:0 15px 40px rgba(249,115,22,.42);
     }
 
-    .info-block + .info-block{
-      margin-top:18px;
-      padding-top:18px;
-      border-top:1px solid rgba(255,255,255,.06);
+    .next-btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:none;
     }
 
-    .info-title{
-      margin:0;
+    .helper-note{
+      margin-top:14px;
       font-size:13px;
-      line-height:1.2;
-      color:#fff;
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-    }
-
-    .info-text{
-      margin:10px 0 0;
-      font-size:14px;
-      line-height:1.45;
-      color:var(--text-secondary);
-      font-weight:600;
-    }
-
-    .mini-list{
-      list-style:none;
-      padding:0;
-      margin:12px 0 0;
-      display:grid;
-      gap:10px;
-    }
-
-    .mini-list li{
-      display:flex;
-      align-items:flex-start;
-      gap:8px;
-      color:var(--text-secondary);
-      font-size:14px;
       line-height:1.4;
+      color:var(--text-muted);
       font-weight:600;
     }
 
-    .mini-list li::before{
-      content:"";
-      width:7px;
-      height:7px;
-      min-width:7px;
-      border-radius:999px;
-      margin-top:6px;
-      background:linear-gradient(180deg, var(--blue-soft), var(--blue));
-      box-shadow:0 0 10px rgba(59,130,246,.18);
+    @keyframes fadeSlide{
+      from{ opacity:0; transform:translateX(16px); }
+      to{ opacity:1; transform:translateX(0); }
     }
 
     @keyframes logoGlow{
@@ -526,48 +504,27 @@
       50%{ filter:drop-shadow(0 0 16px rgba(249,115,22,.36)); }
     }
 
-    @keyframes buttonPulse{
-      0%,100%{
-        box-shadow:
-          0 10px 30px rgba(249,115,22,.24),
-          0 0 0 0 rgba(249,115,22,.12);
-        transform:scale(1);
-      }
-      50%{
-        box-shadow:
-          0 14px 36px rgba(249,115,22,.34),
-          0 0 0 8px rgba(249,115,22,0);
-        transform:scale(1.012);
-      }
-    }
-
-    @media (max-width:1024px){
-      .layout{
-        grid-template-columns:1fr;
-      }
-
-      .info-panel{
-        position:static;
-      }
-    }
-
     @media (max-width:720px){
       .page{
         padding:10px;
+        align-items:flex-start;
       }
 
       .shell{
         width:calc(100vw - 20px);
+        min-height:calc(100vh - 20px);
         border-radius:24px;
       }
 
       .inner{
         padding:12px 12px 20px;
+        min-height:calc(100vh - 20px);
+        grid-template-rows:auto auto 1fr auto;
       }
 
       .topbar{
         padding:12px;
-        margin-bottom:18px;
+        gap:10px;
         flex-wrap:wrap;
       }
 
@@ -603,52 +560,70 @@
         height:28px;
       }
 
-      .hero{
-        margin-bottom:18px;
-      }
-
       .hero-title{
-        font-size:clamp(22px,7vw,32px);
+        font-size:clamp(22px,7vw,30px);
       }
 
       .hero-sub{
-        font-size:15px;
-      }
-
-      .form-panel,
-      .info-panel{
-        border-radius:20px;
-      }
-
-      .form-panel{
-        padding:18px 14px 16px;
-      }
-
-      .info-panel{
-        padding:16px 14px;
-      }
-
-      .panel-title{
-        font-size:24px;
-      }
-
-      .panel-sub{
         font-size:14px;
       }
 
-      .form-grid{
-        grid-template-columns:1fr;
-        gap:12px;
+      .wizard-card{
+        min-height:460px;
+        border-radius:22px;
+        padding:22px 16px 18px;
       }
 
-      .actions{
-        flex-direction:column;
-        align-items:stretch;
+      .question-title{
+        font-size:clamp(24px,8vw,32px);
+      }
+
+      .question-help{
+        font-size:14px;
+      }
+
+      .input,
+      .select,
+      .textarea{
+        font-size:16px;
+        padding:16px 16px;
+      }
+
+      .textarea{
+        min-height:150px;
+      }
+
+      .chip-group{
+        gap:10px;
+      }
+
+      .radio-chip span{
+        min-height:44px;
+        padding:0 14px;
+        font-size:14px;
+      }
+
+      .footer{
+        grid-template-columns:1fr;
+        gap:12px;
       }
 
       .next-btn{
         width:100%;
         min-width:unset;
+        justify-self:stretch;
+      }
+
+      .back-btn{
+        order:2;
+      }
+
+      .progress-line{
+        order:1;
+      }
+
+      .next-btn{
+        order:3;
       }
     }
   </style>
@@ -674,139 +649,222 @@
             </div>
           </div>
 
-          <div class="progress-chip">Step 1 of 3</div>
+          <div class="progress-chip" id="progressChip">Question 1 of 8</div>
         </div>
 
         <section class="hero">
-          <h1 class="hero-title">Tell us about your business</h1>
-          <div class="hero-sub">
-            A few simple inputs are all we need to build your system correctly.
-          </div>
+          <h1 class="hero-title">Step 1 — Tell us how your business works</h1>
+          <div class="hero-sub">This takes under 2 minutes. We use your answers to build the system correctly.</div>
         </section>
 
-        <div class="layout">
-          <section class="form-panel">
-            <div class="section-kicker">Step 1</div>
-            <h2 class="panel-title">Business input</h2>
-            <p class="panel-sub">
-              Share the basics of how your business operates. We use this to build your AI call agents, CRM, scheduling, and communication flow.
-            </p>
+        <div class="wizard-area">
+          <div class="wizard-card">
+            <div class="question-kicker" id="questionKicker">Business input</div>
 
-            <form action="step2.html" method="get">
-              <div class="form-grid">
-                <div class="field">
-                  <label class="label" for="businessName">Business name</label>
-                  <input class="input" id="businessName" name="businessName" type="text" placeholder="Your business name" required>
-                </div>
+            <div class="question-slide active" data-step="0">
+              <h2 class="question-title">What is your business name?</h2>
+              <p class="question-help">We use this to label and structure your system correctly.</p>
+              <div class="answer-wrap">
+                <input class="input" id="businessName" type="text" placeholder="Your business name">
+              </div>
+            </div>
 
-                <div class="field">
-                  <label class="label" for="industry">Industry</label>
-                  <input class="input" id="industry" name="industry" type="text" placeholder="Contractor, clinic, service business..." required>
-                </div>
+            <div class="question-slide" data-step="1">
+              <h2 class="question-title">What industry are you in?</h2>
+              <p class="question-help">This helps shape your call logic, scheduling flow, and communication structure.</p>
+              <div class="answer-wrap">
+                <input class="input" id="industry" type="text" placeholder="Plumbing, clinic, contractor, legal, dental...">
+              </div>
+            </div>
 
-                <div class="field">
-                  <label class="label" for="location">Country / market</label>
-                  <input class="input" id="location" name="location" type="text" placeholder="Where you operate" required>
-                </div>
+            <div class="question-slide" data-step="2">
+              <h2 class="question-title">Where do you operate?</h2>
+              <p class="question-help">We use this for market structure, availability, and communication setup.</p>
+              <div class="answer-wrap">
+                <input class="input" id="location" type="text" placeholder="Country or main market">
+              </div>
+            </div>
 
-                <div class="field">
-                  <label class="label" for="teamSize">Team size</label>
-                  <select class="select" id="teamSize" name="teamSize" required>
-                    <option value="">Select team size</option>
-                    <option>Just me</option>
-                    <option>2–5 people</option>
-                    <option>6–15 people</option>
-                    <option>16+ people</option>
-                  </select>
-                </div>
+            <div class="question-slide" data-step="3">
+              <h2 class="question-title">How many people run your operations?</h2>
+              <p class="question-help">This helps us understand how your team communication and workflow should be structured.</p>
+              <div class="answer-wrap">
+                <select class="select" id="teamSize">
+                  <option value="">Select team size</option>
+                  <option>Just me</option>
+                  <option>2–5 people</option>
+                  <option>6–15 people</option>
+                  <option>16+ people</option>
+                </select>
+              </div>
+            </div>
 
-                <div class="field full">
-                  <label class="label" for="services">What do you sell or provide?</label>
-                  <textarea class="textarea" id="services" name="services" placeholder="Briefly describe your services, jobs, or appointments..." required></textarea>
-                </div>
+            <div class="question-slide" data-step="4">
+              <h2 class="question-title">What do you sell or provide?</h2>
+              <p class="question-help">Briefly describe the services, jobs, appointments, or work your business handles.</p>
+              <div class="answer-wrap">
+                <textarea class="textarea" id="services" placeholder="Describe your services or appointments..."></textarea>
+              </div>
+            </div>
 
-                <div class="field full">
-                  <label class="label">How do you want scheduling handled?</label>
-                  <div class="chip-group">
-                    <label class="radio-chip">
-                      <input type="radio" name="schedulingMode" value="Automatic" required>
-                      <span>Automatic</span>
-                    </label>
-                    <label class="radio-chip">
-                      <input type="radio" name="schedulingMode" value="Assisted">
-                      <span>Assisted</span>
-                    </label>
-                    <label class="radio-chip">
-                      <input type="radio" name="schedulingMode" value="Manual approval">
-                      <span>Manual approval</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="field full">
-                  <label class="label">Main communication channels</label>
-                  <div class="chip-group">
-                    <label class="radio-chip">
-                      <input type="checkbox" name="channels" value="Phone">
-                      <span>Phone</span>
-                    </label>
-                    <label class="radio-chip">
-                      <input type="checkbox" name="channels" value="SMS">
-                      <span>SMS</span>
-                    </label>
-                    <label class="radio-chip">
-                      <input type="checkbox" name="channels" value="Email">
-                      <span>Email</span>
-                    </label>
-                    <label class="radio-chip">
-                      <input type="checkbox" name="channels" value="Web forms">
-                      <span>Web forms</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="field full">
-                  <label class="label" for="notes">Anything important we should know?</label>
-                  <textarea class="textarea" id="notes" name="notes" placeholder="Special workflow, languages, after-hours calls, urgent requests, staff coordination, or anything else..."></textarea>
+            <div class="question-slide" data-step="5">
+              <h2 class="question-title">How should scheduling be handled?</h2>
+              <p class="question-help">Choose how appointments or jobs should be managed.</p>
+              <div class="answer-wrap">
+                <div class="chip-group">
+                  <label class="radio-chip">
+                    <input type="radio" name="schedulingMode" value="Automatic">
+                    <span>Automatic</span>
+                  </label>
+                  <label class="radio-chip">
+                    <input type="radio" name="schedulingMode" value="Assisted">
+                    <span>Assisted</span>
+                  </label>
+                  <label class="radio-chip">
+                    <input type="radio" name="schedulingMode" value="Manual approval">
+                    <span>Manual approval</span>
+                  </label>
                 </div>
               </div>
+            </div>
 
-              <div class="actions">
-                <a class="back-link" href="index.html">← Back to landing page</a>
-                <button class="next-btn" type="submit">Continue to Step 2</button>
+            <div class="question-slide" data-step="6">
+              <h2 class="question-title">Which communication channels matter most?</h2>
+              <p class="question-help">Choose all the main channels your business depends on.</p>
+              <div class="answer-wrap">
+                <div class="chip-group">
+                  <label class="radio-chip">
+                    <input type="checkbox" name="channels" value="Phone">
+                    <span>Phone</span>
+                  </label>
+                  <label class="radio-chip">
+                    <input type="checkbox" name="channels" value="SMS">
+                    <span>SMS</span>
+                  </label>
+                  <label class="radio-chip">
+                    <input type="checkbox" name="channels" value="Email">
+                    <span>Email</span>
+                  </label>
+                  <label class="radio-chip">
+                    <input type="checkbox" name="channels" value="Web forms">
+                    <span>Web forms</span>
+                  </label>
+                </div>
+                <div class="helper-note">You can select more than one.</div>
               </div>
-            </form>
-          </section>
-
-          <aside class="info-panel">
-            <div class="info-block">
-              <h3 class="info-title">What happens next</h3>
-              <p class="info-text">
-                After this step, we use your input to structure how the system should handle calls, scheduling, follow-ups, and communication.
-              </p>
             </div>
 
-            <div class="info-block">
-              <h3 class="info-title">What you are setting here</h3>
-              <ul class="mini-list">
-                <li>How your business operates</li>
-                <li>How appointments or jobs should be handled</li>
-                <li>How clients and staff should be contacted</li>
-                <li>What the AI agents need to coordinate automatically</li>
-              </ul>
+            <div class="question-slide" data-step="7">
+              <h2 class="question-title">Anything important we should know?</h2>
+              <p class="question-help">Tell us about special workflows, languages, after-hours calls, urgent requests, or anything else that matters.</p>
+              <div class="answer-wrap">
+                <textarea class="textarea" id="notes" placeholder="Add any important business details..."></textarea>
+              </div>
             </div>
+          </div>
+        </div>
 
-            <div class="info-block">
-              <h3 class="info-title">Important</h3>
-              <p class="info-text">
-                This is a monthly system, not a software purchase. Your custom monthly price is shown after your system is built.
-              </p>
-            </div>
-          </aside>
+        <div class="footer">
+          <button class="back-btn" id="backBtn" type="button">← Back</button>
+          <div class="progress-line">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <button class="next-btn" id="nextBtn" type="button">Continue</button>
         </div>
 
       </div>
     </div>
   </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".question-slide"));
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const progressFill = document.getElementById("progressFill");
+    const progressChip = document.getElementById("progressChip");
+    const questionKicker = document.getElementById("questionKicker");
+
+    const kickers = [
+      "Business input",
+      "Industry",
+      "Market",
+      "Team",
+      "Services",
+      "Scheduling",
+      "Channels",
+      "Notes"
+    ];
+
+    let current = 0;
+
+    function updateUI() {
+      slides.forEach((slide, i) => slide.classList.toggle("active", i === current));
+      progressChip.textContent = `Question ${current + 1} of ${slides.length}`;
+      questionKicker.textContent = kickers[current];
+      progressFill.style.width = `${((current + 1) / slides.length) * 100}%`;
+      backBtn.style.visibility = current === 0 ? "hidden" : "visible";
+      nextBtn.textContent = current === slides.length - 1 ? "Continue to Step 2" : "Continue";
+    }
+
+    function validateCurrent() {
+      if (current === 0) {
+        return document.getElementById("businessName").value.trim() !== "";
+      }
+      if (current === 1) {
+        return document.getElementById("industry").value.trim() !== "";
+      }
+      if (current === 2) {
+        return document.getElementById("location").value.trim() !== "";
+      }
+      if (current === 3) {
+        return document.getElementById("teamSize").value.trim() !== "";
+      }
+      if (current === 4) {
+        return document.getElementById("services").value.trim() !== "";
+      }
+      if (current === 5) {
+        return document.querySelector('input[name="schedulingMode"]:checked') !== null;
+      }
+      if (current === 6) {
+        return document.querySelectorAll('input[name="channels"]:checked').length > 0;
+      }
+      return true;
+    }
+
+    function goNext() {
+      if (!validateCurrent()) return;
+
+      if (current < slides.length - 1) {
+        current += 1;
+        updateUI();
+      } else {
+        window.location.href = "step2.html";
+      }
+    }
+
+    function goBack() {
+      if (current > 0) {
+        current -= 1;
+        updateUI();
+      } else {
+        window.location.href = "index.html";
+      }
+    }
+
+    nextBtn.addEventListener("click", goNext);
+    backBtn.addEventListener("click", goBack);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const tag = document.activeElement.tagName.toLowerCase();
+        if (tag !== "textarea") {
+          e.preventDefault();
+          goNext();
+        }
+      }
+    });
+
+    updateUI();
+  </script>
 </body>
 </html>
