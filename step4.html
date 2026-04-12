@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Call Port — Step 4</title>
+  <title>AI Call Port</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root{
       --bg-main:#05070b;
       --bg-shell:#080b11;
+      --bg-soft:#0b1119;
       --bg-card:#0d1118;
-      --bg-soft:#0a1019;
 
       --text-primary:#ffffff;
       --text-secondary:#d7e0ea;
-      --text-muted:#91a0b5;
+      --text-muted:#90a0b5;
 
       --blue:#3b82f6;
       --blue-soft:#67d4ff;
@@ -24,8 +24,6 @@
 
       --border:rgba(255,255,255,.08);
       --border-soft:rgba(255,255,255,.06);
-      --field-bg:rgba(255,255,255,.03);
-      --success:#22c55e;
     }
 
     *{box-sizing:border-box}
@@ -76,7 +74,6 @@
 
     .shell{
       width:min(1240px, calc(100vw - 36px));
-      min-height:min(94vh, 940px);
       border-radius:30px;
       border:1px solid rgba(255,255,255,.10);
       background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));
@@ -100,21 +97,17 @@
     .inner{
       position:relative;
       z-index:1;
-      padding:18px 20px 26px;
-      min-height:min(94vh, 940px);
-      display:grid;
-      grid-template-rows:auto auto 1fr auto;
-      gap:18px;
+      padding:18px 20px 30px;
     }
 
     .topbar{
       position:relative;
       min-height:66px;
       padding:10px 16px;
+      margin-bottom:34px;
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:12px;
+      justify-content:flex-start;
     }
 
     .topbar::before{
@@ -133,7 +126,10 @@
       pointer-events:none;
     }
 
-    .topbar > *{ position:relative; z-index:1; }
+    .topbar > *{
+      position:relative;
+      z-index:1;
+    }
 
     .brand{
       display:flex;
@@ -160,7 +156,7 @@
       height:54px;
       object-fit:contain;
       display:block;
-      filter:drop-shadow(0 0 8px rgba(249,115,22,.22));
+      filter:drop-shadow(0 0 8px rgba(249,115,22,.20));
       animation:logoGlow 3s ease-in-out infinite;
     }
 
@@ -216,11 +212,374 @@
       text-transform:uppercase;
     }
 
-    .progress-chip{
+    .section{
+      max-width:1080px;
+      margin:0 auto;
+    }
+
+    .hero{
+      text-align:center;
+      padding:18px 0 8px;
+      max-width:760px;
+      margin:0 auto;
+    }
+
+    .hero-kicker{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:98px;
+      min-height:30px;
+      padding:0 14px;
+      border-radius:999px;
+      background:rgba(249,115,22,.12);
+      border:1px solid rgba(249,115,22,.24);
+      color:var(--orange);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      margin-bottom:18px;
+    }
+
+    .hero-title{
+      margin:0;
+      font-size:clamp(30px,4.4vw,56px);
+      line-height:1.03;
+      font-weight:800;
+      letter-spacing:-.055em;
+      color:#fff;
+      text-wrap:balance;
+    }
+
+    .hero-sub{
+      margin:16px auto 0;
+      max-width:720px;
+      font-size:clamp(17px,1.45vw,21px);
+      line-height:1.28;
+      color:rgba(255,255,255,.92);
+      font-weight:650;
+      text-wrap:balance;
+    }
+
+    .hero-support{
+      margin:14px auto 0;
+      max-width:700px;
+      font-size:15px;
+      line-height:1.48;
+      color:var(--text-secondary);
+      font-weight:600;
+      text-wrap:balance;
+    }
+
+    .hero-steps{
+      margin:14px auto 0;
+      max-width:640px;
+      font-size:15px;
+      line-height:1.45;
+      color:var(--orange);
+      font-weight:800;
+      text-wrap:balance;
+    }
+
+    .hero-cta{
+      margin-top:24px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:280px;
+      height:58px;
+      border-radius:18px;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      transition:.18s ease;
+    }
+
+    .primary-btn{
+      border:none;
+      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
+      color:#fff;
+      box-shadow:0 10px 30px rgba(249,115,22,.28);
+      animation:buttonPulse 1.8s ease-in-out infinite;
+    }
+
+    .primary-btn:hover{
+      transform:translateY(-2px);
+      filter:brightness(1.04);
+      box-shadow:0 15px 40px rgba(249,115,22,.42);
+    }
+
+    .secondary-btn{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.03);
+      color:#fff;
+    }
+
+    .secondary-btn:hover{
+      transform:translateY(-2px);
+      background:rgba(255,255,255,.05);
+      border-color:rgba(255,255,255,.18);
+    }
+
+    .trust-line{
+      margin-top:14px;
+      font-size:14px;
+      line-height:1.4;
+      color:var(--text-muted);
+      font-weight:600;
+    }
+
+    .block{
+      margin-top:34px;
+    }
+
+    .panel{
+      border-radius:24px;
+      border:1px solid var(--border-soft);
+      background:rgba(255,255,255,.03);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      padding:24px 22px;
+    }
+
+    .panel.soft{
+      background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));
+      border-color:rgba(103,212,255,.10);
+    }
+
+    .panel.orange{
+      background:linear-gradient(180deg, rgba(249,115,22,.08), rgba(255,255,255,.02));
+      border-color:rgba(249,115,22,.16);
+    }
+
+    .section-title{
+      margin:0;
+      text-align:center;
+      font-size:clamp(22px,2.6vw,34px);
+      line-height:1.08;
+      font-weight:800;
+      letter-spacing:-.045em;
+      color:#fff;
+      text-wrap:balance;
+    }
+
+    .section-sub{
+      margin:10px auto 0;
+      max-width:720px;
+      text-align:center;
+      font-size:15px;
+      line-height:1.45;
+      color:var(--text-muted);
+      font-weight:600;
+      text-wrap:balance;
+    }
+
+    .demo-grid{
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      align-items:stretch;
+    }
+
+    .demo-card{
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.07);
+      background:rgba(255,255,255,.02);
+      padding:20px 18px;
+      min-height:220px;
+    }
+
+    .demo-label{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:88px;
+      height:28px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(249,115,22,.12);
+      border:1px solid rgba(249,115,22,.22);
+      color:var(--orange);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      margin-bottom:14px;
+    }
+
+    .demo-title{
+      margin:0;
+      font-size:24px;
+      line-height:1.08;
+      font-weight:800;
+      letter-spacing:-.04em;
+      color:#fff;
+      text-wrap:balance;
+    }
+
+    .demo-text{
+      margin:10px 0 0;
+      font-size:14px;
+      line-height:1.46;
+      color:var(--text-secondary);
+      font-weight:600;
+    }
+
+    .demo-visual{
+      margin-top:18px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(0,0,0,.28);
+      padding:14px;
+    }
+
+    .phone-line{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      color:#fff;
+      font-size:14px;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+
+    .wave{
+      height:10px;
+      border-radius:999px;
+      background:
+        linear-gradient(90deg,
+          rgba(59,130,246,.15) 0%,
+          rgba(59,130,246,.55) 15%,
+          rgba(249,115,22,.55) 50%,
+          rgba(59,130,246,.55) 85%,
+          rgba(59,130,246,.15) 100%);
+      box-shadow:0 0 18px rgba(249,115,22,.12);
+    }
+
+    .call-note{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--text-muted);
+      font-weight:600;
+    }
+
+    .dashboard-row{
+      display:grid;
+      gap:8px;
+    }
+
+    .dash-item{
+      border-radius:12px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.05);
+      padding:10px 12px;
+      font-size:13px;
+      color:#fff;
+      font-weight:650;
+    }
+
+    .features-grid{
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .feature-item{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.02);
+      padding:18px 16px;
+      min-height:96px;
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+    }
+
+    .feature-dot{
+      width:8px;
+      height:8px;
+      min-width:8px;
+      border-radius:999px;
+      margin-top:7px;
+      background:linear-gradient(180deg, var(--blue-soft), var(--blue));
+      box-shadow:0 0 10px rgba(59,130,246,.18);
+    }
+
+    .feature-text{
+      font-size:15px;
+      line-height:1.42;
+      color:#fff;
+      font-weight:650;
+    }
+
+    .steps-grid{
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:16px;
+      position:relative;
+    }
+
+    .steps-grid::before{
+      content:"";
+      position:absolute;
+      left:8%;
+      right:8%;
+      top:50%;
+      height:1px;
+      background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(249,115,22,.14),
+        rgba(249,115,22,.10),
+        transparent
+      );
+      z-index:0;
+    }
+
+    .step-card{
+      position:relative;
+      z-index:1;
+      border-radius:24px;
+      border:1px solid var(--border-soft);
+      background:rgba(255,255,255,.03);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      padding:24px 18px 22px;
+      min-height:220px;
+      transition:all .22s ease;
+    }
+
+    .step-card:hover{
+      transform:translateY(-4px);
+      border-color:rgba(249,115,22,.22);
+      box-shadow:0 10px 30px rgba(0,0,0,.34);
+    }
+
+    .step-card.highlight{
+      border-color:rgba(249,115,22,.22);
+      background:linear-gradient(180deg, rgba(249,115,22,.08), rgba(255,255,255,.03));
+      box-shadow:
+        0 0 0 1px rgba(249,115,22,.05),
+        0 0 24px rgba(249,115,22,.07);
+    }
+
+    .step-number{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:74px;
       height:30px;
       padding:0 12px;
       border-radius:999px;
@@ -231,78 +590,72 @@
       font-weight:900;
       letter-spacing:.16em;
       text-transform:uppercase;
-      white-space:nowrap;
+      margin-bottom:14px;
     }
 
-    .hero{
-      text-align:center;
-      max-width:780px;
-      margin:0 auto;
-    }
-
-    .hero-title{
+    .step-title{
       margin:0;
-      font-size:clamp(26px,4vw,46px);
-      line-height:1.06;
+      font-size:22px;
+      line-height:1.08;
       font-weight:800;
-      letter-spacing:-.05em;
+      letter-spacing:-.04em;
       color:#fff;
       text-wrap:balance;
     }
 
-    .hero-sub{
-      margin:12px auto 0;
-      max-width:720px;
-      font-size:clamp(15px,1.35vw,18px);
-      line-height:1.4;
+    .step-text{
+      margin:10px 0 0;
+      font-size:14px;
+      line-height:1.45;
       color:var(--text-secondary);
       font-weight:600;
-      text-wrap:balance;
     }
 
-    .main{
+    .behavior-list{
+      margin:20px auto 0;
+      max-width:760px;
       display:grid;
-      grid-template-columns:1.05fr .95fr;
-      gap:18px;
-      align-items:start;
-      min-height:0;
+      grid-template-columns:1fr 1fr;
+      gap:12px 18px;
+      list-style:none;
+      padding:0;
     }
 
-    .panel{
-      border-radius:26px;
-      border:1px solid var(--border-soft);
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
-      padding:24px 22px;
-      position:relative;
-      overflow:hidden;
+    .behavior-list li{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      color:#fff;
+      font-size:15px;
+      line-height:1.4;
+      font-weight:650;
     }
 
-    .panel::before{
+    .behavior-list li::before{
       content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(220px circle at 85% 0%, rgba(249,115,22,.04), transparent 46%),
-        radial-gradient(220px circle at 8% 0%, rgba(59,130,246,.04), transparent 46%);
+      width:8px;
+      height:8px;
+      min-width:8px;
+      border-radius:999px;
+      margin-top:6px;
+      background:linear-gradient(180deg, var(--blue-soft), var(--blue));
+      box-shadow:0 0 10px rgba(59,130,246,.18);
     }
 
-    .panel > *{
-      position:relative;
-      z-index:1;
+    .pricing-anchor{
+      text-align:center;
+      padding:6px 0 2px;
     }
 
-    .section-kicker{
+    .benchmark-badge{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:96px;
-      height:30px;
+      min-height:28px;
       padding:0 12px;
       border-radius:999px;
       background:rgba(249,115,22,.12);
-      border:1px solid rgba(249,115,22,.24);
+      border:1px solid rgba(249,115,22,.22);
       color:var(--orange);
       font-size:10px;
       font-weight:900;
@@ -311,470 +664,94 @@
       margin-bottom:16px;
     }
 
-    .panel-title{
-      margin:0;
-      font-size:28px;
-      line-height:1.08;
-      font-weight:800;
-      letter-spacing:-.04em;
+    .anchor-price{
+      margin-top:10px;
+      font-size:clamp(42px,5vw,72px);
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.07em;
       color:#fff;
     }
 
-    .panel-sub{
-      margin:10px 0 0;
-      font-size:15px;
-      line-height:1.45;
+    .anchor-unit{
+      font-size:18px;
+      color:#ffffffb8;
+      font-weight:700;
+      margin-left:8px;
+    }
+
+    .anchor-copy{
+      margin:16px auto 0;
+      max-width:760px;
+      font-size:17px;
+      line-height:1.5;
       color:var(--text-secondary);
       font-weight:600;
-    }
-
-    .summary-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-top:20px;
-    }
-
-    .summary-card{
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(255,255,255,.02);
-      padding:16px 14px;
-      min-height:108px;
-    }
-
-    .summary-label{
-      font-size:10px;
-      line-height:1.2;
-      color:var(--text-muted);
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      margin-bottom:8px;
-    }
-
-    .summary-value{
-      font-size:18px;
-      line-height:1.25;
-      color:#fff;
-      font-weight:750;
       text-wrap:balance;
     }
 
-    .summary-note{
-      margin-top:6px;
-      font-size:13px;
-      line-height:1.35;
-      color:var(--text-secondary);
-      font-weight:600;
-    }
-
-    .price-block{
-      margin-top:18px;
-      border-radius:22px;
-      border:1px solid rgba(249,115,22,.16);
-      background:linear-gradient(180deg, rgba(249,115,22,.09), rgba(255,255,255,.02));
-      padding:20px 18px;
-    }
-
-    .price-top{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:16px;
-      flex-wrap:wrap;
-    }
-
-    .price-title{
-      font-size:13px;
-      line-height:1.2;
-      color:#fff;
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      margin-bottom:6px;
-    }
-
-    .price-value{
-      font-size:44px;
-      line-height:1;
-      color:#fff;
-      font-weight:900;
-      letter-spacing:-.06em;
-    }
-
-    .price-unit{
-      font-size:16px;
-      line-height:1;
-      color:#ffcfac;
-      font-weight:700;
-      margin-left:6px;
-    }
-
-    .price-copy{
-      margin-top:12px;
+    .anchor-small{
+      margin:12px auto 0;
+      max-width:720px;
       font-size:14px;
       line-height:1.45;
-      color:var(--text-secondary);
-      font-weight:600;
-    }
-
-    .price-points{
-      list-style:none;
-      padding:0;
-      margin:14px 0 0;
-      display:grid;
-      gap:8px;
-    }
-
-    .price-points li{
-      display:flex;
-      gap:9px;
-      align-items:flex-start;
-      font-size:14px;
-      line-height:1.4;
-      color:#fff;
-      font-weight:650;
-    }
-
-    .price-points li::before{
-      content:"";
-      width:7px;
-      height:7px;
-      min-width:7px;
-      border-radius:999px;
-      margin-top:6px;
-      background:var(--orange);
-      box-shadow:0 0 10px rgba(249,115,22,.18);
-    }
-
-    .agreement{
-      margin-top:18px;
-      border-top:1px solid rgba(255,255,255,.06);
-      padding-top:18px;
-    }
-
-    .agreement-title{
-      margin:0;
-      font-size:13px;
-      line-height:1.2;
-      color:#fff;
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-    }
-
-    .agreement-copy{
-      margin:10px 0 0;
-      font-size:14px;
-      line-height:1.45;
-      color:var(--text-secondary);
-      font-weight:600;
-    }
-
-    .check-row{
-      margin-top:14px;
-      display:flex;
-      align-items:flex-start;
-      gap:10px;
-    }
-
-    .check-row input{
-      margin-top:4px;
-      accent-color: var(--orange);
-      transform:scale(1.1);
-    }
-
-    .check-row label{
-      font-size:14px;
-      line-height:1.45;
-      color:#fff;
-      font-weight:650;
-    }
-
-    .link-btn{
-      margin-top:10px;
-      display:inline-flex;
-      border:none;
-      background:transparent;
-      color:#ffbb87;
-      font-size:13px;
-      font-weight:700;
-      cursor:pointer;
-      padding:0;
-    }
-
-    .form-grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:14px;
-      margin-top:18px;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-
-    .label{
-      font-size:11px;
-      line-height:1.2;
-      color:#fff;
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-    }
-
-    .input{
-      width:100%;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.08);
-      background:var(--field-bg);
-      color:#fff;
-      padding:14px 14px;
-      font:inherit;
-      outline:none;
-      transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
-    }
-
-    .input::placeholder{
-      color:#8e9db2;
-    }
-
-    .input:focus{
-      border-color:rgba(249,115,22,.32);
-      box-shadow:0 0 0 4px rgba(249,115,22,.08);
-      background:rgba(255,255,255,.04);
-    }
-
-    .stack{
-      display:grid;
-      gap:18px;
-    }
-
-    .mini-panel{
-      border-radius:22px;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(255,255,255,.025);
-      padding:18px 16px;
-    }
-
-    .mini-title{
-      margin:0;
-      font-size:18px;
-      line-height:1.15;
-      color:#fff;
-      font-weight:800;
-      letter-spacing:-.03em;
-    }
-
-    .mini-copy{
-      margin:8px 0 0;
-      font-size:14px;
-      line-height:1.45;
-      color:var(--text-secondary);
-      font-weight:600;
-    }
-
-    .success-row{
-      margin-top:14px;
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-    }
-
-    .success-dot{
-      width:9px;
-      height:9px;
-      min-width:9px;
-      border-radius:999px;
-      margin-top:6px;
-      background:var(--success);
-      box-shadow:0 0 10px rgba(34,197,94,.24);
-    }
-
-    .pay-card{
-      margin-top:14px;
-      border-radius:18px;
-      border:1px dashed rgba(255,255,255,.10);
-      background:rgba(255,255,255,.02);
-      padding:16px 14px;
-    }
-
-    .pay-placeholder{
-      font-size:14px;
-      line-height:1.5;
-      color:#fff;
-      font-weight:650;
-    }
-
-    .pay-note{
-      margin-top:8px;
-      font-size:13px;
-      line-height:1.4;
       color:var(--text-muted);
       font-weight:600;
+      text-wrap:balance;
     }
 
-    .status-chip{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:100px;
-      height:28px;
-      padding:0 10px;
-      border-radius:999px;
-      background:rgba(34,197,94,.10);
-      border:1px solid rgba(34,197,94,.18);
-      color:#93f0b1;
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      margin-top:14px;
+    .final-cta{
+      text-align:center;
+      padding:10px 0 4px;
     }
 
-    .footer{
-      display:grid;
-      grid-template-columns:160px 1fr 280px;
-      align-items:center;
-      gap:14px;
-      padding-top:8px;
+    .final-cta .section-title{
+      max-width:720px;
+      margin:0 auto;
     }
 
-    .back-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:flex-start;
-      border:none;
-      background:transparent;
-      color:var(--text-muted);
-      font-size:13px;
-      font-weight:700;
-      cursor:pointer;
-      padding:0;
-      transition:color .18s ease;
-    }
-
-    .back-btn:hover{ color:#fff; }
-
-    .progress-line{
-      height:8px;
-      border-radius:999px;
-      overflow:hidden;
-      background:#111827;
-      border:1px solid rgba(255,255,255,.05);
-    }
-
-    .progress-fill{
-      height:100%;
-      width:100%;
-      background:linear-gradient(90deg, var(--orange), var(--orange-soft));
-    }
-
-    .activate-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:280px;
-      height:56px;
-      border:none;
-      border-radius:18px;
-      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
-      color:#fff;
-      font-size:13px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      cursor:pointer;
-      box-shadow:0 10px 30px rgba(249,115,22,.28);
-      transition:.18s ease;
-      justify-self:end;
-    }
-
-    .activate-btn:hover{
-      transform:translateY(-2px);
-      filter:brightness(1.04);
-      box-shadow:0 15px 40px rgba(249,115,22,.42);
-    }
-
-    .activate-btn:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-      transform:none;
-      box-shadow:none;
-    }
-
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.72);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:20;
-      padding:18px;
-    }
-
-    .modal.open{ display:flex; }
-
-    .modal-card{
-      width:min(760px, 100%);
-      border-radius:24px;
-      border:1px solid rgba(255,255,255,.08);
-      background:linear-gradient(180deg, rgba(12,15,22,.98), rgba(8,10,16,.99));
-      box-shadow:0 30px 90px rgba(0,0,0,.55);
-      padding:22px 20px 18px;
-    }
-
-    .modal-title{
-      margin:0;
-      font-size:24px;
-      line-height:1.1;
-      font-weight:800;
-      color:#fff;
-    }
-
-    .modal-copy{
-      margin:10px 0 0;
-      font-size:14px;
-      line-height:1.5;
-      color:var(--text-secondary);
-      font-weight:600;
-      white-space:pre-line;
-    }
-
-    .modal-actions{
-      margin-top:18px;
-      display:flex;
-      justify-content:flex-end;
-    }
-
-    .modal-close{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:140px;
-      height:44px;
-      border:none;
-      border-radius:14px;
-      background:rgba(255,255,255,.06);
-      color:#fff;
-      font-size:12px;
-      font-weight:800;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      cursor:pointer;
+    .final-cta .hero-cta{
+      margin-top:22px;
     }
 
     @keyframes logoGlow{
       0%,100%{ filter:drop-shadow(0 0 8px rgba(249,115,22,.20)); }
-      50%{ filter:drop-shadow(0 0 16px rgba(249,115,22,.36)); }
+      50%{ filter:drop-shadow(0 0 16px rgba(249,115,22,.34)); }
+    }
+
+    @keyframes buttonPulse{
+      0%,100%{
+        box-shadow:
+          0 10px 30px rgba(249,115,22,.24),
+          0 0 0 0 rgba(249,115,22,.12);
+        transform:scale(1);
+      }
+      50%{
+        box-shadow:
+          0 14px 36px rgba(249,115,22,.34),
+          0 0 0 8px rgba(249,115,22,0);
+        transform:scale(1.012);
+      }
     }
 
     @media (max-width:1024px){
-      .main{
+      .demo-grid{
+        grid-template-columns:1fr;
+      }
+
+      .features-grid{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .steps-grid{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .steps-grid::before{
+        display:none;
+      }
+
+      .behavior-list{
         grid-template-columns:1fr;
       }
     }
@@ -786,19 +763,16 @@
 
       .shell{
         width:calc(100vw - 20px);
-        min-height:calc(100vh - 20px);
         border-radius:24px;
       }
 
       .inner{
-        padding:12px 12px 20px;
-        min-height:calc(100vh - 20px);
+        padding:12px 12px 22px;
       }
 
       .topbar{
         padding:12px;
-        gap:10px;
-        flex-wrap:wrap;
+        margin-bottom:24px;
       }
 
       .topbar::before{
@@ -828,50 +802,122 @@
         height:18px;
       }
 
-      .progress-chip{
+      .hero{
+        padding-top:8px;
+      }
+
+      .hero-kicker{
+        min-height:28px;
         font-size:9px;
-        height:28px;
+        margin-bottom:14px;
       }
 
       .hero-title{
-        font-size:clamp(24px,7vw,34px);
+        font-size:clamp(26px,9vw,38px);
+        line-height:1.06;
       }
 
       .hero-sub{
+        font-size:16px;
+        line-height:1.34;
+      }
+
+      .hero-support,
+      .hero-steps,
+      .trust-line{
         font-size:14px;
       }
 
+      .primary-btn,
+      .secondary-btn{
+        width:100%;
+        min-width:unset;
+        height:54px;
+        font-size:12px;
+      }
+
+      .block{
+        margin-top:24px;
+      }
+
       .panel{
-        border-radius:22px;
-        padding:20px 16px;
+        border-radius:20px;
+        padding:18px 14px;
       }
 
-      .panel-title{
-        font-size:24px;
+      .section-title{
+        font-size:clamp(20px,7vw,28px);
       }
 
-      .summary-grid{
-        grid-template-columns:1fr;
+      .section-sub{
+        font-size:14px;
       }
 
-      .price-value{
-        font-size:38px;
+      .demo-card{
+        min-height:auto;
+        padding:18px 14px;
       }
 
-      .footer{
+      .demo-title{
+        font-size:22px;
+      }
+
+      .demo-text{
+        font-size:13px;
+      }
+
+      .features-grid{
         grid-template-columns:1fr;
         gap:12px;
       }
 
-      .activate-btn{
-        width:100%;
-        min-width:unset;
-        justify-self:stretch;
+      .feature-item{
+        min-height:auto;
+        padding:16px 14px;
       }
 
-      .back-btn{ order:2; }
-      .progress-line{ order:1; }
-      .activate-btn{ order:3; }
+      .feature-text{
+        font-size:14px;
+      }
+
+      .steps-grid{
+        grid-template-columns:1fr;
+      }
+
+      .step-card{
+        min-height:auto;
+        border-radius:20px;
+        padding:18px 14px 16px;
+      }
+
+      .step-title{
+        font-size:20px;
+      }
+
+      .step-text{
+        font-size:13px;
+      }
+
+      .behavior-list li{
+        font-size:14px;
+      }
+
+      .anchor-price{
+        font-size:clamp(36px,12vw,56px);
+      }
+
+      .anchor-unit{
+        display:block;
+        margin:8px 0 0;
+      }
+
+      .anchor-copy{
+        font-size:15px;
+      }
+
+      .anchor-small{
+        font-size:13px;
+      }
     }
   </style>
 </head>
@@ -895,236 +941,213 @@
               <div class="beta-badge">Beta</div>
             </div>
           </div>
-
-          <div class="progress-chip">Step 4 of 4</div>
         </div>
 
-        <section class="hero">
-          <h1 class="hero-title">Activate your system</h1>
-          <div class="hero-sub">You’ve tested it. You’ve seen it in action. Now make it live.</div>
+        <section class="hero section">
+          <div class="hero-kicker">Built for SMBs and Growing Businesses</div>
+
+          <h1 class="hero-title">
+            AI Call Agents That Handle Every Situation Automatically
+          </h1>
+
+          <div class="hero-sub">
+            Multiple AI agents work together and switch in real time — handling calls, bookings, emergencies, after-hours support, reservations, and customer communication without staff.
+          </div>
+
+          <div class="hero-support">
+            Fully configured. No ongoing management required. Voice, call flows, and responses are prebuilt for performance — and the system improves continuously over time.
+          </div>
+
+          <div class="hero-steps">
+            Built in 4 guided steps. Your system is built automatically and ready to run immediately.
+          </div>
+
+          <div class="hero-cta">
+            <a class="primary-btn" href="step1.html">Build & Test Your System</a>
+            <a class="secondary-btn" href="step1.html">Start Step 1</a>
+          </div>
+
+          <div class="trust-line">
+            No manual setup required. No technical work. Test it before you activate.
+          </div>
         </section>
 
-        <div class="main">
-          <section class="panel">
-            <div class="section-kicker">Activation</div>
-            <h2 class="panel-title">Your system summary</h2>
-            <p class="panel-sub">Everything below is ready for activation. Review the setup, confirm the service terms, and activate your monthly system.</p>
+        <section class="block section">
+          <div class="panel orange">
+            <h2 class="section-title">Test it. Then see how it works.</h2>
+            <p class="section-sub">
+              Call your own business and experience how your system handles real calls — then watch how that same call appears instantly in your dashboard.
+            </p>
 
-            <div class="summary-grid">
-              <div class="summary-card">
-                <div class="summary-label">Country</div>
-                <div class="summary-value" id="summaryCountry">Canada</div>
-                <div class="summary-note">Active market</div>
-              </div>
+            <div class="demo-grid">
+              <div class="demo-card">
+                <div class="demo-label">Demo 1</div>
+                <h3 class="demo-title">Call your own business</h3>
+                <p class="demo-text">
+                  Hear exactly how your system responds to a real call before going live.
+                </p>
 
-              <div class="summary-card">
-                <div class="summary-label">Industry</div>
-                <div class="summary-value" id="summaryIndustry">Plumbing</div>
-                <div class="summary-note">Home Services</div>
-              </div>
-
-              <div class="summary-card">
-                <div class="summary-label">Business Model</div>
-                <div class="summary-value" id="summaryBusinessModel">Appointment-based</div>
-                <div class="summary-note">Configured for service operations</div>
-              </div>
-
-              <div class="summary-card">
-                <div class="summary-label">Team Size</div>
-                <div class="summary-value" id="summaryTeamSize">2–5 people</div>
-                <div class="summary-note">Ready for scaling</div>
-              </div>
-
-              <div class="summary-card">
-                <div class="summary-label">Scheduling</div>
-                <div class="summary-value" id="summaryScheduling">Automatic</div>
-                <div class="summary-note">System-managed appointment flow</div>
-              </div>
-
-              <div class="summary-card">
-                <div class="summary-label">Channels</div>
-                <div class="summary-value" id="summaryChannels">Phone, SMS, Email</div>
-                <div class="summary-note">Primary communication channels</div>
-              </div>
-            </div>
-
-            <div class="price-block">
-              <div class="price-top">
-                <div>
-                  <div class="price-title">Your Monthly System</div>
-                  <div>
-                    <span class="price-value" id="monthlyPrice">$799</span>
-                    <span class="price-unit">/ month</span>
+                <div class="demo-visual">
+                  <div class="phone-line">
+                    <span>Incoming Test Call</span>
+                    <span>AI Answering...</span>
+                  </div>
+                  <div class="wave"></div>
+                  <div class="call-note">
+                    Real call experience — not a simulation
                   </div>
                 </div>
-                <div class="status-chip">Ready to Activate</div>
               </div>
 
-              <div class="price-copy">
-                This monthly system includes your configured AI call flow, dashboard access, CRM layer, communication logic, and live system support.
-              </div>
+              <div class="demo-card">
+                <div class="demo-label">Demo 2</div>
+                <h3 class="demo-title">See the dashboard live</h3>
+                <p class="demo-text">
+                  Watch that same call appear with summaries, actions, and next steps already prepared.
+                </p>
 
-              <ul class="price-points">
-                <li>Fully configured system</li>
-                <li>Monthly service with ongoing improvement</li>
-                <li>Built from your selected workflow and communication needs</li>
-              </ul>
+                <div class="demo-visual dashboard-row">
+                  <div class="dash-item">Call summary generated</div>
+                  <div class="dash-item">Intent detected: Booking request</div>
+                  <div class="dash-item">Next action prepared automatically</div>
+                </div>
+              </div>
             </div>
 
-            <div class="agreement">
-              <h3 class="agreement-title">Service terms</h3>
-              <p class="agreement-copy">
-                This is a monthly service, not a one-time software purchase. Your system stays active while your subscription is active and continues to improve over time.
-              </p>
-
-              <div class="check-row">
-                <input id="agreeTerms" type="checkbox">
-                <label for="agreeTerms">I agree to the monthly service terms and I’m ready to activate my system.</label>
-              </div>
-
-              <button class="link-btn" id="openTermsBtn" type="button">View full agreement</button>
+            <div class="hero-cta" style="margin-top:22px;">
+              <a class="primary-btn" href="step1.html">Build & Test Your System</a>
             </div>
-          </section>
-
-          <aside class="stack">
-            <section class="panel">
-              <div class="section-kicker">Account</div>
-              <h2 class="panel-title">Create your account</h2>
-              <p class="panel-sub">Keep this simple. Once activated, this account will be used to access your dashboard and system settings.</p>
-
-              <div class="form-grid">
-                <div class="field">
-                  <label class="label" for="fullName">Full name</label>
-                  <input class="input" id="fullName" type="text" placeholder="Your full name">
-                </div>
-
-                <div class="field">
-                  <label class="label" for="email">Business email</label>
-                  <input class="input" id="email" type="email" placeholder="name@company.com">
-                </div>
-
-                <div class="field">
-                  <label class="label" for="password">Password</label>
-                  <input class="input" id="password" type="password" placeholder="Create password">
-                </div>
-              </div>
-            </section>
-
-            <section class="mini-panel">
-              <h3 class="mini-title">Payment</h3>
-              <p class="mini-copy">Connect your payment method to activate the monthly system.</p>
-
-              <div class="pay-card">
-                <div class="pay-placeholder">Stripe payment element goes here</div>
-                <div class="pay-note">
-                  Replace this placeholder with your live Stripe payment element or checkout integration.
-                </div>
-              </div>
-
-              <div class="success-row">
-                <div class="success-dot"></div>
-                <div class="mini-copy" style="margin:0;">
-                  You have already tested the call flow and live dashboard. Activation makes that system live for your business.
-                </div>
-              </div>
-            </section>
-
-            <section class="mini-panel">
-              <h3 class="mini-title">What happens after activation</h3>
-              <p class="mini-copy">
-                Your dashboard account becomes active, your system goes live, and your configured call handling and communication flows begin operating immediately.
-              </p>
-            </section>
-          </aside>
-        </div>
-
-        <div class="footer">
-          <button class="back-btn" type="button" onclick="window.location.href='step3.html'">← Back</button>
-          <div class="progress-line">
-            <div class="progress-fill"></div>
           </div>
-          <button class="activate-btn" id="activateBtn" type="button" disabled>Activate My System</button>
-        </div>
+        </section>
+
+        <section class="block section">
+          <div class="panel soft">
+            <h2 class="section-title">Not a receptionist. A complete call system.</h2>
+            <p class="section-sub">
+              Built to handle real business operations, not just answer the phone.
+            </p>
+
+            <div class="features-grid">
+              <div class="feature-item">
+                <div class="feature-dot"></div>
+                <div class="feature-text">Answers every call automatically</div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-dot"></div>
+                <div class="feature-text">Switches behavior based on context</div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-dot"></div>
+                <div class="feature-text">Handles after-hours and emergency calls</div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-dot"></div>
+                <div class="feature-text">Books appointments and reservations</div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-dot"></div>
+                <div class="feature-text">Responds to questions instantly</div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-dot"></div>
+                <div class="feature-text">Works with your CRM — or use ours</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="block section">
+          <div class="panel">
+            <h2 class="section-title">See exactly how it works</h2>
+            <p class="section-sub">
+              Build it. Call it. See it. Activate it.
+            </p>
+
+            <div class="steps-grid">
+              <div class="step-card">
+                <div class="step-number">Step 1</div>
+                <h3 class="step-title">Tell us about your business</h3>
+                <p class="step-text">
+                  We use your inputs to configure your system automatically.
+                </p>
+              </div>
+
+              <div class="step-card highlight">
+                <div class="step-number">Step 2</div>
+                <h3 class="step-title">Test a real call</h3>
+                <p class="step-text">
+                  Call your own business and hear exactly how the system responds.
+                </p>
+              </div>
+
+              <div class="step-card highlight">
+                <div class="step-number">Step 3</div>
+                <h3 class="step-title">See the dashboard live</h3>
+                <p class="step-text">
+                  Watch that call appear instantly with summaries, actions, and next steps.
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-number">Step 4</div>
+                <h3 class="step-title">Activate your system</h3>
+                <p class="step-text">
+                  Review everything, receive your beta pricing, and go live.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="block section">
+          <div class="panel soft">
+            <h2 class="section-title">A system that adapts in real time</h2>
+            <p class="section-sub">
+              Built to run itself, respond intelligently, and improve over time.
+            </p>
+
+            <ul class="behavior-list">
+              <li>Switches between AI agents automatically</li>
+              <li>Understands intent and urgency</li>
+              <li>Adjusts responses per situation</li>
+              <li>Improves over time from real interactions</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="block section">
+          <div class="panel orange pricing-anchor">
+            <div class="benchmark-badge">Industry Cost Benchmark</div>
+            <h2 class="section-title">Built for real business operations</h2>
+
+            <div class="anchor-price">
+              $1,500–$2,000
+              <span class="anchor-unit">/ month</span>
+            </div>
+
+            <div class="anchor-copy">
+              Systems like this typically replace missed calls, manual scheduling, staff coordination, and communication overhead — costing businesses thousands every month.
+            </div>
+
+            <div class="anchor-small">
+              Your system is built based on your setup. You’ll receive your custom beta pricing after configuration.
+            </div>
+
+            <div class="hero-cta">
+              <a class="primary-btn" href="step1.html">Build & Test Your System</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="block section final-cta">
+          <h2 class="section-title">Start simple. Scale into a fully automated call system.</h2>
+          <div class="hero-cta">
+            <a class="primary-btn" href="step1.html">Start Step 1</a>
+          </div>
+        </section>
 
       </div>
     </div>
   </div>
-
-  <div class="modal" id="termsModal">
-    <div class="modal-card">
-      <h3 class="modal-title">Service Agreement</h3>
-      <div class="modal-copy">
-This monthly service includes access to your configured AI call system, dashboard, communication flows, and ongoing service availability.
-
-Your subscription remains active on a monthly basis until cancelled. Your custom configuration, workflow setup, and system behavior are based on the information you selected during onboarding.
-
-Activation confirms that you are starting a monthly service and authorizing billing through your connected payment method.
-
-Replace this text with your final legal service agreement.
-      </div>
-      <div class="modal-actions">
-        <button class="modal-close" id="closeTermsBtn" type="button">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const params = new URLSearchParams(window.location.search);
-
-    function setText(id, value, fallback) {
-      const el = document.getElementById(id);
-      el.textContent = value && value.trim() ? value : fallback;
-    }
-
-    setText("summaryCountry", params.get("country"), "Canada");
-    setText("summaryIndustry", params.get("industry"), "Plumbing");
-    setText("summaryBusinessModel", params.get("businessModel"), "Appointment-based");
-    setText("summaryTeamSize", params.get("teamSize"), "2–5 people");
-    setText("summaryScheduling", params.get("schedulingMode"), "Automatic");
-    setText("summaryChannels", params.get("channels"), "Phone, SMS, Email");
-
-    const activateBtn = document.getElementById("activateBtn");
-    const agreeTerms = document.getElementById("agreeTerms");
-    const fullName = document.getElementById("fullName");
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-
-    function validateActivation() {
-      const ok =
-        agreeTerms.checked &&
-        fullName.value.trim() !== "" &&
-        email.value.trim() !== "" &&
-        password.value.trim() !== "";
-
-      activateBtn.disabled = !ok;
-    }
-
-    [agreeTerms, fullName, email, password].forEach(el => {
-      el.addEventListener("input", validateActivation);
-      el.addEventListener("change", validateActivation);
-    });
-
-    activateBtn.addEventListener("click", () => {
-      alert("Activation logic goes here. Connect this button to Supabase auth + Stripe payment confirmation + system activation.");
-    });
-
-    const termsModal = document.getElementById("termsModal");
-    const openTermsBtn = document.getElementById("openTermsBtn");
-    const closeTermsBtn = document.getElementById("closeTermsBtn");
-
-    openTermsBtn.addEventListener("click", () => {
-      termsModal.classList.add("open");
-    });
-
-    closeTermsBtn.addEventListener("click", () => {
-      termsModal.classList.remove("open");
-    });
-
-    termsModal.addEventListener("click", (e) => {
-      if (e.target === termsModal) {
-        termsModal.classList.remove("open");
-      }
-    });
-  </script>
 </body>
 </html>
