@@ -1,1583 +1,374 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Call Port</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    :root{
-      --bg-main:#05070b;
-      --bg-shell:#080b11;
-      --bg-soft:#0b1119;
-      --bg-card:#0d1118;
-
-      --text-primary:#ffffff;
-      --text-secondary:#d7e0ea;
-      --text-muted:#90a0b5;
-
-      --blue:#3b82f6;
-      --blue-soft:#67d4ff;
-      --orange:#f97316;
-      --orange-soft:#fb923c;
-      --gold:#ffbf2f;
-
-      --border:rgba(255,255,255,.08);
-      --border-soft:rgba(255,255,255,.06);
-    }
-
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-
-    body{
-      margin:0;
-      color:var(--text-primary);
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:linear-gradient(180deg,#05070b 0%, #04060a 100%);
-      position:relative;
-      overflow-x:hidden;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 18% 22%, rgba(59,130,246,.06), transparent 28%),
-        radial-gradient(circle at 82% 78%, rgba(249,115,22,.06), transparent 32%);
-      z-index:0;
-    }
-
-    .grid-bg{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      opacity:.08;
-      background:
-        linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
-      background-size:42px 42px;
-      mask-image:radial-gradient(circle at center, black 42%, transparent 96%);
-      z-index:0;
-    }
-
-    .page{
-      position:relative;
-      z-index:1;
-      min-height:100vh;
-      padding:18px;
-      display:flex;
-      justify-content:center;
-    }
-
-    .shell{
-      width:min(1240px, calc(100vw - 36px));
-      border-radius:30px;
-      border:1px solid rgba(255,255,255,.10);
-      background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));
-      box-shadow:
-        0 36px 100px rgba(0,0,0,.58),
-        inset 0 1px 0 rgba(255,255,255,.04);
-      overflow:hidden;
-      position:relative;
-    }
-
-    .shell::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:radial-gradient(360px circle at 50% 0%, rgba(249,115,22,.04), transparent 56%);
-      z-index:0;
-    }
-
-    .inner{
-      position:relative;
-      z-index:1;
-      padding:18px 20px 56px;
-    }
-
-    .topbar{
-      position:relative;
-      min-height:66px;
-      padding:10px 16px;
-      margin-bottom:34px;
-      display:flex;
-      align-items:center;
-      justify-content:flex-start;
-    }
-
-    .topbar::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius:18px;
-      background:
-        linear-gradient(
-          90deg,
-          rgba(59,130,246,.04),
-          rgba(0,0,0,.92) 22%,
-          rgba(0,0,0,.92) 78%,
-          rgba(249,115,22,.04)
-        );
-      pointer-events:none;
-    }
-
-    .topbar > *{ position:relative; z-index:1; }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
-    }
-
-    .logo-wrap{
-      width:62px;
-      height:62px;
-      min-width:62px;
-      min-height:62px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex:0 0 62px;
-      background:transparent;
-      overflow:visible;
-    }
-
-    .logo{
-      width:54px;
-      height:54px;
-      object-fit:contain;
-      display:block;
-      filter:drop-shadow(0 0 8px rgba(249,115,22,.18));
-      animation:logoGlow 3s ease-in-out infinite;
-    }
-
-    .brand-stack{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .brand-wordmark{
-      display:flex;
-      align-items:flex-end;
-      gap:6px;
-      line-height:1;
-    }
-
-    .brand-ai{
-      font-size:14px;
-      font-weight:900;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-      background:linear-gradient(180deg, var(--blue-soft), var(--blue));
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-    }
-
-    .brand-callport{
-      font-size:14px;
-      font-weight:900;
-      letter-spacing:.02em;
-      text-transform:uppercase;
-      background:linear-gradient(180deg, var(--gold), var(--orange));
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-    }
-
-    .beta-badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      height:20px;
-      padding:0 8px;
-      border-radius:999px;
-      border:1px solid rgba(249,115,22,.24);
-      background:rgba(249,115,22,.10);
-      color:#fff;
-      font-size:9px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-    }
-
-    .section-wide{
-      max-width:1080px;
-      margin:0 auto;
-      position:relative;
-    }
-
-    .section-narrow{
-      max-width:920px;
-      margin:0 auto;
-      position:relative;
-    }
-
-    .hero{
-      text-align:center;
-      padding:12px 0 24px;
-      max-width:760px;
-      margin:0 auto;
-    }
-
-    .hero-kicker{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:30px;
-      padding:0 14px;
-      border-radius:999px;
-      background:rgba(249,115,22,.12);
-      border:1px solid rgba(249,115,22,.24);
-      color:var(--orange);
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      margin-bottom:18px;
-    }
-
-    .hero-title{
-      margin:0;
-      font-size:clamp(28px,4.2vw,50px);
-      line-height:1.03;
-      font-weight:800;
-      letter-spacing:-.055em;
-      color:#fff;
-      text-wrap:balance;
-    }
-
-    .hero-title::after{
-      content:"";
-      display:block;
-      width:80px;
-      height:3px;
-      margin:18px auto 0;
-      border-radius:999px;
-      background:linear-gradient(90deg, var(--blue), var(--blue-soft));
-      opacity:.85;
-    }
-
-    .hero-sub{
-      margin:18px auto 0;
-      max-width:680px;
-      font-size:clamp(17px,1.5vw,21px);
-      line-height:1.34;
-      text-wrap:balance;
-    }
-
-    .blue-highlight{
-      background:linear-gradient(180deg, var(--blue-soft), var(--blue));
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-      font-weight:700;
-      letter-spacing:-0.01em;
-    }
-
-    .hero-support{
-      margin:14px auto 0;
-      max-width:660px;
-      font-size:15px;
-      line-height:1.48;
-      color:var(--text-secondary);
-      font-weight:600;
-      text-wrap:balance;
-    }
-
-    .hero-steps{
-      margin:18px auto 0;
-      max-width:760px;
-      font-size:clamp(22px,2.2vw,30px);
-      line-height:1.28;
-      color:var(--orange);
-      font-weight:900;
-      text-wrap:balance;
-    }
-
-    .hero-steps-grid{
-      margin-top:20px;
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:16px;
-      position:relative;
-    }
-
-    .hero-steps-grid::before{
-      content:"";
-      position:absolute;
-      left:8%;
-      right:8%;
-      top:50%;
-      height:1px;
-      background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(59,130,246,.18),
-        rgba(249,115,22,.10),
-        transparent
-      );
-      z-index:0;
-    }
-
-    .hero-step-card{
-      position:relative;
-      z-index:1;
-      border-radius:22px;
-      border:1px solid var(--border-soft);
-      background:rgba(255,255,255,.03);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
-      padding:18px 15px 16px;
-      min-height:168px;
-      text-align:left;
-      transition:all .22s ease;
-    }
-
-    .hero-step-card:hover{
-      transform:translateY(-4px);
-      border-color:rgba(59,130,246,.22);
-      box-shadow:0 10px 30px rgba(0,0,0,.34);
-    }
-
-    .hero-step-card.highlight{
-      border-color:rgba(249,115,22,.20);
-      background:linear-gradient(180deg, rgba(249,115,22,.07), rgba(255,255,255,.03));
-      box-shadow:
-        0 0 0 1px rgba(249,115,22,.04),
-        0 0 20px rgba(249,115,22,.06);
-    }
-
-    .step-number{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:74px;
-      height:30px;
-      padding:0 12px;
-      border-radius:999px;
-      background:rgba(59,130,246,.12);
-      border:1px solid rgba(59,130,246,.28);
-      color:var(--blue-soft);
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      margin-bottom:14px;
-    }
-
-    .hero-step-title{
-      margin:0;
-      font-size:19px;
-      line-height:1.08;
-      font-weight:800;
-      letter-spacing:-.04em;
-      color:#fff;
-      text-wrap:balance;
-    }
-
-    .hero-step-text{
-      margin:10px 0 0;
-      font-size:13px;
-      line-height:1.42;
-      color:var(--text-secondary);
-      font-weight:600;
-    }
-
-    .proof-strip{
-      margin-top:16px;
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .proof-pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:34px;
-      padding:0 14px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.03);
-      color:#fff;
-      font-size:11px;
-      font-weight:800;
-      letter-spacing:.05em;
-      text-align:center;
-    }
-
-    .hero-cta{
-      margin-top:22px;
-      display:flex;
-      justify-content:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .primary-btn,
-    .secondary-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:280px;
-      height:58px;
-      border-radius:18px;
-      text-decoration:none;
-      font-size:13px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      transition:.18s ease;
-    }
-
-    .primary-btn{
-      border:none;
-      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
-      color:#fff;
-      box-shadow:0 10px 30px rgba(249,115,22,.28);
-      animation:buttonPulse 1.8s ease-in-out infinite;
-    }
-
-    .primary-btn:hover{
-      transform:translateY(-2px);
-      filter:brightness(1.04);
-      box-shadow:0 15px 40px rgba(249,115,22,.42);
-    }
-
-    .secondary-btn{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.03);
-      color:#fff;
-    }
-
-    .secondary-btn:hover{
-      transform:translateY(-2px);
-      background:rgba(59,130,246,.08);
-      border-color:rgba(59,130,246,.30);
-    }
-
-    .trust-line{
-      margin-top:10px;
-      font-size:14px;
-      line-height:1.4;
-      color:var(--text-muted);
-      font-weight:600;
-    }
-
-    .block-sm{ margin-top:56px; }
-    .block-md{ margin-top:76px; }
-    .block-lg{ margin-top:92px; }
-
-    .section-divider::before{
-      content:"";
-      position:absolute;
-      top:-40px;
-      left:50%;
-      transform:translateX(-50%);
-      width:180px;
-      height:1px;
-      background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,.14),
-        transparent
-      );
-      opacity:.75;
-      pointer-events:none;
-    }
-
-    .panel{
-      border-radius:24px;
-      border:1px solid var(--border-soft);
-      background:rgba(255,255,255,.03);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
-      padding:22px 20px;
-    }
-
-    .panel.soft{
-      background:linear-gradient(180deg, rgba(103,212,255,.06), rgba(255,255,255,.02));
-      border-color:rgba(103,212,255,.16);
-      box-shadow:0 0 40px rgba(59,130,246,.06);
-    }
-
-    .panel.orange{
-      background:linear-gradient(180deg, rgba(249,115,22,.08), rgba(255,255,255,.02));
-      border-color:rgba(249,115,22,.16);
-    }
-
-    .panel.subtle{
-      background:linear-gradient(180deg, rgba(255,255,255,.028), rgba(255,255,255,.018));
-      border-color:rgba(255,255,255,.07);
-      box-shadow:none;
-    }
-
-    .section-title{
-      margin:0;
-      text-align:center;
-      font-size:clamp(22px,2.6vw,34px);
-      line-height:1.08;
-      font-weight:800;
-      letter-spacing:-.045em;
-      color:#fff;
-      text-wrap:balance;
-    }
-
-    .section-sub{
-      margin:10px auto 0;
-      max-width:720px;
-      text-align:center;
-      font-size:15px;
-      line-height:1.45;
-      color:var(--text-muted);
-      font-weight:600;
-      text-wrap:balance;
-    }
-
-    .demo-grid{
-      margin-top:20px;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-    }
-
-    .demo-card{
-      border-radius:20px;
-      border:1px solid rgba(255,255,255,.07);
-      background:rgba(255,255,255,.02);
-      padding:20px 18px;
-      min-height:250px;
-    }
-
-    .demo-label{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:88px;
-      height:28px;
-      padding:0 12px;
-      border-radius:999px;
-      background:rgba(249,115,22,.12);
-      border:1px solid rgba(249,115,22,.22);
-      color:var(--orange);
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      margin-bottom:14px;
-    }
-
-    .demo-title{
-      margin:0;
-      font-size:24px;
-      line-height:1.08;
-      font-weight:800;
-      letter-spacing:-.04em;
-      color:#fff;
-      text-wrap:balance;
-    }
-
-    .demo-text{
-      margin:10px 0 0;
-      font-size:14px;
-      line-height:1.46;
-      color:var(--text-secondary);
-      font-weight:600;
-    }
-
-    .demo-visual{
-      margin-top:18px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(0,0,0,.28);
-      padding:14px;
-    }
-
-    .phone-line{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      color:#fff;
-      font-size:14px;
-      font-weight:700;
-      margin-bottom:10px;
-    }
-
-    .wave{
-      height:10px;
-      border-radius:999px;
-      background:
-        linear-gradient(90deg,
-          rgba(59,130,246,.15) 0%,
-          rgba(59,130,246,.55) 15%,
-          rgba(249,115,22,.55) 50%,
-          rgba(59,130,246,.55) 85%,
-          rgba(59,130,246,.15) 100%);
-      box-shadow:0 0 18px rgba(249,115,22,.12);
-    }
-
-    .call-note{
-      margin-top:10px;
-      font-size:13px;
-      color:var(--text-muted);
-      font-weight:600;
-    }
-
-    .dashboard-row{
-      display:grid;
-      gap:8px;
-    }
-
-    .dash-item{
-      border-radius:12px;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.05);
-      padding:10px 12px;
-      font-size:13px;
-      color:#fff;
-      font-weight:650;
-    }
-
-    .pricing-builder{
-      margin-top:20px;
-      display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:18px;
-      align-items:start;
-    }
-
-    .builder-list{
-      display:grid;
-      gap:12px;
-    }
-
-    .builder-card{
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.07);
-      background:rgba(255,255,255,.02);
-      padding:16px 16px 15px;
-    }
-
-    .builder-card.required{
-      border-color:rgba(59,130,246,.20);
-      background:linear-gradient(180deg, rgba(59,130,246,.06), rgba(255,255,255,.02));
-    }
-
-    .builder-card-header{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    .builder-card-title{
-      margin:0;
-      font-size:17px;
-      line-height:1.15;
-      font-weight:800;
-      color:#fff;
-      letter-spacing:-.02em;
-    }
-
-    .builder-card-price{
-      white-space:nowrap;
-      font-size:15px;
-      font-weight:900;
-      color:var(--orange);
-    }
-
-    .builder-card-sub{
-      margin:6px 0 0;
-      font-size:13px;
-      line-height:1.42;
-      color:var(--text-secondary);
-      font-weight:600;
-    }
-
-    .builder-points{
-      margin:12px 0 0;
-      padding:0;
-      list-style:none;
-      display:grid;
-      gap:6px;
-    }
-
-    .builder-points li{
-      display:flex;
-      align-items:flex-start;
-      gap:8px;
-      font-size:13px;
-      line-height:1.4;
-      color:#fff;
-      font-weight:600;
-    }
-
-    .builder-points li::before{
-      content:"";
-      width:7px;
-      height:7px;
-      min-width:7px;
-      border-radius:999px;
-      margin-top:6px;
-      background:linear-gradient(180deg, var(--blue-soft), var(--blue));
-      box-shadow:0 0 10px rgba(59,130,246,.18);
-    }
-
-    .builder-note{
-      margin-top:10px;
-      font-size:13px;
-      line-height:1.42;
-      color:var(--orange);
-      font-weight:700;
-    }
-
-    .price-box{
-      border-radius:22px;
-      border:1px solid rgba(249,115,22,.18);
-      background:linear-gradient(180deg, rgba(249,115,22,.09), rgba(255,255,255,.02));
-      padding:18px 18px 20px;
-      position:sticky;
-      top:18px;
-    }
-
-    .price-box-kicker{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:28px;
-      padding:0 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.08);
-      color:#fff;
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      margin-bottom:14px;
-    }
-
-    .price-box-title{
-      margin:0;
-      font-size:26px;
-      line-height:1.05;
-      font-weight:800;
-      letter-spacing:-.04em;
-      color:#fff;
-    }
-
-    .price-box-value{
-      margin-top:14px;
-      font-size:clamp(34px,4vw,50px);
-      line-height:1;
-      font-weight:850;
-      letter-spacing:-.05em;
-      color:#fff;
-    }
-
-    .price-box-value span{
-      font-size:15px;
-      color:#ffffffb0;
-      font-weight:700;
-      margin-left:6px;
-    }
-
-    .price-box-copy{
-      margin-top:12px;
-      font-size:14px;
-      line-height:1.45;
-      color:var(--text-secondary);
-      font-weight:600;
-    }
-
-    .price-box-list{
-      margin:14px 0 0;
-      padding:0;
-      list-style:none;
-      display:grid;
-      gap:7px;
-    }
-
-    .price-box-list li{
-      display:flex;
-      gap:8px;
-      align-items:flex-start;
-      font-size:13px;
-      line-height:1.42;
-      color:#fff;
-      font-weight:600;
-    }
-
-    .price-box-list li::before{
-      content:"";
-      width:7px;
-      height:7px;
-      min-width:7px;
-      border-radius:999px;
-      margin-top:6px;
-      background:var(--orange);
-      box-shadow:0 0 10px rgba(249,115,22,.16);
-    }
-
-    .price-box-foot{
-      margin-top:16px;
-      padding-top:14px;
-      border-top:1px solid rgba(255,255,255,.08);
-      font-size:13px;
-      line-height:1.42;
-      color:var(--text-muted);
-      font-weight:600;
-    }
-
-    .beta-benefits{
-      margin-top:18px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.02);
-      padding:16px;
-    }
-
-    .beta-benefits h3{
-      margin:0;
-      font-size:18px;
-      line-height:1.1;
-      font-weight:800;
-      color:#fff;
-      letter-spacing:-.02em;
-    }
-
-    .beta-benefits ul{
-      margin:12px 0 0;
-      padding:0;
-      list-style:none;
-      display:grid;
-      gap:7px;
-    }
-
-    .beta-benefits li{
-      display:flex;
-      align-items:flex-start;
-      gap:8px;
-      font-size:13px;
-      line-height:1.42;
-      color:#fff;
-      font-weight:600;
-    }
-
-    .beta-benefits li::before{
-      content:"";
-      width:7px;
-      height:7px;
-      min-width:7px;
-      border-radius:999px;
-      margin-top:6px;
-      background:var(--orange);
-      box-shadow:0 0 10px rgba(249,115,22,.16);
-    }
-
-    .pricing-anchor{
-      text-align:center;
-      padding:8px 0 2px;
-    }
-
-    .benchmark-badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:28px;
-      padding:0 12px;
-      border-radius:999px;
-      background:rgba(249,115,22,.12);
-      border:1px solid rgba(249,115,22,.22);
-      color:var(--orange);
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      margin-bottom:16px;
-    }
-
-    .anchor-strike-wrap{
-      margin-top:16px;
-      opacity:.88;
-    }
-
-    .anchor-strike{
-      font-size:clamp(26px,3vw,42px);
-      line-height:1.1;
-      font-weight:750;
-      letter-spacing:-.03em;
-      color:rgba(255,255,255,.75);
-      text-decoration:line-through;
-      text-decoration-thickness:2px;
-      text-decoration-color:rgba(249,115,22,.6);
-    }
-
-    .anchor-copy{
-      margin:18px auto 0;
-      max-width:680px;
-      font-size:17px;
-      line-height:1.5;
-      color:var(--text-secondary);
-      font-weight:600;
-      text-wrap:balance;
-    }
-
-    .anchor-small{
-      margin:12px auto 0;
-      max-width:640px;
-      font-size:14px;
-      line-height:1.45;
-      color:var(--text-muted);
-      font-weight:600;
-      text-wrap:balance;
-    }
-
-    .anchor-beta{
-      margin:16px auto 0;
-      max-width:620px;
-      font-size:14px;
-      line-height:1.45;
-      color:var(--orange);
-      font-weight:800;
-      text-wrap:balance;
-    }
-
-    .final-cta{
-      text-align:center;
-      padding:8px 0 4px;
-    }
-
-    .final-cta .section-title{
-      max-width:620px;
-      margin:0 auto;
-    }
-
-    .final-cta .hero-cta{
-      margin-top:20px;
-    }
-
-    @keyframes logoGlow{
-      0%,100%{ filter:drop-shadow(0 0 8px rgba(249,115,22,.18)); }
-      50%{ filter:drop-shadow(0 0 16px rgba(249,115,22,.30)); }
-    }
-
-    @keyframes buttonPulse{
-      0%,100%{
-        box-shadow:
-          0 10px 30px rgba(249,115,22,.24),
-          0 0 0 0 rgba(249,115,22,.12);
-        transform:scale(1);
-      }
-      50%{
-        box-shadow:
-          0 14px 36px rgba(249,115,22,.34),
-          0 0 0 8px rgba(249,115,22,0);
-        transform:scale(1.012);
-      }
-    }
-
-    @media (max-width:1024px){
-      .hero-steps-grid{
-        grid-template-columns:1fr 1fr;
-      }
-
-      .hero-steps-grid::before{
-        display:none;
-      }
-
-      .demo-grid,
-      .pricing-builder{
-        grid-template-columns:1fr;
-      }
-
-      .features-grid{
-        grid-template-columns:1fr 1fr;
-      }
-
-      .behavior-list{
-        grid-template-columns:1fr;
-      }
-
-      .price-box{
-        position:static;
-      }
-    }
-
-    @media (max-width:720px){
-      .page{
-        padding:10px;
-      }
-
-      .shell{
-        width:calc(100vw - 20px);
-        border-radius:24px;
-      }
-
-      .inner{
-        padding:12px 12px 28px;
-      }
-
-      .topbar{
-        padding:12px;
-        margin-bottom:24px;
-      }
-
-      .topbar::before{
-        border-radius:16px;
-      }
-
-      .logo-wrap{
-        width:50px;
-        height:50px;
-        min-width:50px;
-        min-height:50px;
-        flex:0 0 50px;
-      }
-
-      .logo{
-        width:42px;
-        height:42px;
-      }
-
-      .brand-ai,
-      .brand-callport{
-        font-size:12px;
-      }
-
-      .beta-badge{
-        font-size:8px;
-        height:18px;
-      }
-
-      .hero{
-        padding:8px 0 14px;
-      }
-
-      .hero-kicker{
-        min-height:28px;
-        font-size:9px;
-        margin-bottom:14px;
-      }
-
-      .hero-title{
-        font-size:clamp(26px,9vw,38px);
-        line-height:1.06;
-      }
-
-      .hero-sub{
-        font-size:16px;
-        line-height:1.34;
-      }
-
-      .hero-support,
-      .trust-line{
-        font-size:14px;
-      }
-
-      .hero-steps{
-        font-size:clamp(19px,6vw,24px);
-      }
-
-      .hero-steps-grid{
-        grid-template-columns:1fr;
-      }
-
-      .primary-btn,
-      .secondary-btn{
-        width:100%;
-        min-width:unset;
-        height:54px;
-        font-size:12px;
-      }
-
-      .block-sm{ margin-top:34px; }
-      .block-md{ margin-top:42px; }
-      .block-lg{ margin-top:50px; }
-
-      .section-divider::before{
-        top:-24px;
-        width:120px;
-      }
-
-      .panel{
-        border-radius:20px;
-        padding:18px 14px;
-      }
-
-      .section-title{
-        font-size:clamp(20px,7vw,28px);
-      }
-
-      .section-sub{
-        font-size:14px;
-      }
-
-      .hero-step-card{
-        min-height:auto;
-        padding:18px 14px 16px;
-        border-radius:20px;
-      }
-
-      .hero-step-title{
-        font-size:20px;
-      }
-
-      .hero-step-text{
-        font-size:13px;
-      }
-
-      .demo-card{
-        min-height:auto;
-        padding:18px 14px;
-      }
-
-      .demo-title{
-        font-size:22px;
-      }
-
-      .demo-text{
-        font-size:13px;
-      }
-
-      .features-grid{
-        grid-template-columns:1fr;
-        gap:12px;
-      }
-
-      .feature-item{
-        min-height:auto;
-        padding:16px 14px;
-      }
-
-      .feature-text{
-        font-size:14px;
-      }
-
-      .proof-pill{
-        width:100%;
-      }
-
-      .behavior-list li,
-      .builder-points li,
-      .price-box-list li{
-        font-size:13px;
-      }
-
-      .anchor-strike{
-        font-size:clamp(22px,7vw,34px);
-      }
-
-      .anchor-copy{
-        font-size:15px;
-      }
-
-      .anchor-small,
-      .anchor-beta{
-        font-size:13px;
-      }
-
-      .price-box-value{
-        font-size:clamp(30px,10vw,40px);
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Call Port</title>
+
+<style>
+:root{
+  --bg:#05070d;
+  --card:#0b1220;
+  --border:rgba(255,255,255,.08);
+  --text:#e6edf3;
+  --text-secondary:#9aa4b2;
+  --orange:#f97316;
+  --blue:#38bdf8;
+}
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;
+  background:radial-gradient(circle at top,#0a0f1f 0%,#05070d 70%);
+  color:var(--text);
+}
+
+section{
+  padding:110px 20px;
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+}
+
+h1{
+  font-size:48px;
+  text-align:center;
+  margin-bottom:20px;
+}
+
+p{
+  text-align:center;
+  color:var(--text-secondary);
+  max-width:700px;
+  margin:0 auto 30px;
+}
+
+.highlight{
+  color:var(--blue);
+  font-weight:600;
+}
+
+.orange{
+  color:var(--orange);
+  font-weight:700;
+}
+
+/* buttons */
+
+.btn{
+  display:inline-block;
+  padding:16px 28px;
+  border-radius:12px;
+  font-weight:600;
+  text-decoration:none;
+}
+
+.primary{
+  background:linear-gradient(135deg,#ff7a18,#ff9a3c);
+  color:#fff;
+}
+
+.secondary{
+  border:1px solid var(--border);
+  color:#fff;
+}
+
+/* cards */
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:24px;
+}
+
+/* feature grid */
+
+.features{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:16px;
+  margin-top:40px;
+}
+
+.feature{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+
+.dot{
+  width:8px;
+  height:8px;
+  background:var(--blue);
+  border-radius:50%;
+  margin-top:6px;
+}
+
+/* steps */
+
+.steps{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+  margin-top:40px;
+}
+
+.step{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px;
+}
+
+/* pricing */
+
+.pricing{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+}
+
+@media(max-width:900px){
+  .pricing{grid-template-columns:1fr;}
+}
+
+.price-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:24px;
+}
+
+.price{
+  font-size:26px;
+  font-weight:700;
+  color:var(--orange);
+}
+
+/* compact upgrades */
+
+.compact{
+  margin-top:14px;
+  font-size:13px;
+  color:var(--text-secondary);
+  text-align:center;
+}
+
+/* spacing fix */
+
+.spaced{
+  margin-top:60px;
+}
+
+</style>
 </head>
+
 <body>
-  <div class="grid-bg"></div>
 
-  <div class="page">
-    <div class="shell">
-      <div class="inner">
+<section>
+<div class="container">
 
-        <div class="topbar">
-          <div class="brand">
-            <div class="logo-wrap">
-              <img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo">
-            </div>
-            <div class="brand-stack">
-              <div class="brand-wordmark">
-                <span class="brand-ai">AI</span>
-                <span class="brand-callport">CALL PORT</span>
-              </div>
-              <div class="beta-badge">Beta</div>
-            </div>
-          </div>
-        </div>
+<h1>AI Call Agents That Handle Every Situation Automatically</h1>
 
-        <section class="hero section-wide">
-          <div class="hero-kicker">Built for SMBs and Growing Businesses</div>
+<p class="highlight">
+Multiple AI agents work together in real time — handling calls, scheduling, bookings, emergencies, after-hours support, and customer communication without staff.
+</p>
 
-          <h1 class="hero-title">
-            AI Call Agents That Handle Every Situation Automatically
-          </h1>
+<p>
+Set up in 4 guided steps. Your system is built automatically and ready to run immediately.
+</p>
 
-          <div class="hero-sub blue-highlight">
-            Multiple AI agents work together and switch in real time — handling calls, scheduling, bookings, emergencies, after-hours support, reservations, and customer communication without staff.
-          </div>
+<div class="steps">
 
-          <div class="hero-support">
-            Fully configured. No ongoing management required. Voice, call flows, and responses are prebuilt for performance — and the system improves continuously over time.
-          </div>
+<div class="step">
+<strong>Step 1</strong>
+<p>Tell us about your business</p>
+</div>
 
-          <div class="hero-steps">
-            Set up in 4 guided steps. Your system is built automatically and ready to run immediately.
-          </div>
+<div class="step">
+<strong>Step 2</strong>
+<p>Test a real call</p>
+</div>
 
-          <div class="hero-steps-grid">
-            <div class="hero-step-card">
-              <div class="step-number">Step 1</div>
-              <h3 class="hero-step-title">Tell us about your business</h3>
-              <p class="hero-step-text">
-                Configure calls, scheduling, and communication.
-              </p>
-            </div>
+<div class="step">
+<strong>Step 3</strong>
+<p>See dashboard live</p>
+</div>
 
-            <div class="hero-step-card highlight">
-              <div class="step-number">Step 2</div>
-              <h3 class="hero-step-title">Test a real call</h3>
-              <p class="hero-step-text">
-                Hear how the system responds live.
-              </p>
-            </div>
+<div class="step">
+<strong>Step 4</strong>
+<p>Activate your system</p>
+</div>
 
-            <div class="hero-step-card highlight">
-              <div class="step-number">Step 3</div>
-              <h3 class="hero-step-title">See the dashboard live</h3>
-              <p class="hero-step-text">
-                Watch summaries, actions, and next steps appear.
-              </p>
-            </div>
+</div>
 
-            <div class="hero-step-card">
-              <div class="step-number">Step 4</div>
-              <h3 class="hero-step-title">Activate your system</h3>
-              <p class="hero-step-text">
-                Get beta pricing and go live.
-              </p>
-            </div>
-          </div>
+<p class="spaced">
+<span class="orange">Limited-time beta pricing</span> • 75 countries • All industries supported
+</p>
 
-          <div class="proof-strip">
-            <div class="proof-pill">Limited-time beta pricing</div>
-            <div class="proof-pill">75 active countries</div>
-            <div class="proof-pill">Every SMB industry</div>
-          </div>
+<div style="text-align:center;">
+<a class="btn primary" href="#">Build & Test Your System</a>
+</div>
 
-          <div class="hero-cta">
-            <a class="primary-btn" href="step1.html">Build & Test Your System</a>
-            <a class="secondary-btn" href="step1.html">Start Step 1</a>
-          </div>
+</div>
+</section>
 
-          <div class="trust-line">
-            No manual setup required. Test the real call before you activate anything.
-          </div>
-        </section>
+<!-- DEMO -->
 
-        <section class="block-md section-wide">
-          <div class="panel orange">
-            <h2 class="section-title">Test it. Then see how it works.</h2>
-            <p class="section-sub">
-              Call your own business and experience how your system handles real calls — then watch how that same call appears instantly inside your dashboard.
-            </p>
+<section>
+<div class="container">
 
-            <div class="demo-grid">
-              <div class="demo-card">
-                <div class="demo-label">Demo 1</div>
-                <h3 class="demo-title">Call your own business</h3>
-                <p class="demo-text">
-                  Hear exactly how your system responds to a real call before going live.
-                </p>
+<h1>Test it. Then see how it works.</h1>
 
-                <div class="demo-visual">
-                  <div class="phone-line">
-                    <span>Incoming Test Call</span>
-                    <span>AI Responding...</span>
-                  </div>
-                  <div class="wave"></div>
-                  <div class="call-note">
-                    Real call experience — not a simulation
-                  </div>
-                </div>
-              </div>
+<p>
+Call your business and watch how the system responds instantly.
+</p>
 
-              <div class="demo-card">
-                <div class="demo-label">Demo 2</div>
-                <h3 class="demo-title">See the dashboard live</h3>
-                <p class="demo-text">
-                  Watch that same call appear with summaries, actions, and next steps already prepared.
-                </p>
+</div>
+</section>
 
-                <div class="demo-visual dashboard-row">
-                  <div class="dash-item">Call summary generated</div>
-                  <div class="dash-item">Intent detected automatically</div>
-                  <div class="dash-item">Next action prepared instantly</div>
-                </div>
-              </div>
-            </div>
+<!-- FEATURES -->
 
-            <div class="hero-cta" style="margin-top:22px;">
-              <a class="primary-btn" href="step1.html">Build & Test Your System</a>
-            </div>
-          </div>
-        </section>
+<section>
+<div class="container">
 
-        <section class="block-lg section-wide section-divider">
-          <div class="panel soft">
-            <h2 class="section-title">Not a receptionist. A complete call system.</h2>
-            <p class="section-sub">
-              Built to handle real business operations, not just answer the phone.
-            </p>
+<h1>Not a receptionist. A complete call system.</h1>
 
-            <div class="features-grid">
-              <div class="feature-item">
-                <div class="feature-dot"></div>
-                <div class="feature-text">Answers every call automatically</div>
-              </div>
-              <div class="feature-item">
-                <div class="feature-dot"></div>
-                <div class="feature-text">Switches behavior based on context</div>
-              </div>
-              <div class="feature-item">
-                <div class="feature-dot"></div>
-                <div class="feature-text">Handles after-hours and emergency calls</div>
-              </div>
-              <div class="feature-item">
-                <div class="feature-dot"></div>
-                <div class="feature-text">Built-in scheduling for service and sales calls</div>
-              </div>
-              <div class="feature-item">
-                <div class="feature-dot"></div>
-                <div class="feature-text">Works with your CRM — or use ours</div>
-              </div>
-              <div class="feature-item">
-                <div class="feature-dot"></div>
-                <div class="feature-text">Multilingual across 75 active countries</div>
-              </div>
-            </div>
+<div class="features">
 
-            <div class="upgrade-pill">
-              <strong>Optional growth upgrade:</strong> Outbound calling + lead generation
-            </div>
-          </div>
-        </section>
+<div class="card feature"><div class="dot"></div>Answers every call automatically</div>
+<div class="card feature"><div class="dot"></div>Switches behavior based on context</div>
+<div class="card feature"><div class="dot"></div>Handles emergencies & after-hours</div>
+<div class="card feature"><div class="dot"></div>Built-in scheduling system</div>
+<div class="card feature"><div class="dot"></div>CRM integration</div>
+<div class="card feature"><div class="dot"></div>Multilingual in 75 countries</div>
 
-        <section class="block-md section-wide">
-          <div class="panel subtle">
-            <h2 class="section-title">A system that adapts in real time</h2>
-            <p class="section-sub">
-              Built to run itself, respond intelligently, and improve over time.
-            </p>
+</div>
 
-            <ul class="behavior-list">
-              <li>Switches between AI agents automatically</li>
-              <li>Understands intent and urgency</li>
-              <li>Adjusts responses by situation</li>
-              <li>Improves over time from real interactions</li>
-            </ul>
-          </div>
-        </section>
+<p class="orange spaced">
+Optional upgrade: outbound calling & lead generation
+</p>
 
-        <section class="block-lg section-wide section-divider">
-          <div class="panel soft">
-            <h2 class="section-title">Build your system. Pay only for what you need.</h2>
-            <p class="section-sub">
-              Start with a core AI call system. Add the features your business needs. Your final price depends on your configuration.
-            </p>
+</div>
+</section>
 
-            <div class="pricing-builder">
-              <div class="builder-list">
-                <div class="builder-card required">
-                  <div class="builder-card-header">
-                    <div>
-                      <h3 class="builder-card-title">Core AI Call Handling System</h3>
-                      <p class="builder-card-sub">Required base system</p>
-                    </div>
-                    <div class="builder-card-price">$199/mo</div>
-                  </div>
+<!-- INTELLIGENCE -->
 
-                  <ul class="builder-points">
-                    <li>Answers every incoming call automatically</li>
-                    <li>Greets callers professionally using your business name</li>
-                    <li>Understands caller intent and captures leads or messages</li>
-                    <li>Handles common questions and after-hours calls</li>
-                    <li>Logs and summarizes every call in your dashboard</li>
-                  </ul>
+<section>
+<div class="container">
 
-                  <div class="builder-note">Includes 200 minutes • Overage: $0.90/min</div>
-                </div>
+<h1>A system that adapts in real time</h1>
 
-                <div class="builder-card">
-                  <div class="builder-card-header">
-                    <div>
-                      <h3 class="builder-card-title">Smart Scheduling & Workforce Coordination</h3>
-                      <p class="builder-card-sub">Bookings, reminders, assignment logic</p>
-                    </div>
-                    <div class="builder-card-price">+$149/mo</div>
-                  </div>
+<div class="features">
 
-                  <ul class="builder-points">
-                    <li>Books service and sales appointments during calls</li>
-                    <li>Assigns work to available staff automatically</li>
-                    <li>Staff enter availability and receive instant notifications</li>
-                    <li>Team members must confirm assignments</li>
-                    <li>If ignored, the system reassigns to another worker</li>
-                    <li>Owner receives all notifications and visibility</li>
-                    <li>Sends confirmations and reminders to customers and staff</li>
-                  </ul>
+<div class="feature"><div class="dot"></div>Switches AI agents automatically</div>
+<div class="feature"><div class="dot"></div>Understands intent & urgency</div>
+<div class="feature"><div class="dot"></div>Adjusts responses dynamically</div>
+<div class="feature"><div class="dot"></div>Improves from real interactions</div>
 
-                  <div class="builder-note">Prevents missed jobs and ensures every lead is handled</div>
-                </div>
+</div>
 
-                <div class="builder-card">
-                  <div class="builder-card-header">
-                    <div>
-                      <h3 class="builder-card-title">Advanced Call Logic</h3>
-                      <p class="builder-card-sub">Multi-scenario handling</p>
-                    </div>
-                    <div class="builder-card-price">+$149/mo</div>
-                  </div>
+</div>
+</section>
 
-                  <ul class="builder-points">
-                    <li>Handles service, sales, support, and urgent calls differently</li>
-                    <li>Routes based on intent, urgency, and situation</li>
-                    <li>Uses structured workflows and escalation logic</li>
-                  </ul>
-                </div>
+<!-- PRICING BUILDER -->
 
-                <div class="builder-card">
-                  <div class="builder-card-header">
-                    <div>
-                      <h3 class="builder-card-title">CRM Integration</h3>
-                      <p class="builder-card-sub">Connect your existing system</p>
-                    </div>
-                    <div class="builder-card-price">+$149/mo</div>
-                  </div>
+<section>
+<div class="container">
 
-                  <ul class="builder-points">
-                    <li>Creates and updates leads automatically</li>
-                    <li>Logs calls, summaries, and customer interactions</li>
-                    <li>Keeps your pipeline up to date</li>
-                  </ul>
-                </div>
+<h1>Build your system. Pay only for what you need.</h1>
 
-                <div class="builder-card">
-                  <div class="builder-card-header">
-                    <div>
-                      <h3 class="builder-card-title">Multilingual System</h3>
-                      <p class="builder-card-sub">Serve more customers</p>
-                    </div>
-                    <div class="builder-card-price">+$99/mo</div>
-                  </div>
+<p>
+Start with a core AI system. Add features as your business grows.
+</p>
 
-                  <ul class="builder-points">
-                    <li>Answers calls in multiple languages</li>
-                    <li>Switches based on customer language automatically</li>
-                  </ul>
-                </div>
+<div class="pricing">
 
-                <div class="builder-card">
-                  <div class="builder-card-header">
-                    <div>
-                      <h3 class="builder-card-title">Outbound Calling & Lead Generation</h3>
-                      <p class="builder-card-sub">Optional growth upgrade</p>
-                    </div>
-                    <div class="builder-card-price">From +$300/mo</div>
-                  </div>
+<div>
 
-                  <ul class="builder-points">
-                    <li>Calls leads automatically</li>
-                    <li>Qualifies prospects and books appointments</li>
-                    <li>Runs outbound campaigns to generate new business</li>
-                  </ul>
-                </div>
-              </div>
+<div class="price-card">
+<strong>Core AI Call Handling</strong>
+<div class="price">$199/mo</div>
 
-              <div>
-                <div class="price-box">
-                  <div class="price-box-kicker">Typical Pricing</div>
-                  <h3 class="price-box-title">Your system starts here</h3>
-                  <div class="price-box-value">$199<span>/month</span></div>
+<ul>
+<li>Answers every incoming call</li>
+<li>Captures leads and messages</li>
+<li>Handles common questions</li>
+<li>Call summaries in dashboard</li>
+</ul>
 
-                  <div class="price-box-copy">
-                    Start with core AI call handling and add only the features your business actually needs.
-                  </div>
+<p class="orange">Includes 200 minutes • $0.90/min overage</p>
+</div>
 
-                  <ul class="price-box-list">
-                    <li>Solo businesses often land at $199–$350/month</li>
-                    <li>Growing businesses often land at $400–$700/month</li>
-                    <li>Advanced systems often land at $700–$1,200+/month</li>
-                    <li>Additional users: +$15/month each</li>
-                  </ul>
+<div class="price-card">
+<strong>Scheduling & Workforce</strong>
+<div class="price">+$149/mo</div>
 
-                  <div class="price-box-foot">
-                    Most businesses start simple and expand as they grow. You only pay for what your system uses.
-                  </div>
-                </div>
+<ul>
+<li>Books service & sales calls</li>
+<li>Assigns jobs automatically</li>
+<li>Staff confirms assignments</li>
+<li>Auto reassignment if ignored</li>
+<li>Notifications to owner</li>
+</ul>
+</div>
 
-                <div class="beta-benefits">
-                  <h3>Beta access benefits</h3>
-                  <ul>
-                    <li>Full system setup included <strong style="color:var(--orange);">(normally $1,500)</strong></li>
-                    <li>No upfront setup cost during beta</li>
-                    <li>Pricing locked for 12 months</li>
-                    <li>Cancel anytime</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+<div class="price-card">
+<strong>Advanced Call Logic</strong>
+<div class="price">+$149/mo</div>
 
-            <div class="hero-cta" style="margin-top:24px;">
-              <a class="primary-btn" href="step1.html">Build & Test Your System</a>
-            </div>
-          </div>
-        </section>
+<ul>
+<li>Handles service vs sales vs urgent</li>
+<li>Smart routing logic</li>
+<li>Escalation workflows</li>
+</ul>
+</div>
 
-        <section class="block-lg section-narrow section-divider">
-          <div class="panel orange pricing-anchor">
-            <div class="benchmark-badge">Limited-Time Beta Access</div>
-            <h2 class="section-title">Projected regular pricing after beta</h2>
+<div class="compact">
+CRM +$149 • Multilingual +$99 • Outbound from +$300 • Users +$15
+</div>
 
-            <div class="anchor-strike-wrap">
-              <div class="anchor-strike">$1,500–$2,000/month</div>
-            </div>
+</div>
 
-            <div class="anchor-copy">
-              Your custom limited-time beta price is shown after configuration and live preview.
-            </div>
+<div>
 
-            <div class="anchor-small">
-              This is projected regular pricing after beta, not your final beta price.
-            </div>
+<div class="price-card">
 
-            <div class="anchor-beta">
-              Limited-time beta pricing for early customers
-            </div>
+<h2>Your system starts at $199/mo</h2>
 
-            <div class="hero-cta">
-              <a class="primary-btn" href="step1.html">Build & Test Your System</a>
-            </div>
-          </div>
-        </section>
+<p>
+Most businesses start small and expand over time.
+</p>
 
-        <section class="block-md section-narrow">
-          <div class="final-cta">
-            <h2 class="section-title">Start simple. Scale into a fully automated call system.</h2>
-            <div class="hero-cta">
-              <a class="primary-btn" href="step1.html">Start Step 1</a>
-            </div>
-          </div>
-        </section>
+<ul>
+<li>Solo: $199–$350/mo</li>
+<li>Growing: $400–$700/mo</li>
+<li>Advanced: $700–$1200+</li>
+</ul>
 
-      </div>
-    </div>
-  </div>
+<p class="orange">
+Beta includes full setup (normally $1500)
+</p>
+
+<p>
+No setup cost • Price locked 12 months • Cancel anytime
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div style="text-align:center;margin-top:40px;">
+<a class="btn primary" href="#">Build & Test Your System</a>
+</div>
+
+</div>
+</section>
+
 </body>
 </html>
