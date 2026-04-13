@@ -1,2006 +1,840 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Call Port — Step 2</title>
-<style>
-:root{
---bg:#06080f;
---panel:rgba(12,14,21,.94);
---border:rgba(255,255,255,.10);
---border-soft:rgba(255,255,255,.06);
---text:rgba(255,255,255,.96);
---muted:rgba(203,213,225,.82);
---muted2:rgba(148,163,184,.68);
---orange:#f97316;
---orange2:#ea580c;
---green:#22c55e;
---blue:#38bdf8;
-}
-
-*{
-box-sizing:border-box;
-min-width:0;
-}
-
-html,body{
-height:100%;
-max-width:100%;
-overflow-x:hidden;
-}
-
-body{
-margin:0;
-overflow-x:hidden;
-background:
-radial-gradient(circle at 20% 14%, rgba(249,115,22,.05), transparent 22%),
-radial-gradient(circle at 82% 18%, rgba(249,115,22,.035), transparent 18%),
-linear-gradient(180deg, #080a11 0%, #06080f 100%);
-color:var(--text);
-font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-.grid-bg{
-position:fixed;
-inset:0;
-pointer-events:none;
-opacity:.18;
-background:
-linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
-linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
-background-size:42px 42px;
-mask-image:radial-gradient(circle at center, black 42%, transparent 96%);
-}
-
-.screen{
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:12px;
-width:100%;
-max-width:100%;
-}
-
-.shell{
-width:min(1380px, calc(100vw - 24px));
-max-width:100%;
-height:min(94vh, 940px);
-border-radius:30px;
-border:1px solid rgba(255,255,255,.10);
-background:linear-gradient(180deg, rgba(17,19,28,.96), rgba(10,12,18,.98));
-box-shadow:0 10px 40px rgba(0,0,0,.40);
-overflow:hidden;
-}
-
-.content{
-height:100%;
-display:grid;
-grid-template-rows:auto auto 1fr auto;
-gap:12px;
-padding:18px 20px 16px;
-}
-
-.topbar{
-display:grid;
-grid-template-columns:220px 1fr 220px;
-align-items:start;
-gap:14px;
-}
-
-.brand{
-display:flex;
-align-items:center;
-gap:10px;
-min-width:0;
-}
-
-.brand-mark{
-width:16px;
-height:16px;
-border-radius:5px;
-background:var(--orange);
-flex:0 0 auto;
-margin-top:2px;
-}
-
-.brand-name{
-font-size:15px;
-font-weight:900;
-letter-spacing:.02em;
-text-transform:uppercase;
-white-space:nowrap;
-color:#fff;
-}
-
-.beta-badge{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-height:22px;
-padding:0 8px;
-border-radius:999px;
-border:1px solid rgba(249,115,22,.24);
-background:rgba(249,115,22,.08);
-color:#fff;
-font-size:10px;
-font-weight:900;
-letter-spacing:.16em;
-text-transform:uppercase;
-}
-
-.title-wrap{
-text-align:center;
-padding-top:2px;
-}
-
-.title-wrap .step{
-display:block;
-color:rgba(249,115,22,.90);
-font-size:14px;
-font-weight:900;
-letter-spacing:.18em;
-text-transform:uppercase;
-margin-bottom:8px;
-}
-
-.title-wrap h1{
-margin:0;
-font-size:clamp(30px,4vw,52px);
-line-height:.95;
-font-weight:900;
-letter-spacing:-.07em;
-color:var(--orange);
-}
-
-.title-wrap p{
-margin:10px auto 0;
-max-width:760px;
-font-size:18px;
-line-height:1.35;
-color:var(--muted);
-font-weight:700;
-}
-
-.progress-meta{
-text-align:right;
-padding-top:6px;
-}
-
-.progress-meta .small{
-display:block;
-font-size:15px;
-font-weight:900;
-color:var(--muted2);
-letter-spacing:.10em;
-text-transform:uppercase;
-margin-bottom:8px;
-}
-
-.progress-bar{
-width:100%;
-max-width:180px;
-height:10px;
-margin-left:auto;
-border-radius:999px;
-overflow:hidden;
-border:1px solid rgba(255,255,255,.06);
-background:rgba(255,255,255,.04);
-}
-
-.progress-fill{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,var(--orange),#fb923c);
-transition:width .35s ease;
-}
-
-.intro-strip{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:16px;
-padding:12px 18px;
-border-radius:18px;
-border:1px solid var(--border-soft);
-background:rgba(255,255,255,.02);
-}
-
-.intro-strip strong{
-font-size:18px;
-font-weight:900;
-color:var(--orange);
-display:block;
-margin-bottom:4px;
-letter-spacing:.04em;
-text-transform:uppercase;
-}
-
-.intro-strip span{
-font-size:16px;
-line-height:1.35;
-color:var(--muted);
-font-weight:700;
-}
-
-.intro-pill{
-display:inline-flex;
-align-items:center;
-gap:10px;
-min-height:40px;
-padding:0 16px;
-border-radius:999px;
-border:1px solid rgba(249,115,22,.16);
-background:rgba(249,115,22,.05);
-color:#fff;
-font-size:14px;
-font-weight:900;
-letter-spacing:.08em;
-text-transform:uppercase;
-white-space:nowrap;
-}
-
-.intro-pill .dot{
-width:8px;
-height:8px;
-border-radius:999px;
-background:var(--orange);
-}
-
-.main{
-min-height:0;
-display:grid;
-grid-template-columns:1fr;
-}
-
-.steps-panel{
-display:grid;
-grid-template-rows:auto 1fr;
-height:100%;
-min-height:0;
-border-radius:24px;
-border:1px solid var(--border);
-background:linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,.016));
-overflow:hidden;
-}
-
-.panel-head{
-padding:14px 20px 8px;
-border-bottom:1px solid rgba(255,255,255,.05);
-}
-
-.panel-head strong{
-display:block;
-font-size:22px;
-font-weight:900;
-letter-spacing:-.04em;
-margin-bottom:4px;
-color:#fff;
-}
-
-.panel-head strong::after{
-content:"";
-display:block;
-width:42px;
-height:2px;
-margin-top:8px;
-background:rgba(249,115,22,.78);
-border-radius:2px;
-}
-
-.panel-head span{
-display:block;
-font-size:16px;
-color:var(--muted);
-font-weight:700;
-line-height:1.32;
-}
-
-.steps-list{
-min-height:0;
-padding:22px 26px 24px;
-display:grid;
-grid-template-columns:repeat(3, 1fr);
-grid-template-rows:repeat(3, minmax(0, 1fr));
-gap:22px 26px;
-align-content:stretch;
-position:relative;
-z-index:1;
-}
-
-.step-btn{
-position:relative;
-min-height:0;
-padding:12px 14px;
-border-radius:16px;
-border:1px solid rgba(255,255,255,.08);
-background:rgba(255,255,255,.02);
-color:#fff;
-display:flex;
-flex-direction:column;
-justify-content:space-between;
-gap:8px;
-cursor:pointer;
-transition:.18s ease;
-text-align:left;
-outline:none;
-pointer-events:auto;
-}
-
-.step-btn:hover{
-transform:translateY(-1px);
-border-color:rgba(255,255,255,.12);
-background:rgba(255,255,255,.028);
-}
-
-.row-top{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:10px;
-}
-
-.step-code{
-font-size:12px;
-font-weight:900;
-letter-spacing:.14em;
-text-transform:uppercase;
-color:rgba(249,115,22,.94);
-background:rgba(249,115,22,.08);
-border:1px solid rgba(249,115,22,.20);
-padding:4px 8px;
-border-radius:8px;
-}
-
-.step-status{
-font-size:12px;
-font-weight:900;
-letter-spacing:.08em;
-text-transform:uppercase;
-color:var(--muted2);
-}
-
-.step-title{
-position:relative;
-padding-left:10px;
-font-size:20px;
-line-height:1.02;
-letter-spacing:-.05em;
-font-weight:900;
-color:#fff;
-}
-
-.step-title::before{
-content:"";
-position:absolute;
-left:0;
-top:4px;
-bottom:4px;
-width:2px;
-border-radius:2px;
-background:rgba(249,115,22,.24);
-}
-
-.step-footer{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:10px;
-}
-
-.step-hint{
-font-size:12px;
-color:var(--muted);
-font-weight:700;
-line-height:1.35;
-}
-
-.step-dot{
-width:8px;
-height:8px;
-border-radius:999px;
-background:rgba(255,255,255,.16);
-flex:0 0 auto;
-}
-
-.step-btn.complete{
-border-color:rgba(249,115,22,.10);
-background:rgba(255,255,255,.018);
-}
-
-.step-btn.complete .step-status{
-color:#fff;
-}
-
-.step-btn.complete .step-dot{
-background:rgba(249,115,22,.88);
-}
-
-.step-btn.locked{
-background:rgba(255,255,255,.018);
-border-color:rgba(255,255,255,.06);
-}
-
-.step-btn.locked .step-title,
-.step-btn.locked .step-status,
-.step-btn.locked .step-hint{
-opacity:.82;
-}
-
-.step-btn.active{
-border-color:rgba(249,115,22,.76);
-background:rgba(249,115,22,.05);
-animation:activePulse 1.55s ease-in-out infinite;
-}
-
-.step-btn.active .step-status{
-color:#fff;
-}
-
-.step-btn.active .step-title::before{
-background:rgba(249,115,22,.92);
-}
-
-.step-btn.active .step-dot{
-background:rgba(249,115,22,.96);
-animation:ping 1.25s ease-in-out infinite;
-}
-
-.next-step-btn{
-border:1px solid rgba(255,255,255,.08);
-background:rgba(255,255,255,.02);
-}
-
-.next-step-btn.locked{
-background:rgba(255,255,255,.02);
-border-color:rgba(255,255,255,.08);
-}
-
-.next-step-btn.active{
-background:linear-gradient(90deg, var(--orange), var(--orange2));
-border-color:rgba(255,255,255,.18);
-color:#fff;
-animation:demoBlink 1.4s ease-in-out infinite;
-}
-
-.next-step-btn.active .step-code{
-color:#fff;
-background:rgba(255,255,255,.10);
-border-color:rgba(255,255,255,.18);
-}
-
-.next-step-btn.active .step-status,
-.next-step-btn.active .step-title,
-.next-step-btn.active .step-hint{
-color:#fff;
-}
-
-.next-step-btn.active .step-title::before,
-.next-step-btn.active .step-dot{
-background:#fff;
-}
-
-.bottom{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:16px;
-padding-top:10px;
-border-top:1px solid rgba(255,255,255,.06);
-}
-
-.bottom-note{
-font-size:18px;
-color:#fff;
-font-weight:800;
-line-height:1.3;
-}
-
-.bottom-note span{
-color:rgba(249,115,22,.92);
-font-weight:900;
-}
-
-.helper-note{
-color:var(--muted2);
-font-size:15px;
-font-weight:700;
-}
-
-.overlay{
-position:fixed;
-inset:0;
-display:none;
-align-items:center;
-justify-content:center;
-background:rgba(0,0,0,.80);
-backdrop-filter:blur(8px);
-z-index:50;
-padding:20px;
-}
-
-.overlay.show{display:flex}
-
-.modal{
-width:min(920px, 100%);
-height:min(78vh, 760px);
-border-radius:28px;
-border:1px solid rgba(255,255,255,.10);
-background:linear-gradient(180deg, rgba(15,17,24,.98), rgba(9,11,17,.98));
-box-shadow:0 10px 40px rgba(0,0,0,.45);
-display:grid;
-grid-template-rows:auto 1fr auto;
-overflow:hidden;
-position:relative;
-}
-
-.modal-head{
-padding:24px 26px 18px;
-border-bottom:1px solid rgba(255,255,255,.06);
-display:grid;
-grid-template-columns:1fr auto;
-gap:18px;
-align-items:start;
-}
-
-.modal-head small{
-display:block;
-color:rgba(249,115,22,.92);
-font-size:14px;
-font-weight:900;
-letter-spacing:.18em;
-text-transform:uppercase;
-margin-bottom:10px;
-}
-
-.modal-head h2{
-margin:0;
-font-size:40px;
-line-height:.98;
-letter-spacing:-.06em;
-font-weight:900;
-color:var(--orange);
-}
-
-.modal-head p{
-margin:10px 0 0;
-font-size:18px;
-line-height:1.35;
-color:var(--muted);
-font-weight:700;
-max-width:620px;
-}
-
-.modal-close{
-min-width:120px;
-height:46px;
-padding:0 16px;
-border-radius:14px;
-border:1px solid rgba(255,255,255,.08);
-background:rgba(255,255,255,.03);
-color:#fff;
-font-size:14px;
-font-weight:900;
-letter-spacing:.10em;
-text-transform:uppercase;
-cursor:pointer;
-}
-
-.modal-body{
-padding:22px 26px;
-display:grid;
-align-items:center;
-min-height:0;
-overflow:auto;
--webkit-overflow-scrolling:touch;
-}
-
-.question{
-width:100%;
-max-width:760px;
-margin:0 auto;
-text-align:center;
-display:none;
-}
-
-.question.active{display:block}
-
-.q-title{
-font-size:34px;
-line-height:1.05;
-letter-spacing:-.05em;
-font-weight:900;
-margin-bottom:12px;
-color:#fff;
-}
-
-.q-sub{
-font-size:18px;
-line-height:1.4;
-color:var(--muted);
-font-weight:700;
-max-width:680px;
-margin:0 auto 22px;
-}
-
-.field{
-width:100%;
-max-width:620px;
-height:62px;
-margin:0 auto;
-display:block;
-border-radius:18px;
-border:1px solid rgba(255,255,255,.10);
-background:rgba(255,255,255,.03);
-color:#fff;
-font-size:18px;
-font-weight:700;
-padding:0 18px;
-outline:none;
-transition:.18s ease;
-direction:ltr;
-text-align:left;
-}
-
-.field:focus{
-border-color:rgba(249,115,22,.50);
-box-shadow:0 0 0 3px rgba(249,115,22,.06);
-background:rgba(255,255,255,.04);
-}
-
-.stack-fields{
-display:grid;
-gap:14px;
-width:100%;
-max-width:620px;
-margin:0 auto;
-}
-
-.options{
-display:grid;
-grid-template-columns:repeat(2,minmax(0,1fr));
-gap:14px;
-width:100%;
-max-width:760px;
-margin:0 auto;
-}
-
-.option{
-min-height:88px;
-border-radius:18px;
-border:1px solid rgba(255,255,255,.09);
-background:rgba(255,255,255,.03);
-color:#fff;
-padding:16px;
-text-align:left;
-cursor:pointer;
-transition:.16s ease;
-display:flex;
-flex-direction:column;
-justify-content:center;
-gap:8px;
-}
-
-.option:hover{
-border-color:rgba(255,255,255,.14);
-background:rgba(255,255,255,.05);
-}
-
-.option.selected{
-border-color:rgba(249,115,22,.60);
-background:rgba(249,115,22,.10);
-}
-
-.option strong{
-display:block;
-font-size:20px;
-line-height:1.05;
-letter-spacing:-.03em;
-font-weight:900;
-}
-
-.option span{
-display:block;
-font-size:16px;
-line-height:1.35;
-color:var(--muted);
-font-weight:700;
-}
-
-.prompt-box{
-width:100%;
-max-width:700px;
-margin:0 auto;
-padding:18px;
-border-radius:18px;
-border:1px solid rgba(249,115,22,.20);
-background:rgba(249,115,22,.06);
-display:grid;
-gap:12px;
-}
-
-.prompt-item{
-padding:12px 14px;
-border-radius:14px;
-border:1px solid rgba(255,255,255,.06);
-background:rgba(255,255,255,.03);
-color:#fff;
-font-size:16px;
-line-height:1.4;
-font-weight:700;
-text-align:left;
-}
-
-.role-box{
-width:100%;
-max-width:700px;
-margin:16px auto 0;
-display:grid;
-gap:10px;
-}
-
-.role-row{
-display:grid;
-grid-template-columns:auto 1fr auto;
-gap:12px;
-align-items:center;
-padding:12px 14px;
-border-radius:16px;
-border:1px solid rgba(255,255,255,.06);
-background:rgba(255,255,255,.02);
-}
-
-.role-row.active{
-border-color:rgba(249,115,22,.45);
-background:rgba(249,115,22,.08);
-}
-
-.role-dot{
-width:10px;
-height:10px;
-border-radius:999px;
-background:rgba(255,255,255,.18);
-}
-
-.role-row.active .role-dot{
-background:var(--orange);
-animation:ping 1.2s ease-in-out infinite;
-}
-
-.role-main{
-text-align:left;
-}
-
-.role-main strong{
-display:block;
-font-size:17px;
-line-height:1.05;
-font-weight:900;
-color:#fff;
-}
-
-.role-main span{
-display:block;
-font-size:14px;
-line-height:1.35;
-color:var(--muted);
-font-weight:700;
-margin-top:3px;
-}
-
-.role-state{
-font-size:12px;
-color:var(--muted2);
-font-weight:900;
-letter-spacing:.10em;
-text-transform:uppercase;
-}
-
-.role-row.active .role-state{
-color:#fff;
-}
-
-.timer-box{
-width:100%;
-max-width:620px;
-margin:18px auto 0;
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-}
-
-.mini-card{
-border:1px solid rgba(255,255,255,.08);
-background:rgba(255,255,255,.03);
-border-radius:16px;
-padding:14px;
-text-align:left;
-}
-
-.mini-card .label{
-display:block;
-font-size:12px;
-color:var(--muted2);
-font-weight:900;
-letter-spacing:.10em;
-text-transform:uppercase;
-margin-bottom:6px;
-}
-
-.mini-card .value{
-display:block;
-font-size:20px;
-color:#fff;
-font-weight:900;
-letter-spacing:-.03em;
-}
-
-.agreement-wrap{
-max-width:700px;
-margin:0 auto;
-display:grid;
-gap:18px;
-}
-
-.agreement-check{
-text-align:left;
-padding:14px;
-border:1px solid rgba(255,255,255,.08);
-border-radius:16px;
-background:rgba(255,255,255,.03);
-}
-
-.agreement-check label{
-display:flex;
-gap:12px;
-align-items:flex-start;
-cursor:pointer;
-}
-
-.agreement-check input{
-margin-top:4px;
-transform:scale(1.15);
-}
-
-.agreement-check span{
-font-size:16px;
-line-height:1.4;
-color:#fff;
-font-weight:700;
-}
-
-.doc-links{
-display:grid;
-gap:12px;
-max-width:700px;
-margin:0 auto 18px;
-}
-
-.doc-btn{
-width:100%;
-min-height:56px;
-border-radius:16px;
-border:1px solid rgba(255,255,255,.08);
-background:rgba(255,255,255,.03);
-color:#fff;
-font-size:15px;
-font-weight:900;
-letter-spacing:.04em;
-cursor:pointer;
-text-align:left;
-padding:0 16px;
-}
-
-.doc-btn:hover{
-border-color:rgba(255,255,255,.14);
-background:rgba(255,255,255,.05);
-}
-
-.doc-view{
-max-width:760px;
-margin:0 auto;
-text-align:left;
-display:grid;
-gap:16px;
-}
-
-.doc-scroll{
-max-height:48vh;
-overflow:auto;
-border:1px solid rgba(255,255,255,.08);
-background:rgba(255,255,255,.03);
-border-radius:18px;
-padding:18px;
-}
-
-.doc-scroll h3{
-margin:0 0 12px;
-font-size:24px;
-color:var(--orange);
-letter-spacing:-.03em;
-}
-
-.doc-scroll p{
-margin:0 0 12px;
-font-size:15px;
-line-height:1.5;
-color:#fff;
-font-weight:600;
-}
-
-.doc-scroll ul{
-margin:0 0 14px 18px;
-padding:0;
-}
-
-.doc-scroll li{
-margin:0 0 10px;
-font-size:15px;
-line-height:1.5;
-color:#fff;
-font-weight:600;
-}
-
-.doc-actions{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-}
-
-.modal-foot{
-padding:18px 26px 22px;
-border-top:1px solid rgba(255,255,255,.06);
-display:grid;
-grid-template-columns:auto 1fr auto;
-align-items:center;
-gap:14px;
-}
-
-.modal-progress{
-font-size:16px;
-color:var(--muted);
-font-weight:800;
-text-align:center;
-}
-
-.ghost-btn,
-.primary-btn{
-min-width:130px;
-height:50px;
-border-radius:14px;
-font-size:14px;
-font-weight:900;
-letter-spacing:.10em;
-text-transform:uppercase;
-cursor:pointer;
-transition:.18s ease;
-}
-
-.ghost-btn{
-border:1px solid rgba(255,255,255,.08);
-background:rgba(255,255,255,.03);
-color:#fff;
-}
-
-.primary-btn{
-border:1px solid rgba(255,255,255,.16);
-background:linear-gradient(90deg,var(--orange),var(--orange2));
-color:#fff;
-}
-
-.primary-btn:disabled{
-cursor:not-allowed;
-opacity:.38;
-background:linear-gradient(90deg, rgba(249,115,22,.20), rgba(234,88,12,.18));
-border-color:rgba(249,115,22,.20);
-}
-
-@keyframes activePulse{
-0%,100%{ border-color:rgba(249,115,22,.70); }
-50%{ border-color:rgba(251,146,60,.92); }
-}
-
-@keyframes ping{
-0%,100%{transform:scale(1)}
-50%{transform:scale(1.35)}
-}
-
-@keyframes demoBlink{
-0%,100%{ transform:scale(1); filter:brightness(1); }
-50%{ transform:scale(1.03); filter:brightness(1.18); }
-}
-
-@media (max-width:1100px){
-.screen{
-align-items:flex-start;
-padding:12px;
-}
-
-.shell{
-height:auto;
-min-height:calc(100vh - 24px);
-width:calc(100vw - 24px);
-max-width:calc(100vw - 24px);
-}
-
-.content{
-height:auto;
-}
-
-.steps-list{
-grid-template-columns:repeat(2, 1fr);
-grid-template-rows:auto;
-}
-}
-
-@media (max-width:760px){
-.screen{
-padding:8px;
-align-items:flex-start;
-}
-
-.shell{
-width:calc(100vw - 16px);
-max-width:calc(100vw - 16px);
-min-height:calc(100vh - 16px);
-height:auto;
-border-radius:20px;
-}
-
-.content{
-height:auto;
-padding:14px 14px 16px;
-gap:10px;
-}
-
-.topbar{
-grid-template-columns:1fr;
-gap:10px;
-}
-
-.brand{
-flex-wrap:wrap;
-}
-
-.title-wrap{
-text-align:left;
-}
-
-.title-wrap h1{
-font-size:34px;
-}
-
-.title-wrap p{
-font-size:16px;
-max-width:100%;
-}
-
-.progress-meta{
-text-align:left;
-width:100%;
-}
-
-.progress-bar{
-margin-left:0;
-max-width:100%;
-}
-
-.intro-strip{
-flex-direction:column;
-align-items:flex-start;
-padding:12px 14px;
-}
-
-.intro-pill{
-width:100%;
-white-space:normal;
-justify-content:flex-start;
-padding:10px 14px;
-min-height:auto;
-}
-
-.panel-head{
-padding:12px 14px 8px;
-}
-
-.steps-list{
-grid-template-columns:1fr;
-grid-template-rows:auto;
-gap:14px;
-padding:14px;
-}
-
-.modal{
-width:100%;
-max-width:100%;
-height:min(88vh,760px);
-border-radius:20px;
-}
-
-.modal-head{
-grid-template-columns:1fr;
-padding:18px 16px 14px;
-}
-
-.modal-head h2{
-font-size:30px;
-}
-
-.modal-head p{
-font-size:16px;
-max-width:100%;
-}
-
-.modal-body{
-padding:14px 16px;
-}
-
-.q-title{
-font-size:28px;
-}
-
-.q-sub{
-font-size:16px;
-}
-
-.field{
-max-width:100%;
-width:100%;
-font-size:16px;
-}
-
-.options,
-.timer-box,
-.doc-actions{
-grid-template-columns:1fr;
-}
-
-.modal-foot{
-grid-template-columns:1fr;
-gap:10px;
-padding:14px 16px 16px;
-}
-
-.modal-progress{
-text-align:left;
-font-size:15px;
-}
-
-.ghost-btn,
-.primary-btn{
-width:100%;
-min-width:0;
-}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Call Port — Step 2</title>
+  <style>
+    :root{
+      --bg-main:#05070b;
+      --bg-shell:#080b11;
+      --bg-card:#0d1118;
+      --bg-soft:#0a1019;
+
+      --text-primary:#ffffff;
+      --text-secondary:#d7e0ea;
+      --text-muted:#91a0b5;
+
+      --blue:#3b82f6;
+      --blue-soft:#67d4ff;
+      --orange:#f97316;
+      --orange-soft:#fb923c;
+      --gold:#ffbf2f;
+
+      --border:rgba(255,255,255,.08);
+      --border-soft:rgba(255,255,255,.06);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      color:var(--text-primary);
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:linear-gradient(180deg,#05070b 0%, #04060a 100%);
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(59,130,246,.06), transparent 28%),
+        radial-gradient(circle at 82% 78%, rgba(249,115,22,.06), transparent 32%);
+      z-index:0;
+    }
+
+    .grid-bg{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.08;
+      background:
+        linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(circle at center, black 42%, transparent 96%);
+      z-index:0;
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      min-height:100vh;
+      padding:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .shell{
+      width:min(1180px, calc(100vw - 36px));
+      min-height:min(92vh, 920px);
+      border-radius:30px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));
+      box-shadow:
+        0 36px 100px rgba(0,0,0,.58),
+        inset 0 1px 0 rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(360px circle at 50% 0%, rgba(249,115,22,.04), transparent 56%),
+        radial-gradient(420px circle at 12% 10%, rgba(59,130,246,.04), transparent 52%);
+      z-index:0;
+    }
+
+    .inner{
+      position:relative;
+      z-index:1;
+      padding:18px 20px 24px;
+      min-height:min(92vh, 920px);
+      display:grid;
+      grid-template-rows:auto auto 1fr auto;
+      gap:18px;
+    }
+
+    .topbar{
+      position:relative;
+      min-height:66px;
+      padding:10px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .topbar::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:18px;
+      background:
+        linear-gradient(
+          90deg,
+          rgba(59,130,246,.04),
+          rgba(0,0,0,.92) 22%,
+          rgba(0,0,0,.92) 78%,
+          rgba(249,115,22,.04)
+        );
+      pointer-events:none;
+    }
+
+    .topbar > *{ position:relative; z-index:1; }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .logo-wrap{
+      width:62px;
+      height:62px;
+      min-width:62px;
+      min-height:62px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 62px;
+    }
+
+    .logo{
+      width:54px;
+      height:54px;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 0 8px rgba(249,115,22,.22));
+      animation:logoGlow 3s ease-in-out infinite;
+    }
+
+    .brand-stack{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .brand-wordmark{
+      display:flex;
+      align-items:flex-end;
+      gap:6px;
+      line-height:1;
+    }
+
+    .brand-ai{
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      background:linear-gradient(180deg, var(--blue-soft), var(--blue));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .brand-callport{
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.02em;
+      text-transform:uppercase;
+      background:linear-gradient(180deg, var(--gold), var(--orange));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .beta-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      height:20px;
+      padding:0 8px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.24);
+      background:rgba(249,115,22,.10);
+      color:#fff;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .progress-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:122px;
+      height:30px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--blue-soft);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .hero{
+      text-align:center;
+      max-width:820px;
+      margin:0 auto;
+    }
+
+    .hero-title{
+      margin:0;
+      font-size:clamp(26px,4vw,46px);
+      line-height:1.04;
+      font-weight:800;
+      letter-spacing:-.05em;
+      color:#fff;
+      text-wrap:balance;
+    }
+
+    .hero-sub{
+      margin:12px auto 0;
+      max-width:760px;
+      font-size:clamp(15px,1.35vw,18px);
+      line-height:1.5;
+      color:var(--blue-soft);
+      font-weight:700;
+      text-wrap:balance;
+    }
+
+    .content{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:18px;
+      min-height:0;
+    }
+
+    .panel{
+      border-radius:28px;
+      border:1px solid var(--border-soft);
+      background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.03),
+        0 22px 60px rgba(0,0,0,.32);
+      padding:24px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(260px circle at 80% 0%, rgba(249,115,22,.05), transparent 48%),
+        radial-gradient(260px circle at 10% 0%, rgba(59,130,246,.05), transparent 48%);
+    }
+
+    .panel > *{ position:relative; z-index:1; }
+
+    .panel-kicker{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:88px;
+      height:30px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(103,212,255,.10);
+      border:1px solid rgba(103,212,255,.20);
+      color:var(--blue-soft);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      margin-bottom:16px;
+    }
+
+    .panel-title{
+      margin:0;
+      font-size:clamp(26px,3.2vw,38px);
+      line-height:1.06;
+      font-weight:800;
+      letter-spacing:-.05em;
+      color:#fff;
+      text-wrap:balance;
+    }
+
+    .panel-copy{
+      margin:12px 0 0;
+      font-size:15px;
+      line-height:1.55;
+      color:var(--text-secondary);
+      font-weight:600;
+    }
+
+    .summary-grid{
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .summary-card{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+    }
+
+    .summary-label{
+      font-size:10px;
+      line-height:1.2;
+      color:var(--text-muted);
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .summary-value{
+      margin-top:8px;
+      font-size:15px;
+      line-height:1.45;
+      color:#fff;
+      font-weight:700;
+    }
+
+    .call-preview{
+      margin-top:20px;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.02);
+      padding:18px;
+    }
+
+    .signal-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:22px;
+    }
+
+    .mini-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:28px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      color:#eef5ff;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.15em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .signal-track{
+      position:relative;
+      height:74px;
+      margin-bottom:18px;
+    }
+
+    .signal-line{
+      position:absolute;
+      left:4%;
+      right:4%;
+      height:2px;
+      border-radius:999px;
+    }
+
+    .signal-line.blue{
+      top:20px;
+      background:linear-gradient(90deg, transparent, rgba(103,212,255,.95), transparent);
+    }
+
+    .signal-line.orange{
+      bottom:18px;
+      background:linear-gradient(90deg, transparent, rgba(249,115,22,.55), transparent);
+    }
+
+    .signal-dot{
+      position:absolute;
+      top:50%;
+      width:14px;
+      height:14px;
+      margin-top:-7px;
+      border-radius:999px;
+    }
+
+    .signal-dot.blue{
+      left:26%;
+      background:var(--blue-soft);
+      box-shadow:0 0 18px rgba(103,212,255,.75);
+    }
+
+    .signal-dot.white{
+      left:47%;
+      background:#fff;
+      box-shadow:0 0 18px rgba(255,255,255,.55);
+    }
+
+    .signal-dot.orange{
+      left:72%;
+      background:var(--orange);
+      box-shadow:0 0 18px rgba(249,115,22,.7);
+    }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:12px;
+    }
+
+    .mini-card{
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(12,16,24,.52);
+      padding:14px;
+    }
+
+    .mini-card strong{
+      display:block;
+      font-size:12px;
+      line-height:1.15;
+      font-weight:900;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:#fff;
+    }
+
+    .mini-card span{
+      display:block;
+      margin-top:6px;
+      font-size:12px;
+      line-height:1.45;
+      color:var(--text-secondary);
+      font-weight:700;
+    }
+
+    .mini-card.crm strong{
+      color:var(--blue-soft);
+    }
+
+    .test-list{
+      margin:18px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:10px;
+    }
+
+    .test-list li{
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px 14px 14px 40px;
+      position:relative;
+      color:var(--text-secondary);
+      font-size:14px;
+      line-height:1.5;
+      font-weight:600;
+    }
+
+    .test-list li::before{
+      content:"";
+      position:absolute;
+      left:15px;
+      top:18px;
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:var(--blue-soft);
+      box-shadow:0 0 12px rgba(103,212,255,.28);
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns:140px 1fr 220px;
+      align-items:center;
+      gap:14px;
+      padding-top:6px;
+    }
+
+    .back-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:flex-start;
+      border:none;
+      background:transparent;
+      color:var(--text-muted);
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      padding:0;
+      transition:color .18s ease;
+    }
+
+    .back-btn:hover{ color:#fff; }
+
+    .progress-line{
+      height:8px;
+      border-radius:999px;
+      overflow:hidden;
+      background:#111827;
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    .progress-fill{
+      height:100%;
+      width:25%;
+      background:linear-gradient(90deg, var(--blue), var(--blue-soft));
+    }
+
+    .next-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:220px;
+      height:54px;
+      border:none;
+      border-radius:18px;
+      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
+      color:#fff;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      cursor:pointer;
+      box-shadow:0 10px 30px rgba(249,115,22,.28);
+      transition:.18s ease;
+      justify-self:end;
+      text-decoration:none;
+    }
+
+    .next-btn:hover{
+      transform:translateY(-2px);
+      filter:brightness(1.04);
+      box-shadow:0 15px 40px rgba(249,115,22,.42);
+    }
+
+    @keyframes logoGlow{
+      0%,100%{ filter:drop-shadow(0 0 8px rgba(249,115,22,.20)); }
+      50%{ filter:drop-shadow(0 0 16px rgba(249,115,22,.36)); }
+    }
+
+    @media (max-width:920px){
+      .content{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:720px){
+      .page{
+        padding:10px;
+        align-items:flex-start;
+      }
+
+      .shell{
+        width:calc(100vw - 20px);
+        min-height:calc(100vh - 20px);
+        border-radius:24px;
+      }
+
+      .inner{
+        padding:12px 12px 20px;
+        min-height:calc(100vh - 20px);
+      }
+
+      .topbar{
+        padding:12px;
+        gap:10px;
+        flex-wrap:wrap;
+      }
+
+      .topbar::before{
+        border-radius:16px;
+      }
+
+      .logo-wrap{
+        width:50px;
+        height:50px;
+        min-width:50px;
+        min-height:50px;
+        flex:0 0 50px;
+      }
+
+      .logo{
+        width:42px;
+        height:42px;
+      }
+
+      .brand-ai,
+      .brand-callport{
+        font-size:12px;
+      }
+
+      .beta-badge{
+        font-size:8px;
+        height:18px;
+      }
+
+      .progress-chip{
+        font-size:9px;
+        height:28px;
+      }
+
+      .hero-title{
+        font-size:clamp(22px,7vw,30px);
+      }
+
+      .hero-sub{
+        font-size:14px;
+      }
+
+      .panel{
+        border-radius:22px;
+        padding:20px 16px;
+      }
+
+      .summary-grid,
+      .mini-grid{
+        grid-template-columns:1fr;
+      }
+
+      .actions{
+        grid-template-columns:1fr;
+        gap:12px;
+      }
+
+      .next-btn{
+        width:100%;
+        min-width:unset;
+        justify-self:stretch;
+      }
+
+      .back-btn{ order:2; }
+      .progress-line{ order:1; }
+      .next-btn{ order:3; }
+    }
+  </style>
 </head>
 <body>
-<div class="grid-bg"></div>
-
-<div class="screen">
-<div class="shell">
-<div class="content">
-<div class="topbar">
-<div class="brand">
-<div class="brand-mark"></div>
-<div class="brand-name">AI Call Port</div>
-<div class="beta-badge">Beta</div>
-</div>
-
-<div class="title-wrap">
-<span class="step">Step 2</span>
-<h1>Live Demo Access</h1>
-<p>Complete sign up and agreement first, then unlock your guided AI demo call.</p>
-</div>
-
-<div class="progress-meta">
-<span class="small" id="metaProgress">0 of 7 Complete</span>
-<div class="progress-bar">
-<div class="progress-fill" id="progressFill"></div>
-</div>
-</div>
-</div>
-
-<div class="intro-strip">
-<div>
-<strong id="introTitle">Complete the highlighted access step</strong>
-<span id="introText">The system guides the next action automatically.</span>
-</div>
-<div class="intro-pill"><span class="dot"></span><span id="nextLabel">Next Step: Sign Up</span></div>
-</div>
-
-<div class="main">
-<section class="steps-panel">
-<div class="panel-head">
-<strong>Demo Access Pipeline</strong>
-<span>Sign up and agreement unlock the demo. Complete both demo calls to unlock Step 3.</span>
-</div>
-<div class="steps-list" id="stepsList"></div>
-</section>
-</div>
-
-<div class="bottom">
-<div>
-<div class="bottom-note">Complete the highlighted step to unlock <span>Step 3 — Review & Activate</span></div>
-<div class="helper-note">Step 3 becomes active only after sign up, agreement, and both demo calls are complete.</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<div class="overlay" id="overlay">
-<div class="modal">
-<div class="modal-head">
-<div>
-<small id="modalStepCode">Step 2A</small>
-<h2 id="modalTitle">Sign Up</h2>
-<p id="modalDesc">Create your account to access the live demo.</p>
-</div>
-<button class="modal-close" id="modalClose" type="button">Close</button>
-</div>
-
-<div class="modal-body" id="modalBody"></div>
-
-<div class="modal-foot">
-<button class="ghost-btn" id="modalBack" type="button">Back</button>
-<div class="modal-progress" id="modalProgress">Question 1 of 1</div>
-<button class="primary-btn" id="modalNext" type="button" disabled>Continue</button>
-</div>
-</div>
-</div>
-
-<script>
-const step1Data = JSON.parse(localStorage.getItem("aiCallPortStep1Final") || "{}");
-
-const legalDocs = {
-beta: {
-title: "Beta Access Terms",
-html: `
-<h3>Beta Access Terms</h3>
-<p>AI Call Port is currently offered as a beta service. By continuing, you understand that features, call behavior, dashboards, CRM elements, routing logic, reporting, and integrations may change during the beta period.</p>
-<ul>
-<li>Beta access is provided for evaluation, testing, onboarding, and configuration purposes.</li>
-<li>Features may be updated, suspended, removed, or reconfigured without notice during the beta stage.</li>
-<li>Demo behavior may differ from final production behavior after review and activation.</li>
-<li>Access to beta functionality does not guarantee permanent availability of any specific feature.</li>
-</ul>
-<p>These terms are intended to set expectations for testing, access, and early use of the system.</p>
-`
-},
-privacy: {
-title: "Privacy and Data Use",
-html: `
-<h3>Privacy and Data Use</h3>
-<p>AI Call Port uses the information you provide to configure, test, document, and prepare your AI call system for activation.</p>
-<ul>
-<li>We may store business details, service information, routing preferences, scheduling rules, communication settings, and user contact details.</li>
-<li>We may process demo-related call data, system notes, workflow selections, and onboarding inputs to prepare your account.</li>
-<li>Business information submitted during onboarding is used only for setup, review, support, service delivery, and activation preparation.</li>
-<li>You confirm that the information you submit is accurate and that you are authorized to provide it for company use.</li>
-</ul>
-<p>Any final production privacy terms may be expanded at activation.</p>
-`
-},
-security: {
-title: "Security and Access Rules",
-html: `
-<h3>Security and Access Rules</h3>
-<p>To protect both your company and AI Call Port, access and setup rules apply during onboarding, demo access, and activation.</p>
-<ul>
-<li>You are responsible for protecting your login credentials and limiting access to authorized personnel.</li>
-<li>You confirm that the business phone number, operational information, and business workflow details submitted are authorized for use.</li>
-<li>You agree not to misuse, reverse engineer, disrupt, or attempt to interfere with platform logic, routing, or security controls.</li>
-<li>Administrative access, CRM access, and future production access may be limited or revoked in cases of misuse or unauthorized activity.</li>
-</ul>
-<p>Activation may require additional access verification and account approval.</p>
-`
-},
-authorization: {
-title: "Business Authorization Acknowledgment",
-html: `
-<h3>Business Authorization Acknowledgment</h3>
-<p>By continuing, you confirm that you are authorized by your company or business to submit the business name, phone number, workflow information, operational details, and service preferences used to configure this AI system.</p>
-<ul>
-<li>You have authority to request testing, setup, or activation for this business.</li>
-<li>You have authority to connect or test the listed business phone number.</li>
-<li>You understand that activation proceeds only after review, approval, and final commercial confirmation.</li>
-</ul>
-<p>This acknowledgment helps protect both your company and AI Call Port from unauthorized configuration requests.</p>
-`
-}
-};
-
-const scenarioPrompts = {
-standard: [
-"Hi, I’d like to book a service.",
-"What services do you offer?",
-"Do you have availability this week?",
-"What information do you need from me?",
-"Can you schedule me for an appointment?"
-],
-urgent: [
-"Hi, I need urgent help today.",
-"This is an emergency.",
-"Can you prioritize this request?",
-"Do you handle after-hours calls?",
-"What happens next if this is urgent?"
-]
-};
-
-const scenarioRoles = {
-standard: [
-["intake", "Intake Agent", "Greets caller and identifies business context."],
-["qualification", "Qualification Agent", "Understands service need and collects details."],
-["booking", "Booking Agent", "Handles scheduling and appointment flow."],
-["communication", "Communication Agent", "Confirms next steps and reminders."]
-],
-urgent: [
-["intake", "Intake Agent", "Greets caller and verifies issue type."],
-["urgency", "Urgency Agent", "Detects priority and changes the call path."],
-["dispatch", "Priority Routing Agent", "Handles escalation or urgent routing."],
-["communication", "Communication Agent", "Confirms urgency handling and next action."]
-]
-};
-
-const steps = [
-{
-key:"signUp",
-code:"2A",
-title:"Sign Up",
-desc:"Create your account to access your live AI demo.",
-questions:[
-{ type:"signup", key:"fullName" }
-]
-},
-{
-key:"documentationAgreement",
-code:"2B",
-title:"Documentation Agreement",
-desc:"Review the required documents and accept the agreement before demo access.",
-questions:[
-{ type:"agreement", key:"accepted" }
-]
-},
-{
-key:"businessNumber",
-code:"2C",
-title:"Business Number",
-desc:"Enter the number you will call for the demo.",
-questions:[
-{ type:"text", key:"phone", label:"Business phone number", placeholder:"+1 (555) 123-4567" }
-]
-},
-{
-key:"demoType",
-code:"2D",
-title:"Demo Type",
-desc:"Choose which scenario you want to test first.",
-questions:[
-{ type:"options", key:"scenario", label:"Choose demo type", options:["Standard Call","Urgent Call"] }
-]
-},
-{
-key:"callInstructions",
-code:"2E",
-title:"Call Instructions",
-desc:"Follow instructions before placing your call.",
-questions:[
-{ type:"callInstructions", key:"instructions", label:"Call instructions" }
-]
-},
-{
-key:"standardDemo",
-code:"2F",
-title:"Standard Demo",
-desc:"Run the normal customer flow.",
-questions:[
-{ type:"guidedDemo", key:"standardComplete", scenario:"standard", label:"Standard demo" }
-]
-},
-{
-key:"urgentDemo",
-code:"2G",
-title:"Urgent Demo",
-desc:"Test urgent routing behavior.",
-questions:[
-{ type:"guidedDemo", key:"urgentComplete", scenario:"urgent", label:"Urgent demo" }
-]
-}
-];
-
-const state = {
-activeStepIndex:0,
-currentStepIndex:0,
-currentQuestionIndex:0,
-values:{},
-demoSeconds:0,
-demoInterval:null,
-demoRoleIndex:0,
-currentScenario:"",
-activeDocKey:null,
-docsOpened:{}
-};
-
-steps.forEach(step => state.values[step.key] = {});
-Object.keys(legalDocs).forEach(key => state.docsOpened[key] = false);
-
-const stepsList = document.getElementById("stepsList");
-const metaProgress = document.getElementById("metaProgress");
-const progressFill = document.getElementById("progressFill");
-const nextLabel = document.getElementById("nextLabel");
-const introTitle = document.getElementById("introTitle");
-const introText = document.getElementById("introText");
-
-const overlay = document.getElementById("overlay");
-const modalBody = document.getElementById("modalBody");
-const modalStepCode = document.getElementById("modalStepCode");
-const modalTitle = document.getElementById("modalTitle");
-const modalDesc = document.getElementById("modalDesc");
-const modalProgress = document.getElementById("modalProgress");
-const modalClose = document.getElementById("modalClose");
-const modalBack = document.getElementById("modalBack");
-const modalNext = document.getElementById("modalNext");
-
-function normalizePhone(v){
-return String(v || "").trim();
-}
-
-function isValidPhone(phone){
-const digits = phone.replace(/\D/g,"");
-return digits.length >= 10;
-}
-
-function isValidEmail(email){
-return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function escapeHtml(str){
-return String(str)
-.replaceAll("&", "&amp;")
-.replaceAll("<", "&lt;")
-.replaceAll(">", "&gt;")
-.replaceAll('"', "&quot;")
-.replaceAll("'", "&#039;");
-}
-
-function hasViewedAllDocs(){
-return Object.values(state.docsOpened).every(Boolean);
-}
-
-function isStepComplete(stepIndex){
-const step = steps[stepIndex];
-const v = state.values[step.key];
-
-return step.questions.every(q => {
-if (q.type === "text") return !!v[q.key] && v[q.key].trim().length > 0;
-if (q.type === "options") return !!v[q.key];
-if (q.type === "callInstructions") return v[q.key] === true;
-if (q.type === "guidedDemo") return v[q.key] === true;
-if (q.type === "signup") return !!v.email && isValidEmail(v.email) && !!v.fullName && !!v.password && v.password.length >= 6 && !!v.businessName;
-if (q.type === "agreement") return v.accepted === true && hasViewedAllDocs();
-return false;
-});
-}
-
-function allComplete(){
-return steps.every((_,i)=>isStepComplete(i));
-}
-
-function currentQuestion(){
-const step = steps[state.currentStepIndex];
-return step.questions[state.currentQuestionIndex];
-}
-
-function stepSummary(stepIndex){
-const step = steps[stepIndex];
-const v = state.values[step.key];
-
-switch(step.key){
-case "signUp":
-return v.email || "Completed";
-case "documentationAgreement":
-return v.accepted ? "Accepted" : "Pending";
-case "businessNumber":
-return v.phone || "Configured";
-case "demoType":
-return v.scenario || "Configured";
-case "callInstructions":
-return "Reviewed";
-case "standardDemo":
-return v.standardComplete ? "Completed" : "Configured";
-case "urgentDemo":
-return v.urgentComplete ? "Completed" : "Configured";
-default:
-return "Configured";
-}
-}
-
-function renderSteps(){
-const buttonHtml = steps.map((step, i) => {
-const complete = isStepComplete(i);
-const active = i === state.activeStepIndex && !complete;
-const locked = i > state.activeStepIndex && !complete;
-const status = complete ? "Complete" : active ? "Next Step" : locked ? "Locked" : "Ready";
-
-return `
-<button type="button" class="step-btn ${complete ? "complete" : ""} ${active ? "active" : ""} ${locked ? "locked" : ""}" data-step="${i}">
-<div class="row-top">
-<div class="step-code">${step.code}</div>
-<div class="step-status">${status}</div>
-</div>
-<div class="step-title">${step.title}</div>
-<div class="step-footer">
-<div class="step-hint">${complete ? stepSummary(i) : active ? "Press to continue" : "Available next"}</div>
-<div class="step-dot"></div>
-</div>
-</button>
-`;
-}).join("");
-
-const nextReady = allComplete();
-
-const nextHtml = `
-<button type="button" class="step-btn next-step-btn ${nextReady ? "active" : "locked"}" id="step3Btn">
-<div class="row-top">
-<div class="step-code">Step 3</div>
-<div class="step-status">${nextReady ? "Unlocked" : "Locked"}</div>
-</div>
-<div class="step-title">Review & Activate</div>
-<div class="step-footer">
-<div class="step-hint">${nextReady ? "Press to continue" : "Complete all access and demo steps"}</div>
-<div class="step-dot"></div>
-</div>
-</button>
-`;
-
-stepsList.innerHTML = buttonHtml + nextHtml;
-
-stepsList.onclick = (e) => {
-const btn = e.target.closest("button");
-if (!btn) return;
-
-if (btn.id === "step3Btn") {
-if (!allComplete()) return;
-localStorage.setItem("aiCallPortStep2Final", JSON.stringify(state.values));
-window.location.href = "/step3.html";
-return;
-}
-
-const stepAttr = btn.dataset.step;
-if (stepAttr == null) return;
-
-const index = Number(stepAttr);
-const isComplete = isStepComplete(index);
-const isActive = index === state.activeStepIndex;
-const isUnlocked = index < state.activeStepIndex;
-
-if (!(isComplete || isActive || isUnlocked)) return;
-
-openStep(index);
-};
-
-updateProgress();
-}
-
-function updateProgress(){
-const done = steps.filter((_, i) => isStepComplete(i)).length;
-metaProgress.textContent = `${done} of ${steps.length} Complete`;
-progressFill.style.width = `${(done / steps.length) * 100}%`;
-
-const nextStep = steps.find((_, i) => !isStepComplete(i));
-nextLabel.textContent = nextStep ? `Next Step: ${nextStep.title}` : "Step 2 Complete";
-
-if (nextStep?.key === "signUp") {
-introTitle.textContent = "Create your account first";
-introText.textContent = "Sign up is required before the live demo is available.";
-} else if (nextStep?.key === "documentationAgreement") {
-introTitle.textContent = "Review and accept required documents";
-introText.textContent = "Documentation agreement unlocks the demo access steps.";
-} else {
-introTitle.textContent = "Complete the highlighted access step";
-introText.textContent = "The system guides the next action automatically.";
-}
-}
-
-function openStep(stepIndex){
-state.currentStepIndex = stepIndex;
-state.currentQuestionIndex = 0;
-state.activeDocKey = null;
-updateModal();
-overlay.classList.add("show");
-}
-
-function renderTextQuestion(step, question){
-const value = state.values[step.key][question.key] || "";
-modalBody.innerHTML = `
-<div class="question active">
-<div class="q-title">${question.label}</div>
-<div class="q-sub">Use the real phone number your customers would call during the demo.</div>
-<input class="field" id="answerField" type="tel" value="${escapeHtml(value)}" placeholder="${question.placeholder || ""}">
-</div>
-`;
-const input = document.getElementById("answerField");
-input.focus();
-input.addEventListener("input", validateModal);
-}
-
-function renderOptionsQuestion(step, question){
-const value = state.values[step.key][question.key] || "";
-modalBody.innerHTML = `
-<div class="question active">
-<div class="q-title">${question.label}</div>
-<div class="q-sub">Choose which call you want to run first. You will complete both before activation.</div>
-<div class="options">
-${question.options.map(option => `
-<button type="button" class="option ${value === option ? "selected" : ""}" data-option="${escapeHtml(option)}">
-<strong>${option}</strong>
-<span>${option === "Standard Call" ? "Test normal booking and service questions." : "Test urgent routing and after-hours behavior."}</span>
-</button>
-`).join("")}
-</div>
-</div>
-`;
-[...document.querySelectorAll("[data-option]")].forEach(btn => {
-btn.addEventListener("click", () => {
-state.values[step.key][question.key] = btn.dataset.option;
-updateModal();
-});
-});
-}
-
-function renderSignupQuestion(){
-const v = state.values.signUp;
-const businessName = step1Data?.businessProfile?.businessName || "";
-
-modalBody.innerHTML = `
-<div class="question active">
-<div class="q-title">Create your account</div>
-<div class="q-sub">This unlocks your live AI demo environment.</div>
-
-<div class="stack-fields">
-<input class="field" id="signupName" type="text" placeholder="Full name" value="${escapeHtml(v.fullName || "")}">
-<input class="field" id="signupEmail" type="email" placeholder="Business email" value="${escapeHtml(v.email || "")}">
-<input class="field" id="signupPassword" type="password" placeholder="Password (min 6 characters)" value="${escapeHtml(v.password || "")}">
-<input class="field" id="signupBusiness" type="text" placeholder="Business name" value="${escapeHtml(v.businessName || businessName)}">
-</div>
-</div>
-`;
-
-["signupName","signupEmail","signupPassword","signupBusiness"].forEach(id=>{
-document.getElementById(id).addEventListener("input", validateModal);
-});
-}
-
-function renderAgreementQuestion(){
-if (state.activeDocKey) {
-const doc = legalDocs[state.activeDocKey];
-modalBody.innerHTML = `
-<div class="question active">
-<div class="q-title">${escapeHtml(doc.title)}</div>
-<div class="q-sub">Read the document below, then return to the agreement step.</div>
-
-<div class="doc-view">
-<div class="doc-scroll">${doc.html}</div>
-<div class="doc-actions">
-<button type="button" class="ghost-btn" id="docBackBtn">Back to Agreement</button>
-<button type="button" class="primary-btn" id="docMarkBtn">Mark as Read</button>
-</div>
-</div>
-</div>
-`;
-
-document.getElementById("docBackBtn").addEventListener("click", () => {
-state.activeDocKey = null;
-renderAgreementQuestion();
-validateModal();
-});
-
-document.getElementById("docMarkBtn").addEventListener("click", () => {
-state.docsOpened[state.activeDocKey] = true;
-state.activeDocKey = null;
-renderAgreementQuestion();
-validateModal();
-});
-return;
-}
-
-modalBody.innerHTML = `
-<div class="question active">
-<div class="q-title">Documentation Agreement</div>
-<div class="q-sub">Review the required documents below. All documents must be marked as read before you can accept and continue.</div>
-
-<div class="doc-links">
-<button type="button" class="doc-btn" data-doc="beta">Open Beta Access Terms ${state.docsOpened.beta ? "✓" : ""}</button>
-<button type="button" class="doc-btn" data-doc="privacy">Open Privacy and Data Use ${state.docsOpened.privacy ? "✓" : ""}</button>
-<button type="button" class="doc-btn" data-doc="security">Open Security and Access Rules ${state.docsOpened.security ? "✓" : ""}</button>
-<button type="button" class="doc-btn" data-doc="authorization">Open Business Authorization Acknowledgment ${state.docsOpened.authorization ? "✓" : ""}</button>
-</div>
-
-<div class="agreement-wrap">
-<div class="prompt-box" style="text-align:left;">
-<div class="prompt-item">Required documents reviewed: ${Object.values(state.docsOpened).filter(Boolean).length} of ${Object.keys(legalDocs).length}</div>
-<div class="prompt-item">You must review all standard documents before proceeding to the live demo.</div>
-</div>
-
-<div class="agreement-check">
-<label>
-<input id="agreementCheck" type="checkbox" ${state.values.documentationAgreement.accepted ? "checked" : ""}>
-<span>I have reviewed the required documents and I agree to continue.</span>
-</label>
-</div>
-</div>
-</div>
-`;
-
-[...document.querySelectorAll("[data-doc]")].forEach(btn => {
-btn.addEventListener("click", () => {
-state.activeDocKey = btn.dataset.doc;
-renderAgreementQuestion();
-validateModal();
-});
-});
-
-document.getElementById("agreementCheck").addEventListener("change", e=>{
-state.values.documentationAgreement.accepted = e.target.checked;
-validateModal();
-});
-}
-
-function renderCallInstructions(){
-const phone = state.values.businessNumber.phone || "your business number";
-const businessName = step1Data?.businessProfile?.businessName || "your business";
-const scenario = state.values.demoType.scenario || "your selected scenario";
-
-modalBody.innerHTML = `
-<div class="question active">
-<div class="q-title">Call ${escapeHtml(phone)} now</div>
-<div class="q-sub">Pretend you are a real customer calling ${escapeHtml(businessName)}. Your first test is ${escapeHtml(scenario)}.</div>
-<div class="prompt-box">
-<div class="prompt-item">1. Call your business number from your phone.</div>
-<div class="prompt-item">2. Speak like a real customer, not like a tester.</div>
-<div class="prompt-item">3. Listen for your business name, service logic, and booking behavior.</div>
-<div class="prompt-item">4. Notice how different AI roles activate during the conversation.</div>
-</div>
-</div>
-`;
-}
-
-function formatClock(seconds){
-const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-const s = String(seconds % 60).padStart(2, "0");
-return `${m}:${s}`;
-}
-
-function stopDemoTimer(){
-if (state.demoInterval) {
-clearInterval(state.demoInterval);
-state.demoInterval = null;
-}
-}
-
-function renderGuidedDemo(step, question){
-const scenario = question.scenario;
-state.currentScenario = scenario;
-const prompts = scenarioPrompts[scenario];
-const roles = scenarioRoles[scenario];
-const seconds = state.demoSeconds || 0;
-const roleIndex = state.demoRoleIndex || 0;
-
-modalBody.innerHTML = `
-<div class="question active">
-<div class="q-title">${scenario === "standard" ? "Standard Demo Call" : "Urgent Demo Call"}</div>
-<div class="q-sub">Call your own number now and use these exact lines. The active roles below show how the system shifts during the conversation.</div>
-
-<div class="prompt-box">
-${prompts.map(p => `<div class="prompt-item">${escapeHtml(p)}</div>`).join("")}
-</div>
-
-<div class="role-box">
-${roles.map((role, i) => `
-<div class="role-row ${i === roleIndex ? "active" : ""}">
-<div class="role-dot"></div>
-<div class="role-main">
-<strong>${escapeHtml(role[1])}</strong>
-<span>${escapeHtml(role[2])}</span>
-</div>
-<div class="role-state">${i === roleIndex ? "Active" : "Waiting"}</div>
-</div>
-`).join("")}
-</div>
-
-<div class="timer-box">
-<div class="mini-card">
-<span class="label">Demo Timer</span>
-<span class="value" id="demoTimer">${formatClock(seconds)}</span>
-</div>
-<div class="mini-card">
-<span class="label">Call Limit</span>
-<span class="value">01:00</span>
-</div>
-</div>
-
-<div style="margin-top:18px;">
-<button
-type="button"
-class="primary-btn"
-onclick="finishDemoCall('${step.key}','${question.key}')"
->
-I Completed This Call
-</button>
-</div>
-</div>
-`;
-
-stopDemoTimer();
-state.demoSeconds = 0;
-state.demoRoleIndex = 0;
-
-state.demoInterval = setInterval(() => {
-state.demoSeconds += 1;
-const timer = document.getElementById("demoTimer");
-if (timer) timer.textContent = formatClock(state.demoSeconds);
-
-if (state.demoSeconds === 12 || state.demoSeconds === 24 || state.demoSeconds === 38) {
-state.demoRoleIndex = Math.min(state.demoRoleIndex + 1, roles.length - 1);
-renderGuidedDemo(step, question);
-}
-
-if (state.demoSeconds >= 60) {
-stopDemoTimer();
-state.values[step.key][question.key] = true;
-validateModal();
-}
-}, 1000);
-}
-
-function updateModal(){
-const step = steps[state.currentStepIndex];
-const question = currentQuestion();
-
-modalStepCode.textContent = `Step ${step.code}`;
-modalTitle.textContent = step.title;
-modalDesc.textContent = step.desc;
-modalProgress.textContent = `Question ${state.currentQuestionIndex + 1} of ${step.questions.length}`;
-
-stopDemoTimer();
-
-if (question.type === "text") renderTextQuestion(step, question);
-if (question.type === "options") renderOptionsQuestion(step, question);
-if (question.type === "signup") renderSignupQuestion();
-if (question.type === "agreement") renderAgreementQuestion();
-if (question.type === "callInstructions") renderCallInstructions();
-if (question.type === "guidedDemo") renderGuidedDemo(step, question);
-
-modalBack.textContent = state.currentQuestionIndex === 0 ? "Close" : "Back";
-validateModal();
-}
-
-function validateModal(){
-const step = steps[state.currentStepIndex];
-const question = currentQuestion();
-const v = state.values[step.key];
-let valid = false;
-
-if (question.type === "text") {
-const field = document.getElementById("answerField");
-valid = !!field && isValidPhone(field.value.trim());
-} else if (question.type === "options") {
-valid = !!v[question.key];
-} else if (question.type === "callInstructions") {
-valid = true;
-} else if (question.type === "guidedDemo") {
-valid = v[question.key] === true;
-} else if (question.type === "signup") {
-const name = document.getElementById("signupName")?.value.trim() || "";
-const email = document.getElementById("signupEmail")?.value.trim() || "";
-const pass = document.getElementById("signupPassword")?.value.trim() || "";
-const business = document.getElementById("signupBusiness")?.value.trim() || "";
-valid = name.length > 0 && isValidEmail(email) && pass.length >= 6 && business.length > 0;
-} else if (question.type === "agreement") {
-valid = state.values.documentationAgreement.accepted === true && hasViewedAllDocs() && !state.activeDocKey;
-}
-
-modalNext.disabled = !valid;
-
-if (question.type === "guidedDemo") {
-modalNext.textContent = v[question.key] === true ? "Save Step" : "Complete Call";
-} else if (question.type === "agreement") {
-modalNext.textContent = "Accept & Continue";
-} else if (question.type === "signup") {
-modalNext.textContent = "Save Sign Up";
-} else {
-modalNext.textContent = state.currentQuestionIndex === step.questions.length - 1 ? "Save Step" : "Continue";
-}
-}
-
-function saveCurrentAnswer(){
-const step = steps[state.currentStepIndex];
-const question = currentQuestion();
-
-if (question.type === "text") {
-const field = document.getElementById("answerField");
-state.values[step.key][question.key] = normalizePhone(field.value);
-}
-
-if (question.type === "callInstructions") {
-state.values[step.key][question.key] = true;
-}
-
-if (question.type === "signup") {
-state.values.signUp.fullName = document.getElementById("signupName").value.trim();
-state.values.signUp.email = document.getElementById("signupEmail").value.trim();
-state.values.signUp.password = document.getElementById("signupPassword").value.trim();
-state.values.signUp.businessName = document.getElementById("signupBusiness").value.trim();
-}
-
-if (question.type === "agreement") {
-state.values.documentationAgreement.accepted = document.getElementById("agreementCheck").checked;
-}
-}
-
-modalNext.addEventListener("click", () => {
-saveCurrentAnswer();
-const step = steps[state.currentStepIndex];
-const question = currentQuestion();
-
-if (question.type === "guidedDemo" && state.values[step.key][question.key] !== true) return;
-
-if (state.currentQuestionIndex < step.questions.length - 1){
-state.currentQuestionIndex += 1;
-updateModal();
-return;
-}
-
-if (isStepComplete(state.currentStepIndex) && state.currentStepIndex === state.activeStepIndex && state.activeStepIndex < steps.length - 1){
-state.activeStepIndex += 1;
-}
-
-overlay.classList.remove("show");
-stopDemoTimer();
-renderSteps();
-});
-
-modalBack.addEventListener("click", () => {
-if (state.activeDocKey) {
-state.activeDocKey = null;
-renderAgreementQuestion();
-validateModal();
-return;
-}
-
-if (state.currentQuestionIndex === 0){
-overlay.classList.remove("show");
-stopDemoTimer();
-return;
-}
-saveCurrentAnswer();
-state.currentQuestionIndex -= 1;
-updateModal();
-});
-
-modalClose.addEventListener("click", () => {
-overlay.classList.remove("show");
-stopDemoTimer();
-state.activeDocKey = null;
-});
-
-overlay.addEventListener("click", (e) => {
-if (e.target === overlay) {
-overlay.classList.remove("show");
-stopDemoTimer();
-state.activeDocKey = null;
-}
-});
-
-window.finishDemoCall = function(stepKey, questionKey) {
-stopDemoTimer();
-state.values[stepKey][questionKey] = true;
-validateModal();
-};
-
-renderSteps();
-</script>
+  <div class="grid-bg"></div>
+
+  <div class="page">
+    <div class="shell">
+      <div class="inner">
+
+        <div class="topbar">
+          <div class="brand">
+            <div class="logo-wrap">
+              <img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo">
+            </div>
+            <div class="brand-stack">
+              <div class="brand-wordmark">
+                <span class="brand-ai">AI</span>
+                <span class="brand-callport">CALL PORT</span>
+              </div>
+              <div class="beta-badge">Beta</div>
+            </div>
+          </div>
+
+          <div class="progress-chip">Question 2 of 8</div>
+        </div>
+
+        <section class="hero">
+          <h1 class="hero-title">Step 2 — Review your setup and test the flow</h1>
+          <div class="hero-sub">Your customer journey is simple: configure the system, hear the call behavior live, then see how that same interaction turns into usable actions inside the dashboard.</div>
+        </section>
+
+        <section class="content">
+          <div class="panel">
+            <div class="panel-kicker">Business Setup</div>
+            <h2 class="panel-title">Your system preview</h2>
+            <p class="panel-copy">Here’s the configuration passed from Step 1. This is what your AI call system will use as the starting point for the live test and the next setup steps.</p>
+
+            <div class="summary-grid">
+              <div class="summary-card">
+                <div class="summary-label">Country</div>
+                <div class="summary-value" id="countryValue">—</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">Industry</div>
+                <div class="summary-value" id="industryValue">—</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">Business model</div>
+                <div class="summary-value" id="businessModelValue">—</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">Team size</div>
+                <div class="summary-value" id="teamSizeValue">—</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">Scheduling</div>
+                <div class="summary-value" id="schedulingValue">—</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">Country status</div>
+                <div class="summary-value" id="countryStatusValue">—</div>
+              </div>
+            </div>
+
+            <div class="call-preview">
+              <div class="signal-top">
+                <div class="mini-chip">AI call port system active</div>
+                <div class="mini-chip">Business logic running</div>
+              </div>
+
+              <div class="signal-track">
+                <div class="signal-line blue"></div>
+                <div class="signal-line orange"></div>
+                <div class="signal-dot blue"></div>
+                <div class="signal-dot white"></div>
+                <div class="signal-dot orange"></div>
+              </div>
+
+              <div class="mini-grid">
+                <div class="mini-card">
+                  <strong>Call handling</strong>
+                  <span>Answers and routes instantly</span>
+                </div>
+                <div class="mini-card crm">
+                  <strong>CRM sync</strong>
+                  <span>Updates your system in real time</span>
+                </div>
+                <div class="mini-card">
+                  <strong>Bookings</strong>
+                  <span>Schedules calls and appointments</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-kicker">Live Test</div>
+            <h2 class="panel-title">What this setup is preparing</h2>
+            <p class="panel-copy">Answer a few quick questions, test a live call, see your dashboard respond, and activate a system configured for how your business actually works.</p>
+
+            <ul class="test-list">
+              <li><strong>Channels:</strong> <span id="channelsValue">—</span></li>
+              <li><strong>Languages:</strong> <span id="languagesValue">—</span></li>
+              <li><strong>Workflow needs:</strong> <span id="workflowValue">—</span></li>
+            </ul>
+
+            <ul class="test-list" style="margin-top:14px;">
+              <li>The live call flow will adapt to your industry and business model.</li>
+              <li>The dashboard preview will reflect your selected channels and workflow needs.</li>
+              <li>You can still go back if anything needs to be changed before moving forward.</li>
+            </ul>
+          </div>
+        </section>
+
+        <div class="actions">
+          <button class="back-btn" id="backBtn" type="button">← Back to Step 1</button>
+          <div class="progress-line">
+            <div class="progress-fill"></div>
+          </div>
+          <a class="next-btn" id="nextBtn" href="#">Continue</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+
+    const values = {
+      country: params.get("country") || "Not set",
+      countryStatus: params.get("countryStatus") || "Not set",
+      industry: params.get("industry") || "Not set",
+      industryCategory: params.get("industryCategory") || "",
+      businessModel: params.get("businessModel") || "Not set",
+      teamSize: params.get("teamSize") || "Not set",
+      schedulingMode: params.get("schedulingMode") || "Not set",
+      channels: params.get("channels") || "Not set",
+      languages: params.get("languages") || "Not set",
+      workflowNeeds: params.get("workflowNeeds") || "Not set"
+    };
+
+    function setText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    setText("countryValue", values.country);
+    setText("industryValue", values.industryCategory ? `${values.industry} • ${values.industryCategory}` : values.industry);
+    setText("businessModelValue", values.businessModel);
+    setText("teamSizeValue", values.teamSize);
+    setText("schedulingValue", values.schedulingMode);
+    setText("countryStatusValue", values.countryStatus);
+    setText("channelsValue", values.channels);
+    setText("languagesValue", values.languages);
+    setText("workflowValue", values.workflowNeeds);
+
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "step1.html";
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", (e) => {
+      e.preventDefault();
+      const nextParams = new URLSearchParams(window.location.search);
+      window.location.href = `step3.html?${nextParams.toString()}`;
+    });
+  </script>
 </body>
 </html>
