@@ -1,495 +1,1475 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Call Port | Step 1</title>
   <meta
     name="description"
-    content="Step 1 of AI Call Port guided setup. Tell us about your business so your AI call system can be configured correctly."
-    content="Step 1 of AI Call Port guided setup. Enter your company details and business structure so the system can be configured correctly."
+    content="Step 1 of AI Call Port guided setup. Enter your company details and answer one question at a time so the system can be configured correctly."
   />
   <style>
     :root{
-
+      --bg-main:#05070b;
+      --bg-shell:#080b11;
+      --text-primary:#f7fbff;
+      --text-secondary:#c9d7e6;
+      --text-muted:#8d9db1;
+      --blue:#3b82f6;
+      --blue-soft:#7bd7ff;
+      --orange:#f97316;
+      --orange-soft:#ff9d4d;
+      --gold:#ffc14d;
+      --projected:#d7bf7d;
+      --danger:#ff7d7d;
       --border:rgba(255,255,255,.08);
       --border-soft:rgba(255,255,255,.06);
-      --success:#7bd7ff;
-      --danger:#ff7d7d;
     }
 
     *{box-sizing:border-box}
-      top:18px;
+    html,body{height:100%;margin:0}
+
+    body{
+      color:var(--text-primary);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(59,130,246,.08), transparent 26%),
+        radial-gradient(circle at 82% 22%, rgba(249,115,22,.07), transparent 28%),
+        linear-gradient(180deg,#05070b 0%, #04060a 100%);
+      overflow-x:hidden;
     }
 
-    .main-panel{
-      padding:26px;
+    .grid-bg{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background:
+        linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(circle at center, black 40%, transparent 92%);
+      z-index:0;
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      min-height:100vh;
+      padding:22px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .shell{
+      width:min(1280px, calc(100vw - 44px));
+      min-height:calc(100vh - 44px);
+      border-radius:32px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));
+      box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(420px circle at 50% 0%, rgba(249,115,22,.05), transparent 56%),
+        radial-gradient(520px circle at 10% 8%, rgba(59,130,246,.04), transparent 52%);
+      z-index:0;
+    }
+
+    .inner{
+      position:relative;
+      z-index:1;
+      padding:22px 24px 30px;
+      min-height:calc(100vh - 44px);
+      display:grid;
+      grid-template-rows:auto auto 1fr auto;
+      gap:18px;
+    }
+
+    .topbar{
+      position:relative;
+      min-height:72px;
+      padding:12px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+
+    .topbar::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:20px;
+      background:linear-gradient(
+        90deg,
+        rgba(59,130,246,.04),
+        rgba(0,0,0,.92) 22%,
+        rgba(0,0,0,.92) 78%,
+        rgba(249,115,22,.04)
+      );
+      pointer-events:none;
+    }
+
+    .topbar > *{position:relative;z-index:1}
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+
+    .logo-wrap{
+      width:64px;
+      height:64px;
+      min-width:64px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 64px;
+    }
+
+    .logo{
+      width:56px;
+      height:56px;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 0 10px rgba(249,115,22,.20));
+    }
+
+    .brand-stack{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .brand-wordmark{
+      display:flex;
+      align-items:flex-end;
+      gap:6px;
+      line-height:1;
+    }
+
+    .brand-ai,
+    .brand-callport{
+      font-size:14px;
+      font-weight:900;
+      text-transform:uppercase;
+      color:transparent;
+      -webkit-background-clip:text;
+      background-clip:text;
+    }
+
+    .brand-ai{
+      letter-spacing:.04em;
+      background-image:linear-gradient(180deg, var(--blue-soft), var(--blue));
+    }
+
+    .brand-callport{
+      letter-spacing:.02em;
+      background-image:linear-gradient(180deg, var(--gold), var(--orange));
+    }
+
+    .beta-badge,
+    .topbar-note,
+    .progress-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .beta-badge{
+      min-height:22px;
+      padding:0 9px;
+      border:1px solid rgba(249,115,22,.24);
+      background:rgba(249,115,22,.10);
+      color:#fff;
+    }
+
+    .topbar-note{
+      min-height:32px;
+      padding:0 14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:var(--text-secondary);
+    }
+
+    .hero{
+      max-width:780px;
+      margin:0 auto;
+      text-align:center;
+    }
+
+    .hero h1{
+      margin:0;
+      font-size:clamp(28px,4.5vw,48px);
+      line-height:1.02;
+      letter-spacing:-.06em;
+      color:#fff;
+    }
+
+    .hero p{
+      margin:12px auto 0;
+      max-width:720px;
+      color:var(--blue-soft);
+      font-size:15px;
+      line-height:1.6;
+      font-weight:700;
+      text-wrap:balance;
+    }
+
+    .wizard-wrap{
+      display:grid;
+      place-items:center;
+      min-height:0;
+    }
+
+    .wizard-card{
+      width:min(860px, 100%);
+      min-height:520px;
+      border-radius:30px;
+      border:1px solid var(--border-soft);
       background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));
-      border-color:rgba(103,212,255,.14);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.03),
+        0 22px 60px rgba(0,0,0,.32);
+      padding:28px 24px 22px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .wizard-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(260px circle at 80% 0%, rgba(249,115,22,.05), transparent 48%),
+        radial-gradient(260px circle at 10% 0%, rgba(59,130,246,.05), transparent 48%);
+    }
+
+    .wizard-card > *{position:relative;z-index:1}
+
+    .wizard-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    .progress-chip{
+      min-height:30px;
+      padding:0 12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:var(--blue-soft);
+    }
+
+    .progress-line{
+      margin-top:16px;
+      height:10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.05);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .progress-fill{
+      height:100%;
+      width:8.33%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--blue), var(--blue-soft));
+      box-shadow:0 0 18px rgba(123,215,255,.22);
+      transition:width .25s ease;
+    }
+
+    .slide{
+      display:none;
+      padding-top:24px;
+      animation:fadeSlide .24s ease;
+    }
+
+    .slide.active{
+      display:block;
     }
 
     .eyebrow{
       display:inline-flex;
       align-items:center;
-    }
-
-    .progress-fill{
-      width:25%;
-      width:33.333%;
-      height:100%;
+      min-height:30px;
+      padding:0 12px;
       border-radius:999px;
-      background:linear-gradient(90deg, var(--blue), var(--blue-soft));
-      box-shadow:0 0 12px rgba(123,215,255,.28);
+      background:rgba(123,215,255,.08);
+      border:1px solid rgba(123,215,255,.18);
+      color:var(--blue-soft);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
     }
 
-    .main-panel{
-      padding:26px;
-      background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));
-      border-color:rgba(103,212,255,.14);
-    }
-
-    .panel-head{
-      display:flex;
-      justify-content:space-between;
-      white-space:nowrap;
-    }
-
-    .section-card{
-      margin-top:18px;
-      padding:18px;
-      border-radius:22px;
-      background:rgba(255,255,255,.025);
-      border:1px solid rgba(255,255,255,.06);
-    }
-
-    .section-card h3{
-      margin:0;
-      font-size:20px;
-      letter-spacing:-.03em;
+    .question-title{
+      margin:18px 0 0;
+      font-size:clamp(30px,4vw,44px);
+      line-height:1.04;
+      letter-spacing:-.055em;
       color:#fff;
     }
 
-    .section-card p{
-      margin:10px 0 0;
-      font-size:14px;
-      line-height:1.6;
+    .question-copy{
+      margin:12px 0 0;
+      max-width:700px;
       color:var(--text-secondary);
+      font-size:15px;
+      line-height:1.58;
       font-weight:600;
-    }
-
-    .form-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-      margin-top:16px;
     }
 
     .field{
-    .textarea{
-      min-height:132px;
-      resize:vertical;
+      margin-top:22px;
+      display:grid;
+      gap:8px;
     }
 
-    .section-card{
-      margin-top:18px;
-      padding:18px;
-      border-radius:22px;
-      background:rgba(255,255,255,.025);
+    .label{
+      color:#edf6ff;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .input{
+      width:100%;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(8,12,19,.88);
+      color:#f7fbff;
+      padding:16px;
+      font:inherit;
+      outline:none;
+      transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    .input::placeholder{
+      color:#8fa2b8;
+    }
+
+    .input:focus{
+      border-color:rgba(123,215,255,.48);
+      box-shadow:0 0 0 4px rgba(123,215,255,.10);
+      background:rgba(10,15,24,.96);
+    }
+
+    .search-results{
+      margin-top:14px;
+      max-height:265px;
+      overflow:auto;
+      border-radius:20px;
       border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.02);
+      padding:12px;
     }
 
-    .section-card h3{
-      margin:0;
-      font-size:20px;
-      letter-spacing:-.03em;
+    .group-title{
+      margin:6px 0 10px;
       color:#fff;
+      opacity:.86;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
     }
 
-    .section-card p{
-      margin:10px 0 0;
-      font-size:14px;
-      line-height:1.6;
-      color:var(--text-secondary);
+    .option-list{
+      display:grid;
+      gap:8px;
+      margin-bottom:12px;
+    }
+
+    .option-btn{
+      width:100%;
+      text-align:left;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#fff;
+      border-radius:16px;
+      padding:14px;
+      cursor:pointer;
+      transition:.18s ease;
+      font:inherit;
+    }
+
+    .option-btn:hover{
+      border-color:rgba(103,212,255,.24);
+      background:rgba(255,255,255,.05);
+    }
+
+    .option-btn.selected{
+      background:rgba(103,212,255,.10);
+      border-color:rgba(103,212,255,.32);
+      box-shadow:0 0 0 3px rgba(103,212,255,.06);
+    }
+
+    .option-main{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      font-size:15px;
+      line-height:1.35;
+      font-weight:700;
+    }
+
+    .option-meta{
+      margin-top:5px;
+      color:var(--text-muted);
+      font-size:12px;
+      line-height:1.4;
       font-weight:600;
     }
 
+    .status-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:76px;
+      height:22px;
+      padding:0 8px;
+      border-radius:999px;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .status-active{
+      border:1px solid rgba(59,130,246,.22);
+      background:rgba(59,130,246,.14);
+      color:#9bdcff;
+    }
+
+    .status-coming{
+      border:1px solid rgba(249,115,22,.22);
+      background:rgba(249,115,22,.12);
+      color:#ffc48e;
+    }
+
+    .status-projected{
+      border:1px solid rgba(215,191,125,.24);
+      background:rgba(215,191,125,.10);
+      color:#f4dfac;
+    }
+
     .choice-grid{
-      margin-top:16px;
+      margin-top:22px;
       display:grid;
-      accent-color:#7bd7ff;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+
+    .choice-card{
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(8,12,19,.80);
+      padding:16px;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .choice-card:hover{
+      border-color:rgba(103,212,255,.22);
+      background:rgba(255,255,255,.04);
+    }
+
+    .choice-card.selected{
+      border-color:rgba(103,212,255,.30);
+      background:rgba(103,212,255,.08);
+      box-shadow:0 0 0 3px rgba(103,212,255,.06);
+    }
+
+    .choice-card strong{
+      display:block;
+      color:#fff;
+      font-size:15px;
+      line-height:1.35;
+      font-weight:800;
+    }
+
+    .choice-card span{
+      display:block;
+      margin-top:6px;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.45;
+      font-weight:600;
+    }
+
+    .helper-note{
+      margin-top:16px;
+      color:var(--text-muted);
+      font-size:13px;
+      line-height:1.5;
+      font-weight:600;
+    }
+
+    .selected-preview{
+      margin-top:16px;
+      color:#fff;
+      font-size:13px;
+      line-height:1.55;
+      font-weight:700;
+    }
+
+    .inactive-note{
+      margin-top:14px;
+      border-radius:18px;
+      border:1px solid rgba(249,115,22,.20);
+      background:rgba(249,115,22,.08);
+      padding:14px;
+      color:#ffd7b5;
+      font-size:13px;
+      line-height:1.5;
+      font-weight:600;
+      display:none;
     }
 
     .error{
-      margin-top:16px;
-      display:none;
+      margin-top:12px;
       color:var(--danger);
       font-size:13px;
       line-height:1.5;
       font-weight:700;
+      min-height:20px;
     }
 
-    .actions{
-      margin-top:24px;
-      display:flex;
+    .wizard-actions{
+      display:grid;
+      grid-template-columns:160px 1fr 220px;
+      align-items:center;
+      gap:14px;
+      padding-top:6px;
+    }
+
+    .back-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:flex-start;
+      border:none;
+      background:transparent;
+      color:var(--text-muted);
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      padding:0;
+    }
+
+    .back-btn:hover{color:#fff}
+
+    .status-copy{
+      text-align:center;
+      color:var(--text-muted);
       font-size:13px;
       line-height:1.5;
       font-weight:600;
-      max-width:420px;
     }
 
-    .button-row{
+    .next-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:220px;
+      height:54px;
+      border:none;
+      border-radius:18px;
+      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.14em;
       text-transform:uppercase;
-      transition:.18s ease;
-      border:1px solid rgba(255,255,255,.10);
       cursor:pointer;
+      transition:.18s ease;
+      box-shadow:0 10px 30px rgba(249,115,22,.28);
+      justify-self:end;
     }
 
-    .btn-primary{
+    .next-btn:hover{
       transform:translateY(-2px);
-      background:rgba(59,130,246,.08);
-      border-color:rgba(59,130,246,.30);
+      filter:brightness(1.04);
     }
 
-    @keyframes logoGlow{
-      0%,100%{ filter:drop-shadow(0 0 8px rgba(249,115,22,.18)); }
-      50%{ filter:drop-shadow(0 0 16px rgba(249,115,22,.30)); }
+    @keyframes fadeSlide{
+      from{opacity:0;transform:translateY(12px)}
+      to{opacity:1;transform:translateY(0)}
     }
 
-    @media (max-width:1080px){
+    @media (max-width:900px){
+      .wizard-actions{
+        grid-template-columns:1fr;
+      }
+
+      .next-btn{
+        width:100%;
+        min-width:unset;
+        justify-self:stretch;
+      }
+
+      .status-copy{text-align:left}
+    }
+
+    @media (max-width:760px){
+      .page{padding:10px}
+      .shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}
+      .inner{padding:12px 12px 20px;min-height:calc(100vh - 20px)}
+      .topbar{padding:12px;flex-wrap:wrap}
+      .topbar::before{border-radius:16px}
+      .logo-wrap{width:50px;height:50px;min-width:50px;min-height:50px;flex:0 0 50px}
+      .logo{width:42px;height:42px}
+      .brand-ai,.brand-callport{font-size:12px}
+      .beta-badge,.topbar-note,.progress-chip{font-size:8px}
+      .wizard-card{min-height:540px;border-radius:22px;padding:22px 16px 18px}
+      .question-title{font-size:30px}
+      .choice-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <div class="page">
+    <div class="shell">
+      <div class="inner">
+        <header class="topbar">
+          <div class="brand">
+            <div class="logo-wrap">
+              <img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo" />
+            </div>
+            <div class="brand-stack">
+              <div class="brand-wordmark">
+                <span class="brand-ai">AI</span>
+                <span class="brand-callport">CALL PORT</span>
+              </div>
+              <div class="beta-badge">Beta</div>
             </div>
           </div>
 
-          <div class="topbar-note">Step 1 of 4 • business setup</div>
-          <div class="topbar-note">Step 1 of 3 • company + configuration</div>
+          <div class="topbar-note">Step 1 of 3 • guided company + configuration</div>
         </header>
 
-        <main class="setup">
-          <aside class="sidebar">
-            <div class="eyebrow">Guided Setup</div>
-            <h1 class="side-title">Tell us how your business works</h1>
-            <h1 class="side-title">Start with the company details that shape the system</h1>
-            <p class="side-copy">
-              We use this to shape your call handling, booking logic, routing behavior, and dashboard setup before you test anything live.
-              Your company name comes first so the greeting, dashboard, reports, and verification flow can stay personalized from the beginning.
-            </p>
+        <section class="hero">
+          <h1>Tell us about the business one question at a time</h1>
+          <p>Your company details come first, then the system learns the country, industry, scheduling style, channels, languages, and workflow logic it needs to prepare.</p>
+        </section>
 
-            <div class="progress">
-              <div class="progress-top">
-                <span>Progress</span>
-                <span>25%</span>
-                <span>Step 1 of 3</span>
-              </div>
-              <div class="progress-bar">
-                <div class="progress-fill"></div>
+        <div class="wizard-wrap">
+          <div class="wizard-card">
+            <div class="wizard-top">
+              <div class="eyebrow" id="eyebrow">Company Profile</div>
+              <div class="progress-chip" id="progressChip">Question 1 of 12</div>
             </div>
 
-            <ul class="bullet-list">
-              <li>Set the right greeting and business context</li>
-              <li>Match the system to your scheduling workflow</li>
-              <li>Prepare the dashboard for real call activity</li>
-              <li>Get ready for your live test in Step 2</li>
-              <li>Collect the business identity used across the system</li>
-              <li>Configure routing, scheduling, channels, and workflow logic</li>
-              <li>Prepare a live system build before verification and pricing</li>
-              <li>Send the setup into a real configuration progress screen</li>
-            </ul>
-          </aside>
-
-          <section class="main-panel">
-            <div class="panel-head">
-              <div>
-                <h2 class="panel-title">Business profile</h2>
-                <h2 class="panel-title">Business intake</h2>
-                <p class="panel-sub">
-                  Answer a few quick questions, test a live call, see your dashboard respond, and activate a system configured for how your business actually works.
-                  Start with your company information, then tell us how your business actually operates so AI Call Port can configure the right call logic, scheduling flow, and dashboard structure.
-                </p>
-              </div>
-              <div class="step-chip">Step 1</div>
+            <div class="progress-line">
+              <div class="progress-fill" id="progressFill"></div>
             </div>
 
-            <form>
-              <div class="form-grid">
-                <label class="field">
-                  <span class="label">Business name</span>
-                  <input class="input" type="text" placeholder="AI Call Port Plumbing" />
-                </label>
-            <form id="setupForm">
-              <div class="section-card">
-                <h3>Company details</h3>
-                <p>These details carry forward into verification, branded call behavior, reports, and dashboard identity.</p>
+            <div class="slide active" data-step="0">
+              <h2 class="question-title">What is your company name?</h2>
+              <p class="question-copy">This will be used for the branded greeting, dashboard identity, reports, waitlist logic, and verification records.</p>
+              <label class="field">
+                <span class="label">Company name</span>
+                <input class="input" id="companyName" type="text" placeholder="Acme Plumbing & Drain" />
+              </label>
+              <div class="error" id="error-0"></div>
+            </div>
 
-                <label class="field">
-                  <span class="label">Industry</span>
-                  <select class="select">
-                    <option>Home services</option>
-                    <option>Medical</option>
-                    <option>Legal</option>
-                    <option>Real estate</option>
-                    <option>Hospitality</option>
-                  </select>
-                </label>
-                <div class="form-grid">
-                  <label class="field full">
-                    <span class="label">Company name</span>
-                    <input class="input" id="companyName" type="text" placeholder="Acme Plumbing & Drain" required />
-                  </label>
+            <div class="slide" data-step="1">
+              <h2 class="question-title">Who owns or runs the business?</h2>
+              <p class="question-copy">We use the owner name for reporting, account setup, waitlist notifications, and future verification.</p>
+              <label class="field">
+                <span class="label">Owner full name</span>
+                <input class="input" id="ownerName" type="text" placeholder="Jordan Lee" />
+              </label>
+              <div class="error" id="error-1"></div>
+            </div>
 
-                <label class="field">
-                  <span class="label">Country</span>
-                  <select class="select">
-                    <option>United States</option>
-                    <option>Canada</option>
-                    <option>United Kingdom</option>
-                    <option>Australia</option>
-                  </select>
-                </label>
-                  <label class="field">
-                    <span class="label">Owner full name</span>
-                    <input class="input" id="ownerName" type="text" placeholder="Jordan Lee" />
-                  </label>
+            <div class="slide" data-step="2">
+              <h2 class="question-title">What business email should we use?</h2>
+              <p class="question-copy">This email will be verified in Step 2 before testing is unlocked.</p>
+              <label class="field">
+                <span class="label">Business email</span>
+                <input class="input" id="businessEmail" type="email" placeholder="owner@acmeplumbing.com" />
+              </label>
+              <div class="error" id="error-2"></div>
+            </div>
 
-                <label class="field">
-                  <span class="label">Team size</span>
-                  <select class="select">
-                    <option>1-3 people</option>
-                    <option>4-10 people</option>
-                    <option>11-25 people</option>
-                    <option>26+ people</option>
-                  </select>
-                </label>
+            <div class="slide" data-step="3">
+              <h2 class="question-title">What business phone number should be connected?</h2>
+              <p class="question-copy">This number helps shape call behavior and will also be verified before live testing.</p>
+              <label class="field">
+                <span class="label">Business phone</span>
+                <input class="input" id="businessPhone" type="tel" placeholder="(555) 555-0199" />
+              </label>
+              <div class="error" id="error-3"></div>
+            </div>
 
-                <label class="field">
-                  <span class="label">Primary phone number</span>
-                  <input class="input" type="tel" placeholder="(555) 555-0199" />
-                </label>
+            <div class="slide" data-step="4">
+              <h2 class="question-title">Which country is the business operating in?</h2>
+              <p class="question-copy">Search across 150 countries. We currently support 75 active countries, with others marked as coming soon or projected.</p>
+              <label class="field">
+                <span class="label">Search country</span>
+                <input class="input" id="countrySearch" type="text" placeholder="Search by country or continent" />
+              </label>
+              <div class="selected-preview" id="countryPreview"></div>
+              <div class="inactive-note" id="inactiveCountryNote"></div>
+              <div class="search-results" id="countryResults"></div>
+              <div class="error" id="error-4"></div>
+            </div>
 
-                <label class="field">
-                  <span class="label">Booking style</span>
-                  <select class="select">
-                    <option>Calls only</option>
-                    <option>Calls + appointments</option>
-                    <option>Calls + dispatching</option>
-                    <option>Lead capture only</option>
-                  </select>
-                </label>
-                  <label class="field">
-                    <span class="label">Business email</span>
-                    <input class="input" id="businessEmail" type="email" placeholder="owner@acmeplumbing.com" />
-                  </label>
+            <div class="slide" data-step="5">
+              <h2 class="question-title">What industry best fits the business?</h2>
+              <p class="question-copy">Search a long SMB industry list by keyword. Results are grouped by category so the system can apply the right workflow context.</p>
+              <label class="field">
+                <span class="label">Search industry</span>
+                <input class="input" id="industrySearch" type="text" placeholder="Search plumbing, dental, legal, retail, HVAC, cleaning..." />
+              </label>
+              <div class="selected-preview" id="industryPreview"></div>
+              <div class="search-results" id="industryResults"></div>
+              <div class="error" id="error-5"></div>
+            </div>
 
-                <label class="field full">
-                  <span class="label">What should callers usually accomplish?</span>
-                  <textarea class="textarea" placeholder="Example: book a service, request a quote, ask after-hours questions, or leave an urgent message for dispatch."></textarea>
-                </label>
-              </div>
-                  <label class="field">
-                    <span class="label">Business phone</span>
-                    <input class="input" id="businessPhone" type="tel" placeholder="(555) 555-0199" />
-                  </label>
+            <div class="slide" data-step="6">
+              <h2 class="question-title">How does the business usually make money?</h2>
+              <p class="question-copy">Choose the business model that best describes how calls need to be handled.</p>
+              <div class="choice-grid" id="businessModelGrid"></div>
+              <div class="selected-preview" id="businessModelPreview"></div>
+              <div class="error" id="error-6"></div>
+            </div>
 
-              <div class="section-card">
-                <h3>What should the system help with on day one?</h3>
-                <p>Choose the workflows you want available when you run your first live test.</p>
-                <div class="choice-grid">
-                  <label class="choice"><input type="checkbox" checked /> Booking appointments or consultations</label>
-                  <label class="choice"><input type="checkbox" checked /> Routing urgent or after-hours calls</label>
-                  <label class="choice"><input type="checkbox" /> Qualifying new leads automatically</label>
-                  <label class="choice"><input type="checkbox" /> Sending notes into a CRM or dashboard</label>
-                  <label class="field">
-                    <span class="label">Website</span>
-                    <input class="input" id="website" type="url" placeholder="https://acmeplumbing.com" />
-                  </label>
-                </div>
-              </div>
+            <div class="slide" data-step="7">
+              <h2 class="question-title">How large is the team?</h2>
+              <p class="question-copy">Team size affects dashboard structure, task visibility, reminders, and coordination logic.</p>
+              <div class="choice-grid" id="teamSizeGrid"></div>
+              <div class="selected-preview" id="teamSizePreview"></div>
+              <div class="error" id="error-7"></div>
+            </div>
 
-              <div class="section-card">
-                <h3>Languages and communication style</h3>
-                <p>Give the system a sense of how your business should sound when customers call in.</p>
-                <div class="form-grid" style="margin-top:16px;">
-                <h3>Business structure</h3>
-                <p>These choices define how the AI agents, dashboard, scheduling logic, and pricing should be prepared.</p>
+            <div class="slide" data-step="8">
+              <h2 class="question-title">How should scheduling work?</h2>
+              <p class="question-copy">This defines whether the AI only helps, fully books, or supports dispatch-style scheduling.</p>
+              <div class="choice-grid" id="schedulingGrid"></div>
+              <div class="selected-preview" id="schedulingPreview"></div>
+              <div class="error" id="error-8"></div>
+            </div>
 
-                <div class="form-grid">
-                  <label class="field">
-                    <span class="label">Country</span>
-                    <select class="select" id="country" required>
-                      <option value="United States|North America|Active">United States</option>
-                      <option value="Canada|North America|Active">Canada</option>
-                      <option value="United Kingdom|Europe|Active">United Kingdom</option>
-                      <option value="Australia|Oceania|Active">Australia</option>
-                      <option value="Germany|Europe|Coming Soon">Germany</option>
-                      <option value="United Arab Emirates|Middle East|Coming Soon">United Arab Emirates</option>
-                      <option value="Japan|Asia|Projected">Japan</option>
-                      <option value="South Africa|Africa|Projected">South Africa</option>
-                    </select>
-                  </label>
+            <div class="slide" data-step="9">
+              <h2 class="question-title">Which channels should be prepared on day one?</h2>
+              <p class="question-copy">Choose all the paths the system should support from the start.</p>
+              <div class="choice-grid" id="channelsGrid"></div>
+              <div class="selected-preview" id="channelsPreview"></div>
+              <div class="error" id="error-9"></div>
+            </div>
 
-                  <label class="field">
-                    <span class="label">Industry</span>
-                    <select class="select" id="industry" required>
-                      <option value="Plumbing|Home Services">Plumbing</option>
-                      <option value="HVAC|Home Services">HVAC</option>
-                      <option value="Electrical|Home Services">Electrical</option>
-                      <option value="Dental Practice|Healthcare">Dental Practice</option>
-                      <option value="Law Firm|Professional Services">Law Firm</option>
-                      <option value="Real Estate|Professional Services">Real Estate</option>
-                      <option value="Automotive Service|Local Services">Automotive Service</option>
-                      <option value="Hospitality|Hospitality">Hospitality</option>
-                    </select>
-                  </label>
+            <div class="slide" data-step="10">
+              <h2 class="question-title">Which languages should the system support?</h2>
+              <p class="question-copy">Choose one or more business languages for the customer-facing experience.</p>
+              <div class="choice-grid" id="languagesGrid"></div>
+              <div class="selected-preview" id="languagesPreview"></div>
+              <div class="error" id="error-10"></div>
+            </div>
 
-                  <label class="field">
-                    <span class="label">Business model</span>
-                    <select class="select" id="businessModel" required>
-                      <option>Appointment-based</option>
-                      <option>Recurring service</option>
-                      <option>Quote-based</option>
-                      <option>Emergency service</option>
-                      <option>Mixed model</option>
-                      <option>Multi-location</option>
-                    </select>
-                  </label>
+            <div class="slide" data-step="11">
+              <h2 class="question-title">What workflows should be enabled first?</h2>
+              <p class="question-copy">These choices drive the initial call logic, pricing estimate, and verification path before live testing.</p>
+              <div class="choice-grid" id="workflowGrid"></div>
+              <div class="selected-preview" id="workflowPreview"></div>
+              <div class="helper-note">If the country is not active, you will still be able to continue setup and review the system, but activation will become a waitlist path.</div>
+              <div class="error" id="error-11"></div>
+            </div>
 
-                  <label class="field">
-                    <span class="label">Primary language</span>
-                    <select class="select">
-                      <option>English</option>
-                      <option>Spanish</option>
-                      <option>French</option>
-                    <span class="label">Team size</span>
-                    <select class="select" id="teamSize" required>
-                      <option>1-3 people</option>
-                      <option>4-10 people</option>
-                      <option>11-25 people</option>
-                      <option>26+ people</option>
-                    </select>
-                  </label>
-
-                  <label class="field">
-                    <span class="label">Tone</span>
-                    <select class="select">
-                      <option>Professional and friendly</option>
-                      <option>Warm and consultative</option>
-                      <option>Fast and direct</option>
-                    <span class="label">Scheduling mode</span>
-                    <select class="select" id="schedulingMode" required>
-                      <option>Manual approval</option>
-                      <option>AI-assisted booking</option>
-                      <option>Automatic scheduling</option>
-                      <option>Dispatch-based scheduling</option>
-                    </select>
-                  </label>
-
-                  <label class="field full">
-                    <span class="label">What should callers usually accomplish?</span>
-                    <textarea class="textarea" id="callerGoals" placeholder="Example: book a service, request a quote, confirm an appointment, reach after-hours support, or trigger urgent dispatch."></textarea>
-                  </label>
-                </div>
-              </div>
-
-              <div class="section-card">
-                <h3>Channels and languages</h3>
-                <p>Choose the communication paths and languages you want the system prepared for on day one.</p>
-
-                <div class="choice-grid" id="channelsGrid">
-                  <label class="choice"><input type="checkbox" value="Phone" checked /> Phone</label>
-                  <label class="choice"><input type="checkbox" value="SMS" checked /> SMS</label>
-                  <label class="choice"><input type="checkbox" value="Web chat" /> Web chat</label>
-                  <label class="choice"><input type="checkbox" value="Email follow-up" /> Email follow-up</label>
-                </div>
-
-                <div class="choice-grid" id="languagesGrid" style="margin-top:12px;">
-                  <label class="choice"><input type="checkbox" value="English" checked /> English</label>
-                  <label class="choice"><input type="checkbox" value="Spanish" /> Spanish</label>
-                  <label class="choice"><input type="checkbox" value="French" /> French</label>
-                  <label class="choice"><input type="checkbox" value="Arabic" /> Arabic</label>
-                </div>
-              </div>
-
-              <div class="section-card">
-                <h3>Workflow needs</h3>
-                <p>These determine what gets enabled before pricing and verification in Step 2.</p>
-                <div class="choice-grid" id="workflowGrid">
-                  <label class="choice"><input type="checkbox" value="New lead qualification" checked /> New lead qualification</label>
-                  <label class="choice"><input type="checkbox" value="After-hours call handling" checked /> After-hours call handling</label>
-                  <label class="choice"><input type="checkbox" value="Emergency routing" /> Emergency routing</label>
-                  <label class="choice"><input type="checkbox" value="Team dispatch" /> Team dispatch</label>
-                  <label class="choice"><input type="checkbox" value="Appointment confirmations" checked /> Appointment confirmations</label>
-                  <label class="choice"><input type="checkbox" value="Multi-location support" /> Multi-location support</label>
-                </div>
-              </div>
-
-              <div class="error" id="formError">Please enter your company name and choose at least one channel, one language, and one workflow need before continuing.</div>
-
-              <div class="actions">
-                <div class="action-note">
-                  This step only shapes the initial setup. You’ll test the live call behavior next.
-                  After this step, the system will show a live configuration progress screen before moving into verification, documentation, and pricing review.
-                </div>
-                <div class="button-row">
-                  <a class="btn btn-secondary" href="index.html">Back to landing page</a>
-                  <a class="btn btn-primary" href="step2.html">Continue to Step 2</a>
-                  <button class="btn btn-primary" type="submit">Configure My System</button>
-                </div>
-              </div>
-            </form>
+            <div class="wizard-actions">
+              <button class="back-btn" id="backBtn" type="button">← Back</button>
+              <div class="status-copy" id="statusCopy">Company details come first so the rest of the flow stays personalized.</div>
+              <button class="next-btn" id="nextBtn" type="button">Continue</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    const form = document.getElementById("setupForm");
-    const errorEl = document.getElementById("formError");
+    const countryData = [
+      { name: "United States", continent: "North America", status: "Active" },
+      { name: "Canada", continent: "North America", status: "Active" },
+      { name: "Mexico", continent: "North America", status: "Active" },
+      { name: "Guatemala", continent: "North America", status: "Active" },
+      { name: "Costa Rica", continent: "North America", status: "Active" },
+      { name: "Panama", continent: "North America", status: "Active" },
+      { name: "Dominican Republic", continent: "North America", status: "Active" },
+      { name: "Jamaica", continent: "North America", status: "Active" },
+      { name: "Trinidad and Tobago", continent: "North America", status: "Active" },
+      { name: "El Salvador", continent: "North America", status: "Projected" },
+      { name: "Honduras", continent: "North America", status: "Projected" },
+      { name: "Nicaragua", continent: "North America", status: "Projected" },
+      { name: "Belize", continent: "North America", status: "Projected" },
+      { name: "Bahamas", continent: "North America", status: "Projected" },
+      { name: "Barbados", continent: "North America", status: "Projected" },
 
-    function collectCheckedValues(containerId) {
-      return Array.from(document.querySelectorAll(`#${containerId} input:checked`))
-        .map(input => input.value);
+      { name: "Brazil", continent: "South America", status: "Active" },
+      { name: "Argentina", continent: "South America", status: "Active" },
+      { name: "Chile", continent: "South America", status: "Active" },
+      { name: "Colombia", continent: "South America", status: "Active" },
+      { name: "Peru", continent: "South America", status: "Active" },
+      { name: "Uruguay", continent: "South America", status: "Active" },
+      { name: "Paraguay", continent: "South America", status: "Active" },
+      { name: "Ecuador", continent: "South America", status: "Active" },
+      { name: "Bolivia", continent: "South America", status: "Projected" },
+      { name: "Venezuela", continent: "South America", status: "Projected" },
+
+      { name: "United Kingdom", continent: "Europe", status: "Active" },
+      { name: "Ireland", continent: "Europe", status: "Active" },
+      { name: "Germany", continent: "Europe", status: "Active" },
+      { name: "France", continent: "Europe", status: "Active" },
+      { name: "Spain", continent: "Europe", status: "Active" },
+      { name: "Portugal", continent: "Europe", status: "Active" },
+      { name: "Italy", continent: "Europe", status: "Active" },
+      { name: "Netherlands", continent: "Europe", status: "Active" },
+      { name: "Belgium", continent: "Europe", status: "Active" },
+      { name: "Luxembourg", continent: "Europe", status: "Active" },
+      { name: "Switzerland", continent: "Europe", status: "Active" },
+      { name: "Austria", continent: "Europe", status: "Active" },
+      { name: "Denmark", continent: "Europe", status: "Active" },
+      { name: "Sweden", continent: "Europe", status: "Active" },
+      { name: "Norway", continent: "Europe", status: "Active" },
+      { name: "Finland", continent: "Europe", status: "Active" },
+      { name: "Poland", continent: "Europe", status: "Active" },
+      { name: "Czech Republic", continent: "Europe", status: "Active" },
+      { name: "Romania", continent: "Europe", status: "Active" },
+      { name: "Greece", continent: "Europe", status: "Active" },
+      { name: "Hungary", continent: "Europe", status: "Active" },
+      { name: "Slovakia", continent: "Europe", status: "Active" },
+      { name: "Slovenia", continent: "Europe", status: "Active" },
+      { name: "Croatia", continent: "Europe", status: "Active" },
+      { name: "Estonia", continent: "Europe", status: "Active" },
+      { name: "Latvia", continent: "Europe", status: "Active" },
+      { name: "Lithuania", continent: "Europe", status: "Active" },
+      { name: "Iceland", continent: "Europe", status: "Active" },
+      { name: "Malta", continent: "Europe", status: "Active" },
+      { name: "Cyprus", continent: "Europe", status: "Active" },
+      { name: "Bulgaria", continent: "Europe", status: "Active" },
+      { name: "Serbia", continent: "Europe", status: "Active" },
+      { name: "Bosnia and Herzegovina", continent: "Europe", status: "Coming Soon" },
+      { name: "Montenegro", continent: "Europe", status: "Coming Soon" },
+      { name: "Albania", continent: "Europe", status: "Coming Soon" },
+      { name: "North Macedonia", continent: "Europe", status: "Coming Soon" },
+      { name: "Ukraine", continent: "Europe", status: "Coming Soon" },
+      { name: "Moldova", continent: "Europe", status: "Projected" },
+      { name: "Belarus", continent: "Europe", status: "Projected" },
+      { name: "Georgia", continent: "Europe", status: "Projected" },
+      { name: "Armenia", continent: "Europe", status: "Projected" },
+      { name: "Azerbaijan", continent: "Europe", status: "Projected" },
+
+      { name: "United Arab Emirates", continent: "Middle East", status: "Active" },
+      { name: "Saudi Arabia", continent: "Middle East", status: "Active" },
+      { name: "Qatar", continent: "Middle East", status: "Active" },
+      { name: "Bahrain", continent: "Middle East", status: "Active" },
+      { name: "Kuwait", continent: "Middle East", status: "Active" },
+      { name: "Oman", continent: "Middle East", status: "Active" },
+      { name: "Jordan", continent: "Middle East", status: "Active" },
+      { name: "Lebanon", continent: "Middle East", status: "Coming Soon" },
+      { name: "Israel", continent: "Middle East", status: "Projected" },
+      { name: "Turkey", continent: "Middle East", status: "Projected" },
+
+      { name: "India", continent: "Asia", status: "Active" },
+      { name: "Singapore", continent: "Asia", status: "Active" },
+      { name: "Japan", continent: "Asia", status: "Active" },
+      { name: "South Korea", continent: "Asia", status: "Active" },
+      { name: "Malaysia", continent: "Asia", status: "Active" },
+      { name: "Thailand", continent: "Asia", status: "Active" },
+      { name: "Indonesia", continent: "Asia", status: "Active" },
+      { name: "Philippines", continent: "Asia", status: "Active" },
+      { name: "Vietnam", continent: "Asia", status: "Active" },
+      { name: "Hong Kong", continent: "Asia", status: "Active" },
+      { name: "Taiwan", continent: "Asia", status: "Active" },
+      { name: "Pakistan", continent: "Asia", status: "Coming Soon" },
+      { name: "Bangladesh", continent: "Asia", status: "Coming Soon" },
+      { name: "Sri Lanka", continent: "Asia", status: "Coming Soon" },
+      { name: "Nepal", continent: "Asia", status: "Coming Soon" },
+      { name: "Cambodia", continent: "Asia", status: "Coming Soon" },
+      { name: "Laos", continent: "Asia", status: "Projected" },
+      { name: "Myanmar", continent: "Asia", status: "Projected" },
+      { name: "Mongolia", continent: "Asia", status: "Projected" },
+      { name: "Kazakhstan", continent: "Asia", status: "Projected" },
+      { name: "Uzbekistan", continent: "Asia", status: "Projected" },
+      { name: "Kyrgyzstan", continent: "Asia", status: "Projected" },
+      { name: "Tajikistan", continent: "Asia", status: "Projected" },
+      { name: "Turkmenistan", continent: "Asia", status: "Projected" },
+      { name: "China", continent: "Asia", status: "Projected" },
+
+      { name: "South Africa", continent: "Africa", status: "Active" },
+      { name: "Nigeria", continent: "Africa", status: "Active" },
+      { name: "Kenya", continent: "Africa", status: "Active" },
+      { name: "Egypt", continent: "Africa", status: "Active" },
+      { name: "Morocco", continent: "Africa", status: "Active" },
+      { name: "Ghana", continent: "Africa", status: "Active" },
+      { name: "Tunisia", continent: "Africa", status: "Coming Soon" },
+      { name: "Algeria", continent: "Africa", status: "Coming Soon" },
+      { name: "Ethiopia", continent: "Africa", status: "Coming Soon" },
+      { name: "Tanzania", continent: "Africa", status: "Coming Soon" },
+      { name: "Uganda", continent: "Africa", status: "Projected" },
+      { name: "Rwanda", continent: "Africa", status: "Projected" },
+      { name: "Zambia", continent: "Africa", status: "Projected" },
+      { name: "Zimbabwe", continent: "Africa", status: "Projected" },
+      { name: "Namibia", continent: "Africa", status: "Projected" },
+      { name: "Botswana", continent: "Africa", status: "Projected" },
+      { name: "Mozambique", continent: "Africa", status: "Projected" },
+      { name: "Angola", continent: "Africa", status: "Projected" },
+      { name: "Senegal", continent: "Africa", status: "Projected" },
+      { name: "Ivory Coast", continent: "Africa", status: "Projected" },
+
+      { name: "Australia", continent: "Oceania", status: "Active" },
+      { name: "New Zealand", continent: "Oceania", status: "Active" },
+      { name: "Fiji", continent: "Oceania", status: "Coming Soon" },
+      { name: "Papua New Guinea", continent: "Oceania", status: "Projected" },
+      { name: "Samoa", continent: "Oceania", status: "Projected" }
+    ];
+
+    const industryData = [
+      { name: "Plumbing", category: "Home Services" },
+      { name: "HVAC", category: "Home Services" },
+      { name: "Electrical", category: "Home Services" },
+      { name: "Roofing", category: "Home Services" },
+      { name: "Garage Door Services", category: "Home Services" },
+      { name: "Appliance Repair", category: "Home Services" },
+      { name: "Handyman Services", category: "Home Services" },
+      { name: "Locksmith", category: "Home Services" },
+      { name: "Landscaping", category: "Home Services" },
+      { name: "Pool Services", category: "Home Services" },
+      { name: "Solar Installation", category: "Home Services" },
+      { name: "Flooring", category: "Home Services" },
+      { name: "Painting", category: "Home Services" },
+      { name: "General Contracting", category: "Construction" },
+      { name: "Remodeling", category: "Construction" },
+      { name: "Concrete Services", category: "Construction" },
+      { name: "Excavation", category: "Construction" },
+      { name: "Windows and Doors", category: "Construction" },
+      { name: "Property Management", category: "Real Estate" },
+      { name: "Residential Real Estate", category: "Real Estate" },
+      { name: "Commercial Real Estate", category: "Real Estate" },
+      { name: "Mortgage Brokerage", category: "Financial Services" },
+      { name: "Accounting Firm", category: "Financial Services" },
+      { name: "Bookkeeping", category: "Financial Services" },
+      { name: "Tax Preparation", category: "Financial Services" },
+      { name: "Insurance Agency", category: "Financial Services" },
+      { name: "Wealth Management", category: "Financial Services" },
+      { name: "Law Firm", category: "Legal" },
+      { name: "Family Law", category: "Legal" },
+      { name: "Personal Injury Law", category: "Legal" },
+      { name: "Immigration Law", category: "Legal" },
+      { name: "Criminal Defense", category: "Legal" },
+      { name: "Estate Planning", category: "Legal" },
+      { name: "Dental Practice", category: "Healthcare" },
+      { name: "Medical Clinic", category: "Healthcare" },
+      { name: "Chiropractic Practice", category: "Healthcare" },
+      { name: "Physical Therapy", category: "Healthcare" },
+      { name: "Mental Health Practice", category: "Healthcare" },
+      { name: "Dermatology", category: "Healthcare" },
+      { name: "Vision Care", category: "Healthcare" },
+      { name: "Veterinary Clinic", category: "Healthcare" },
+      { name: "Home Healthcare", category: "Healthcare" },
+      { name: "Med Spa", category: "Beauty & Wellness" },
+      { name: "Hair Salon", category: "Beauty & Wellness" },
+      { name: "Barbershop", category: "Beauty & Wellness" },
+      { name: "Nail Salon", category: "Beauty & Wellness" },
+      { name: "Massage Therapy", category: "Beauty & Wellness" },
+      { name: "Skincare Clinic", category: "Beauty & Wellness" },
+      { name: "Gym", category: "Fitness" },
+      { name: "Yoga Studio", category: "Fitness" },
+      { name: "Personal Training", category: "Fitness" },
+      { name: "Martial Arts School", category: "Fitness" },
+      { name: "Tutoring Center", category: "Education" },
+      { name: "Private School", category: "Education" },
+      { name: "Daycare", category: "Education" },
+      { name: "Music Lessons", category: "Education" },
+      { name: "Driving School", category: "Education" },
+      { name: "IT Services", category: "IT Services" },
+      { name: "Managed IT", category: "IT Services" },
+      { name: "Cybersecurity Services", category: "IT Services" },
+      { name: "Web Design Agency", category: "Professional Services" },
+      { name: "Marketing Agency", category: "Professional Services" },
+      { name: "Staffing Agency", category: "Professional Services" },
+      { name: "Business Consulting", category: "Professional Services" },
+      { name: "Architectural Firm", category: "Professional Services" },
+      { name: "Engineering Services", category: "Professional Services" },
+      { name: "Translation Services", category: "Professional Services" },
+      { name: "Cleaning Services", category: "Cleaning Services" },
+      { name: "Commercial Cleaning", category: "Cleaning Services" },
+      { name: "Janitorial Services", category: "Cleaning Services" },
+      { name: "Carpet Cleaning", category: "Cleaning Services" },
+      { name: "Pest Control", category: "Pest Control" },
+      { name: "Wildlife Removal", category: "Pest Control" },
+      { name: "Moving Company", category: "Moving & Storage" },
+      { name: "Storage Facility", category: "Moving & Storage" },
+      { name: "Security Services", category: "Security Services" },
+      { name: "Alarm Monitoring", category: "Security Services" },
+      { name: "Auto Repair", category: "Automotive" },
+      { name: "Auto Detailing", category: "Automotive" },
+      { name: "Tire Shop", category: "Automotive" },
+      { name: "Collision Repair", category: "Automotive" },
+      { name: "Car Rental", category: "Automotive" },
+      { name: "Restaurant", category: "Hospitality" },
+      { name: "Catering", category: "Hospitality" },
+      { name: "Hotel", category: "Hospitality" },
+      { name: "Vacation Rental Management", category: "Hospitality" },
+      { name: "Event Venue", category: "Events & Rentals" },
+      { name: "Party Rentals", category: "Events & Rentals" },
+      { name: "Equipment Rentals", category: "Events & Rentals" },
+      { name: "Retail Store", category: "Local Retail" },
+      { name: "Furniture Store", category: "Local Retail" },
+      { name: "Jewelry Store", category: "Local Retail" },
+      { name: "Pet Services", category: "Local Services" },
+      { name: "Dog Grooming", category: "Local Services" },
+      { name: "Funeral Home", category: "Local Services" },
+      { name: "Travel Agency", category: "Professional Services" }
+    ];
+
+    const businessModels = [
+      { name: "Appointment-based", note: "Calls mostly lead to scheduled service or consultation slots." },
+      { name: "Recurring service", note: "Customers often book repeat visits, maintenance, or repeat work." },
+      { name: "Quote-based", note: "Most callers want pricing, qualification, or estimate requests." },
+      { name: "Emergency service", note: "Urgent calls need faster routing and higher-priority logic." },
+      { name: "Mixed model", note: "The business handles bookings, quotes, support, and service together." },
+      { name: "Multi-location", note: "Calls may need routing by branch, team, or service area." }
+    ];
+
+    const teamSizes = [
+      { name: "1-3 people", note: "Lean team with simpler task routing and owner visibility." },
+      { name: "4-10 people", note: "Growing team with more shared scheduling and worker coordination." },
+      { name: "11-25 people", note: "Larger workflow with more confirmations, updates, and assignments." },
+      { name: "26+ people", note: "Multi-user operations with broader task and reporting structure." }
+    ];
+
+    const schedulingModes = [
+      { name: "Manual approval", note: "AI captures requests, but final scheduling stays manual." },
+      { name: "AI-assisted booking", note: "AI prepares booking flow, then humans confirm or finalize." },
+      { name: "Automatic scheduling", note: "AI books appointments directly using the configured rules." },
+      { name: "Dispatch-based scheduling", note: "Jobs route into assignment or dispatch-style scheduling logic." }
+    ];
+
+    const channels = [
+      { name: "Phone", note: "Inbound voice call handling is active." },
+      { name: "SMS", note: "Reminder, confirmation, and follow-up text support." },
+      { name: "Web chat", note: "Website chat interactions can align with the same workflow." },
+      { name: "Email follow-up", note: "Structured email messages support reminders and updates." }
+    ];
+
+    const languages = [
+      { name: "English", note: "Primary English-speaking business experience." },
+      { name: "Spanish", note: "Spanish language support and routing." },
+      { name: "French", note: "French language support and routing." },
+      { name: "Arabic", note: "Arabic language support and routing." },
+      { name: "Portuguese", note: "Portuguese language support and routing." },
+      { name: "German", note: "German language support and routing." }
+    ];
+
+    const workflowNeeds = [
+      { name: "New lead qualification", note: "Capture and qualify incoming opportunities." },
+      { name: "After-hours call handling", note: "Respond when the business is closed." },
+      { name: "Emergency routing", note: "Urgent cases trigger faster routing logic." },
+      { name: "Team dispatch", note: "Calls can route into operational assignment workflows." },
+      { name: "Appointment confirmations", note: "Clients are reminded and asked to confirm." },
+      { name: "Multi-location support", note: "Calls route by branch, market, or location logic." }
+    ];
+
+    const state = {
+      companyName: "",
+      ownerName: "",
+      businessEmail: "",
+      businessPhone: "",
+      country: null,
+      industry: null,
+      businessModel: "",
+      teamSize: "",
+      schedulingMode: "",
+      channels: ["Phone", "SMS"],
+      languages: ["English"],
+      workflowNeeds: ["New lead qualification", "After-hours call handling", "Appointment confirmations"]
+    };
+
+    const stepMeta = [
+      { eyebrow: "Company Profile", status: "Company identity comes first so the rest of the setup stays personalized." },
+      { eyebrow: "Owner Profile", status: "This will carry into account records, reports, and future verification." },
+      { eyebrow: "Contact Setup", status: "The business email will be verified before testing is unlocked." },
+      { eyebrow: "Contact Setup", status: "The business phone will be verified before live testing begins." },
+      { eyebrow: "Country Search", status: "Choose an active market or continue with waitlist options if the country is not live yet." },
+      { eyebrow: "Industry Search", status: "Industry helps shape call logic, dashboards, and workflow defaults." },
+      { eyebrow: "Business Model", status: "This tells the AI what types of calls and next actions matter most." },
+      { eyebrow: "Team Structure", status: "Team size influences assignments, confirmations, and dashboard visibility." },
+      { eyebrow: "Scheduling Logic", status: "Scheduling style changes how bookings and confirmations are prepared." },
+      { eyebrow: "Channel Setup", status: "Choose the communication channels the business wants ready first." },
+      { eyebrow: "Language Setup", status: "Language support affects caller routing and experience design." },
+      { eyebrow: "Workflow Setup", status: "These workflow choices determine what gets enabled before pricing and verification." }
+    ];
+
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const progressChip = document.getElementById("progressChip");
+    const progressFill = document.getElementById("progressFill");
+    const eyebrow = document.getElementById("eyebrow");
+    const statusCopy = document.getElementById("statusCopy");
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let current = 0;
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
+    function clearErrors() {
+      document.querySelectorAll(".error").forEach(el => el.textContent = "");
+    }
 
-      const companyName = document.getElementById("companyName").value.trim();
-      const ownerName = document.getElementById("ownerName").value.trim();
-      const businessEmail = document.getElementById("businessEmail").value.trim();
-      const businessPhone = document.getElementById("businessPhone").value.trim();
-      const website = document.getElementById("website").value.trim();
-      const [country, continent, countryStatus] = document.getElementById("country").value.split("|");
-      const [industry, industryCategory] = document.getElementById("industry").value.split("|");
-      const businessModel = document.getElementById("businessModel").value;
-      const teamSize = document.getElementById("teamSize").value;
-      const schedulingMode = document.getElementById("schedulingMode").value;
-      const callerGoals = document.getElementById("callerGoals").value.trim();
-      const channels = collectCheckedValues("channelsGrid");
-      const languages = collectCheckedValues("languagesGrid");
-      const workflowNeeds = collectCheckedValues("workflowGrid");
+    function updateUI() {
+      slides.forEach((slide, index) => slide.classList.toggle("active", index === current));
+      progressChip.textContent = `Question ${current + 1} of ${slides.length}`;
+      progressFill.style.width = `${((current + 1) / slides.length) * 100}%`;
+      eyebrow.textContent = stepMeta[current].eyebrow;
+      statusCopy.textContent = stepMeta[current].status;
+      backBtn.style.visibility = current === 0 ? "hidden" : "visible";
+      nextBtn.textContent = current === slides.length - 1 ? "Continue to System Build" : "Continue";
+    }
 
-      const isValid = companyName && channels.length && languages.length && workflowNeeds.length;
-      if (!isValid) {
-        errorEl.style.display = "block";
+    function validateStep(step) {
+      clearErrors();
+
+      if (step === 0 && !document.getElementById("companyName").value.trim()) {
+        document.getElementById("error-0").textContent = "Company name is required before configuration can begin.";
+        return false;
+      }
+
+      if (step === 1 && !document.getElementById("ownerName").value.trim()) {
+        document.getElementById("error-1").textContent = "Owner full name is required.";
+        return false;
+      }
+
+      if (step === 2) {
+        const value = document.getElementById("businessEmail").value.trim();
+        if (!value || !value.includes("@")) {
+          document.getElementById("error-2").textContent = "Enter a valid business email address.";
+          return false;
+        }
+      }
+
+      if (step === 3 && !document.getElementById("businessPhone").value.trim()) {
+        document.getElementById("error-3").textContent = "Business phone is required.";
+        return false;
+      }
+
+      if (step === 4 && !state.country) {
+        document.getElementById("error-4").textContent = "Please choose a country to continue.";
+        return false;
+      }
+
+      if (step === 5 && !state.industry) {
+        document.getElementById("error-5").textContent = "Please choose an industry to continue.";
+        return false;
+      }
+
+      if (step === 6 && !state.businessModel) {
+        document.getElementById("error-6").textContent = "Select the business model that fits best.";
+        return false;
+      }
+
+      if (step === 7 && !state.teamSize) {
+        document.getElementById("error-7").textContent = "Select the team size.";
+        return false;
+      }
+
+      if (step === 8 && !state.schedulingMode) {
+        document.getElementById("error-8").textContent = "Select the scheduling mode.";
+        return false;
+      }
+
+      if (step === 9 && state.channels.length === 0) {
+        document.getElementById("error-9").textContent = "Select at least one channel.";
+        return false;
+      }
+
+      if (step === 10 && state.languages.length === 0) {
+        document.getElementById("error-10").textContent = "Select at least one language.";
+        return false;
+      }
+
+      if (step === 11 && state.workflowNeeds.length === 0) {
+        document.getElementById("error-11").textContent = "Select at least one workflow need.";
+        return false;
+      }
+
+      return true;
+    }
+
+    function goNext() {
+      if (!validateStep(current)) return;
+
+      if (current < slides.length - 1) {
+        current += 1;
+        updateUI();
+      } else {
+        state.companyName = document.getElementById("companyName").value.trim();
+        state.ownerName = document.getElementById("ownerName").value.trim();
+        state.businessEmail = document.getElementById("businessEmail").value.trim();
+        state.businessPhone = document.getElementById("businessPhone").value.trim();
+
+        const params = new URLSearchParams();
+        params.set("companyName", state.companyName);
+        params.set("ownerName", state.ownerName);
+        params.set("businessEmail", state.businessEmail);
+        params.set("businessPhone", state.businessPhone);
+        params.set("country", state.country.name);
+        params.set("continent", state.country.continent);
+        params.set("countryStatus", state.country.status);
+        params.set("industry", state.industry.name);
+        params.set("industryCategory", state.industry.category);
+        params.set("businessModel", state.businessModel);
+        params.set("teamSize", state.teamSize);
+        params.set("schedulingMode", state.schedulingMode);
+        params.set("channels", state.channels.join(", "));
+        params.set("languages", state.languages.join(", "));
+        params.set("workflowNeeds", state.workflowNeeds.join(", "));
+
+        window.location.href = `config-progress.html?${params.toString()}`;
+      }
+    }
+
+    function goBack() {
+      if (current > 0) {
+        current -= 1;
+        updateUI();
+      } else {
+        window.location.href = "index.html";
+      }
+    }
+
+    backBtn.addEventListener("click", goBack);
+    nextBtn.addEventListener("click", goNext);
+
+    function renderCountryResults(filter = "") {
+      const q = filter.trim().toLowerCase();
+      const filtered = countryData.filter(item =>
+        item.name.toLowerCase().includes(q) ||
+        item.continent.toLowerCase().includes(q) ||
+        item.status.toLowerCase().includes(q)
+      );
+
+      const continents = ["North America", "South America", "Europe", "Middle East", "Asia", "Africa", "Oceania"];
+      const statusOrder = ["Active", "Coming Soon", "Projected"];
+      const container = document.getElementById("countryResults");
+      let html = "";
+
+      continents.forEach(continent => {
+        const group = filtered.filter(item => item.continent === continent);
+        if (!group.length) return;
+        html += `<div class="group-title">${escapeHtml(continent)}</div><div class="option-list">`;
+        statusOrder.forEach(status => {
+          group.filter(item => item.status === status).forEach(item => {
+            const selected = state.country && state.country.name === item.name ? " selected" : "";
+            const badgeClass = status === "Active" ? "status-active" : status === "Coming Soon" ? "status-coming" : "status-projected";
+            html += `
+              <button type="button" class="option-btn${selected}" data-country="${escapeHtml(item.name)}">
+                <div class="option-main">
+                  <span>${escapeHtml(item.name)}</span>
+                  <span class="status-badge ${badgeClass}">${escapeHtml(item.status)}</span>
+                </div>
+                <div class="option-meta">${escapeHtml(item.continent)}</div>
+              </button>
+            `;
+          });
+        });
+        html += `</div>`;
+      });
+
+      if (!html) {
+        html = `<div class="helper-note">No countries found for that search.</div>`;
+      }
+
+      container.innerHTML = html;
+
+      container.querySelectorAll("[data-country]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const selected = countryData.find(item => item.name === btn.dataset.country);
+          state.country = selected;
+          renderCountryResults(document.getElementById("countrySearch").value);
+          renderCountryPreview();
+        });
+      });
+    }
+
+    function renderCountryPreview() {
+      const preview = document.getElementById("countryPreview");
+      const note = document.getElementById("inactiveCountryNote");
+
+      if (!state.country) {
+        preview.innerHTML = "";
+        note.style.display = "none";
+        note.textContent = "";
         return;
       }
 
-      errorEl.style.display = "none";
+      preview.innerHTML = `<strong>Selected:</strong> ${escapeHtml(state.country.name)} <span style="color:var(--text-muted)">(${escapeHtml(state.country.status)})</span>`;
 
-      const params = new URLSearchParams();
-      params.set("companyName", companyName);
-      params.set("ownerName", ownerName);
-      params.set("businessEmail", businessEmail);
-      params.set("businessPhone", businessPhone);
-      params.set("website", website);
-      params.set("country", country);
-      params.set("continent", continent);
-      params.set("countryStatus", countryStatus);
-      params.set("industry", industry);
-      params.set("industryCategory", industryCategory);
-      params.set("businessModel", businessModel);
-      params.set("teamSize", teamSize);
-      params.set("schedulingMode", schedulingMode);
-      params.set("callerGoals", callerGoals);
-      params.set("channels", channels.join(", "));
-      params.set("languages", languages.join(", "));
-      params.set("workflowNeeds", workflowNeeds.join(", "));
+      if (state.country.status !== "Active") {
+        note.style.display = "block";
+        note.textContent = `${state.country.name} is currently marked ${state.country.status}. You can continue the guided setup and pricing preview, but activation will become a waitlist option until this market goes live.`;
+      } else {
+        note.style.display = "none";
+        note.textContent = "";
+      }
+    }
 
-      window.location.href = `config-progress.html?${params.toString()}`;
+    function renderIndustryResults(filter = "") {
+      const q = filter.trim().toLowerCase();
+      const filtered = industryData.filter(item =>
+        item.name.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q)
+      );
+      const categories = [...new Set(filtered.map(item => item.category))];
+      const container = document.getElementById("industryResults");
+      let html = "";
+
+      categories.forEach(category => {
+        html += `<div class="group-title">${escapeHtml(category)}</div><div class="option-list">`;
+        filtered.filter(item => item.category === category).forEach(item => {
+          const selected = state.industry && state.industry.name === item.name ? " selected" : "";
+          html += `
+            <button type="button" class="option-btn${selected}" data-industry="${escapeHtml(item.name)}">
+              <div class="option-main"><span>${escapeHtml(item.name)}</span></div>
+              <div class="option-meta">${escapeHtml(item.category)}</div>
+            </button>
+          `;
+        });
+        html += `</div>`;
+      });
+
+      if (!html) {
+        html = `<div class="helper-note">No industries found for that search.</div>`;
+      }
+
+      container.innerHTML = html;
+
+      container.querySelectorAll("[data-industry]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.industry = industryData.find(item => item.name === btn.dataset.industry);
+          renderIndustryResults(document.getElementById("industrySearch").value);
+          renderIndustryPreview();
+        });
+      });
+    }
+
+    function renderIndustryPreview() {
+      const preview = document.getElementById("industryPreview");
+      if (!state.industry) {
+        preview.innerHTML = "";
+        return;
+      }
+      preview.innerHTML = `<strong>Selected:</strong> ${escapeHtml(state.industry.name)} <span style="color:var(--text-muted)">(${escapeHtml(state.industry.category)})</span>`;
+    }
+
+    function renderSingleChoice(containerId, previewId, items, stateKey) {
+      const container = document.getElementById(containerId);
+      const preview = document.getElementById(previewId);
+      container.innerHTML = "";
+
+      items.forEach(item => {
+        const el = document.createElement("button");
+        el.type = "button";
+        el.className = `choice-card${state[stateKey] === item.name ? " selected" : ""}`;
+        el.innerHTML = `<strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.note)}</span>`;
+        el.addEventListener("click", () => {
+          state[stateKey] = item.name;
+          renderSingleChoice(containerId, previewId, items, stateKey);
+        });
+        container.appendChild(el);
+      });
+
+      preview.innerHTML = state[stateKey] ? `<strong>Selected:</strong> ${escapeHtml(state[stateKey])}` : "";
+    }
+
+    function renderMultiChoice(containerId, previewId, items, stateKey) {
+      const container = document.getElementById(containerId);
+      const preview = document.getElementById(previewId);
+      container.innerHTML = "";
+
+      items.forEach(item => {
+        const selected = state[stateKey].includes(item.name);
+        const el = document.createElement("button");
+        el.type = "button";
+        el.className = `choice-card${selected ? " selected" : ""}`;
+        el.innerHTML = `<strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.note)}</span>`;
+        el.addEventListener("click", () => {
+          if (state[stateKey].includes(item.name)) {
+            state[stateKey] = state[stateKey].filter(value => value !== item.name);
+          } else {
+            state[stateKey] = [...state[stateKey], item.name];
+          }
+          renderMultiChoice(containerId, previewId, items, stateKey);
+        });
+        container.appendChild(el);
+      });
+
+      preview.innerHTML = state[stateKey].length
+        ? `<strong>Selected:</strong> ${escapeHtml(state[stateKey].join(", "))}`
+        : "";
+    }
+
+    document.getElementById("countrySearch").addEventListener("input", event => {
+      renderCountryResults(event.target.value);
     });
+
+    document.getElementById("industrySearch").addEventListener("input", event => {
+      renderIndustryResults(event.target.value);
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        const active = document.activeElement;
+        if (active && active.classList.contains("input")) {
+          event.preventDefault();
+          goNext();
+        }
+      }
+    });
+
+    renderCountryResults();
+    renderIndustryResults();
+    renderSingleChoice("businessModelGrid", "businessModelPreview", businessModels, "businessModel");
+    renderSingleChoice("teamSizeGrid", "teamSizePreview", teamSizes, "teamSize");
+    renderSingleChoice("schedulingGrid", "schedulingPreview", schedulingModes, "schedulingMode");
+    renderMultiChoice("channelsGrid", "channelsPreview", channels, "channels");
+    renderMultiChoice("languagesGrid", "languagesPreview", languages, "languages");
+    renderMultiChoice("workflowGrid", "workflowPreview", workflowNeeds, "workflowNeeds");
+    updateUI();
   </script>
 </body>
 </html>
