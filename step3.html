@@ -3,820 +3,780 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Call Port — Beta</title>
+  <title>AI Call Port — Step 3</title>
+  <meta
+    name="description"
+    content="Test your configured AI call system live, see the dashboard respond in real time, and activate your setup."
+  />
   <style>
     :root{
-      --bg:#06080f;
-      --bg2:#0a0d14;
-      --panel:rgba(12,14,21,.92);
-      --panel-2:rgba(255,255,255,.03);
-      --border:rgba(255,255,255,.08);
-      --border-soft:rgba(255,255,255,.05);
-      --text:rgba(255,255,255,.96);
-      --muted:rgba(203,213,225,.78);
-      --muted2:rgba(148,163,184,.62);
+      --bg-main:#05070b;
+      --bg-shell:#080b11;
+      --bg-card:#0d1118;
+      --bg-soft:#0a1019;
+
+      --text-primary:#ffffff;
+      --text-secondary:#d7e0ea;
+      --text-muted:#91a0b5;
+
+      --blue:#3b82f6;
+      --blue-soft:#67d4ff;
       --orange:#f97316;
-      --orange2:#ea580c;
-      --shadow:0 24px 60px rgba(0,0,0,.34);
-      --radius-xl:30px;
-      --radius-lg:22px;
-      --radius-md:16px;
+      --orange-soft:#fb923c;
+      --gold:#ffbf2f;
+
+      --border:rgba(255,255,255,.08);
+      --border-soft:rgba(255,255,255,.06);
     }
 
-    *{
-      box-sizing:border-box;
-      min-width:0;
-    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
 
-    html,body{
+    body{
       margin:0;
-      padding:0;
-      min-height:100%;
-      scroll-behavior:smooth;
+      color:var(--text-primary);
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:linear-gradient(180deg,#05070b 0%, #04060a 100%);
+      position:relative;
       overflow-x:hidden;
     }
 
-    body{
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:var(--text);
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
       background:
-        radial-gradient(circle at 18% 14%, rgba(249,115,22,.07), transparent 20%),
-        radial-gradient(circle at 82% 10%, rgba(249,115,22,.05), transparent 16%),
-        linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+        radial-gradient(circle at 18% 22%, rgba(59,130,246,.06), transparent 28%),
+        radial-gradient(circle at 82% 78%, rgba(249,115,22,.06), transparent 32%);
+      z-index:0;
     }
 
     .grid-bg{
       position:fixed;
       inset:0;
       pointer-events:none;
-      opacity:.18;
+      opacity:.08;
       background:
         linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
       background-size:42px 42px;
-      mask-image:radial-gradient(circle at center, black 38%, transparent 96%);
+      mask-image:radial-gradient(circle at center, black 42%, transparent 96%);
       z-index:0;
     }
 
     .page{
       position:relative;
       z-index:1;
+      min-height:100vh;
+      padding:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
 
     .shell{
-      width:min(1380px, calc(100vw - 28px));
-      margin:18px auto;
-      border-radius:32px;
+      width:min(1180px, calc(100vw - 36px));
+      min-height:min(92vh, 960px);
+      border-radius:30px;
       border:1px solid rgba(255,255,255,.10);
-      background:linear-gradient(180deg, rgba(17,19,28,.96), rgba(10,12,18,.98));
-      box-shadow:0 10px 40px rgba(0,0,0,.38);
+      background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));
+      box-shadow:
+        0 36px 100px rgba(0,0,0,.58),
+        inset 0 1px 0 rgba(255,255,255,.04);
       overflow:hidden;
+      position:relative;
+    }
+
+    .shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(360px circle at 50% 0%, rgba(249,115,22,.04), transparent 56%),
+        radial-gradient(420px circle at 12% 10%, rgba(59,130,246,.04), transparent 52%);
+      z-index:0;
+    }
+
+    .inner{
+      position:relative;
+      z-index:1;
+      padding:18px 20px 24px;
+      min-height:min(92vh, 960px);
+      display:grid;
+      grid-template-rows:auto auto 1fr auto;
+      gap:18px;
     }
 
     .topbar{
+      position:relative;
+      min-height:66px;
+      padding:10px 16px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
-      padding:20px 28px 0;
+      gap:12px;
     }
+
+    .topbar::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:18px;
+      background:
+        linear-gradient(
+          90deg,
+          rgba(59,130,246,.04),
+          rgba(0,0,0,.92) 22%,
+          rgba(0,0,0,.92) 78%,
+          rgba(249,115,22,.04)
+        );
+      pointer-events:none;
+    }
+
+    .topbar > *{ position:relative; z-index:1; }
 
     .brand{
       display:flex;
       align-items:center;
       gap:10px;
+      min-width:0;
+    }
+
+    .logo-wrap{
+      width:62px;
+      height:62px;
+      min-width:62px;
+      min-height:62px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 62px;
+    }
+
+    .logo{
+      width:54px;
+      height:54px;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 0 8px rgba(249,115,22,.22));
+      animation:logoGlow 3s ease-in-out infinite;
+    }
+
+    .brand-stack{
+      display:flex;
+      align-items:center;
+      gap:10px;
       flex-wrap:wrap;
     }
 
-    .brand-mark{
-      width:16px;
-      height:16px;
-      border-radius:5px;
-      background:var(--orange);
-      box-shadow:0 0 18px rgba(249,115,22,.34);
+    .brand-wordmark{
+      display:flex;
+      align-items:flex-end;
+      gap:6px;
+      line-height:1;
     }
 
-    .brand-name{
-      font-size:15px;
+    .brand-ai{
+      font-size:14px;
       font-weight:900;
-      letter-spacing:.03em;
+      letter-spacing:.04em;
       text-transform:uppercase;
-      color:#fff;
+      background:linear-gradient(180deg, var(--blue-soft), var(--blue));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
     }
 
-    .beta{
+    .brand-callport{
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.02em;
+      text-transform:uppercase;
+      background:linear-gradient(180deg, var(--gold), var(--orange));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .beta-badge{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      height:22px;
+      height:20px;
       padding:0 8px;
       border-radius:999px;
-      border:1px solid rgba(249,115,22,.22);
-      background:rgba(249,115,22,.08);
+      border:1px solid rgba(249,115,22,.24);
+      background:rgba(249,115,22,.10);
+      color:#fff;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .progress-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:118px;
+      height:30px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--blue-soft);
       font-size:10px;
       font-weight:900;
       letter-spacing:.16em;
       text-transform:uppercase;
-      color:#fff;
-    }
-
-    .top-actions{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .mini-btn{
-      min-height:42px;
-      padding:0 16px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.03);
-      color:#fff;
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      transition:.18s ease;
-    }
-
-    .mini-btn:hover{
-      background:rgba(255,255,255,.05);
-      transform:translateY(-1px);
+      white-space:nowrap;
     }
 
     .hero{
-      display:grid;
-      grid-template-columns:1.02fr .98fr;
-      gap:26px;
-      align-items:center;
-      padding:28px 28px 34px;
+      text-align:center;
+      max-width:860px;
+      margin:0 auto;
     }
 
-    .copy{
-      padding:6px 8px 6px 0;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      min-height:34px;
-      padding:0 14px;
-      border-radius:999px;
-      border:1px solid rgba(249,115,22,.18);
-      background:rgba(249,115,22,.06);
-      color:#fff;
-      font-size:11px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      margin-bottom:18px;
-    }
-
-    .eyebrow-dot{
-      width:8px;
-      height:8px;
-      border-radius:999px;
-      background:var(--orange);
-      animation:eyebrowPulse 1.8s ease-in-out infinite;
-    }
-
-    h1{
+    .hero-title{
       margin:0;
-      font-size:clamp(42px,6vw,88px);
-      line-height:.92;
-      letter-spacing:-.08em;
-      font-weight:900;
-      color:#fff;
-    }
-
-    .headline-accent{
-      display:block;
-      color:var(--orange);
-    }
-
-    .sub{
-      margin:18px 0 0;
-      max-width:760px;
-      font-size:clamp(18px,2.1vw,24px);
-      line-height:1.42;
-      color:var(--muted);
-      font-weight:700;
-    }
-
-    .micro{
-      margin-top:18px;
-      max-width:760px;
-      font-size:15px;
-      line-height:1.48;
-      color:var(--muted2);
-      font-weight:700;
-    }
-
-    .cta-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:14px;
-      margin-top:30px;
-    }
-
-    .btn{
-      min-height:56px;
-      padding:0 22px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.10);
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:14px;
-      font-weight:900;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      transition:.18s ease;
-    }
-
-    .btn-primary{
-      background:linear-gradient(90deg,var(--orange),var(--orange2));
-      color:#fff;
-      box-shadow:0 10px 30px rgba(249,115,22,.18);
-    }
-
-    .btn-primary:hover{
-      transform:translateY(-1px);
-      filter:brightness(1.05);
-    }
-
-    .btn-secondary{
-      background:rgba(255,255,255,.03);
-      color:#fff;
-    }
-
-    .btn-secondary:hover{
-      transform:translateY(-1px);
-      background:rgba(255,255,255,.05);
-    }
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:12px;
-      margin-top:28px;
-      max-width:760px;
-    }
-
-    .stat{
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.03);
-      border-radius:18px;
-      padding:16px;
-    }
-
-    .stat strong{
-      display:block;
-      font-size:28px;
-      line-height:1;
-      letter-spacing:-.05em;
-      font-weight:900;
-      color:#fff;
-    }
-
-    .stat span{
-      display:block;
-      margin-top:7px;
-      font-size:13px;
-      line-height:1.35;
-      color:var(--muted);
+      font-size:clamp(26px,4vw,46px);
+      line-height:1.04;
       font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-
-    .visual-wrap{
-      position:relative;
-      min-height:620px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .visual-panel{
-      position:relative;
-      width:min(100%, 720px);
-      aspect-ratio:1/1;
-      border-radius:32px;
-      border:1px solid rgba(255,255,255,.08);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),
-        rgba(10,12,18,.76);
-      overflow:hidden;
-      box-shadow:var(--shadow);
-    }
-
-    .visual-glow{
-      position:absolute;
-      inset:auto auto -18% -10%;
-      width:55%;
-      height:55%;
-      background:radial-gradient(circle, rgba(249,115,22,.16), transparent 65%);
-      pointer-events:none;
-      filter:blur(10px);
-    }
-
-    .hero-image{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      opacity:.56;
-      transform:scale(1.04);
-      filter:saturate(.92) contrast(1.03) brightness(.86);
-      animation:imageIn 1.4s ease-out both;
-    }
-
-    .image-scrim{
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at center, transparent 25%, rgba(6,8,15,.18) 65%, rgba(6,8,15,.56) 100%),
-        linear-gradient(180deg, rgba(6,8,15,.18), rgba(6,8,15,.38));
-    }
-
-    .system-title{
-      position:absolute;
-      top:18px;
-      left:20px;
-      right:20px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      z-index:3;
-    }
-
-    .system-chip{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      min-height:34px;
-      padding:0 14px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(9,11,17,.45);
-      backdrop-filter:blur(10px);
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:.12em;
-      text-transform:uppercase;
+      letter-spacing:-.05em;
       color:#fff;
+      text-wrap:balance;
     }
 
-    .system-chip .pulse{
-      width:8px;
-      height:8px;
-      border-radius:999px;
-      background:var(--orange);
-      animation:chipPulse 1.5s ease-in-out infinite;
+    .hero-sub{
+      margin:12px auto 0;
+      max-width:780px;
+      font-size:clamp(15px,1.35vw,18px);
+      line-height:1.5;
+      color:var(--blue-soft);
+      font-weight:700;
+      text-wrap:balance;
     }
 
-    .system-chip.alt{
-      color:var(--muted);
+    .content{
+      display:grid;
+      grid-template-columns:1fr 1.08fr;
+      gap:18px;
+      min-height:0;
+      align-items:start;
     }
 
-    .lines-svg{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      z-index:2;
-      pointer-events:none;
+    .panel{
+      border-radius:28px;
+      border:1px solid var(--border-soft);
+      background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.03),
+        0 22px 60px rgba(0,0,0,.32);
+      padding:24px;
+      position:relative;
+      overflow:hidden;
+      min-height:100%;
     }
 
-    .flow-line{
-      stroke:rgba(249,115,22,.18);
-      stroke-width:1.6;
-      fill:none;
-      stroke-linecap:round;
-      stroke-dasharray:8 10;
-      animation:lineFlow 5.2s linear infinite;
+    .panel.orange{
+      background:linear-gradient(180deg, rgba(249,115,22,.08), rgba(255,255,255,.02));
+      border-color:rgba(249,115,22,.15);
     }
 
-    .flow-line.active{
-      stroke:rgba(249,115,22,.45);
-      animation-duration:2.6s;
-    }
-
-    .node{
-      position:absolute;
-      z-index:4;
-      width:18px;
-      height:18px;
-      border-radius:999px;
-      border:2px solid rgba(255,255,255,.14);
-      background:rgba(8,10,17,.78);
-      box-shadow:0 0 0 0 rgba(249,115,22,0);
-      transform:translate(-50%,-50%);
-    }
-
-    .node::after{
+    .panel::before{
       content:"";
       position:absolute;
-      inset:3px;
-      border-radius:999px;
-      background:rgba(255,255,255,.12);
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(260px circle at 80% 0%, rgba(249,115,22,.05), transparent 48%),
+        radial-gradient(260px circle at 10% 0%, rgba(59,130,246,.05), transparent 48%);
     }
 
-    .node.active{
-      border-color:rgba(249,115,22,.72);
-      box-shadow:0 0 24px rgba(249,115,22,.40), 0 0 0 10px rgba(249,115,22,0);
-      animation:nodePulse 1.8s ease-in-out infinite;
-    }
+    .panel > *{ position:relative; z-index:1; }
 
-    .node.active::after{
-      background:var(--orange);
-    }
-
-    .node-label{
-      position:absolute;
-      z-index:5;
-      min-width:150px;
-      max-width:210px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(9,11,17,.74);
-      backdrop-filter:blur(10px);
-      opacity:0;
-      transform:translateY(8px);
-      animation:labelIn .7s ease forwards;
-      box-shadow:0 16px 30px rgba(0,0,0,.28);
-    }
-
-    .node-label strong{
-      display:block;
-      font-size:13px;
-      line-height:1.05;
-      letter-spacing:.03em;
-      text-transform:uppercase;
-      color:#fff;
-      font-weight:900;
-    }
-
-    .node-label span{
-      display:block;
-      margin-top:4px;
-      font-size:12px;
-      line-height:1.35;
-      color:var(--muted);
-      font-weight:800;
-    }
-
-    .node-label.active strong{
-      color:var(--orange);
-    }
-
-    .orbit-ring{
-      position:absolute;
-      inset:9%;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.05);
-      z-index:1;
-    }
-
-    .orbit-ring.r2{
-      inset:19%;
-      border-color:rgba(255,255,255,.04);
-    }
-
-    .orbit-ring.r3{
-      inset:31%;
-      border-color:rgba(249,115,22,.06);
-    }
-
-    .section{
-      padding:0 28px 28px;
-    }
-
-    .system-section{
-      border-top:1px solid rgba(255,255,255,.06);
-      padding-top:26px;
-    }
-
-    .section-card{
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:28px;
-      background:linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,.016));
-      padding:28px;
-      overflow:hidden;
-    }
-
-    .section-head{
-      text-align:center;
-      max-width:940px;
-      margin:0 auto 28px;
-    }
-
-    .section-eyebrow{
+    .panel-kicker{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-height:32px;
-      padding:0 14px;
+      min-width:88px;
+      height:30px;
+      padding:0 12px;
       border-radius:999px;
-      border:1px solid rgba(249,115,22,.18);
-      background:rgba(249,115,22,.06);
-      color:#fff;
-      font-size:11px;
+      background:rgba(103,212,255,.10);
+      border:1px solid rgba(103,212,255,.20);
+      color:var(--blue-soft);
+      font-size:10px;
       font-weight:900;
       letter-spacing:.16em;
       text-transform:uppercase;
       margin-bottom:16px;
     }
 
-    .section-head h2{
+    .panel.orange .panel-kicker{
+      background:rgba(249,115,22,.12);
+      border-color:rgba(249,115,22,.24);
+      color:var(--orange-soft);
+    }
+
+    .panel-title{
       margin:0;
-      font-size:clamp(34px,5vw,68px);
-      line-height:.96;
-      letter-spacing:-.07em;
-      font-weight:900;
+      font-size:clamp(24px,3.1vw,34px);
+      line-height:1.06;
+      font-weight:800;
+      letter-spacing:-.05em;
       color:#fff;
+      text-wrap:balance;
     }
 
-    .section-head h2 span{
-      color:var(--orange);
+    .panel-copy{
+      margin:12px 0 0;
+      font-size:15px;
+      line-height:1.55;
+      color:var(--text-secondary);
+      font-weight:600;
     }
 
-    .section-head p{
-      margin:16px auto 0;
-      max-width:820px;
-      font-size:18px;
-      line-height:1.45;
-      color:var(--muted);
-      font-weight:700;
-    }
-
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      justify-content:center;
-      margin-top:24px;
-    }
-
-    .chip{
-      min-height:34px;
-      padding:0 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.03);
-      color:var(--muted);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:11px;
-      font-weight:900;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-    }
-
-    .ai-grid{
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-      gap:14px;
-      margin-top:28px;
-    }
-
-    .ai-col{
-      background:rgba(255,255,255,.02);
+    .status-card{
+      margin-top:18px;
+      border-radius:18px;
       border:1px solid rgba(255,255,255,.06);
-      border-radius:20px;
+      background:rgba(255,255,255,.03);
       padding:16px;
-      opacity:.42;
-      transform:translateY(10px);
-      transition:.4s ease;
-      min-height:290px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
+      display:grid;
+      gap:8px;
     }
 
-    .ai-col.active{
-      opacity:1;
-      border-color:rgba(249,115,22,.5);
-      box-shadow:0 0 25px rgba(249,115,22,.12);
-      transform:translateY(0);
-    }
-
-    .ai-col-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    .ai-col-num{
-      font-size:11px;
-      color:var(--muted2);
+    .status-label{
+      font-size:10px;
+      line-height:1.2;
+      color:var(--text-muted);
       font-weight:900;
-      letter-spacing:.12em;
+      letter-spacing:.14em;
       text-transform:uppercase;
     }
 
-    .ai-col-arrow{
-      color:var(--orange);
-      font-size:16px;
-      font-weight:900;
-    }
-
-    .ai-col-title{
-      font-size:22px;
-      line-height:1.05;
-      font-weight:900;
-      letter-spacing:-.04em;
+    .status-value{
+      font-size:20px;
+      line-height:1.2;
       color:#fff;
-      margin-top:2px;
+      font-weight:800;
+      letter-spacing:-.03em;
     }
 
-    .ai-col-sub{
-      font-size:13px;
-      line-height:1.4;
-      color:var(--muted2);
-      font-weight:700;
-      min-height:52px;
+    .status-help{
+      color:var(--text-secondary);
+      font-size:14px;
+      line-height:1.5;
+      font-weight:600;
     }
 
-    .ai-agent{
-      font-size:13px;
-      padding:10px 10px 11px;
-      border-radius:12px;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      display:grid;
-      gap:4px;
+    .test-number{
+      margin-top:18px;
+      border-radius:22px;
+      border:1px solid rgba(249,115,22,.18);
+      background:rgba(249,115,22,.08);
+      padding:18px;
+      text-align:center;
     }
 
-    .ai-agent small{
-      display:block;
-      color:rgba(249,115,22,.82);
+    .test-number-label{
       font-size:10px;
+      line-height:1.2;
+      color:#ffd7b5;
       font-weight:900;
       letter-spacing:.16em;
       text-transform:uppercase;
     }
 
-    .ai-agent span{
-      display:block;
+    .test-number-value{
+      margin-top:10px;
+      font-size:34px;
+      line-height:1;
+      color:#fff;
+      font-weight:900;
+      letter-spacing:-.04em;
+    }
+
+    .prompt-list{
+      margin-top:18px;
+      display:grid;
+      gap:10px;
+    }
+
+    .prompt{
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+      color:#edf5ff;
+      font-size:14px;
+      line-height:1.5;
+      font-weight:600;
+    }
+
+    .prompt strong{
+      color:#fff;
+    }
+
+    .button-row{
+      margin-top:20px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .action-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:180px;
+      height:48px;
+      padding:0 16px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      color:#dbe6f1;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .action-btn:hover{
+      transform:translateY(-2px);
+      background:rgba(59,130,246,.08);
+      border-color:rgba(59,130,246,.30);
+    }
+
+    .action-btn.primary{
+      border:none;
+      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
+      color:#fff;
+      box-shadow:0 10px 30px rgba(249,115,22,.28);
+    }
+
+    .action-btn.primary:hover{
+      filter:brightness(1.04);
+      box-shadow:0 15px 40px rgba(249,115,22,.42);
+    }
+
+    .listen-list{
+      list-style:none;
+      margin:18px 0 0;
+      padding:0;
+      display:grid;
+      gap:10px;
+    }
+
+    .listen-list li{
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px 14px 14px 40px;
+      position:relative;
+      color:var(--text-secondary);
+      font-size:14px;
+      line-height:1.5;
+      font-weight:600;
+    }
+
+    .listen-list li::before{
+      content:"";
+      position:absolute;
+      left:15px;
+      top:18px;
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:var(--blue-soft);
+      box-shadow:0 0 12px rgba(103,212,255,.28);
+    }
+
+    .chip-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+
+    .chip{
+      min-height:34px;
+      padding:0 14px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#dbe6f1;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      text-align:center;
+    }
+
+    .dashboard-grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .dash-card{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+      min-height:112px;
+    }
+
+    .dash-label{
+      font-size:10px;
+      line-height:1.2;
+      color:var(--text-muted);
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .dash-value{
+      margin-top:10px;
+      color:#fff;
+      font-size:15px;
+      line-height:1.45;
+      font-weight:700;
+      text-wrap:balance;
+    }
+
+    .dash-value.blue{
+      color:var(--blue-soft);
+    }
+
+    .results-strip{
+      margin-top:18px;
+      display:grid;
+      gap:10px;
+    }
+
+    .result-item{
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+      color:var(--text-secondary);
+      font-size:14px;
+      line-height:1.5;
+      font-weight:600;
+    }
+
+    .result-item strong{
+      color:#fff;
+    }
+
+    .activation{
+      margin-top:18px;
+      border-radius:20px;
+      border:1px solid rgba(249,115,22,.18);
+      background:rgba(249,115,22,.08);
+      padding:18px;
+    }
+
+    .activation-title{
+      margin:0;
+      font-size:22px;
+      line-height:1.1;
       color:#fff;
       font-weight:800;
-      line-height:1.32;
-      font-size:13px;
+      letter-spacing:-.03em;
     }
 
-    .ai-cta{
-      display:flex;
-      justify-content:center;
-      margin-top:28px;
-    }
-
-    .footer-strip{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      padding:20px 28px 26px;
-      border-top:1px solid rgba(255,255,255,.06);
-    }
-
-    .footer-note{
+    .activation-copy{
+      margin:10px 0 0;
+      color:#ffd7b5;
       font-size:14px;
-      line-height:1.4;
-      color:var(--muted2);
+      line-height:1.55;
+      font-weight:600;
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns:140px 1fr 240px;
+      align-items:center;
+      gap:14px;
+      padding-top:6px;
+    }
+
+    .back-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:flex-start;
+      border:none;
+      background:transparent;
+      color:var(--text-muted);
+      font-size:13px;
       font-weight:700;
+      cursor:pointer;
+      padding:0;
+      transition:color .18s ease;
     }
 
-    .footer-note span{
-      color:var(--orange);
+    .back-btn:hover{ color:#fff; }
+
+    .progress-line{
+      height:8px;
+      border-radius:999px;
+      overflow:hidden;
+      background:#111827;
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    .progress-fill{
+      height:100%;
+      width:75%;
+      background:linear-gradient(90deg, var(--blue), var(--blue-soft));
+    }
+
+    .next-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:240px;
+      height:54px;
+      border:none;
+      border-radius:18px;
+      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
+      color:#fff;
+      font-size:13px;
       font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      cursor:pointer;
+      box-shadow:0 10px 30px rgba(249,115,22,.28);
+      transition:.18s ease;
+      justify-self:end;
+      text-decoration:none;
     }
 
-    @keyframes imageIn{
-      from{ opacity:0; transform:scale(1.08); }
-      to{ opacity:.56; transform:scale(1.04); }
+    .next-btn:hover{
+      transform:translateY(-2px);
+      filter:brightness(1.04);
+      box-shadow:0 15px 40px rgba(249,115,22,.42);
     }
 
-    @keyframes labelIn{
-      to{ opacity:1; transform:translateY(0); }
+    @keyframes logoGlow{
+      0%,100%{ filter:drop-shadow(0 0 8px rgba(249,115,22,.20)); }
+      50%{ filter:drop-shadow(0 0 16px rgba(249,115,22,.36)); }
     }
 
-    @keyframes nodePulse{
-      0%,100%{ transform:translate(-50%,-50%) scale(1); }
-      50%{ transform:translate(-50%,-50%) scale(1.16); }
-    }
-
-    @keyframes lineFlow{
-      from{ stroke-dashoffset:0; }
-      to{ stroke-dashoffset:-72; }
-    }
-
-    @keyframes chipPulse{
-      0%,100%{ transform:scale(1); opacity:1; }
-      50%{ transform:scale(1.35); opacity:.88; }
-    }
-
-    @keyframes eyebrowPulse{
-      0%,100%{ transform:scale(1); opacity:1; }
-      50%{ transform:scale(1.25); opacity:.85; }
-    }
-
-    @media (max-width: 1180px){
-      .hero{
+    @media (max-width:920px){
+      .content{
         grid-template-columns:1fr;
-        gap:22px;
-      }
-
-      .copy{
-        padding-right:0;
-      }
-
-      .visual-wrap{
-        min-height:unset;
-      }
-
-      .visual-panel{
-        max-width:760px;
-      }
-
-      .ai-grid{
-        grid-template-columns:repeat(3,1fr);
       }
     }
 
-    @media (max-width: 760px){
+    @media (max-width:720px){
+      .page{
+        padding:10px;
+        align-items:flex-start;
+      }
+
       .shell{
-        width:calc(100vw - 16px);
-        margin:8px auto;
-        border-radius:22px;
-      }
-
-      .topbar,
-      .hero,
-      .section,
-      .footer-strip{
-        padding-left:14px;
-        padding-right:14px;
-      }
-
-      .topbar{
-        flex-wrap:wrap;
-      }
-
-      h1{
-        font-size:44px;
-      }
-
-      .sub{
-        font-size:18px;
-      }
-
-      .stats{
-        grid-template-columns:1fr;
-      }
-
-      .visual-panel{
+        width:calc(100vw - 20px);
+        min-height:calc(100vh - 20px);
         border-radius:24px;
       }
 
-      .system-title{
-        flex-direction:column;
-        align-items:flex-start;
+      .inner{
+        padding:12px 12px 20px;
+        min-height:calc(100vh - 20px);
       }
 
-      .node-label{
-        min-width:120px;
-        max-width:160px;
-        padding:8px 10px;
+      .topbar{
+        padding:12px;
+        gap:10px;
+        flex-wrap:wrap;
       }
 
-      .section-card{
-        padding:18px;
+      .topbar::before{
+        border-radius:16px;
+      }
+
+      .logo-wrap{
+        width:50px;
+        height:50px;
+        min-width:50px;
+        min-height:50px;
+        flex:0 0 50px;
+      }
+
+      .logo{
+        width:42px;
+        height:42px;
+      }
+
+      .brand-ai,
+      .brand-callport{
+        font-size:12px;
+      }
+
+      .beta-badge{
+        font-size:8px;
+        height:18px;
+      }
+
+      .progress-chip{
+        font-size:9px;
+        height:28px;
+      }
+
+      .hero-title{
+        font-size:clamp(22px,7vw,30px);
+      }
+
+      .hero-sub{
+        font-size:14px;
+      }
+
+      .panel{
         border-radius:22px;
+        padding:20px 16px;
       }
 
-      .ai-grid{
+      .dashboard-grid{
         grid-template-columns:1fr;
       }
 
-      .footer-strip{
+      .button-row{
         flex-direction:column;
-        align-items:flex-start;
       }
+
+      .action-btn{
+        width:100%;
+        min-width:unset;
+      }
+
+      .actions{
+        grid-template-columns:1fr;
+        gap:12px;
+      }
+
+      .next-btn{
+        width:100%;
+        min-width:unset;
+        justify-self:stretch;
+      }
+
+      .back-btn{ order:2; }
+      .progress-line{ order:1; }
+      .next-btn{ order:3; }
     }
   </style>
 </head>
@@ -824,333 +784,226 @@
   <div class="grid-bg"></div>
 
   <div class="page">
-    <main class="shell">
-      <div class="topbar">
-        <div class="brand">
-          <div class="brand-mark"></div>
-          <div class="brand-name">AI Call Port</div>
-          <div class="beta">Beta</div>
+    <div class="shell">
+      <div class="inner">
+
+        <div class="topbar">
+          <div class="brand">
+            <div class="logo-wrap">
+              <img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo">
+            </div>
+            <div class="brand-stack">
+              <div class="brand-wordmark">
+                <span class="brand-ai">AI</span>
+                <span class="brand-callport">CALL PORT</span>
+              </div>
+              <div class="beta-badge">Beta</div>
+            </div>
+          </div>
+
+          <div class="progress-chip">Step 3 of 4</div>
         </div>
 
-        <div class="top-actions">
-          <a class="mini-btn" href="#system">See System</a>
-          <a class="mini-btn" href="step1.html">Enter The System</a>
+        <section class="hero">
+          <h1 class="hero-title">Test your system live</h1>
+          <div class="hero-sub">Run a live test and see how your configured dashboard responds in real time.</div>
+        </section>
+
+        <section class="content">
+          <div class="panel orange">
+            <div class="panel-kicker">Live Call Test</div>
+            <h2 class="panel-title">Call the system and hear it respond</h2>
+            <p class="panel-copy">Use the test number below and try a realistic customer request. The right side already reflects your configuration and will update as the test progresses.</p>
+
+            <div class="status-card">
+              <div class="status-label">Call status</div>
+              <div class="status-value" id="callStatus">Waiting for test call</div>
+              <div class="status-help" id="callHelp">Start the simulation below or place a real test call to hear how your configured system behaves.</div>
+            </div>
+
+            <div class="test-number">
+              <div class="test-number-label">Test Number</div>
+              <div class="test-number-value">(888) 240-0199</div>
+            </div>
+
+            <div class="prompt-list">
+              <div class="prompt"><strong>Try:</strong> “I want to book an appointment for tomorrow.”</div>
+              <div class="prompt"><strong>Try:</strong> “I need urgent help today.”</div>
+              <div class="prompt"><strong>Try:</strong> “Can I get a quote for this job?”</div>
+            </div>
+
+            <div class="button-row">
+              <button class="action-btn" type="button" data-sim="booking">Simulate booking call</button>
+              <button class="action-btn" type="button" data-sim="urgent">Simulate urgent call</button>
+              <button class="action-btn" type="button" data-sim="quote">Simulate quote call</button>
+            </div>
+
+            <ul class="listen-list">
+              <li>Listen for the right greeting and brand tone.</li>
+              <li>Make sure the AI understands the caller’s intent quickly.</li>
+              <li>Check whether routing, booking, or urgency handling matches your workflow.</li>
+              <li>Confirm the dashboard reflects the same interaction clearly.</li>
+            </ul>
+          </div>
+
+          <div class="panel">
+            <div class="panel-kicker">Configured Dashboard</div>
+            <h2 class="panel-title">Your live dashboard preview</h2>
+            <p class="panel-copy">This dashboard already reflects the setup from Steps 1 and 2. During the test it updates with intent, actions, and operational next steps.</p>
+
+            <div class="chip-row" id="configChips"></div>
+
+            <div class="dashboard-grid">
+              <div class="dash-card">
+                <div class="dash-label">Call summary</div>
+                <div class="dash-value" id="summaryValue">No test call yet. Run a simulation to generate a live summary.</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-label">Detected intent</div>
+                <div class="dash-value blue" id="intentValue">Waiting for input</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-label">Priority</div>
+                <div class="dash-value" id="priorityValue">Standard</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-label">Action triggered</div>
+                <div class="dash-value" id="actionValue">No action triggered yet</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-label">CRM / Internal update</div>
+                <div class="dash-value" id="crmValue">System ready to log the next interaction</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-label">Language</div>
+                <div class="dash-value" id="languageValue">—</div>
+              </div>
+            </div>
+
+            <div class="results-strip">
+              <div class="result-item"><strong>Industry:</strong> <span id="industryValue">—</span></div>
+              <div class="result-item"><strong>Business model:</strong> <span id="businessModelValue">—</span></div>
+              <div class="result-item"><strong>Workflow needs:</strong> <span id="workflowValue">—</span></div>
+            </div>
+
+            <div class="activation">
+              <h3 class="activation-title">Ready to launch this setup?</h3>
+              <p class="activation-copy">If the test feels right, the next step can become activation and onboarding. You’ve already configured the system and reviewed pricing. This is the proof stage.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="actions">
+          <button class="back-btn" id="backBtn" type="button">← Back to Step 2</button>
+          <div class="progress-line">
+            <div class="progress-fill"></div>
+          </div>
+          <a class="next-btn" id="nextBtn" href="#">Activate Your System</a>
         </div>
+
       </div>
-
-      <section class="hero">
-        <div class="copy">
-          <div class="eyebrow">
-            <span class="eyebrow-dot"></span>
-            <span>Welcome to AI Call Port</span>
-          </div>
-
-          <h1>
-            12 AI agents
-            <span class="headline-accent">working together</span>
-            to run your daily operations
-          </h1>
-
-          <p class="sub">
-            We help your business handle phone calls, bookings, scheduling, after-hours requests, inventory questions, lead qualification, and customer communication through one connected AI call system.
-          </p>
-
-          <p class="micro">
-            The system is self-operated, optimized, and built to communicate with you, your customers, and your employees — while we custom-build a simple CRM around your business.
-          </p>
-
-          <div class="cta-row">
-            <a class="btn btn-primary" href="step1.html">Enter The System</a>
-            <a class="btn btn-secondary" href="#system">See How It Works</a>
-          </div>
-
-          <div class="stats">
-            <div class="stat">
-              <strong>12</strong>
-              <span>Connected AI Agents</span>
-            </div>
-            <div class="stat">
-              <strong>24/7</strong>
-              <span>Call Coverage</span>
-            </div>
-            <div class="stat">
-              <strong>1</strong>
-              <span>Guided Business System</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="visual-wrap">
-          <div class="visual-panel">
-            <div class="visual-glow"></div>
-
-            <img
-              class="hero-image"
-              src="YOUR_IMAGE_URL_HERE"
-              alt="AI agents working together"
-            />
-
-            <div class="image-scrim"></div>
-
-            <div class="system-title">
-              <div class="system-chip">
-                <span class="pulse"></span>
-                <span>Live Multi-Agent System</span>
-              </div>
-              <div class="system-chip alt">
-                <span>Business Logic Active</span>
-              </div>
-            </div>
-
-            <div class="orbit-ring"></div>
-            <div class="orbit-ring r2"></div>
-            <div class="orbit-ring r3"></div>
-
-            <svg class="lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path class="flow-line active" d="M50 50 L20 24" />
-              <path class="flow-line" d="M50 50 L33 17" />
-              <path class="flow-line" d="M50 50 L52 12" />
-              <path class="flow-line active" d="M50 50 L72 18" />
-              <path class="flow-line" d="M50 50 L84 28" />
-              <path class="flow-line" d="M50 50 L89 49" />
-              <path class="flow-line active" d="M50 50 L82 70" />
-              <path class="flow-line" d="M50 50 L68 84" />
-              <path class="flow-line" d="M50 50 L49 90" />
-              <path class="flow-line active" d="M50 50 L29 82" />
-              <path class="flow-line" d="M50 50 L14 72" />
-              <path class="flow-line" d="M50 50 L10 50" />
-            </svg>
-
-            <div class="node active" style="left:50%;top:50%;"></div>
-
-            <div class="node active" style="left:20%;top:24%; animation-delay:.2s;"></div>
-            <div class="node" style="left:33%;top:17%;"></div>
-            <div class="node" style="left:52%;top:12%;"></div>
-            <div class="node active" style="left:72%;top:18%; animation-delay:.35s;"></div>
-            <div class="node" style="left:84%;top:28%;"></div>
-            <div class="node" style="left:89%;top:49%;"></div>
-            <div class="node active" style="left:82%;top:70%; animation-delay:.5s;"></div>
-            <div class="node" style="left:68%;top:84%;"></div>
-            <div class="node" style="left:49%;top:90%;"></div>
-            <div class="node active" style="left:29%;top:82%; animation-delay:.65s;"></div>
-            <div class="node" style="left:14%;top:72%;"></div>
-            <div class="node" style="left:10%;top:50%;"></div>
-
-            <div class="node-label active" style="left:13%; top:14%; animation-delay:.35s;">
-              <strong>Lead Qualification</strong>
-              <span>Understands intent instantly</span>
-            </div>
-
-            <div class="node-label active" style="left:67%; top:8%; animation-delay:.75s;">
-              <strong>Booking Agent</strong>
-              <span>Schedules services automatically</span>
-            </div>
-
-            <div class="node-label active" style="left:72%; top:71%; animation-delay:1.15s;">
-              <strong>After Hours</strong>
-              <span>Handles calls when your team is offline</span>
-            </div>
-
-            <div class="node-label active" style="left:13%; top:79%; animation-delay:1.55s;">
-              <strong>Inventory Agent</strong>
-              <span>Answers availability and stock questions</span>
-            </div>
-
-            <div class="node-label active" style="left:38%; top:42%; animation-delay:1.95s;">
-              <strong>CRM Sync</strong>
-              <span>Updates your business system in real time</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section system-section" id="system">
-        <div class="section-card">
-          <div class="section-head">
-            <div class="section-eyebrow">Global AI Workforce</div>
-            <h2>
-              12 AI agents <span>handling every part</span><br>
-              of your business calls
-            </h2>
-            <p>
-              From the first ring to final follow-up — everything is handled automatically. The system includes a built-in CRM for SMBs, appointment and reminder logic, multilingual handling, owner reporting, and continuous optimization.
-            </p>
-
-            <div class="chips">
-              <div class="chip">Fully Automatic</div>
-              <div class="chip">Built-In CRM</div>
-              <div class="chip">Self-Optimizing</div>
-              <div class="chip">Monthly Reports</div>
-              <div class="chip">Appointments & Reminders</div>
-              <div class="chip">Any Business Type</div>
-              <div class="chip">Global Operation</div>
-              <div class="chip">English</div>
-              <div class="chip">Spanish</div>
-              <div class="chip">French</div>
-              <div class="chip">Arabic</div>
-              <div class="chip">Portuguese</div>
-              <div class="chip">German</div>
-              <div class="chip">Multi-Country Operation</div>
-            </div>
-          </div>
-
-          <div class="ai-grid">
-            <div class="ai-col active">
-              <div class="ai-col-top">
-                <div class="ai-col-num">01</div>
-                <div class="ai-col-arrow">→</div>
-              </div>
-              <div class="ai-col-title">Input & Access</div>
-              <div class="ai-col-sub">How requests enter the platform</div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Call Intake Agent</span>
-              </div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Country Detection Agent</span>
-              </div>
-            </div>
-
-            <div class="ai-col">
-              <div class="ai-col-top">
-                <div class="ai-col-num">02</div>
-                <div class="ai-col-arrow">→</div>
-              </div>
-              <div class="ai-col-title">System Control</div>
-              <div class="ai-col-sub">How the platform decides what happens next</div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Orchestrator Agent</span>
-              </div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Workflow Control Agent</span>
-              </div>
-            </div>
-
-            <div class="ai-col">
-              <div class="ai-col-top">
-                <div class="ai-col-num">03</div>
-                <div class="ai-col-arrow">→</div>
-              </div>
-              <div class="ai-col-title">Language & Understanding</div>
-              <div class="ai-col-sub">How the system understands each caller</div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Language Detection Agent</span>
-              </div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Translation Agent</span>
-              </div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Voice Interface Agent</span>
-              </div>
-            </div>
-
-            <div class="ai-col">
-              <div class="ai-col-top">
-                <div class="ai-col-num">04</div>
-                <div class="ai-col-arrow">→</div>
-              </div>
-              <div class="ai-col-title">Context & Intelligence</div>
-              <div class="ai-col-sub">How the system personalizes and evaluates the call</div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Context Memory Agent</span>
-              </div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Sentiment Analysis Agent</span>
-              </div>
-            </div>
-
-            <div class="ai-col">
-              <div class="ai-col-top">
-                <div class="ai-col-num">05</div>
-                <div class="ai-col-arrow">→</div>
-              </div>
-              <div class="ai-col-title">Call Execution</div>
-              <div class="ai-col-sub">How the system handles the actual interaction</div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Inbound Call Agent</span>
-              </div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Outbound Call Agent</span>
-              </div>
-            </div>
-
-            <div class="ai-col">
-              <div class="ai-col-top">
-                <div class="ai-col-num">06</div>
-                <div class="ai-col-arrow">→</div>
-              </div>
-              <div class="ai-col-title">Business Actions</div>
-              <div class="ai-col-sub">How business tasks are completed</div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Sales Agent</span>
-              </div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Customer Support Agent</span>
-              </div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Scheduler Agent</span>
-              </div>
-            </div>
-
-            <div class="ai-col">
-              <div class="ai-col-top">
-                <div class="ai-col-num">07</div>
-                <div class="ai-col-arrow">→</div>
-              </div>
-              <div class="ai-col-title">Control & Output</div>
-              <div class="ai-col-sub">How the system stays compliant and completes the workflow</div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Compliance / QA Agent</span>
-              </div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>CRM Integration Agent</span>
-              </div>
-              <div class="ai-agent">
-                <small>Agent</small>
-                <span>Automation Agent</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="ai-cta">
-            <a href="step1.html" class="btn btn-primary">Start Your Setup</a>
-          </div>
-        </div>
-      </section>
-
-      <div class="footer-strip">
-        <div class="footer-note">
-          <span>AI Call Port Beta</span> gives SMB owners one guided system for calls, bookings, scheduling, customer communication, and CRM support.
-        </div>
-        <a class="mini-btn" href="step1.html">Enter The System</a>
-      </div>
-    </main>
+    </div>
   </div>
 
   <script>
-    const cols = document.querySelectorAll(".ai-col");
-    let colIndex = 0;
+    const params = new URLSearchParams(window.location.search);
 
-    setInterval(() => {
-      cols.forEach(col => col.classList.remove("active"));
-      cols[colIndex].classList.add("active");
-      colIndex = (colIndex + 1) % cols.length;
-    }, 1200);
+    const values = {
+      country: params.get("country") || "Not set",
+      countryStatus: params.get("countryStatus") || "Not set",
+      industry: params.get("industry") || "Not set",
+      industryCategory: params.get("industryCategory") || "",
+      businessModel: params.get("businessModel") || "Not set",
+      teamSize: params.get("teamSize") || "Not set",
+      schedulingMode: params.get("schedulingMode") || "Not set",
+      channels: params.get("channels") || "",
+      languages: params.get("languages") || "",
+      workflowNeeds: params.get("workflowNeeds") || ""
+    };
+
+    const parsed = {
+      channels: values.channels ? values.channels.split(",").map(v => v.trim()).filter(Boolean) : [],
+      languages: values.languages ? values.languages.split(",").map(v => v.trim()).filter(Boolean) : [],
+      workflowNeeds: values.workflowNeeds ? values.workflowNeeds.split(",").map(v => v.trim()).filter(Boolean) : []
+    };
+
+    function setText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    setText("industryValue", values.industryCategory ? `${values.industry} • ${values.industryCategory}` : values.industry);
+    setText("businessModelValue", values.businessModel);
+    setText("workflowValue", parsed.workflowNeeds.length ? parsed.workflowNeeds.join(", ") : "Not set");
+    setText("languageValue", parsed.languages.length ? parsed.languages.join(", ") : "Not set");
+
+    const configChips = document.getElementById("configChips");
+    const chipValues = [
+      values.country,
+      values.industry,
+      values.businessModel,
+      values.schedulingMode,
+      ...(parsed.languages.length ? parsed.languages : []),
+      ...(parsed.workflowNeeds.slice(0, 2))
+    ].filter(Boolean);
+
+    configChips.innerHTML = chipValues.map(item => `<div class="chip">${item}</div>`).join("");
+
+    const simulations = {
+      booking: {
+        status: "Test call completed",
+        help: "The system handled a booking-style request and updated the dashboard with a next action.",
+        summary: "Caller requested an appointment for tomorrow and provided basic scheduling details.",
+        intent: "Booking request",
+        priority: "Standard",
+        action: "Appointment flow triggered",
+        crm: "Call summary logged and booking follow-up prepared"
+      },
+      urgent: {
+        status: "Urgent call completed",
+        help: "The system handled a high-priority request and reflected urgency in the dashboard.",
+        summary: "Caller needed urgent same-day help and requested immediate assistance.",
+        intent: "Urgent service request",
+        priority: "High",
+        action: "Urgent routing triggered",
+        crm: "Priority alert created and internal follow-up prepared"
+      },
+      quote: {
+        status: "Quote call completed",
+        help: "The system handled a lead-style quote request and prepared the next sales action.",
+        summary: "Caller asked for a quote and shared enough information to begin qualification.",
+        intent: "Quote / lead request",
+        priority: "Standard",
+        action: "Lead capture flow triggered",
+        crm: "Lead summary saved and follow-up action prepared"
+      }
+    };
+
+    function applySimulation(type) {
+      const sim = simulations[type];
+      if (!sim) return;
+      setText("callStatus", sim.status);
+      setText("callHelp", sim.help);
+      setText("summaryValue", sim.summary);
+      setText("intentValue", sim.intent);
+      setText("priorityValue", sim.priority);
+      setText("actionValue", sim.action);
+      setText("crmValue", sim.crm);
+    }
+
+    document.querySelectorAll("[data-sim]").forEach(btn => {
+      btn.addEventListener("click", () => applySimulation(btn.dataset.sim));
+    });
+
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = `step2.html?${params.toString()}`;
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", (e) => {
+      e.preventDefault();
+      const nextParams = new URLSearchParams(window.location.search);
+      window.location.href = `step4.html?${nextParams.toString()}`;
+    });
   </script>
 </body>
 </html>
