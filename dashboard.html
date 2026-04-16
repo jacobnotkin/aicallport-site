@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Call Port | Owner Dashboard</title>
+  <meta
+    name="description"
+    content="AI Call Port owner dashboard overview with live activity, schedules, confirmations, alerts, billing, referrals, and recent calls."
+  />
+  <style>
+    :root{
+      --bg-main:#05070b;
+      --bg-shell:#080b11;
+      --bg-card:#0d1118;
+      --bg-soft:#0a1019;
+
+      --text-primary:#f7fbff;
+      --text-secondary:#c9d7e6;
+      --text-muted:#8d9db1;
+
+      --blue:#3b82f6;
+      --blue-soft:#67d4ff;
+      --orange:#f97316;
+      --orange-soft:#fb923c;
+      --gold:#ffbf2f;
+      --green:#69d39c;
+      --red:#ff6e7f;
+
+      --border:rgba(255,255,255,.08);
+      --border-soft:rgba(255,255,255,.06);
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%}
+
+    body{
+      color:var(--text-primary);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(180deg,#05070b 0%, #04060a 100%);
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(59,130,246,.06), transparent 28%),
+        radial-gradient(circle at 82% 78%, rgba(249,115,22,.06), transparent 32%);
+      z-index:0;
+    }
+
+    .grid-bg{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.08;
+      background:
+        linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(circle at center, black 42%, transparent 96%);
+      z-index:0;
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      min-height:100vh;
+      padding:18px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .shell{
+      width:min(1480px, calc(100vw - 36px));
+      min-height:calc(100vh - 36px);
+      border-radius:30px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));
+      box-shadow:
+        0 36px 100px rgba(0,0,0,.58),
+        inset 0 1px 0 rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(420px circle at 50% 0%, rgba(249,115,22,.05), transparent 56%),
+        radial-gradient(520px circle at 10% 8%, rgba(59,130,246,.04), transparent 52%);
+      z-index:0;
+    }
+
+    .layout{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:260px 1fr;
+      min-height:calc(100vh - 36px);
+    }
+
+    .sidebar{
+      border-right:1px solid rgba(255,255,255,.06);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      padding:20px 16px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+      padding:6px 8px;
+    }
+
+    .logo-wrap{
+      width:56px;
+      height:56px;
+      min-width:56px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 56px;
+    }
+
+    .logo{
+      width:48px;
+      height:48px;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 0 10px rgba(249,115,22,.20));
+    }
+
+    .brand-wordmark{
+      display:flex;
+      gap:6px;
+      align-items:flex-end;
+      line-height:1;
+      flex-wrap:wrap;
+    }
+
+    .brand-ai,
+    .brand-callport{
+      font-size:14px;
+      font-weight:900;
+      text-transform:uppercase;
+      color:transparent;
+      -webkit-background-clip:text;
+      background-clip:text;
+    }
+
+    .brand-ai{
+      letter-spacing:.04em;
+      background-image:linear-gradient(180deg, var(--blue-soft), var(--blue));
+    }
+
+    .brand-callport{
+      letter-spacing:.02em;
+      background-image:linear-gradient(180deg, var(--gold), var(--orange));
+    }
+
+    .beta-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:22px;
+      padding:0 9px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.24);
+      background:rgba(249,115,22,.10);
+      color:#fff;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .company-card{
+      border-radius:22px;
+      border:1px solid var(--border-soft);
+      background:rgba(255,255,255,.03);
+      padding:16px;
+    }
+
+    .company-card strong{
+      display:block;
+      font-size:18px;
+      line-height:1.2;
+      color:#fff;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+
+    .company-card span{
+      display:block;
+      margin-top:8px;
+      color:var(--blue-soft);
+      font-size:13px;
+      line-height:1.5;
+      font-weight:700;
+    }
+
+    .nav{
+      display:grid;
+      gap:8px;
+    }
+
+    .nav-link{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.05);
+      background:rgba(255,255,255,.02);
+      padding:13px 14px;
+      color:#dbe6f1;
+      text-decoration:none;
+      font-size:13px;
+      line-height:1.4;
+      font-weight:700;
+      transition:.18s ease;
+    }
+
+    .nav-link:hover{
+      transform:translateX(2px);
+      border-color:rgba(103,212,255,.18);
+      background:rgba(255,255,255,.04);
+    }
+
+    .nav-link.active{
+      border-color:rgba(103,212,255,.24);
+      background:rgba(103,212,255,.10);
+      color:#fff;
+    }
+
+    .nav-count{
+      min-width:26px;
+      height:22px;
+      padding:0 7px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(255,255,255,.06);
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .sidebar-foot{
+      margin-top:auto;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.02);
+      padding:16px;
+    }
+
+    .sidebar-foot strong{
+      display:block;
+      color:#fff;
+      font-size:13px;
+      line-height:1.3;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .sidebar-foot p{
+      margin:8px 0 0;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.55;
+      font-weight:600;
+    }
+
+    .main{
+      padding:18px;
+      display:grid;
+      gap:16px;
+      align-content:start;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:4;
+      border-radius:24px;
+      border:1px solid var(--border-soft);
+      background:rgba(8,11,18,.90);
+      backdrop-filter:blur(14px);
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:18px;
+      padding:16px 18px;
+    }
+
+    .topbar-left h1{
+      margin:0;
+      color:#fff;
+      font-size:34px;
+      line-height:1;
+      font-weight:850;
+      letter-spacing:-.05em;
+    }
+
+    .topbar-left p{
+      margin:10px 0 0;
+      color:var(--blue-soft);
+      font-size:14px;
+      line-height:1.5;
+      font-weight:700;
+    }
+
+    .topbar-right{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .chip,
+    .action-btn{
+      min-height:40px;
+      padding:0 14px;
+      border-radius:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#eef6ff;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      white-space:nowrap;
+      text-decoration:none;
+    }
+
+    .chip.blue{color:var(--blue-soft)}
+    .chip.orange{color:#ffc48e}
+
+    .action-btn.primary{
+      border:none;
+      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
+      color:#fff;
+      box-shadow:0 10px 30px rgba(249,115,22,.24);
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(6, minmax(0,1fr));
+      gap:12px;
+    }
+
+    .card{
+      border-radius:24px;
+      border:1px solid var(--border-soft);
+      background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(200px circle at 100% 0%, rgba(249,115,22,.04), transparent 42%),
+        radial-gradient(180px circle at 0% 0%, rgba(59,130,246,.04), transparent 44%);
+    }
+
+    .card > *{position:relative;z-index:1}
+
+    .summary-card .label{
+      color:var(--text-muted);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .summary-card .value{
+      margin-top:10px;
+      color:#fff;
+      font-size:32px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.05em;
+    }
+
+    .summary-card .meta{
+      margin-top:8px;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.45;
+      font-weight:600;
+    }
+
+    .summary-card.urgent{
+      border-color:rgba(255,110,127,.18);
+      background:linear-gradient(180deg, rgba(255,110,127,.10), rgba(255,255,255,.02));
+    }
+
+    .summary-card.urgent .value{color:#ffd1d6}
+
+    .main-grid{
+      display:grid;
+      grid-template-columns:1.2fr 1fr .85fr;
+      gap:12px;
+      align-items:start;
+    }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .section-title h2{
+      margin:0;
+      color:#fff;
+      font-size:22px;
+      line-height:1.1;
+      font-weight:800;
+      letter-spacing:-.04em;
+    }
+
+    .section-title span{
+      color:var(--text-muted);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .feed-list,
+    .priority-list,
+    .mini-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .feed-item,
+    .priority-item,
+    .mini-item,
+    .call-row,
+    .client-row{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+    }
+
+    .feed-item{
+      display:grid;
+      grid-template-columns:14px 1fr auto;
+      gap:12px;
+      align-items:start;
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      margin-top:6px;
+      background:var(--blue-soft);
+      box-shadow:0 0 12px rgba(103,212,255,.28);
+    }
+
+    .dot.orange{
+      background:var(--orange);
+      box-shadow:0 0 12px rgba(249,115,22,.24);
+    }
+
+    .dot.red{
+      background:var(--red);
+      box-shadow:0 0 12px rgba(255,110,127,.24);
+    }
+
+    .feed-item strong,
+    .priority-item strong,
+    .mini-item strong{
+      display:block;
+      color:#fff;
+      font-size:14px;
+      line-height:1.45;
+      font-weight:800;
+    }
+
+    .feed-item p,
+    .priority-item p,
+    .mini-item p{
+      margin:6px 0 0;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.5;
+      font-weight:600;
+    }
+
+    .stamp{
+      color:var(--text-muted);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .schedule-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .schedule-item{
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+      display:grid;
+      grid-template-columns:74px 1fr;
+      gap:14px;
+      align-items:start;
+    }
+
+    .time-badge{
+      border-radius:16px;
+      border:1px solid rgba(103,212,255,.20);
+      background:rgba(103,212,255,.10);
+      color:var(--blue-soft);
+      font-size:13px;
+      font-weight:900;
+      line-height:1;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      min-height:60px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:8px;
+    }
+
+    .schedule-item strong{
+      display:block;
+      color:#fff;
+      font-size:15px;
+      line-height:1.4;
+      font-weight:800;
+    }
+
+    .schedule-item p{
+      margin:6px 0 0;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.5;
+      font-weight:600;
+    }
+
+    .tag-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .tag{
+      min-height:24px;
+      padding:0 8px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      color:#eef6ff;
+    }
+
+    .tag.green{
+      border-color:rgba(105,211,156,.24);
+      background:rgba(105,211,156,.12);
+      color:#bdf1d1;
+    }
+
+    .tag.orange{
+      border-color:rgba(249,115,22,.24);
+      background:rgba(249,115,22,.12);
+      color:#ffc48e;
+    }
+
+    .tag.red{
+      border-color:rgba(255,110,127,.24);
+      background:rgba(255,110,127,.12);
+      color:#ffd0d7;
+    }
+
+    .tag.blue{
+      border-color:rgba(103,212,255,.24);
+      background:rgba(103,212,255,.10);
+      color:#9bdcff;
+    }
+
+    .metrics-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:12px;
+    }
+
+    .metric-card h3{
+      margin:0;
+      color:#fff;
+      font-size:20px;
+      line-height:1.15;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+
+    .metric-list{
+      margin-top:14px;
+      display:grid;
+      gap:10px;
+    }
+
+    .metric-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.45;
+      font-weight:600;
+    }
+
+    .metric-row strong{
+      color:#fff;
+      font-weight:800;
+    }
+
+    .tables{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .table-head{
+      display:grid;
+      grid-template-columns:1.2fr .9fr 1fr .8fr;
+      gap:12px;
+      color:var(--text-muted);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      padding:0 4px 10px;
+    }
+
+    .call-row,
+    .client-row{
+      display:grid;
+      gap:6px;
+    }
+
+    .row-main{
+      display:grid;
+      grid-template-columns:1.2fr .9fr 1fr .8fr;
+      gap:12px;
+      align-items:center;
+      color:#eef6ff;
+      font-size:13px;
+      line-height:1.45;
+      font-weight:700;
+    }
+
+    .row-sub{
+      color:var(--text-secondary);
+      font-size:12px;
+      line-height:1.45;
+      font-weight:600;
+    }
+
+    .bottom-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:12px;
+    }
+
+    .mini-card strong{
+      display:block;
+      color:#fff;
+      font-size:18px;
+      line-height:1.2;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+
+    .mini-card p{
+      margin:8px 0 0;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.55;
+      font-weight:600;
+    }
+
+    .copy-link{
+      margin-top:14px;
+      min-height:42px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 14px;
+    }
+
+    @media (max-width:1280px){
+      .summary-grid{grid-template-columns:repeat(3, minmax(0,1fr))}
+      .main-grid{grid-template-columns:1fr}
+      .metrics-grid,
+      .tables,
+      .bottom-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:980px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{border-right:none;border-bottom:1px solid rgba(255,255,255,.06)}
+    }
+
+    @media (max-width:760px){
+      .page{padding:10px}
+      .shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}
+      .layout{min-height:calc(100vh - 20px)}
+      .topbar{grid-template-columns:1fr}
+      .summary-grid{grid-template-columns:1fr 1fr}
+      .row-main,
+      .table-head{grid-template-columns:1fr 1fr}
+      .schedule-item{grid-template-columns:1fr}
+      .time-badge{min-height:46px}
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <div class="page">
+    <div class="shell">
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="logo-wrap">
+              <img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo" />
+            </div>
+            <div>
+              <div class="brand-wordmark">
+                <span class="brand-ai">AI</span>
+                <span class="brand-callport">CALL PORT</span>
+              </div>
+              <div class="beta-badge">Beta</div>
+            </div>
+          </div>
+
+          <div class="company-card">
+            <strong>Acme Plumbing & Drain</strong>
+            <span>Owner dashboard for live operations, confirmations, reports, and billing.</span>
+          </div>
+
+          <nav class="nav">
+            <a class="nav-link active" href="#"><span>Overview</span><span class="nav-count">6</span></a>
+            <a class="nav-link" href="#"><span>Calls</span><span class="nav-count">18</span></a>
+            <a class="nav-link" href="#"><span>Appointments</span><span class="nav-count">12</span></a>
+            <a class="nav-link" href="#"><span>Tasks</span><span class="nav-count">9</span></a>
+            <a class="nav-link" href="#"><span>Clients</span><span class="nav-count">244</span></a>
+            <a class="nav-link" href="#"><span>Staff</span><span class="nav-count">5</span></a>
+            <a class="nav-link" href="#"><span>Reports</span><span class="nav-count">4</span></a>
+            <a class="nav-link" href="#"><span>Notifications</span><span class="nav-count">11</span></a>
+            <a class="nav-link" href="#"><span>Billing</span><span class="nav-count">2</span></a>
+            <a class="nav-link" href="#"><span>Referrals</span><span class="nav-count">4</span></a>
+            <a class="nav-link" href="#"><span>Requests</span><span class="nav-count">1</span></a>
+            <a class="nav-link" href="#"><span>Settings</span><span class="nav-count">•</span></a>
+          </nav>
+
+          <div class="sidebar-foot">
+            <strong>Sound Alerts</strong>
+            <p>Urgent routing, cancellations, unaccepted tasks, and new high-priority bookings trigger sound alerts for the owner.</p>
+          </div>
+        </aside>
+
+        <main class="main">
+          <section class="topbar">
+            <div class="topbar-left">
+              <h1>Overview</h1>
+              <p>What is happening in the business right now, what still needs confirmation, and what requires the owner’s attention.</p>
+            </div>
+            <div class="topbar-right">
+              <div class="chip blue">Apr 15, 2026</div>
+              <div class="chip">Today</div>
+              <div class="chip orange">Sound On</div>
+              <div class="chip">11 Alerts</div>
+              <a class="action-btn" href="#">Add Client</a>
+              <a class="action-btn" href="#">Create Task</a>
+              <a class="action-btn primary" href="#">Add Booking</a>
+            </div>
+          </section>
+
+          <section class="summary-grid">
+            <div class="card summary-card">
+              <div class="label">Calls Today</div>
+              <div class="value">18</div>
+              <div class="meta">4 more than yesterday</div>
+            </div>
+            <div class="card summary-card">
+              <div class="label">Appointments Today</div>
+              <div class="value">12</div>
+              <div class="meta">3 new bookings since 9am</div>
+            </div>
+            <div class="card summary-card">
+              <div class="label">Pending Client Confirmations</div>
+              <div class="value">6</div>
+              <div class="meta">2 reminders still need response</div>
+            </div>
+            <div class="card summary-card">
+              <div class="label">Pending Staff Confirmations</div>
+              <div class="value">4</div>
+              <div class="meta">1 urgent task is still unaccepted</div>
+            </div>
+            <div class="card summary-card urgent">
+              <div class="label">Urgent Items</div>
+              <div class="value">2</div>
+              <div class="meta">Immediate owner review needed</div>
+            </div>
+            <div class="card summary-card">
+              <div class="label">Completed Today</div>
+              <div class="value">9</div>
+              <div class="meta">75% of today’s tasks are closed</div>
+            </div>
+          </section>
+
+          <section class="main-grid">
+            <div class="card">
+              <div class="section-title">
+                <h2>Live Activity Feed</h2>
+                <span>Updated now</span>
+              </div>
+              <div class="feed-list">
+                <div class="feed-item">
+                  <span class="dot red"></span>
+                  <div>
+                    <strong>Urgent plumbing request flagged for same-day dispatch</strong>
+                    <p>Call from Maria Lopez was tagged urgent and needs assignment confirmation from the field team.</p>
+                  </div>
+                  <span class="stamp">2m ago</span>
+                </div>
+                <div class="feed-item">
+                  <span class="dot"></span>
+                  <div>
+                    <strong>Appointment booked for leak inspection</strong>
+                    <p>John Smith booked a 3:00 PM inspection and the client confirmation email and SMS were sent.</p>
+                  </div>
+                  <span class="stamp">9m ago</span>
+                </div>
+                <div class="feed-item">
+                  <span class="dot orange"></span>
+                  <div>
+                    <strong>Client requested quote after after-hours call</strong>
+                    <p>The system captured a new lead, created the client record, and prepared a callback task for sales.</p>
+                  </div>
+                  <span class="stamp">18m ago</span>
+                </div>
+                <div class="feed-item">
+                  <span class="dot"></span>
+                  <div>
+                    <strong>Staff completion confirmed</strong>
+                    <p>Mike Daniels marked the 10:30 AM drain service complete and the dashboard moved the job into today’s completed value.</p>
+                  </div>
+                  <span class="stamp">32m ago</span>
+                </div>
+                <div class="feed-item">
+                  <span class="dot orange"></span>
+                  <div>
+                    <strong>Client confirmation received by SMS</strong>
+                    <p>Sarah Jones confirmed her 1:15 PM service window directly from the reminder text.</p>
+                  </div>
+                  <span class="stamp">45m ago</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-title">
+                <h2>Today’s Schedule</h2>
+                <span>Apr 15</span>
+              </div>
+              <div class="schedule-list">
+                <div class="schedule-item">
+                  <div class="time-badge">09:00 AM</div>
+                  <div>
+                    <strong>Water heater inspection for John Smith</strong>
+                    <p>Assigned to Sarah Kim • Confirmed by client • Estimated value $120</p>
+                    <div class="tag-row">
+                      <span class="tag green">Client Confirmed</span>
+                      <span class="tag blue">Assigned</span>
+                      <span class="tag">Service</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="schedule-item">
+                  <div class="time-badge">10:30 AM</div>
+                  <div>
+                    <strong>Drain cleaning for Maria Lopez</strong>
+                    <p>Assigned to Mike Daniels • Completion still pending • Estimated value $180</p>
+                    <div class="tag-row">
+                      <span class="tag green">Accepted</span>
+                      <span class="tag orange">Awaiting Completion</span>
+                      <span class="tag">Urgent</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="schedule-item">
+                  <div class="time-badge">03:00 PM</div>
+                  <div>
+                    <strong>Leak inspection consultation for Sarah Jones</strong>
+                    <p>Assigned to Alex Carter • Reminder sent • Estimated value $95</p>
+                    <div class="tag-row">
+                      <span class="tag blue">Reminder Sent</span>
+                      <span class="tag">Pending Start</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-title">
+                <h2>Priority Stack</h2>
+                <span>Needs action</span>
+              </div>
+              <div class="priority-list">
+                <div class="priority-item">
+                  <strong>Urgent Alerts</strong>
+                  <p>Same-day dispatch request needs acceptance from available technician.</p>
+                  <div class="tag-row">
+                    <span class="tag red">Urgent</span>
+                    <span class="tag orange">Owner Review</span>
+                  </div>
+                </div>
+                <div class="priority-item">
+                  <strong>Awaiting Client Confirmation</strong>
+                  <p>6 bookings still need response. Two reminder messages were already sent.</p>
+                  <div class="tag-row">
+                    <span class="tag orange">6 Pending</span>
+                  </div>
+                </div>
+                <div class="priority-item">
+                  <strong>Awaiting Staff Completion</strong>
+                  <p>4 items were accepted but have not yet been marked completed in the dashboard.</p>
+                  <div class="tag-row">
+                    <span class="tag blue">4 Open</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="metrics-grid">
+            <div class="card metric-card">
+              <h3>Call Performance</h3>
+              <div class="metric-list">
+                <div class="metric-row"><span>Calls this week</span><strong>96</strong></div>
+                <div class="metric-row"><span>Top call type</span><strong>Quote Requests</strong></div>
+                <div class="metric-row"><span>Urgent vs standard</span><strong>12% urgent</strong></div>
+                <div class="metric-row"><span>Missed opportunity replacement</span><strong>+18 leads</strong></div>
+              </div>
+            </div>
+            <div class="card metric-card">
+              <h3>Booking & Confirmations</h3>
+              <div class="metric-list">
+                <div class="metric-row"><span>Booked today</span><strong>12</strong></div>
+                <div class="metric-row"><span>Confirmed</span><strong>8</strong></div>
+                <div class="metric-row"><span>Pending</span><strong>6</strong></div>
+                <div class="metric-row"><span>No-show / canceled</span><strong>1</strong></div>
+              </div>
+            </div>
+            <div class="card metric-card">
+              <h3>Revenue Snapshot</h3>
+              <div class="metric-list">
+                <div class="metric-row"><span>Booked value today</span><strong>$1,145</strong></div>
+                <div class="metric-row"><span>Completed value today</span><strong>$780</strong></div>
+                <div class="metric-row"><span>Upcoming booked value</span><strong>$3,420</strong></div>
+                <div class="metric-row"><span>Lost value canceled</span><strong>$95</strong></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="tables">
+            <div class="card">
+              <div class="section-title">
+                <h2>Recent Calls</h2>
+                <span>Latest activity</span>
+              </div>
+              <div class="table-head">
+                <div>Caller</div>
+                <div>Intent</div>
+                <div>Summary</div>
+                <div>Status</div>
+              </div>
+              <div class="mini-list">
+                <div class="call-row">
+                  <div class="row-main">
+                    <div>John Smith</div>
+                    <div>Quote</div>
+                    <div>Pipe leak estimate</div>
+                    <div><span class="tag blue">New Lead</span></div>
+                  </div>
+                  <div class="row-sub">Captured after-hours by AI and linked to new client record at 11:02 AM.</div>
+                </div>
+                <div class="call-row">
+                  <div class="row-main">
+                    <div>Maria Lopez</div>
+                    <div>Urgent</div>
+                    <div>Same-day help</div>
+                    <div><span class="tag red">Urgent</span></div>
+                  </div>
+                  <div class="row-sub">Urgent routing triggered and dispatch task created at 10:47 AM.</div>
+                </div>
+                <div class="call-row">
+                  <div class="row-main">
+                    <div>Sarah Jones</div>
+                    <div>Booking</div>
+                    <div>Leak inspection</div>
+                    <div><span class="tag green">Booked</span></div>
+                  </div>
+                  <div class="row-sub">Appointment created and confirmation messages sent automatically.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-title">
+                <h2>Recent Clients</h2>
+                <span>CRM updates</span>
+              </div>
+              <div class="table-head">
+                <div>Client</div>
+                <div>Last Activity</div>
+                <div>Next Booking</div>
+                <div>Status</div>
+              </div>
+              <div class="mini-list">
+                <div class="client-row">
+                  <div class="row-main">
+                    <div>Sarah Jones</div>
+                    <div>Confirmed today</div>
+                    <div>Apr 15, 3:00 PM</div>
+                    <div><span class="tag green">Active</span></div>
+                  </div>
+                  <div class="row-sub">Confirmed by SMS and assigned to Alex Carter.</div>
+                </div>
+                <div class="client-row">
+                  <div class="row-main">
+                    <div>David Ross</div>
+                    <div>New client</div>
+                    <div>Apr 16, 10:00 AM</div>
+                    <div><span class="tag blue">Pending</span></div>
+                  </div>
+                  <div class="row-sub">Created from quote request captured by AI earlier today.</div>
+                </div>
+                <div class="client-row">
+                  <div class="row-main">
+                    <div>Maria Lopez</div>
+                    <div>Urgent service</div>
+                    <div>Apr 15, 10:30 AM</div>
+                    <div><span class="tag orange">Open</span></div>
+                  </div>
+                  <div class="row-sub">Completion still pending from field staff.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="bottom-grid">
+            <div class="card mini-card">
+              <div class="section-title">
+                <h2>System Status</h2>
+                <span>Alerts</span>
+              </div>
+              <strong>Notification delivery is stable</strong>
+              <p>Email and SMS reminders are active, sound alerts are enabled, and only one client reminder failed delivery in the last 24 hours.</p>
+              <div class="metric-list">
+                <div class="metric-row"><span>Sound alerts</span><strong>On</strong></div>
+                <div class="metric-row"><span>Failed notifications</span><strong>1</strong></div>
+                <div class="metric-row"><span>Unread system notices</span><strong>3</strong></div>
+              </div>
+            </div>
+
+            <div class="card mini-card">
+              <div class="section-title">
+                <h2>Billing Snapshot</h2>
+                <span>Current cycle</span>
+              </div>
+              <strong>$349 Base + $150 Scheduling</strong>
+              <p>624 of 1000 included minutes are already used this cycle. No overage has been triggered yet.</p>
+              <div class="metric-list">
+                <div class="metric-row"><span>Minutes used</span><strong>624 / 1000</strong></div>
+                <div class="metric-row"><span>Next billing date</span><strong>Apr 30</strong></div>
+                <div class="metric-row"><span>Luxury voice usage</span><strong>0 min</strong></div>
+              </div>
+            </div>
+
+            <div class="card mini-card">
+              <div class="section-title">
+                <h2>Referral Snapshot</h2>
+                <span>Discounts</span>
+              </div>
+              <strong>4 active referrals</strong>
+              <p>The current referral discount is already reducing the monthly bill. The next milestone adds an extra discount at 10 active referrals.</p>
+              <div class="metric-list">
+                <div class="metric-row"><span>Current discount</span><strong>$40/mo</strong></div>
+                <div class="metric-row"><span>Next milestone</span><strong>10 referrals</strong></div>
+                <div class="metric-row"><span>Milestone bonus</span><strong>+$20/mo</strong></div>
+              </div>
+              <div class="copy-link">Copy Referral Link</div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
