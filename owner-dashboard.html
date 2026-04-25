@@ -1,8 +1,3 @@
-Last login: Fri Apr 24 16:48:48 on ttys002
-yakovnotkin@Yakovs-MacBook-Air ~ % open "/Users/yakovnotkin/Documents/New project/owner-dashboard.html"
-
-yakovnotkin@Yakovs-MacBook-Air ~ % cat "/Users/yakovnotkin/Documents/New project/owner-dashboard.html"
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2045,6 +2040,8 @@ yakovnotkin@Yakovs-MacBook-Air ~ % cat "/Users/yakovnotkin/Documents/New project
     </div>
   </div>
 
+  <script src="billing-config.js"></script>
+  <script src="billing-client.js"></script>
   <script>
     const modules = [
       { id: "overview", name: "Overview", state: "active", submenus: ["Summary", "Alerts", "Today"] },
@@ -3781,65 +3778,60 @@ yakovnotkin@Yakovs-MacBook-Air ~ % cat "/Users/yakovnotkin/Documents/New project
         copy: "The booking was accepted, but completion is still missing. This is where the dashboard helps the owner see operational drift before it becomes revenue leakage or customer confusion.",
         tiles: [["Assigned to", "Mike Daniels"], ["Risk", "Completion still pending"], ["Value", "$180 booked"]]
       },
-      "appointments-leak": {
-        title: "Leak inspection / Reminder path active",
-        copy: "The reminder already went out, the consultation is still on the schedule, and the next operational question is whether the client reconfirms on time.",
-        tiles: [["Assigned to", "Alex Carter"], ["Reminder", "Sent"], ["Value", "$95 booked"]]
-      },
       "tasks-callback": {
-        title: "Callback task / Sales follow-up waiting",
-        copy: "This task was created automatically from a sales-intent call. The system already did the sorting work and is now waiting on the correct human step.",
-        tiles: [["Origin", "After-hours AI call"], ["Owner", "Sales"], ["Blocker", "Callback not completed"]]
+        title: "Callback task / Sales follow-up pending",
+        copy: "This task was created automatically from an after-hours call because the business would have lost the opportunity without a next-day callback path.",
+        tiles: [["Created by", "AI sales flow"], ["Task owner", "Salesman"], ["Due", "Today before 2 PM"]]
       },
       "tasks-dispatch": {
-        title: "Dispatch acceptance / Urgent action needed",
-        copy: "This task exists because the system already classified the situation as urgent. The only missing piece is technician acceptance, so the owner can see exactly where failure risk lives.",
-        tiles: [["Origin", "Emergency routing"], ["Priority", "Urgent"], ["Blocker", "Technician confirmation"]]
+        title: "Dispatch task / Emergency assignment not accepted yet",
+        copy: "Because the urgent task has not been accepted, the owner can see the gap early and push the assignment before the customer loses confidence.",
+        tiles: [["Task type", "Emergency dispatch"], ["Owner", "Serviceman"], ["Risk", "Delayed same-day response"]]
       },
       "tasks-completion": {
-        title: "Completion review / Workflow hold",
-        copy: "The visit happened, but the completion signal did not. That means the next workflow action is blocked, and the dashboard should surface that immediately instead of hiding it in notes.",
-        tiles: [["Origin", "Accepted visit"], ["Status", "Pending completion"], ["Blocker", "Workflow hold"]]
+        title: "Completion review / Workflow still blocked",
+        copy: "A booking can look finished without actually moving the workflow forward. This view gives the owner a clean operational checkpoint before follow-up or billing logic continues.",
+        tiles: [["Task type", "Completion review"], ["Blocking", "Post-visit workflow"], ["Needs", "Completion confirmation"]]
       },
       "notifications-sms": {
         title: "SMS confirmation / Booking updated",
-        copy: "The customer replied directly from the reminder message and the system reflected that immediately inside the booked workflow.",
-        tiles: [["Channel", "SMS"], ["Result", "Confirmed"], ["Impact", "Booking status updated"]]
+        copy: "The customer confirmed directly by text, so the appointment status updated instantly and the owner did not need to manually reconcile messages with the calendar.",
+        tiles: [["Channel", "SMS"], ["Outcome", "Confirmed"], ["Effect", "Booking protected"]]
       },
       "notifications-email": {
-        title: "Reminder failure / CRM correction needed",
-        copy: "This email bounce is not just a message problem. It is a workflow risk, because the next automated step cannot continue until the client record is corrected.",
-        tiles: [["Channel", "Email"], ["Problem", "Delivery failed"], ["Next owner", "CRM correction review"]]
+        title: "Email reminder / Delivery failure",
+        copy: "The system is doing its job by surfacing failed communication instead of letting the owner assume the reminder was delivered successfully.",
+        tiles: [["Channel", "Email"], ["Issue", "Bounce / invalid contact"], ["Next owner", "CRM correction"]]
       }
     };
 
+    function renderCallHandlingDetailPanel(detailKey = "calls-john") {
+      const detail = callHandlingDetailData[detailKey] || callHandlingDetailData["calls-john"];
+      return `
+        <h2>${detail.title}</h2>
+        <p>${detail.copy}</p>
+        <div class="detail-focus-grid">
+          ${detail.tiles.map(([label, value]) => `
+            <div class="detail-focus-tile">
+              <strong>${label}</strong>
+              <span>${value}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
     function attachCallHandlingHandlers() {
       const detailPanel = document.getElementById("callHandlingDetailPanel");
-      const items = workspace.querySelectorAll("[data-call-detail]");
-      if (!detailPanel || !items.length) return;
+      if (!detailPanel) return;
 
-      function renderCallDetail(detailId) {
-        const detail = callHandlingDetailData[detailId];
-        if (!detail) return;
-        detailPanel.innerHTML = `
-          <h2>${detail.title}</h2>
-          <p>${detail.copy}</p>
-          <div class="detail-focus-grid">
-            ${detail.tiles.map((tile) => `
-              <div class="detail-focus-tile">
-                <strong>${tile[0]}</strong>
-                <span>${tile[1]}</span>
-              </div>
-            `).join("")}
-          </div>
-        `;
-      }
+      detailPanel.innerHTML = renderCallHandlingDetailPanel();
 
-      items.forEach((item) => {
-        item.addEventListener("click", () => renderCallDetail(item.dataset.callDetail));
+      workspace.querySelectorAll("[data-call-detail]").forEach(item => {
+        item.addEventListener("click", () => {
+          detailPanel.innerHTML = renderCallHandlingDetailPanel(item.dataset.callDetail);
+        });
       });
-
-      renderCallDetail(items[0].dataset.callDetail);
     }
 
     function renderSubmenu(module) {
@@ -3850,41 +3842,50 @@ yakovnotkin@Yakovs-MacBook-Air ~ % cat "/Users/yakovnotkin/Documents/New project
       submenuBar.querySelectorAll(".submenu-btn").forEach(button => {
         button.addEventListener("click", () => {
           activeSubmenu = button.dataset.submenu;
-          renderWorkspace();
-          renderSubmenu(module);
+          renderAll();
         });
       });
     }
 
     function renderWorkspace() {
-      const module = workspaceData[activeModule];
-      workspaceTitle.textContent = module.title;
-      workspaceCopy.textContent = module.copy;
-      const headerActionSet = typeof module.actions === "function" ? module.actions() : (module.actions || []);
-      renderHeaderActions(headerActionSet);
-      workspace.innerHTML = "";
-      const viewMarkup = activeModule === "crm"
-        ? renderCRMClientListView()
-        : typeof module.views[activeSubmenu] === "function"
-          ? module.views[activeSubmenu]()
-          : module.views[activeSubmenu];
-      workspace.innerHTML = viewMarkup || module.views[activeSubmenu] || "";
+      const module = modules.find(item => item.id === activeModule);
+      const config = workspaceData[activeModule];
+      const actionSet = typeof config.actions === "function" ? config.actions() : config.actions;
+      workspaceTitle.textContent = config.title;
+      workspaceCopy.textContent = config.copy;
+      renderHeaderActions(actionSet);
+      renderSubmenu(module);
+
+      let view = config.views[activeSubmenu];
+      if (typeof view === "function") {
+        view = view();
+      }
+
       if (activeModule === "crm") {
-        activeSubmenu = "Clients";
+        view = renderCRMClientListView();
+      }
+
+      workspace.innerHTML = view || `<div class="empty-note">No view configured yet.</div>`;
+
+      if (activeModule === "crm") {
         attachCRMClientSearch();
       }
+
       if (activeModule === "recommended-actions") {
         attachRecommendedActionHandlers();
       }
+
       if (activeModule === "call-handling") {
         attachCallHandlingHandlers();
+      }
+
+      if (activeModule === "billing" && window.AICallPortBilling) {
+        window.AICallPortBilling.loadAndApplyDashboardBilling(workspace, activeSubmenu);
       }
     }
 
     function renderAll() {
-      const module = modules.find(m => m.id === activeModule);
       renderModuleNav();
-      renderSubmenu(module);
       renderWorkspace();
     }
 
@@ -3898,9 +3899,14 @@ yakovnotkin@Yakovs-MacBook-Air ~ % cat "/Users/yakovnotkin/Documents/New project
       }
     });
 
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        clientProfileOverlay.classList.remove("open");
+      }
+    });
+
     renderAll();
   </script>
   <script src="ai-assistant.js"></script>
 </body>
 </html>
-yakovnotkin@Yakovs-MacBook-Air ~ % 
