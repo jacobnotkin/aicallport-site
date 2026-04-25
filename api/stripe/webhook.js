@@ -1,25 +1,17 @@
-import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
+import {
+  runtime,
+  getProfileByIdOrEmail,
+  getStripe,
+  getSupabaseAdmin,
+  json
+} from "./_shared.js";
 
-// Required for Stripe webhook signature verification
 export const config = {
   api: {
-    bodyParser: false,
-  },
+    bodyParser: false
+  }
 };
-
-// (Optional but ok) ensures Node runtime
-export const runtime = "nodejs";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-// Safe debug: shows the URL exactly as Vercel sees it (including hidden whitespace)
-console.log("SUPABASE_URL (raw):", JSON.stringify(process.env.SUPABASE_URL));
-
-const supabase = createClient(
-  (process.env.SUPABASE_URL || "").trim(),
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+export { runtime };
 
 async function getRawBody(req) {
   const chunks = [];
@@ -29,13 +21,46 @@ async function getRawBody(req) {
   return Buffer.concat(chunks);
 }
 
-export default async function handler(req, res) {
-  // Stripe sends POST
-  if (req.method !== "POST") {
-    return res.status(405).send("Method Not Allowed");
-  }
+async function upsertSubscriptionState({ supabaseAdmin, stripe, session }) {
+  const stripeCustomerId = typeof session.customer === "string" ? session.customer : session.customer?.id || null;
+  const stripeSubscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription?.id || null;
 
+  if (!stripeCustomerId || !stripeSubscriptionId) return;
+
+  const subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+  const customer = await stripe.customers.retrieve(stripeCustomerId);
+  const email = session?.customer_details?.email || session?.customer_email || customer.email || null;
+  const userId = session.client_reference_id || session?.metadata?.user_id || "";
+  const profile = await getProfileByIdOrEmail(supabaseAdmin, { userId, email });
+
+  if (!profile?.id) return;
+
+  const { error } = await supabaseAdmin
+    .from("subscriptions")
+    .upsert(
+      [
+        {
+          user_id: profile.id,
+          stripe_customer_id: stripeCustomerId,
+          stripe_subscription_id: stripeSubscriptionId,
+          status: subscription.status
+        }
+      ],
+      { onConflict: "user_id" }
+    );
+
+  if (error) {
+    console.error("subscriptions upsert error:", error);
+  }
+}
+
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+
+  const stripe = getStripe();
+  const supabaseAdmin = getSupabaseAdmin();
   const signature = req.headers["stripe-signature"];
+
   if (!signature) {
     return res.status(400).send("Missing Stripe-Signature header");
   }
@@ -43,130 +68,49 @@ export default async function handler(req, res) {
   let event;
   try {
     const rawBody = await getRawBody(req);
-
     event = stripe.webhooks.constructEvent(
       rawBody,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-  } catch (err) {
-    console.error("Stripe webhook verification failed:", err);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+  } catch (error) {
+    return res.status(400).send(`Webhook Error: ${error.message}`);
   }
 
   try {
-    // ✅ MAIN EVENT: subscription checkout completed
     if (event.type === "checkout.session.completed") {
-      const session = event.data.object;
-
-      // Email can appear in different fields depending on checkout config
-      const email =
-        session?.customer_details?.email ||
-        session?.customer_email ||
-        null;
-
-      // These will be strings for a subscription checkout
-      const stripeCustomerId =
-        typeof session.customer === "string" ? session.customer : null;
-      // Fetch full subscription from Stripe to get accurate status
-
-      const stripeSubscriptionId =
-  typeof session.subscription === "string" ? session.subscription : null;
-      if (!stripeSubscriptionId) {
-  console.log(
-    "checkout.session.completed: no subscription id (is this really recurring monthly?)"
-  );
-  return res.status(200).json({ received: true });
-}
-      let subscriptionStatus = "active";
-
-
-   
-  const stripeSubscription = await stripe.subscriptions.retrieve(
-    stripeSubscriptionId
-  );
-
-  subscriptionStatus = stripeSubscription.status;
-
-
-      
-      if (!email) {
-        console.log("checkout.session.completed: no email found on session");
-        return res.status(200).json({ received: true });
-      }
-
-      if (!stripeCustomerId) {
-        console.log("checkout.session.completed: no stripe customer id");
-        return res.status(200).json({ received: true });
-      }
-
-      
-
-      // 1) Find the user in profiles by email
-      // Prefer client_reference_id (most reliable)
-const userIdFromStripe = session.client_reference_id || session?.metadata?.user_id;
-
-if (!userIdFromStripe) {
-  console.log("No client_reference_id or metadata.user_id found");
-  return res.status(200).json({ received: true });
-}
-
-// Look up profile by user_id instead of email
-const { data: profile, error: profileError } = await supabase
-  .from("profiles")
-  .select("id")
-  .eq("id", userIdFromStripe)
-  .maybeSingle();
-      if (profileError) {
-        console.error("profiles lookup error:", profileError);
-        return res.status(200).json({ received: true });
-      }
-
-      if (!profile?.id) {
-        console.log("No matching profile for user_id:", userIdFromStripe);
-        return res.status(200).json({ received: true });
-      }
-
-      // 2) Upsert into subscriptions (one row per user)
-      const { error: subError } = await supabase
-        .from("subscriptions")
-        .upsert(
-          [
-            {
-              user_id: profile.id,
-              stripe_customer_id: stripeCustomerId,
-              stripe_subscription_id: stripeSubscriptionId,
-              status: subscriptionStatus,
-              // plan_code will be mapped later (price_id -> starter/pro/elite)
-            },
-          ],
-          { onConflict: "user_id" }
-        );
-
-      if (subError) {
-        console.error("subscriptions upsert error:", subError);
-      } else {
-        console.log(
-          "Subscription saved:",
-          JSON.stringify({
-            email,
-            user_id: profile.id,
-            stripeCustomerId,
-            stripeSubscriptionId,
-          })
-        );
-      }
+      await upsertSubscriptionState({
+        supabaseAdmin,
+        stripe,
+        session: event.data.object
+      });
     }
 
-    // (Optional) Later we will add:
-    // - invoice.paid -> update status/period dates
-    // - invoice.payment_failed -> set past_due
-    // - customer.subscription.updated/deleted -> status changes
+    if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
+      const subscription = event.data.object;
+      const customerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer?.id;
 
-  } catch (err) {
-    console.error("Webhook handler error:", err);
-    // IMPORTANT: still return 200 so Stripe does not retry forever
+      if (customerId) {
+        const { data: row } = await supabaseAdmin
+          .from("subscriptions")
+          .select("user_id")
+          .eq("stripe_customer_id", customerId)
+          .maybeSingle();
+
+        if (row?.user_id) {
+          await supabaseAdmin
+            .from("subscriptions")
+            .update({
+              stripe_subscription_id: subscription.id,
+              status: subscription.status
+            })
+            .eq("user_id", row.user_id);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Webhook handler error:", error);
   }
 
-  return res.status(200).json({ received: true });
+  return json(res, 200, { received: true });
 }
