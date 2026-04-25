@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Call Port | Billing</title>
+  <meta name="description" content="Owner dashboard billing page with base plan, upgrades, minute usage, invoices, and subscription status." />
+  <style>
+    :root{--text-primary:#f7fbff;--text-secondary:#c9d7e6;--text-muted:#8d9db1;--blue:#3b82f6;--blue-soft:#67d4ff;--orange:#f97316;--orange-soft:#fb923c;--green:#69d39c;--red:#ff6e7f;--gold:#ffbf2f;--border-soft:rgba(255,255,255,.06)}
+    *{box-sizing:border-box} html,body{margin:0;height:100%}
+    body{color:var(--text-primary);font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;background:radial-gradient(circle at top left, rgba(78,165,255,.18), transparent 30%),radial-gradient(circle at top right, rgba(255,138,61,.10), transparent 26%),linear-gradient(180deg,#09131f 0%,#07111a 100%);overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 22%, rgba(59,130,246,.06), transparent 28%),radial-gradient(circle at 82% 78%, rgba(249,115,22,.06), transparent 32%);z-index:0}
+    .grid-bg{position:fixed;inset:0;pointer-events:none;opacity:.08;background:linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at center, black 42%, transparent 96%);z-index:0}
+    .page{position:relative;z-index:1;min-height:100vh;padding:18px;display:flex;justify-content:center}
+    .shell{width:min(1480px, calc(100vw - 36px));min-height:calc(100vh - 36px);border-radius:30px;border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);overflow:hidden;position:relative}
+    .shell::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px circle at 50% 0%, rgba(249,115,22,.05), transparent 56%),radial-gradient(520px circle at 10% 8%, rgba(59,130,246,.04), transparent 52%);z-index:0}
+    .layout{position:relative;z-index:1;display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 36px)}
+    .sidebar{border-right:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));padding:20px 16px 18px;display:flex;flex-direction:column;gap:20px}
+    .brand{display:flex;align-items:center;gap:12px;padding:6px 8px}.logo-wrap{width:56px;height:56px;min-width:56px;display:flex;align-items:center;justify-content:center}.logo{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(249,115,22,.20))}.brand-wordmark{display:flex;gap:6px;align-items:flex-end;line-height:1;flex-wrap:wrap}.brand-ai,.brand-callport{font-size:14px;font-weight:900;text-transform:uppercase;color:transparent;-webkit-background-clip:text;background-clip:text}.brand-ai{letter-spacing:.04em;background-image:linear-gradient(180deg, var(--blue-soft), var(--blue))}.brand-callport{letter-spacing:.02em;background-image:linear-gradient(180deg, var(--gold), var(--orange))}
+    .beta-badge,.nav-count,.chip,.tag{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.beta-badge{min-height:22px;padding:0 9px;border:1px solid rgba(249,115,22,.24);background:rgba(249,115,22,.10);color:#fff}
+    .company-card,.card{border-radius:24px;border:1px solid var(--border-soft);background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.03);padding:18px;position:relative;overflow:hidden}
+    .company-card strong{display:block;font-size:18px;line-height:1.2}.company-card span{display:block;margin-top:8px;color:var(--blue-soft);font-size:13px;line-height:1.5;font-weight:700}
+    .nav{display:grid;gap:8px}.nav-link{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:16px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);padding:13px 14px;color:#dbe6f1;text-decoration:none;font-size:13px;font-weight:700}.nav-link.active{border-color:rgba(103,212,255,.24);background:rgba(103,212,255,.10);color:#fff}.nav-count{min-width:26px;height:22px;padding:0 7px;background:rgba(255,255,255,.06);color:#fff}
+    .sidebar-foot{margin-top:auto;border-radius:20px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:16px}.sidebar-foot strong{display:block;font-size:13px;line-height:1.3;text-transform:uppercase}.sidebar-foot p{margin:8px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.55;font-weight:600}
+    .main{padding:18px;display:grid;gap:16px;align-content:start}
+    .topbar{position:sticky;top:0;z-index:4;border-radius:24px;border:1px solid var(--border-soft);background:rgba(8,11,18,.90);backdrop-filter:blur(14px);display:grid;grid-template-columns:1fr auto;gap:18px;padding:16px 18px}
+    .topbar-left h1{margin:0;font-size:34px;font-weight:850;letter-spacing:-.05em}.topbar-left p{margin:10px 0 0;color:var(--blue-soft);font-size:14px;font-weight:700;line-height:1.5}.topbar-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.chip,.action-btn{min-height:40px;padding:0 14px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#eef6ff;font-size:11px;font-weight:900;letter-spacing:.10em;text-transform:uppercase;text-decoration:none;white-space:nowrap}.action-btn.primary{border:none;background:linear-gradient(135deg,var(--orange),var(--orange-soft));color:#fff}
+    .summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.label{color:var(--text-muted);font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.value{margin-top:10px;font-size:32px;line-height:1;font-weight:900;letter-spacing:-.05em}.meta{margin-top:8px;color:var(--text-secondary);font-size:13px;line-height:1.45;font-weight:600}
+    .split{display:grid;grid-template-columns:1fr .9fr;gap:12px}
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.section-title h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}.section-title span{color:var(--text-muted);font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    .price-box{border-radius:22px;border:1px solid rgba(249,115,22,.18);background:rgba(249,115,22,.08);padding:18px}.price-box strong{display:block;font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.price-box .big{margin-top:10px;font-size:42px;line-height:1;font-weight:900;letter-spacing:-.05em}.price-box p{margin:10px 0 0;color:#ffd7b5;font-size:13px;line-height:1.5;font-weight:600}
+    .list,.table,.mini-list{display:grid;gap:10px}.line,.row,.mini-item{border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);padding:14px}
+    .line-top,.row-main{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}.line strong,.mini-item strong{display:block;font-size:14px;font-weight:800;line-height:1.45}.line p,.mini-item p{margin:6px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}
+    .row-main{grid-template-columns:1.1fr .8fr .8fr auto;color:#eef6ff;font-size:13px;font-weight:700}.row-sub{margin-top:8px;color:var(--text-secondary);font-size:12px;line-height:1.45;font-weight:600}
+    .bar{margin-top:10px;height:10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);overflow:hidden}.fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--blue-soft))}
+    .tag{min-height:24px;padding:0 8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#eef6ff}.tag.green{border-color:rgba(105,211,156,.24);background:rgba(105,211,156,.12);color:#bdf1d1}.tag.orange{border-color:rgba(249,115,22,.24);background:rgba(249,115,22,.12);color:#ffc48e}.tag.blue{border-color:rgba(103,212,255,.24);background:rgba(103,212,255,.10);color:#9bdcff}
+    @media (max-width:1280px){.summary-grid,.split{grid-template-columns:1fr}.row-main{grid-template-columns:1fr 1fr}}
+    @media (max-width:980px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid rgba(255,255,255,.06)}}
+    @media (max-width:760px){.page{padding:10px}.shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}.layout{min-height:calc(100vh - 20px)}.topbar{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr 1fr}.line-top,.row-main{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="page"><div class="shell"><div class="layout">
+    <aside class="sidebar">
+      <div class="brand"><div class="logo-wrap"><img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo" /></div><div><div class="brand-wordmark"><span class="brand-ai">AI</span><span class="brand-callport">CALL PORT</span></div><div class="beta-badge">Beta</div></div></div>
+      <div class="company-card"><strong>Acme Plumbing & Drain</strong><span>Base plan, upgrades, minute usage, invoices, and account billing visibility in one owner-facing page.</span></div>
+      <nav class="nav">
+        <a class="nav-link" href="owner-dashboard.html"><span>Overview</span><span class="nav-count">6</span></a>
+        <a class="nav-link" href="calls.html"><span>Calls</span><span class="nav-count">18</span></a>
+        <a class="nav-link" href="appointments.html"><span>Appointments</span><span class="nav-count">12</span></a>
+        <a class="nav-link" href="tasks.html"><span>Tasks</span><span class="nav-count">9</span></a>
+        <a class="nav-link" href="clients.html"><span>Clients</span><span class="nav-count">244</span></a>
+        <a class="nav-link" href="staff.html"><span>Staff</span><span class="nav-count">5</span></a>
+        <a class="nav-link" href="reports.html"><span>Reports</span><span class="nav-count">4</span></a>
+        <a class="nav-link" href="notifications.html"><span>Notifications</span><span class="nav-count">11</span></a>
+        <a class="nav-link active" href="billing.html"><span>Billing</span><span class="nav-count">2</span></a>
+        <a class="nav-link" href="referrals.html"><span>Referrals</span><span class="nav-count">4</span></a>
+        <a class="nav-link" href="requests.html"><span>Requests</span><span class="nav-count">1</span></a>
+        <a class="nav-link" href="settings.html"><span>Settings</span><span class="nav-count">•</span></a>
+      </nav>
+      <div class="sidebar-foot"><strong>Commercial Model</strong><p>Every customer gets the same advanced system. Billing starts from the $349 base and only adds the upgrades they actually need.</p></div>
+    </aside>
+    <main class="main">
+      <section class="topbar">
+        <div class="topbar-left"><h1>Billing</h1><p>Track the base subscription, active upgrades, minute usage, invoices, and what the current billing period is likely to cost.</p></div>
+        <div class="topbar-right"><div class="chip">Stripe Active</div><div class="chip">Current Cycle</div><div class="chip">Next Bill Apr 28</div><a class="action-btn" href="#">Invoices</a><a class="action-btn" href="#">Usage</a><a class="action-btn primary" href="#">Manage Billing</a></div>
+      </section>
+
+      <section class="summary-grid">
+        <div class="card"><div class="label">Base Plan</div><div class="value">$349</div><div class="meta">Advanced system included</div></div>
+        <div class="card"><div class="label">Active Upgrades</div><div class="value">$398</div><div class="meta">Scheduling, CRM sync, language pack</div></div>
+        <div class="card"><div class="label">Minutes Used</div><div class="value">624</div><div class="meta">Of 1000 included standard-voice minutes</div></div>
+        <div class="card"><div class="label">Projected Overage</div><div class="value">$0</div><div class="meta">Current pace still inside plan</div></div>
+        <div class="card"><div class="label">Projected Total</div><div class="value">$747</div><div class="meta">Before taxes or future overage</div></div>
+      </section>
+
+      <section class="split">
+        <div class="card">
+          <div class="section-title"><h2>Current Subscription</h2><span>Plan structure</span></div>
+          <div class="price-box">
+            <strong>Estimated monthly total</strong>
+            <div class="big">$747</div>
+            <p>$349 base system plus active monthly upgrades. Voice overage and premium minute surcharges only apply if usage requires them.</p>
+          </div>
+          <div class="list" style="margin-top:12px;">
+            <div class="line"><div class="line-top"><strong>Base System</strong><span>$349/mo</span></div><p>Advanced AI call system, low-latency standard voice, built-in dashboard, built-in CRM, summaries, recordings, notifications, reports, and 1000 included standard-voice minutes.</p></div>
+            <div class="line"><div class="line-top"><strong>Scheduling Add-On</strong><span>$149/mo</span></div><p>Service and sales booking, reminders, client confirmations, and booking workflow support.</p></div>
+            <div class="line"><div class="line-top"><strong>Additional Language Pack</strong><span>$99/mo</span></div><p>Expanded multilingual handling beyond the default language setup.</p></div>
+            <div class="line"><div class="line-top"><strong>External CRM Integration</strong><span>$149/mo</span></div><p>Syncs leads, client records, notes, and outcomes with the external CRM selected by the customer.</p></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title"><h2>Usage & Status</h2><span>Live cycle</span></div>
+          <div class="mini-list">
+            <div class="mini-item"><strong>Minute usage</strong><p>624 of 1000 included standard-voice minutes used so far this cycle.</p><div class="bar"><div class="fill" style="width:62.4%"></div></div></div>
+            <div class="mini-item"><strong>Luxury package option</strong><p>Not active for this account. If selected, the base package becomes $499/month with 1000 included luxury voice minutes and $0.45/min after included usage.</p><div class="tag-row"><span class="tag blue">Inactive</span></div></div>
+            <div class="mini-item"><strong>Payment status</strong><p>Stripe subscription is active and current. No failed charges in the last three billing periods.</p><div class="tag-row"><span class="tag green">Current</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-title"><h2>Invoices</h2><span>Recent history</span></div>
+        <div class="table">
+          <div class="row">
+            <div class="row-main"><div>April 2026 Invoice</div><div>$747</div><div>Paid Apr 1</div><div><span class="tag green">Paid</span></div></div>
+            <div class="row-sub">Base system plus Scheduling, Language Pack, and External CRM Integration. No overage charges this cycle.</div>
+          </div>
+          <div class="row">
+            <div class="row-main"><div>March 2026 Invoice</div><div>$747</div><div>Paid Mar 1</div><div><span class="tag green">Paid</span></div></div>
+            <div class="row-sub">Flat monthly total with usage remaining under the included 1000-minute threshold.</div>
+          </div>
+          <div class="row">
+            <div class="row-main"><div>February 2026 Invoice</div><div>$771</div><div>Paid Feb 1</div><div><span class="tag orange">Included Overage</span></div></div>
+            <div class="row-sub">80 overage minutes were charged at $0.30/min after the account exceeded the included base allowance.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div></div></div>
+  <script src="billing-config.js"></script>
+  <script src="billing-client.js"></script>
+  <script>
+    window.AICallPortBilling.initBillingPage();
+  </script>
+  <script src="ai-assistant.js"></script>
+</body>
+</html>
