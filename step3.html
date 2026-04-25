@@ -3,1007 +3,819 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Call Port — Step 3</title>
+  <title>AI Call Port | Step 3</title>
   <meta
     name="description"
-    content="Test your configured AI call system live, see the dashboard respond in real time, and activate your setup."
+    content="Step 3 of AI Call Port guided setup. Run the live test, preview the dashboard, and activate when ready."
   />
   <style>
-    :root{
-      --bg-main:#05070b;
-      --bg-shell:#080b11;
-      --bg-card:#0d1118;
-      --bg-soft:#0a1019;
+    :root {
+      --bg: #08131f;
+      --text: #eaf2fb;
+      --muted: #a8b6c8;
+      --line: rgba(255,255,255,0.12);
+      --line-soft: rgba(255,255,255,0.08);
 
-      --text-primary:#ffffff;
-      --text-secondary:#d7e0ea;
-      --text-muted:#91a0b5;
+      --brand: #4ea5ff;
+      --brand-2: #7fd4ff;
 
-      --blue:#3b82f6;
-      --blue-soft:#67d4ff;
-      --orange:#f97316;
-      --orange-soft:#fb923c;
-      --gold:#ffbf2f;
+      --cta-1: #ff8a3d;
+      --cta-2: #ffb36b;
+      --cta-shadow: rgba(255,138,61,0.24);
 
-      --border:rgba(255,255,255,.08);
-      --border-soft:rgba(255,255,255,.06);
+      --highlight: #ffb36b;
+      --success: #7fe0ad;
+      --success-soft: rgba(127,224,173,0.14);
+
+      --shadow: 0 20px 50px rgba(0,0,0,0.35);
+      --radius: 24px;
+      --max: 1180px;
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-
-    body{
-      margin:0;
-      color:var(--text-primary);
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:linear-gradient(180deg,#05070b 0%, #04060a 100%);
-      position:relative;
-      overflow-x:hidden;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 18% 22%, rgba(59,130,246,.06), transparent 28%),
-        radial-gradient(circle at 82% 78%, rgba(249,115,22,.06), transparent 32%);
-      z-index:0;
+        radial-gradient(circle at top left, rgba(78,165,255,0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(255,138,61,0.10), transparent 26%),
+        linear-gradient(180deg, #09131f 0%, #07111a 100%);
+      color: var(--text);
+      line-height: 1.55;
     }
 
-    .grid-bg{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      opacity:.08;
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .container {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(7, 17, 26, 0.74);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 78px;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-image {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 0 10px rgba(255,138,61,0.18));
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .nav-note,
+    .eyebrow,
+    .step-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .nav-note,
+    .step-chip {
+      color: var(--brand-2);
+    }
+
+    .eyebrow {
+      color: var(--highlight);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      min-height: 32px;
+      padding: 0 12px;
+    }
+
+    .page {
+      padding: 38px 0 64px;
+    }
+
+    .hero {
+      max-width: 860px;
+      margin: 0 auto 28px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 18px 0 0;
+      font-size: clamp(2.3rem, 5vw, 4.2rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      margin: 16px auto 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.3vw, 1.12rem);
+    }
+
+    .blue-accent { color: var(--brand-2); }
+    .orange-accent { color: var(--highlight); }
+
+    .shell {
+      width: min(900px, 100%);
+      margin: 0 auto;
+      border-radius: 30px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.035));
+      box-shadow: var(--shadow);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
       background:
-        linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
-      background-size:42px 42px;
-      mask-image:radial-gradient(circle at center, black 42%, transparent 96%);
-      z-index:0;
+        radial-gradient(300px circle at 10% 0%, rgba(78,165,255,0.08), transparent 50%),
+        radial-gradient(300px circle at 90% 0%, rgba(255,138,61,0.07), transparent 50%);
     }
 
-    .page{
-      position:relative;
-      z-index:1;
-      min-height:100vh;
-      padding:18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    .shell > * {
+      position: relative;
+      z-index: 1;
     }
 
-    .shell{
-      width:min(1180px, calc(100vw - 36px));
-      min-height:min(92vh, 960px);
-      border-radius:30px;
-      border:1px solid rgba(255,255,255,.10);
-      background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));
-      box-shadow:
-        0 36px 100px rgba(0,0,0,.58),
-        inset 0 1px 0 rgba(255,255,255,.04);
-      overflow:hidden;
-      position:relative;
+    .shell-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
     }
 
-    .shell::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
+    .progress-line {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+      box-shadow: 0 0 18px rgba(127,212,255,0.22);
+    }
+
+    .main-card {
+      margin-top: 22px;
+      border-radius: 24px;
+      border: 1px solid var(--line-soft);
+      background: rgba(255,255,255,0.03);
+      padding: 22px;
+    }
+
+    .main-card {
+      background: linear-gradient(180deg, rgba(127,212,255,0.05), rgba(255,255,255,0.03));
+    }
+    .state-box{
+      background:linear-gradient(180deg, rgba(249,115,22,.10), rgba(255,255,255,.03));
+      border-color:rgba(249,115,22,.18);
+    }
+    .final-actions{
+      background:linear-gradient(180deg, rgba(167,139,250,.10), rgba(255,255,255,.03));
+      border:1px solid rgba(167,139,250,.18);
+    }
+    .modal{
       background:
-        radial-gradient(360px circle at 50% 0%, rgba(249,115,22,.04), transparent 56%),
-        radial-gradient(420px circle at 12% 10%, rgba(59,130,246,.04), transparent 52%);
-      z-index:0;
+        radial-gradient(circle at top right, rgba(27,150,154,.12), transparent 34%),
+        linear-gradient(180deg, rgba(103,212,255,.08), rgba(255,255,255,.03));
+      border-color:rgba(103,212,255,.18);
     }
 
-    .inner{
-      position:relative;
-      z-index:1;
-      padding:18px 20px 24px;
-      min-height:min(92vh, 960px);
-      display:grid;
-      grid-template-rows:auto auto 1fr auto;
-      gap:18px;
+    .card-title {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      line-height: 1.06;
+      letter-spacing: -0.05em;
+      color: #fff;
     }
 
-    .topbar{
-      position:relative;
-      min-height:66px;
-      padding:10px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
+    .card-copy {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      font-weight: 600;
+      max-width: 700px;
     }
 
-    .topbar::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius:18px;
+    .status-row {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(127,212,255,0.20);
+      background: rgba(127,212,255,0.10);
+      color: #dff5ff;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .status-pill.orange {
+      border-color: rgba(255,138,61,0.22);
+      background: rgba(255,138,61,0.12);
+      color: #ffc48e;
+    }
+
+    .status-pill.green {
+      border-color: rgba(127,224,173,0.20);
+      background: rgba(127,224,173,0.10);
+      color: #bff5d4;
+    }
+
+    .timer {
+      font-size: 2.7rem;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .progress-shell {
+      margin-top: 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.04);
+      padding: 4px;
+    }
+
+    .test-progress {
+      height: 10px;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--brand), var(--brand-2), var(--cta-2));
+      box-shadow: 0 0 18px rgba(127,212,255,0.22);
+      transition: width .2s linear;
+    }
+
+    .action-row {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      min-height: 52px;
+      padding: 0 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(127,212,255,0.14);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: rgba(78,165,255,0.08);
+      border-color: rgba(127,212,255,0.32);
+      box-shadow: 0 0 0 1px rgba(127,212,255,0.08), 0 10px 24px rgba(78,165,255,0.10);
+    }
+
+    .btn.primary {
+      border: none;
+      background: linear-gradient(135deg, var(--cta-1), var(--cta-2));
+      color: white;
+      box-shadow: 0 14px 28px var(--cta-shadow);
+    }
+
+    .btn.primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 30px var(--cta-shadow);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .helper-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 600;
+    }
+
+    .state-box {
+      margin-top: 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      padding: 18px;
+    }
+
+    .state-box strong {
+      display: block;
+      font-size: 18px;
+      line-height: 1.2;
+      color: #fff;
+      letter-spacing: -0.03em;
+    }
+
+    .state-box p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      font-weight: 600;
+    }
+
+    .final-actions {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .final-actions-copy {
+      flex: 1 1 280px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      font-weight: 600;
+      max-width: 460px;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(4, 8, 14, 0.74);
+      backdrop-filter: blur(16px);
+    }
+
+    .overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(1380px, 100%);
+      border-radius: 28px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(12,19,29,0.98), rgba(8,13,22,0.98));
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modal::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
       background:
-        linear-gradient(
-          90deg,
-          rgba(59,130,246,.04),
-          rgba(0,0,0,.92) 22%,
-          rgba(0,0,0,.92) 78%,
-          rgba(249,115,22,.04)
-        );
-      pointer-events:none;
+        radial-gradient(420px circle at 0% 0%, rgba(78,165,255,0.10), transparent 46%),
+        radial-gradient(420px circle at 100% 0%, rgba(255,138,61,0.08), transparent 42%);
     }
 
-    .topbar > *{ position:relative; z-index:1; }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
+    .modal > * {
+      position: relative;
+      z-index: 1;
     }
 
-    .logo-wrap{
-      width:62px;
-      height:62px;
-      min-width:62px;
-      min-height:62px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex:0 0 62px;
+    .modal-top {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
     }
 
-    .logo{
-      width:54px;
-      height:54px;
-      object-fit:contain;
-      display:block;
-      filter:drop-shadow(0 0 8px rgba(249,115,22,.22));
-      animation:logoGlow 3s ease-in-out infinite;
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .brand-stack{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
+    .modal h3 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      line-height: 1.04;
+      letter-spacing: -0.05em;
+      color: #fff;
     }
 
-    .brand-wordmark{
-      display:flex;
-      align-items:flex-end;
-      gap:6px;
-      line-height:1;
+    .modal p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      font-weight: 600;
+      max-width: 760px;
     }
 
-    .brand-ai{
-      font-size:14px;
-      font-weight:900;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-      background:linear-gradient(180deg, var(--blue-soft), var(--blue));
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
+    .close-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
     }
 
-    .brand-callport{
-      font-size:14px;
-      font-weight:900;
-      letter-spacing:.02em;
-      text-transform:uppercase;
-      background:linear-gradient(180deg, var(--gold), var(--orange));
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
+    .dashboard-frame-wrap {
+      margin-top: 20px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+      background: rgba(255,255,255,0.03);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
 
-    .beta-badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      height:20px;
-      padding:0 8px;
-      border-radius:999px;
-      border:1px solid rgba(249,115,22,.24);
-      background:rgba(249,115,22,.10);
-      color:#fff;
-      font-size:9px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
+    .dashboard-frame {
+      display: block;
+      width: 100%;
+      height: min(82vh, 900px);
+      border: 0;
+      background: #05070b;
     }
 
-    .progress-chip{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:118px;
-      height:30px;
-      padding:0 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.08);
-      color:var(--blue-soft);
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      white-space:nowrap;
-    }
-
-    .hero{
-      text-align:center;
-      max-width:860px;
-      margin:0 auto;
-    }
-
-    .hero-title{
-      margin:0;
-      font-size:clamp(26px,4vw,46px);
-      line-height:1.04;
-      font-weight:800;
-      letter-spacing:-.05em;
-      color:#fff;
-      text-wrap:balance;
-    }
-
-    .hero-sub{
-      margin:12px auto 0;
-      max-width:780px;
-      font-size:clamp(15px,1.35vw,18px);
-      line-height:1.5;
-      color:var(--blue-soft);
-      font-weight:700;
-      text-wrap:balance;
-    }
-
-    .content{
-      display:grid;
-      grid-template-columns:1fr 1.08fr;
-      gap:18px;
-      min-height:0;
-      align-items:start;
-    }
-
-    .panel{
-      border-radius:28px;
-      border:1px solid var(--border-soft);
-      background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.03),
-        0 22px 60px rgba(0,0,0,.32);
-      padding:24px;
-      position:relative;
-      overflow:hidden;
-      min-height:100%;
-    }
-
-    .panel.orange{
-      background:linear-gradient(180deg, rgba(249,115,22,.08), rgba(255,255,255,.02));
-      border-color:rgba(249,115,22,.15);
-    }
-
-    .panel::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(260px circle at 80% 0%, rgba(249,115,22,.05), transparent 48%),
-        radial-gradient(260px circle at 10% 0%, rgba(59,130,246,.05), transparent 48%);
-    }
-
-    .panel > *{ position:relative; z-index:1; }
-
-    .panel-kicker{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:88px;
-      height:30px;
-      padding:0 12px;
-      border-radius:999px;
-      background:rgba(103,212,255,.10);
-      border:1px solid rgba(103,212,255,.20);
-      color:var(--blue-soft);
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      margin-bottom:16px;
-    }
-
-    .panel.orange .panel-kicker{
-      background:rgba(249,115,22,.12);
-      border-color:rgba(249,115,22,.24);
-      color:var(--orange-soft);
-    }
-
-    .panel-title{
-      margin:0;
-      font-size:clamp(24px,3.1vw,34px);
-      line-height:1.06;
-      font-weight:800;
-      letter-spacing:-.05em;
-      color:#fff;
-      text-wrap:balance;
-    }
-
-    .panel-copy{
-      margin:12px 0 0;
-      font-size:15px;
-      line-height:1.55;
-      color:var(--text-secondary);
-      font-weight:600;
-    }
-
-    .status-card{
-      margin-top:18px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(255,255,255,.03);
-      padding:16px;
-      display:grid;
-      gap:8px;
-    }
-
-    .status-label{
-      font-size:10px;
-      line-height:1.2;
-      color:var(--text-muted);
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-    }
-
-    .status-value{
-      font-size:20px;
-      line-height:1.2;
-      color:#fff;
-      font-weight:800;
-      letter-spacing:-.03em;
-    }
-
-    .status-help{
-      color:var(--text-secondary);
-      font-size:14px;
-      line-height:1.5;
-      font-weight:600;
-    }
-
-    .test-number{
-      margin-top:18px;
-      border-radius:22px;
-      border:1px solid rgba(249,115,22,.18);
-      background:rgba(249,115,22,.08);
-      padding:18px;
-      text-align:center;
-    }
-
-    .test-number-label{
-      font-size:10px;
-      line-height:1.2;
-      color:#ffd7b5;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-    }
-
-    .test-number-value{
-      margin-top:10px;
-      font-size:34px;
-      line-height:1;
-      color:#fff;
-      font-weight:900;
-      letter-spacing:-.04em;
-    }
-
-    .prompt-list{
-      margin-top:18px;
-      display:grid;
-      gap:10px;
-    }
-
-    .prompt{
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(255,255,255,.03);
-      padding:14px;
-      color:#edf5ff;
-      font-size:14px;
-      line-height:1.5;
-      font-weight:600;
-    }
-
-    .prompt strong{
-      color:#fff;
-    }
-
-    .button-row{
-      margin-top:20px;
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .action-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:180px;
-      height:48px;
-      padding:0 16px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.03);
-      color:#dbe6f1;
-      text-decoration:none;
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      cursor:pointer;
-      transition:.18s ease;
-    }
-
-    .action-btn:hover{
-      transform:translateY(-2px);
-      background:rgba(59,130,246,.08);
-      border-color:rgba(59,130,246,.30);
-    }
-
-    .action-btn.primary{
-      border:none;
-      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
-      color:#fff;
-      box-shadow:0 10px 30px rgba(249,115,22,.28);
-    }
-
-    .action-btn.primary:hover{
-      filter:brightness(1.04);
-      box-shadow:0 15px 40px rgba(249,115,22,.42);
-    }
-
-    .listen-list{
-      list-style:none;
-      margin:18px 0 0;
-      padding:0;
-      display:grid;
-      gap:10px;
-    }
-
-    .listen-list li{
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(255,255,255,.03);
-      padding:14px 14px 14px 40px;
-      position:relative;
-      color:var(--text-secondary);
-      font-size:14px;
-      line-height:1.5;
-      font-weight:600;
-    }
-
-    .listen-list li::before{
-      content:"";
-      position:absolute;
-      left:15px;
-      top:18px;
-      width:10px;
-      height:10px;
-      border-radius:999px;
-      background:var(--blue-soft);
-      box-shadow:0 0 12px rgba(103,212,255,.28);
-    }
-
-    .chip-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:18px;
-    }
-
-    .chip{
-      min-height:34px;
-      padding:0 14px;
-      border-radius:999px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.03);
-      color:#dbe6f1;
-      font-size:11px;
-      font-weight:800;
-      letter-spacing:.05em;
-      text-transform:uppercase;
-      text-align:center;
-    }
-
-    .dashboard-grid{
-      margin-top:18px;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-
-    .dash-card{
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(255,255,255,.03);
-      padding:14px;
-      min-height:112px;
-    }
-
-    .dash-label{
-      font-size:10px;
-      line-height:1.2;
-      color:var(--text-muted);
-      font-weight:900;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-    }
-
-    .dash-value{
-      margin-top:10px;
-      color:#fff;
-      font-size:15px;
-      line-height:1.45;
-      font-weight:700;
-      text-wrap:balance;
-    }
-
-    .dash-value.blue{
-      color:var(--blue-soft);
-    }
-
-    .results-strip{
-      margin-top:18px;
-      display:grid;
-      gap:10px;
-    }
-
-    .result-item{
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(255,255,255,.03);
-      padding:14px;
-      color:var(--text-secondary);
-      font-size:14px;
-      line-height:1.5;
-      font-weight:600;
-    }
-
-    .result-item strong{
-      color:#fff;
-    }
-
-    .activation{
-      margin-top:18px;
-      border-radius:20px;
-      border:1px solid rgba(249,115,22,.18);
-      background:rgba(249,115,22,.08);
-      padding:18px;
-    }
-
-    .activation-title{
-      margin:0;
-      font-size:22px;
-      line-height:1.1;
-      color:#fff;
-      font-weight:800;
-      letter-spacing:-.03em;
-    }
-
-    .activation-copy{
-      margin:10px 0 0;
-      color:#ffd7b5;
-      font-size:14px;
-      line-height:1.55;
-      font-weight:600;
-    }
-
-    .actions{
-      display:grid;
-      grid-template-columns:140px 1fr 240px;
-      align-items:center;
-      gap:14px;
-      padding-top:6px;
-    }
-
-    .back-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:flex-start;
-      border:none;
-      background:transparent;
-      color:var(--text-muted);
-      font-size:13px;
-      font-weight:700;
-      cursor:pointer;
-      padding:0;
-      transition:color .18s ease;
-    }
-
-    .back-btn:hover{ color:#fff; }
-
-    .progress-line{
-      height:8px;
-      border-radius:999px;
-      overflow:hidden;
-      background:#111827;
-      border:1px solid rgba(255,255,255,.05);
-    }
-
-    .progress-fill{
-      height:100%;
-      width:75%;
-      background:linear-gradient(90deg, var(--blue), var(--blue-soft));
-    }
-
-    .next-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:240px;
-      height:54px;
-      border:none;
-      border-radius:18px;
-      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
-      color:#fff;
-      font-size:13px;
-      font-weight:900;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      cursor:pointer;
-      box-shadow:0 10px 30px rgba(249,115,22,.28);
-      transition:.18s ease;
-      justify-self:end;
-      text-decoration:none;
-    }
-
-    .next-btn:hover{
-      transform:translateY(-2px);
-      filter:brightness(1.04);
-      box-shadow:0 15px 40px rgba(249,115,22,.42);
-    }
-
-    @keyframes logoGlow{
-      0%,100%{ filter:drop-shadow(0 0 8px rgba(249,115,22,.20)); }
-      50%{ filter:drop-shadow(0 0 16px rgba(249,115,22,.36)); }
-    }
-
-    @media (max-width:920px){
-      .content{
-        grid-template-columns:1fr;
+    @media (max-width: 760px) {
+      .nav-links { display: none; }
+      .page { padding: 24px 0 52px; }
+      .shell,
+      .modal {
+        padding: 18px;
+        border-radius: 24px;
       }
-    }
-
-    @media (max-width:720px){
-      .page{
-        padding:10px;
-        align-items:flex-start;
+      .modal-top {
+        flex-direction: column;
       }
-
-      .shell{
-        width:calc(100vw - 20px);
-        min-height:calc(100vh - 20px);
-        border-radius:24px;
+      .status-row {
+        align-items: flex-start;
       }
-
-      .inner{
-        padding:12px 12px 20px;
-        min-height:calc(100vh - 20px);
+      .timer {
+        font-size: 2.2rem;
       }
-
-      .topbar{
-        padding:12px;
-        gap:10px;
-        flex-wrap:wrap;
+      .btn {
+        width: 100%;
       }
-
-      .topbar::before{
-        border-radius:16px;
+      .action-row {
+        flex-direction: column;
       }
-
-      .logo-wrap{
-        width:50px;
-        height:50px;
-        min-width:50px;
-        min-height:50px;
-        flex:0 0 50px;
+      .final-actions {
+        flex-direction: column;
+        align-items: stretch;
       }
-
-      .logo{
-        width:42px;
-        height:42px;
+      .dashboard-frame {
+        height: 78vh;
       }
-
-      .brand-ai,
-      .brand-callport{
-        font-size:12px;
-      }
-
-      .beta-badge{
-        font-size:8px;
-        height:18px;
-      }
-
-      .progress-chip{
-        font-size:9px;
-        height:28px;
-      }
-
-      .hero-title{
-        font-size:clamp(22px,7vw,30px);
-      }
-
-      .hero-sub{
-        font-size:14px;
-      }
-
-      .panel{
-        border-radius:22px;
-        padding:20px 16px;
-      }
-
-      .dashboard-grid{
-        grid-template-columns:1fr;
-      }
-
-      .button-row{
-        flex-direction:column;
-      }
-
-      .action-btn{
-        width:100%;
-        min-width:unset;
-      }
-
-      .actions{
-        grid-template-columns:1fr;
-        gap:12px;
-      }
-
-      .next-btn{
-        width:100%;
-        min-width:unset;
-        justify-self:stretch;
-      }
-
-      .back-btn{ order:2; }
-      .progress-line{ order:1; }
-      .next-btn{ order:3; }
     }
   </style>
 </head>
 <body>
-  <div class="grid-bg"></div>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="logo">
+        <img src="public/assets/images/ai-call-port-logo.png" alt="AI Call Port Logo" class="logo-image" />
+        <span>AI Call Port</span>
+      </a>
 
-  <div class="page">
-    <div class="shell">
-      <div class="inner">
+      <nav class="nav-links">
+        <a href="index.html#how-it-works">How it works</a>
+        <a href="index.html#system">System</a>
+        <a href="index.html#pricing">Pricing</a>
+        <a href="index.html#activation">Activation</a>
+        <a href="guides.html">Guides</a>
+      </nav>
 
-        <div class="topbar">
-          <div class="brand">
-            <div class="logo-wrap">
-              <img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo">
-            </div>
-            <div class="brand-stack">
-              <div class="brand-wordmark">
-                <span class="brand-ai">AI</span>
-                <span class="brand-callport">CALL PORT</span>
-              </div>
-              <div class="beta-badge">Beta</div>
-            </div>
-          </div>
+      <div class="nav-note">Step 3 of 3 • Live Test + Activation</div>
+    </div>
+  </header>
 
-          <div class="progress-chip">Step 3 of 4</div>
+  <main class="page">
+    <div class="container">
+      <section class="hero">
+        <span class="eyebrow">Live Test + Activation</span>
+        <h1>Test your system before activation</h1>
+        <p>Run the live test, preview the dashboard, and activate only after the experience feels right for your business.</p>
+      </section>
+
+      <section class="shell">
+        <div class="shell-top">
+          <div class="step-chip">Step 3 of 3</div>
+          <div class="step-chip">Final Step</div>
         </div>
 
-        <section class="hero">
-          <h1 class="hero-title">Test your system live</h1>
-          <div class="hero-sub">Run a live test and see how your configured dashboard responds in real time.</div>
-        </section>
+        <div class="progress-line">
+          <div class="progress-fill"></div>
+        </div>
 
-        <section class="content">
-          <div class="panel orange">
-            <div class="panel-kicker">Live Call Test</div>
-            <h2 class="panel-title">Call the system and hear it respond</h2>
-            <p class="panel-copy">Use the test number below and try a realistic customer request. The right side already reflects your configuration and will update as the test progresses.</p>
+        <section class="main-card">
+          <h2 class="card-title">Run the live test</h2>
+          <p class="card-copy">The live test includes 3 minutes total. Your business can stop the call at any time, preview the dashboard, and use the remaining time on another test call before activation.</p>
 
-            <div class="status-card">
-              <div class="status-label">Call status</div>
-              <div class="status-value" id="callStatus">Waiting for test call</div>
-              <div class="status-help" id="callHelp">Start the simulation below or place a real test call to hear how your configured system behaves.</div>
+          <div class="status-row">
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <span class="status-pill" id="marketPill">Active Market</span>
+              <span class="status-pill green">3-Minute Test</span>
+              <span class="status-pill orange">Pre-Activation</span>
             </div>
-
-            <div class="test-number">
-              <div class="test-number-label">Test Number</div>
-              <div class="test-number-value">(888) 240-0199</div>
-            </div>
-
-            <div class="prompt-list">
-              <div class="prompt"><strong>Try:</strong> “I want to book an appointment for tomorrow.”</div>
-              <div class="prompt"><strong>Try:</strong> “I need urgent help today.”</div>
-              <div class="prompt"><strong>Try:</strong> “Can I get a quote for this job?”</div>
-            </div>
-
-            <div class="button-row">
-              <button class="action-btn" type="button" data-sim="booking">Simulate booking call</button>
-              <button class="action-btn" type="button" data-sim="urgent">Simulate urgent call</button>
-              <button class="action-btn" type="button" data-sim="quote">Simulate quote call</button>
-            </div>
-
-            <ul class="listen-list">
-              <li>Listen for the right greeting and brand tone.</li>
-              <li>Make sure the AI understands the caller’s intent quickly.</li>
-              <li>Check whether routing, booking, or urgency handling matches your workflow.</li>
-              <li>Confirm the dashboard reflects the same interaction clearly.</li>
-            </ul>
+            <div class="timer" id="timer">03:00</div>
           </div>
 
-          <div class="panel">
-            <div class="panel-kicker">Configured Dashboard</div>
-            <h2 class="panel-title">Your live dashboard preview</h2>
-            <p class="panel-copy">This dashboard already reflects the setup from Steps 1 and 2. During the test it updates with intent, actions, and operational next steps.</p>
+          <div class="progress-shell">
+            <div class="test-progress" id="testProgress"></div>
+          </div>
 
-            <div class="chip-row" id="configChips"></div>
+          <div class="helper-note" id="testMessage">Your business can start the live test when ready. The 3-minute demo time can be used across more than one test call before activation.</div>
 
-            <div class="dashboard-grid">
-              <div class="dash-card">
-                <div class="dash-label">Call summary</div>
-                <div class="dash-value" id="summaryValue">No test call yet. Run a simulation to generate a live summary.</div>
-              </div>
-              <div class="dash-card">
-                <div class="dash-label">Detected intent</div>
-                <div class="dash-value blue" id="intentValue">Waiting for input</div>
-              </div>
-              <div class="dash-card">
-                <div class="dash-label">Priority</div>
-                <div class="dash-value" id="priorityValue">Standard</div>
-              </div>
-              <div class="dash-card">
-                <div class="dash-label">Action triggered</div>
-                <div class="dash-value" id="actionValue">No action triggered yet</div>
-              </div>
-              <div class="dash-card">
-                <div class="dash-label">CRM / Internal update</div>
-                <div class="dash-value" id="crmValue">System ready to log the next interaction</div>
-              </div>
-              <div class="dash-card">
-                <div class="dash-label">Language</div>
-                <div class="dash-value" id="languageValue">—</div>
-              </div>
-            </div>
+          <div class="action-row">
+            <button type="button" class="btn primary" id="startTestBtn">Start Live Test</button>
+            <button type="button" class="btn" id="endTestBtn" disabled>End Test Early</button>
+          </div>
 
-            <div class="results-strip">
-              <div class="result-item"><strong>Industry:</strong> <span id="industryValue">—</span></div>
-              <div class="result-item"><strong>Business model:</strong> <span id="businessModelValue">—</span></div>
-              <div class="result-item"><strong>Workflow needs:</strong> <span id="workflowValue">—</span></div>
-            </div>
+          <div class="state-box" id="testStateBox">
+            <strong>Activation is still locked</strong>
+            <p>Start the live test first. Your business can stop at any time, preview the dashboard, and use the remaining demo time on another call if needed.</p>
+          </div>
 
-            <div class="activation">
-              <h3 class="activation-title">Ready to launch this setup?</h3>
-              <p class="activation-copy">If the test feels right, the next step can become activation and onboarding. You’ve already configured the system and reviewed pricing. This is the proof stage.</p>
+          <div class="final-actions">
+            <div class="final-actions-copy" id="activationCopy">Use the live test however your business needs it: stop early, preview the dashboard, and use any remaining demo time on another call before activation.</div>
+            <div class="action-row" style="margin-top:0;">
+              <button type="button" class="btn" id="openPreviewBtn" disabled>Dashboard Preview</button>
+              <button type="button" class="btn primary" id="activateBtn" disabled>Activate AI Call Port</button>
             </div>
           </div>
         </section>
+      </section>
+    </div>
+  </main>
 
-        <div class="actions">
-          <button class="back-btn" id="backBtn" type="button">← Back to Step 2</button>
-          <div class="progress-line">
-            <div class="progress-fill"></div>
-          </div>
-          <a class="next-btn" id="nextBtn" href="#">Activate Your System</a>
+  <div class="overlay" id="dashboardOverlay" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-top">
+        <div>
+          <h3>Dashboard preview</h3>
+          <p>This opens the real dashboard view so your business can see the full operational interface before activation.</p>
         </div>
-
+        <div class="modal-actions">
+          <button type="button" class="btn primary" id="activatePreviewBtn" disabled>Activate AI CALL port</button>
+          <button type="button" class="close-btn" id="closePreviewBtn" aria-label="Close dashboard preview">×</button>
+        </div>
+      </div>
+      <div class="dashboard-frame-wrap">
+        <iframe src="owner-dashboard.html" class="dashboard-frame" title="AI Call Port Owner Dashboard Preview"></iframe>
       </div>
     </div>
   </div>
 
+  <script src="billing-config.js"></script>
+  <script src="billing-client.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
+    const countryStatus = params.get("countryStatus") || "Active";
+    const country = params.get("country") || "selected market";
+    const companyName = params.get("companyName") || "your business";
 
-    const values = {
-      country: params.get("country") || "Not set",
-      countryStatus: params.get("countryStatus") || "Not set",
-      industry: params.get("industry") || "Not set",
-      industryCategory: params.get("industryCategory") || "",
-      businessModel: params.get("businessModel") || "Not set",
-      teamSize: params.get("teamSize") || "Not set",
-      schedulingMode: params.get("schedulingMode") || "Not set",
-      channels: params.get("channels") || "",
-      languages: params.get("languages") || "",
-      workflowNeeds: params.get("workflowNeeds") || ""
-    };
+    const marketPill = document.getElementById("marketPill");
+    const timer = document.getElementById("timer");
+    const testProgress = document.getElementById("testProgress");
+    const testMessage = document.getElementById("testMessage");
+    const testStateBox = document.getElementById("testStateBox");
+    const activationCopy = document.getElementById("activationCopy");
 
-    const parsed = {
-      channels: values.channels ? values.channels.split(",").map(v => v.trim()).filter(Boolean) : [],
-      languages: values.languages ? values.languages.split(",").map(v => v.trim()).filter(Boolean) : [],
-      workflowNeeds: values.workflowNeeds ? values.workflowNeeds.split(",").map(v => v.trim()).filter(Boolean) : []
-    };
+    const startTestBtn = document.getElementById("startTestBtn");
+    const endTestBtn = document.getElementById("endTestBtn");
+    const openPreviewBtn = document.getElementById("openPreviewBtn");
+    const activateBtn = document.getElementById("activateBtn");
 
-    function setText(id, text) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = text;
+    const dashboardOverlay = document.getElementById("dashboardOverlay");
+    const openPreviewBtnEl = document.getElementById("openPreviewBtn");
+    const closePreviewBtn = document.getElementById("closePreviewBtn");
+    const activatePreviewBtn = document.getElementById("activatePreviewBtn");
+
+    const totalDemoSeconds = 180;
+    let remainingSeconds = totalDemoSeconds;
+    let intervalId = null;
+    let hasUsedDemo = false;
+
+    function formatTime(seconds) {
+      const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
+      const secs = String(seconds % 60).padStart(2, "0");
+      return `${minutes}:${secs}`;
     }
 
-    setText("industryValue", values.industryCategory ? `${values.industry} • ${values.industryCategory}` : values.industry);
-    setText("businessModelValue", values.businessModel);
-    setText("workflowValue", parsed.workflowNeeds.length ? parsed.workflowNeeds.join(", ") : "Not set");
-    setText("languageValue", parsed.languages.length ? parsed.languages.join(", ") : "Not set");
-
-    const configChips = document.getElementById("configChips");
-    const chipValues = [
-      values.country,
-      values.industry,
-      values.businessModel,
-      values.schedulingMode,
-      ...(parsed.languages.length ? parsed.languages : []),
-      ...(parsed.workflowNeeds.slice(0, 2))
-    ].filter(Boolean);
-
-    configChips.innerHTML = chipValues.map(item => `<div class="chip">${item}</div>`).join("");
-
-    const simulations = {
-      booking: {
-        status: "Test call completed",
-        help: "The system handled a booking-style request and updated the dashboard with a next action.",
-        summary: "Caller requested an appointment for tomorrow and provided basic scheduling details.",
-        intent: "Booking request",
-        priority: "Standard",
-        action: "Appointment flow triggered",
-        crm: "Call summary logged and booking follow-up prepared"
-      },
-      urgent: {
-        status: "Urgent call completed",
-        help: "The system handled a high-priority request and reflected urgency in the dashboard.",
-        summary: "Caller needed urgent same-day help and requested immediate assistance.",
-        intent: "Urgent service request",
-        priority: "High",
-        action: "Urgent routing triggered",
-        crm: "Priority alert created and internal follow-up prepared"
-      },
-      quote: {
-        status: "Quote call completed",
-        help: "The system handled a lead-style quote request and prepared the next sales action.",
-        summary: "Caller asked for a quote and shared enough information to begin qualification.",
-        intent: "Quote / lead request",
-        priority: "Standard",
-        action: "Lead capture flow triggered",
-        crm: "Lead summary saved and follow-up action prepared"
+    function setMarketState() {
+      if (countryStatus === "Active") {
+        marketPill.textContent = `${country} Active`;
+        marketPill.className = "status-pill";
+      } else {
+        marketPill.textContent = `${countryStatus} Market`;
+        marketPill.className = "status-pill orange";
+        testStateBox.innerHTML = `<strong>Waitlist path only</strong><p>${companyName} can still use the live test in ${country}, stop at any time, and preview the dashboard, but final activation should become a waitlist request instead of immediate launch.</p>`;
+        activationCopy.textContent = `This business can use the live test and preview the dashboard in ${country}, then submit a waitlist activation request when ready.`;
       }
-    };
-
-    function applySimulation(type) {
-      const sim = simulations[type];
-      if (!sim) return;
-      setText("callStatus", sim.status);
-      setText("callHelp", sim.help);
-      setText("summaryValue", sim.summary);
-      setText("intentValue", sim.intent);
-      setText("priorityValue", sim.priority);
-      setText("actionValue", sim.action);
-      setText("crmValue", sim.crm);
     }
 
-    document.querySelectorAll("[data-sim]").forEach(btn => {
-      btn.addEventListener("click", () => applySimulation(btn.dataset.sim));
+    function updateProgress() {
+      timer.textContent = formatTime(remainingSeconds);
+      testProgress.style.width = `${((totalDemoSeconds - remainingSeconds) / totalDemoSeconds) * 100}%`;
+    }
+
+    function unlockPostTest() {
+      openPreviewBtn.disabled = false;
+      activateBtn.disabled = false;
+      activatePreviewBtn.disabled = false;
+
+      if (remainingSeconds <= 0) {
+        startTestBtn.disabled = true;
+        if (countryStatus === "Active") {
+          testStateBox.innerHTML = `<strong>Demo time completed</strong><p>The full 3-minute demo pool has been used. Your business can preview the dashboard and continue to activation.</p>`;
+        } else {
+          testStateBox.innerHTML = `<strong>Waitlist request ready</strong><p>The full demo pool has been used. Continue to submit the waitlist activation request for ${companyName} in ${country}.</p>`;
+        }
+      } else if (countryStatus === "Active") {
+        testStateBox.innerHTML = `<strong>Dashboard preview unlocked</strong><p>${formatTime(remainingSeconds)} of demo time remains. Your business can preview the dashboard now or start another test call with the remaining time.</p>`;
+      } else {
+        testStateBox.innerHTML = `<strong>Waitlist preview unlocked</strong><p>${formatTime(remainingSeconds)} of demo time remains. Your business can preview the dashboard now or use the remaining time on another test call before joining the waitlist.</p>`;
+      }
+    }
+    function finishTest(completed) {
+      clearInterval(intervalId);
+      intervalId = null;
+      endTestBtn.disabled = true;
+      hasUsedDemo = true;
+      unlockPostTest();
+      updateProgress();
+
+      if (completed) {
+        testMessage.textContent = "The full 3-minute demo pool has been used. Your business can now preview the dashboard and continue to activation.";
+      } else {
+        startTestBtn.disabled = remainingSeconds <= 0;
+        testMessage.textContent = `${formatTime(remainingSeconds)} of demo time remains. Your business can preview the dashboard now or start another test call when ready.`;
+      }
+    }
+
+    startTestBtn.addEventListener("click", () => {
+      if (intervalId || remainingSeconds <= 0) return;
+
+      hasUsedDemo = true;
+      openPreviewBtn.disabled = false;
+      activateBtn.disabled = false;
+      testMessage.textContent = "The live test is now running. Stop at any time, then use the remaining demo time on another call if needed.";
+
+      startTestBtn.disabled = true;
+      endTestBtn.disabled = false;
+
+      intervalId = setInterval(() => {
+        remainingSeconds -= 1;
+        updateProgress();
+
+        if (remainingSeconds <= 0) {
+          finishTest(true);
+        }
+      }, 1000);
     });
 
-    document.getElementById("backBtn").addEventListener("click", () => {
-      window.location.href = `step2.html?${params.toString()}`;
+    endTestBtn.addEventListener("click", () => {
+      if (!intervalId) return;
+      finishTest(false);
     });
 
-    document.getElementById("nextBtn").addEventListener("click", (e) => {
-      e.preventDefault();
-      const nextParams = new URLSearchParams(window.location.search);
-      window.location.href = `step4.html?${nextParams.toString()}`;
+    openPreviewBtnEl.addEventListener("click", () => {
+      if (openPreviewBtnEl.disabled) return;
+      dashboardOverlay.classList.add("open");
+      dashboardOverlay.setAttribute("aria-hidden", "false");
     });
+
+    closePreviewBtn.addEventListener("click", () => {
+      dashboardOverlay.classList.remove("open");
+      dashboardOverlay.setAttribute("aria-hidden", "true");
+    });
+
+    dashboardOverlay.addEventListener("click", (event) => {
+      if (event.target === dashboardOverlay) {
+        dashboardOverlay.classList.remove("open");
+        dashboardOverlay.setAttribute("aria-hidden", "true");
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        dashboardOverlay.classList.remove("open");
+        dashboardOverlay.setAttribute("aria-hidden", "true");
+      }
+    });
+
+    async function startActivationCheckout() {
+      if (!hasUsedDemo) return;
+
+      if (countryStatus === "Active") {
+        const originalLabel = activateBtn.textContent;
+        activateBtn.disabled = true;
+        activatePreviewBtn.disabled = true;
+        activateBtn.textContent = "Preparing Checkout...";
+        testMessage.textContent = "Creating your Stripe checkout session and saving the billing setup.";
+
+        try {
+          await window.AICallPortBilling.createCheckoutFromCurrentSetup();
+        } catch (error) {
+          activateBtn.disabled = false;
+          activatePreviewBtn.disabled = false;
+          activateBtn.textContent = originalLabel;
+          testMessage.textContent = `Activation could not start: ${error.message}`;
+        }
+      } else {
+        alert(`Next step: add ${companyName} to the ${country} waitlist and notify them when activation becomes available.`);
+      }
+    }
+
+    activateBtn.addEventListener("click", startActivationCheckout);
+
+    activatePreviewBtn.addEventListener("click", () => {
+      if (!hasUsedDemo) return;
+      startActivationCheckout();
+    });
+
+    setMarketState();
+    updateProgress();
+
+    if (params.get("checkoutCanceled") === "1") {
+      hasUsedDemo = true;
+      unlockPostTest();
+      testMessage.textContent = "Stripe checkout was canceled. Your live test progress is still saved, and you can restart activation anytime.";
+    }
   </script>
+  <script src="ai-assistant.js"></script>
 </body>
 </html>
