@@ -27,11 +27,11 @@
       --border:rgba(255,255,255,.10);
       --border-soft:rgba(255,255,255,.07);
       --shadow:0 36px 100px rgba(0,0,0,.46);
-      --workspace-panel-height:clamp(460px, calc(100vh - 250px), 700px);
+      --workspace-panel-height:clamp(380px, calc(100vh - 320px), 560px);
     }
 
     *{box-sizing:border-box}
-    html,body{margin:0;height:100%}
+    html,body{margin:0;height:100%;overflow:hidden}
 
     body{
       color:var(--text-primary);
@@ -40,7 +40,7 @@
         radial-gradient(circle at top left, rgba(78,165,255,.18), transparent 30%),
         radial-gradient(circle at top right, rgba(255,138,61,.10), transparent 26%),
         linear-gradient(180deg,#09131f 0%, #07111a 100%);
-      overflow-x:hidden;
+      overflow:hidden;
       position:relative;
     }
 
@@ -641,10 +641,12 @@
         radial-gradient(circle at top right, rgba(255,138,61,.06), transparent 30%);
       box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
       padding:18px;
-      min-height:780px;
+      min-height:0;
       height:100%;
       position:relative;
-      overflow:auto;
+      overflow:hidden;
+      display:grid;
+      align-content:stretch;
     }
 
     .workspace::before{
@@ -664,6 +666,9 @@
       grid-template-columns:minmax(0,1fr);
       gap:16px;
       align-items:start;
+      height:100%;
+      min-height:0;
+      overflow:hidden;
     }
 
     .workspace-content-layout.has-detail{
@@ -748,29 +753,71 @@
       overflow:hidden;
     }
 
-    .workspace-content-layout.has-detail .recommended-action-list .list,
-    .workspace-content-layout.has-detail .call-handling-list-card .list,
-    .workspace-content-layout.has-detail .recommended-actions-summary .metric-list,
-    .workspace-content-layout.has-detail .call-handling-summary-card .metric-list,
-    .workspace-content-layout.has-detail .request-list-card .list,
-    .workspace-content-layout.has-detail .request-summary-card .metric-list,
-    .workspace-content-layout.has-detail .communication-list-card .list,
-    .workspace-content-layout.has-detail .communication-summary-card .metric-list,
-    .workspace-content-layout.has-detail .billing-list-card .list,
-    .workspace-content-layout.has-detail .billing-summary-card .metric-list{
+    .recommended-action-list,
+    .recommended-actions-summary,
+    .call-handling-list-card,
+    .call-handling-summary-card,
+    .request-list-card,
+    .request-summary-card,
+    .communication-list-card,
+    .communication-summary-card{
+      height:var(--workspace-panel-height);
+      display:grid;
+      grid-template-rows:auto 1fr;
+      overflow:hidden;
+    }
+
+    .panel-scroll{
+      min-height:0;
+      overflow:auto;
+      padding-right:4px;
+      display:grid;
+      gap:12px;
+      align-content:start;
+    }
+
+    .workspace-content-layout.has-detail .recommended-action-list > .list,
+    .workspace-content-layout.has-detail .call-handling-list-card > .list,
+    .workspace-content-layout.has-detail .request-list-card > .list,
+    .workspace-content-layout.has-detail .communication-list-card > .list,
+    .workspace-content-layout.has-detail .billing-list-card > .list{
       min-height:0;
       overflow:auto;
       padding-right:4px;
       align-content:start;
     }
 
-    .workspace-content-layout.has-detail .recommended-actions-summary p,
-    .workspace-content-layout.has-detail .request-summary-card p,
-    .workspace-content-layout.has-detail .communication-summary-card p,
-    .workspace-content-layout.has-detail .billing-summary-card p{
-      margin-top:12px;
-      overflow:auto;
-      padding-right:4px;
+    .workspace-fixed-view{
+      display:grid;
+      gap:14px;
+      height:100%;
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .workspace-fixed-view.summary-view{
+      grid-template-rows:auto minmax(0,1fr);
+    }
+
+    .workspace-fixed-view.panel-only{
+      grid-template-rows:minmax(0,1fr);
+    }
+
+    .workspace-fixed-view .panel-grid{
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .scroll-card{
+      height:100%;
+      min-height:0;
+      display:grid;
+      grid-template-rows:auto 1fr;
+      overflow:hidden;
+    }
+
+    .scroll-card .panel-scroll{
+      margin-top:14px;
     }
 
     .workspace-content-layout.detail-requests{
@@ -2775,77 +2822,121 @@
         ],
         views: {
           Summary: `
-            <div class="kpi-row">
-              <div class="card kpi-card"><div class="label">Revenue At Risk</div><div class="value">$1,240</div><div class="meta">Quotes and bookings waiting on action</div></div>
-              <div class="card kpi-card"><div class="label">Bookings Today</div><div class="value">12</div><div class="meta">3 new bookings since 9am</div></div>
-              <div class="card kpi-card"><div class="label">Approvals Waiting</div><div class="value">4</div><div class="meta">Routing, discounts, and exceptions</div></div>
-              <div class="card kpi-card"><div class="label">Urgent Escalations</div><div class="value">3</div><div class="meta">Immediate owner review needed</div></div>
-            </div>
-            <div class="panel-grid cols-3">
-              <div class="card orange">
-                <h2>Critical Now</h2>
-                <div class="list">
-                  <div class="item urgent-item"><div class="item-top"><strong>Urgent plumbing request flagged for same-day dispatch</strong><span class="stamp urgent-stamp">2m ago</span></div><p>Intent detection switched the caller into emergency mode, created a dispatch task, and is waiting on owner confirmation for technician assignment.</p><div class="tag-row"><span class="tag red urgent-tag">Urgent</span><span class="tag orange">Owner Review</span><span class="tag blue">Emergency Route</span></div></div>
-                  <div class="item urgent-item"><div class="item-top"><strong>VIP quote callback window closes in 18 minutes</strong><span class="stamp urgent-stamp">18m left</span></div><p>High-value sales lead asked for an owner callback before lunch. Estimated opportunity value is $680.</p><div class="tag-row"><span class="tag red urgent-tag">Revenue Risk</span><span class="tag blue">Sales</span></div></div>
-                  <div class="item"><div class="item-top"><strong>Awaiting client confirmations</strong><span class="stamp">Today</span></div><p>6 bookings still need response. Two reminder messages were already sent automatically and one fallback text is queued.</p><div class="tag-row"><span class="tag orange">6 Pending</span><span class="tag blue">Scheduling</span></div></div>
-                </div>
+            <div class="workspace-fixed-view summary-view">
+              <div class="kpi-row">
+                <div class="card kpi-card"><div class="label">Revenue At Risk</div><div class="value">$1,240</div><div class="meta">Quotes and bookings waiting on action</div></div>
+                <div class="card kpi-card"><div class="label">Bookings Today</div><div class="value">12</div><div class="meta">3 new bookings since 9am</div></div>
+                <div class="card kpi-card"><div class="label">Approvals Waiting</div><div class="value">4</div><div class="meta">Routing, discounts, and exceptions</div></div>
+                <div class="card kpi-card"><div class="label">Urgent Escalations</div><div class="value">3</div><div class="meta">Immediate owner review needed</div></div>
               </div>
-              <div class="card blue">
-                <h2>Money & Schedule Pressure</h2>
-                <div class="list">
-                  <div class="item"><strong>Booked value still open today</strong><p>$1,145 is on today’s schedule, with $365 still waiting on client or staff confirmation before it is fully protected.</p><div class="tag-row"><span class="tag blue">Booked Value</span><span class="tag orange">Needs Protection</span></div></div>
-                  <div class="item"><strong>After-hours leads ready for close attempt</strong><p>3 intent-qualified calls from last night were routed into the morning callback queue with sales behavior already selected.</p><div class="tag-row"><span class="tag green">Qualified</span><span class="tag blue">Follow-Up</span></div></div>
-                  <div class="item"><strong>Technician capacity tightening after 3 PM</strong><p>Only one same-day service window is still open once the leak inspection consultation is confirmed.</p><div class="tag-row"><span class="tag orange">Capacity Watch</span></div></div>
+              <div class="panel-grid cols-3">
+                <div class="card orange scroll-card">
+                  <h2>Critical Now</h2>
+                  <div class="panel-scroll">
+                    <div class="list">
+                      <div class="item urgent-item"><div class="item-top"><strong>Urgent plumbing request flagged for same-day dispatch</strong><span class="stamp urgent-stamp">2m ago</span></div><p>Intent detection switched the caller into emergency mode, created a dispatch task, and is waiting on owner confirmation for technician assignment.</p><div class="tag-row"><span class="tag red urgent-tag">Urgent</span><span class="tag orange">Owner Review</span><span class="tag blue">Emergency Route</span></div></div>
+                      <div class="item urgent-item"><div class="item-top"><strong>VIP quote callback window closes in 18 minutes</strong><span class="stamp urgent-stamp">18m left</span></div><p>High-value sales lead asked for an owner callback before lunch. Estimated opportunity value is $680.</p><div class="tag-row"><span class="tag red urgent-tag">Revenue Risk</span><span class="tag blue">Sales</span></div></div>
+                      <div class="item"><div class="item-top"><strong>Awaiting client confirmations</strong><span class="stamp">Today</span></div><p>6 bookings still need response. Two reminder messages were already sent automatically and one fallback text is queued.</p><div class="tag-row"><span class="tag orange">6 Pending</span><span class="tag blue">Scheduling</span></div></div>
+                      <div class="item"><div class="item-top"><strong>Owner callback promised before noon</strong><span class="stamp">11:40 AM</span></div><p>The quote request is still open and the customer specifically asked for a callback before lunch.</p><div class="tag-row"><span class="tag blue">Sales</span><span class="tag orange">Follow-Up</span></div></div>
+                      <div class="item"><div class="item-top"><strong>Invoice release blocked by parts note</strong><span class="stamp">Billing</span></div><p>Billing closeout is paused until the replacement-valve approval note is reviewed inside the service record.</p><div class="tag-row"><span class="tag orange">Billing Hold</span><span class="tag blue">Owner Note</span></div></div>
+                      <div class="item"><div class="item-top"><strong>Complaint follow-up still unresolved</strong><span class="stamp">Escalation</span></div><p>The reopened complaint thread is still waiting on a final reply owner before the communication board can clear it.</p><div class="tag-row"><span class="tag red urgent-tag">Escalation</span><span class="tag blue">Communication</span></div></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="card teal">
-                <h2>Owner Decisions</h2>
-                <div class="list">
-                  <div class="item action-item"><strong>Approve dispatch assignment</strong><p>Urgent request is routed correctly and only needs final technician approval to go live.</p></div>
-                  <div class="item action-item"><strong>Review billing carry-over choices</strong><p>3 upgrades are marked to stay active after month one and 2 are currently set to switch off.</p></div>
-                  <div class="item action-item"><strong>Open communication escalations</strong><p>3 owner-visible conversations need a reply, approval, or direct intervention.</p></div>
+                <div class="card blue scroll-card">
+                  <h2>Money & Schedule Pressure</h2>
+                  <div class="panel-scroll">
+                    <div class="list">
+                      <div class="item"><strong>Booked value still open today</strong><p>$1,145 is on today’s schedule, with $365 still waiting on client or staff confirmation before it is fully protected.</p><div class="tag-row"><span class="tag blue">Booked Value</span><span class="tag orange">Needs Protection</span></div></div>
+                      <div class="item"><strong>After-hours leads ready for close attempt</strong><p>3 intent-qualified calls from last night were routed into the morning callback queue with sales behavior already selected.</p><div class="tag-row"><span class="tag green">Qualified</span><span class="tag blue">Follow-Up</span></div></div>
+                      <div class="item"><strong>Technician capacity tightening after 3 PM</strong><p>Only one same-day service window is still open once the leak inspection consultation is confirmed.</p><div class="tag-row"><span class="tag orange">Capacity Watch</span></div></div>
+                      <div class="item"><strong>Reminder failures increase no-show risk</strong><p>One bounced reminder and two unconfirmed bookings raise the chance of lost value during the afternoon route.</p><div class="tag-row"><span class="tag orange">Scheduling Risk</span><span class="tag blue">Notifications</span></div></div>
+                      <div class="item"><strong>Commercial quote lane still under-followed</strong><p>Two commercial estimate threads are still open without a same-day next-step note from sales.</p><div class="tag-row"><span class="tag blue">Sales Queue</span><span class="tag orange">Needs Review</span></div></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card teal scroll-card">
+                  <h2>Owner Decisions</h2>
+                  <div class="panel-scroll">
+                    <div class="list">
+                      <div class="item action-item"><strong>Approve dispatch assignment</strong><p>Urgent request is routed correctly and only needs final technician approval to go live.</p></div>
+                      <div class="item action-item"><strong>Review billing carry-over choices</strong><p>3 upgrades are marked to stay active after month one and 2 are currently set to switch off.</p></div>
+                      <div class="item action-item"><strong>Open communication escalations</strong><p>3 owner-visible conversations need a reply, approval, or direct intervention.</p></div>
+                      <div class="item action-item"><strong>Confirm multilingual overflow seat</strong><p>The added language support seat is ready to stay active, but the owner still needs to confirm the recurring billing choice.</p></div>
+                      <div class="item action-item"><strong>Publish revised after-hours wording</strong><p>New fallback message copy was reviewed and only needs final owner approval before it goes live.</p></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           `,
           Alerts: `
-            <div class="panel-grid cols-2">
-              <div class="card">
-                <h2>Urgent Alerts</h2>
-                <div class="list">
-                  <div class="item urgent-item"><div class="item-top"><strong>Same-day dispatch request needs acceptance</strong><span class="stamp urgent-stamp">Active</span></div><p>System detected emergency intent, switched behavior, and is waiting on available technician confirmation.</p><div class="tag-row"><span class="tag red urgent-tag">Urgent</span><span class="tag orange">Open</span><span class="tag blue">Call Handling</span></div></div>
-                  <div class="item urgent-item"><div class="item-top"><strong>Owner callback requested by high-value lead</strong><span class="stamp urgent-stamp">Sales</span></div><p>Quote lead asked for direct owner contact. The request is now time-sensitive and linked to a pending estimate path.</p><div class="tag-row"><span class="tag red urgent-tag">Revenue</span><span class="tag blue">Sales</span></div></div>
-                  <div class="item"><div class="item-top"><strong>One client reminder failed delivery</strong><span class="stamp">1 issue</span></div><p>Email and SMS notifications are stable overall, but one reminder did not deliver in the last 24 hours and needs CRM correction.</p><div class="tag-row"><span class="tag blue">Notification</span></div></div>
+            <div class="workspace-fixed-view panel-only">
+              <div class="panel-grid cols-2">
+                <div class="card scroll-card">
+                  <h2>Urgent Alerts</h2>
+                  <div class="panel-scroll">
+                    <div class="list">
+                      <div class="item urgent-item"><div class="item-top"><strong>Same-day dispatch request needs acceptance</strong><span class="stamp urgent-stamp">Active</span></div><p>System detected emergency intent, switched behavior, and is waiting on available technician confirmation.</p><div class="tag-row"><span class="tag red urgent-tag">Urgent</span><span class="tag orange">Open</span><span class="tag blue">Call Handling</span></div></div>
+                      <div class="item urgent-item"><div class="item-top"><strong>Owner callback requested by high-value lead</strong><span class="stamp urgent-stamp">Sales</span></div><p>Quote lead asked for direct owner contact. The request is now time-sensitive and linked to a pending estimate path.</p><div class="tag-row"><span class="tag red urgent-tag">Revenue</span><span class="tag blue">Sales</span></div></div>
+                      <div class="item"><div class="item-top"><strong>One client reminder failed delivery</strong><span class="stamp">1 issue</span></div><p>Email and SMS notifications are stable overall, but one reminder did not deliver in the last 24 hours and needs CRM correction.</p><div class="tag-row"><span class="tag blue">Notification</span></div></div>
+                      <div class="item"><div class="item-top"><strong>Complaint thread reopened after follow-up message</strong><span class="stamp">Escalation</span></div><p>The same customer replied again, so the complaint is back in the owner-visible escalation lane.</p><div class="tag-row"><span class="tag red urgent-tag">Complaint</span><span class="tag blue">Communication</span></div></div>
+                      <div class="item"><div class="item-top"><strong>Technician completion still missing for drain cleaning</strong><span class="stamp">Operations</span></div><p>The visit was accepted earlier, but the completion state is still missing and the next workflow step remains blocked.</p><div class="tag-row"><span class="tag orange">Workflow Hold</span><span class="tag blue">Scheduling</span></div></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="card">
-                <h2>Owner Attention</h2>
-                <div class="metric-list">
-                  <div class="metric-row"><span>Unread alerts</span><strong>11</strong></div>
-                  <div class="metric-row"><span class="status-live">Urgent items</span><strong>3</strong></div>
-                  <div class="metric-row"><span>Staff confirmations open</span><strong>4</strong></div>
-                  <div class="metric-row"><span>Client confirmations open</span><strong>6</strong></div>
-                  <div class="metric-row"><span>Owner decisions due today</span><strong>4</strong></div>
+                <div class="card scroll-card">
+                  <h2>Owner Attention</h2>
+                  <div class="panel-scroll">
+                    <div class="metric-list">
+                      <div class="metric-row"><span>Unread alerts</span><strong>11</strong></div>
+                      <div class="metric-row"><span class="status-live">Urgent items</span><strong>3</strong></div>
+                      <div class="metric-row"><span>Staff confirmations open</span><strong>4</strong></div>
+                      <div class="metric-row"><span>Client confirmations open</span><strong>6</strong></div>
+                      <div class="metric-row"><span>Owner decisions due today</span><strong>4</strong></div>
+                      <div class="metric-row"><span>Revenue callbacks due</span><strong>3</strong></div>
+                      <div class="metric-row"><span>Open complaints</span><strong>1</strong></div>
+                      <div class="metric-row"><span>Reminder delivery failures</span><strong>1</strong></div>
+                    </div>
+                    <div class="list">
+                      <div class="item"><strong>Watch communication escalations</strong><p>Three conversations are still waiting on a human reply, approval, or direct owner wording change.</p></div>
+                      <div class="item"><strong>Protect afternoon booked value</strong><p>Booked appointments still need confirmations and completion checks before the same-day value is fully protected.</p></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           `,
           Today: `
-            <div class="panel-grid cols-2">
-              <div class="card">
-                <h2>Today at a glance</h2>
-                <div class="metric-list">
-                  <div class="metric-row"><span>Booked today</span><strong>12</strong></div>
-                  <div class="metric-row"><span>Completed today</span><strong>9</strong></div>
-                  <div class="metric-row"><span>Booked value today</span><strong>$1,145</strong></div>
-                  <div class="metric-row"><span>Completed value today</span><strong>$780</strong></div>
-                  <div class="metric-row"><span>Follow-up queue due today</span><strong>17</strong></div>
-                  <div class="metric-row"><span>Approvals due today</span><strong>4</strong></div>
+            <div class="workspace-fixed-view panel-only">
+              <div class="panel-grid cols-2">
+                <div class="card scroll-card">
+                  <h2>Today at a glance</h2>
+                  <div class="panel-scroll">
+                    <div class="metric-list">
+                      <div class="metric-row"><span>Booked today</span><strong>12</strong></div>
+                      <div class="metric-row"><span>Completed today</span><strong>9</strong></div>
+                      <div class="metric-row"><span>Booked value today</span><strong>$1,145</strong></div>
+                      <div class="metric-row"><span>Completed value today</span><strong>$780</strong></div>
+                      <div class="metric-row"><span>Follow-up queue due today</span><strong>17</strong></div>
+                      <div class="metric-row"><span>Approvals due today</span><strong>4</strong></div>
+                      <div class="metric-row"><span>Client confirmations still open</span><strong>6</strong></div>
+                      <div class="metric-row"><span>Missed-call recovery threads</span><strong>5</strong></div>
+                      <div class="metric-row"><span>Unsent review requests</span><strong>2</strong></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="card">
-                <h2>Today’s focus</h2>
-                <p>Protect same-day revenue, clear urgent communication, and keep owner decisions moving. The dashboard should show what is making money, what is delayed, and what could slip if no one acts next.</p>
+                <div class="card scroll-card">
+                  <h2>Today’s focus</h2>
+                  <div class="panel-scroll">
+                    <div class="list">
+                      <div class="item"><strong>Protect same-day revenue</strong><p>Clear confirmations, close pending approvals, and keep booked value from slipping into tomorrow because of preventable friction.</p></div>
+                      <div class="item"><strong>Clear urgent communication</strong><p>Respond to the owner-visible conversations that still need a callback, approval, or escalation reply.</p></div>
+                      <div class="item"><strong>Keep field execution clean</strong><p>Watch task completion, dispatch acceptance, and parts-related billing holds so operations do not drift from the booked workflow.</p></div>
+                      <div class="item"><strong>Watch multilingual quality</strong><p>Keep an eye on the overflow language lanes and confirm the published wording still matches what support should say live.</p></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           `
@@ -4019,7 +4110,7 @@
 
     function filterRecommendedActions(submenu) {
       if (submenu === "Resolved") return recommendedActionStore.resolved;
-      if (submenu === "Today") return recommendedActionStore.pending.filter(item => item.bucket === "Today" || item.lane === "Today").slice(0, 3);
+      if (submenu === "Today") return recommendedActionStore.pending.filter(item => item.bucket === "Today" || item.lane === "Today");
       return recommendedActionStore.pending.filter(item => item.lane === submenu);
     }
 
@@ -4040,21 +4131,31 @@
       if (submenu === "Resolved") {
         return `
           <div class="panel-grid cols-2">
-            <div class="card green">
+            <div class="card green scroll-card">
               <h2>Resolved Actions</h2>
-              <div class="list">
-                ${items.map(renderResolvedActionItem).join("")}
+              <div class="panel-scroll">
+                <div class="list">
+                  ${items.map(renderResolvedActionItem).join("")}
+                </div>
               </div>
             </div>
-            <div class="card teal">
+            <div class="card teal scroll-card">
               <h2>Resolution Tracking</h2>
-              <div class="metric-list">
-                <div class="metric-row"><span>Resolved visible now</span><strong>${counts.resolved}</strong></div>
-                <div class="metric-row"><span>Resolved total</span><strong>${counts.resolved}</strong></div>
-                <div class="metric-row"><span>Average owner response time</span><strong>22m</strong></div>
-                <div class="metric-row"><span>Still open after escalation</span><strong>${counts.escalations}</strong></div>
+              <div class="panel-scroll">
+                <div class="metric-list">
+                  <div class="metric-row"><span>Resolved visible now</span><strong>${counts.resolved}</strong></div>
+                  <div class="metric-row"><span>Resolved total</span><strong>${counts.resolved}</strong></div>
+                  <div class="metric-row"><span>Average owner response time</span><strong>22m</strong></div>
+                  <div class="metric-row"><span>Still open after escalation</span><strong>${counts.escalations}</strong></div>
+                  <div class="metric-row"><span>Resolved today</span><strong>6</strong></div>
+                  <div class="metric-row"><span>Resolved approvals</span><strong>2</strong></div>
+                  <div class="metric-row"><span>Resolved communication issues</span><strong>2</strong></div>
+                </div>
+                <div class="list">
+                  <div class="item"><strong>Resolution history stays visible</strong><p>Resolved actions remain reviewable so the owner can verify what changed and which workflow moved afterward.</p></div>
+                  <div class="item"><strong>Use it as a proof queue</strong><p>This column should show that actions were not only discussed, but actually completed and published in the live operating flow.</p></div>
+                </div>
               </div>
-              <p style="margin-top:12px">Resolved actions stay visible so the owner can confirm what was handled, when it was cleared, and which module changed afterward.</p>
             </div>
           </div>
         `;
@@ -4115,16 +4216,26 @@
       return `
         <div class="card orange recommended-action-list">
           <h2>${sectionTitle}</h2>
-          <div class="list">
-            ${items.map(renderPendingActionItem).join("")}
+          <div class="panel-scroll">
+            <div class="list">
+              ${items.map(renderPendingActionItem).join("")}
+            </div>
           </div>
         </div>
         <div class="recommended-actions-summary">
           <h2>${summaryTitle}</h2>
-          <div class="metric-list">
-            ${summaryRows}
+          <div class="panel-scroll">
+            <div class="metric-list">
+              ${summaryRows}
+              <div class="metric-row"><span>Items visible in this lane</span><strong>${items.length}</strong></div>
+              <div class="metric-row"><span>Owner review windows today</span><strong>4</strong></div>
+              <div class="metric-row"><span>Same-day decisions cleared</span><strong>${counts.resolved}</strong></div>
+            </div>
+            <div class="list">
+              <div class="item"><strong>Keep the selected action central</strong><p>${summaryCopy}</p></div>
+              <div class="item"><strong>Use this column as queue context</strong><p>Counts stay visible here so the owner can understand what still needs review without losing the selected action detail.</p></div>
+            </div>
           </div>
-          <p>${summaryCopy}</p>
         </div>
       `;
     }
@@ -4134,21 +4245,31 @@
         return `
           <div class="card call-handling-list-card">
             <h2>Today’s Appointments</h2>
-            <div class="list">
-              <div class="item action-item" data-call-detail="appointments-heater"><strong>09:00 AM • Water heater inspection</strong><p>Assigned to Sarah Kim • Client confirmed • Estimated value $120</p><div class="tag-row"><span class="tag green">Client Confirmed</span><span class="tag blue">Assigned</span></div></div>
-              <div class="item action-item" data-call-detail="appointments-drain"><strong>10:30 AM • Drain cleaning</strong><p>Assigned to Mike Daniels • Completion still pending • Estimated value $180</p><div class="tag-row"><span class="tag green">Accepted</span><span class="tag orange">Awaiting Completion</span></div></div>
-              <div class="item action-item" data-call-detail="appointments-leak"><strong>03:00 PM • Leak inspection consultation</strong><p>Assigned to Alex Carter • Reminder sent • Estimated value $95</p><div class="tag-row"><span class="tag blue">Reminder Sent</span></div></div>
-              <div class="item action-item" data-call-detail="appointments-spa"><strong>04:15 PM • Spa heater diagnostics</strong><p>Assigned to Kevin Wu • Client rescheduled from morning • Estimated value $210</p><div class="tag-row"><span class="tag orange">Rescheduled</span><span class="tag blue">Assigned</span></div></div>
-              <div class="item action-item" data-call-detail="appointments-maintenance"><strong>05:30 PM • Preventive maintenance walkthrough</strong><p>Assigned to Elena Brooks • Confirmation text delivered • Estimated value $140</p><div class="tag-row"><span class="tag green">Delivery Confirmed</span><span class="tag blue">Visit Ready</span></div></div>
+            <div class="panel-scroll">
+              <div class="list">
+                <div class="item action-item" data-call-detail="appointments-heater"><strong>09:00 AM • Water heater inspection</strong><p>Assigned to Sarah Kim • Client confirmed • Estimated value $120</p><div class="tag-row"><span class="tag green">Client Confirmed</span><span class="tag blue">Assigned</span></div></div>
+                <div class="item action-item" data-call-detail="appointments-drain"><strong>10:30 AM • Drain cleaning</strong><p>Assigned to Mike Daniels • Completion still pending • Estimated value $180</p><div class="tag-row"><span class="tag green">Accepted</span><span class="tag orange">Awaiting Completion</span></div></div>
+                <div class="item action-item" data-call-detail="appointments-leak"><strong>03:00 PM • Leak inspection consultation</strong><p>Assigned to Alex Carter • Reminder sent • Estimated value $95</p><div class="tag-row"><span class="tag blue">Reminder Sent</span></div></div>
+                <div class="item action-item" data-call-detail="appointments-spa"><strong>04:15 PM • Spa heater diagnostics</strong><p>Assigned to Kevin Wu • Client rescheduled from morning • Estimated value $210</p><div class="tag-row"><span class="tag orange">Rescheduled</span><span class="tag blue">Assigned</span></div></div>
+                <div class="item action-item" data-call-detail="appointments-maintenance"><strong>05:30 PM • Preventive maintenance walkthrough</strong><p>Assigned to Elena Brooks • Confirmation text delivered • Estimated value $140</p><div class="tag-row"><span class="tag green">Delivery Confirmed</span><span class="tag blue">Visit Ready</span></div></div>
+              </div>
             </div>
           </div>
           <div class="card call-handling-summary-card">
             <h2>Booking & Confirmations</h2>
-            <div class="metric-list">
-              <div class="metric-row"><span>Booked today</span><strong>12</strong></div>
-              <div class="metric-row"><span>Confirmed</span><strong>8</strong></div>
-              <div class="metric-row"><span>Pending</span><strong>6</strong></div>
-              <div class="metric-row"><span>No-show / canceled</span><strong>1</strong></div>
+            <div class="panel-scroll">
+              <div class="metric-list">
+                <div class="metric-row"><span>Booked today</span><strong>12</strong></div>
+                <div class="metric-row"><span>Confirmed</span><strong>8</strong></div>
+                <div class="metric-row"><span>Pending</span><strong>6</strong></div>
+                <div class="metric-row"><span>No-show / canceled</span><strong>1</strong></div>
+                <div class="metric-row"><span>Rescheduled today</span><strong>2</strong></div>
+                <div class="metric-row"><span>Reminder replies received</span><strong>5</strong></div>
+                <div class="metric-row"><span>Same-day windows protected</span><strong>4</strong></div>
+              </div>
+              <div class="list">
+                <div class="item"><strong>Confirmation pressure stays visible</strong><p>This column tracks whether booked activity is actually protected by replies, reminders, and staff follow-through.</p></div>
+              </div>
             </div>
           </div>
         `;
@@ -4158,21 +4279,31 @@
         return `
           <div class="card call-handling-list-card">
             <h2>Open Tasks</h2>
-            <div class="list">
-              <div class="item action-item" data-call-detail="tasks-callback"><strong>Callback task for new quote request</strong><p>Created from after-hours AI call after sales intent was detected. Follow-up owner is still pending.</p><div class="tag-row"><span class="tag orange">Open</span><span class="tag blue">Sales</span></div></div>
-              <div class="item urgent-item action-item" data-call-detail="tasks-dispatch"><strong>Dispatch acceptance pending</strong><p>Emergency behavior created a same-day dispatch task that is still waiting on technician confirmation.</p><div class="tag-row"><span class="tag red urgent-tag">Urgent</span><span class="tag blue">Emergency</span></div></div>
-              <div class="item action-item" data-call-detail="tasks-completion"><strong>Completion review needed</strong><p>Drain cleaning visit was accepted but still not marked complete, so the next workflow action is blocked.</p><div class="tag-row"><span class="tag orange">Pending</span><span class="tag blue">Workflow Hold</span></div></div>
-              <div class="item action-item" data-call-detail="tasks-permit"><strong>Permit follow-up still waiting on owner note</strong><p>Field team uploaded the permit photo, but the owner review note has not been attached to the task yet.</p><div class="tag-row"><span class="tag orange">Owner Review</span><span class="tag blue">Field Ops</span></div></div>
-              <div class="item action-item" data-call-detail="tasks-invoice"><strong>Post-visit invoice approval pending</strong><p>Service visit is complete, but invoice release is still blocked until the owner confirms the final parts charge.</p><div class="tag-row"><span class="tag orange">Billing Hold</span><span class="tag blue">Completion</span></div></div>
+            <div class="panel-scroll">
+              <div class="list">
+                <div class="item action-item" data-call-detail="tasks-callback"><strong>Callback task for new quote request</strong><p>Created from after-hours AI call after sales intent was detected. Follow-up owner is still pending.</p><div class="tag-row"><span class="tag orange">Open</span><span class="tag blue">Sales</span></div></div>
+                <div class="item urgent-item action-item" data-call-detail="tasks-dispatch"><strong>Dispatch acceptance pending</strong><p>Emergency behavior created a same-day dispatch task that is still waiting on technician confirmation.</p><div class="tag-row"><span class="tag red urgent-tag">Urgent</span><span class="tag blue">Emergency</span></div></div>
+                <div class="item action-item" data-call-detail="tasks-completion"><strong>Completion review needed</strong><p>Drain cleaning visit was accepted but still not marked complete, so the next workflow action is blocked.</p><div class="tag-row"><span class="tag orange">Pending</span><span class="tag blue">Workflow Hold</span></div></div>
+                <div class="item action-item" data-call-detail="tasks-permit"><strong>Permit follow-up still waiting on owner note</strong><p>Field team uploaded the permit photo, but the owner review note has not been attached to the task yet.</p><div class="tag-row"><span class="tag orange">Owner Review</span><span class="tag blue">Field Ops</span></div></div>
+                <div class="item action-item" data-call-detail="tasks-invoice"><strong>Post-visit invoice approval pending</strong><p>Service visit is complete, but invoice release is still blocked until the owner confirms the final parts charge.</p><div class="tag-row"><span class="tag orange">Billing Hold</span><span class="tag blue">Completion</span></div></div>
+              </div>
             </div>
           </div>
           <div class="card call-handling-summary-card">
             <h2>Task Status</h2>
-            <div class="metric-list">
-              <div class="metric-row"><span>Open tasks</span><strong>9</strong></div>
-              <div class="metric-row"><span class="status-live">Urgent tasks</span><strong>2</strong></div>
-              <div class="metric-row"><span>Assigned</span><strong>6</strong></div>
-              <div class="metric-row"><span>Completed today</span><strong>9</strong></div>
+            <div class="panel-scroll">
+              <div class="metric-list">
+                <div class="metric-row"><span>Open tasks</span><strong>9</strong></div>
+                <div class="metric-row"><span class="status-live">Urgent tasks</span><strong>2</strong></div>
+                <div class="metric-row"><span>Assigned</span><strong>6</strong></div>
+                <div class="metric-row"><span>Completed today</span><strong>9</strong></div>
+                <div class="metric-row"><span>Blocked by owner note</span><strong>2</strong></div>
+                <div class="metric-row"><span>Blocked by billing hold</span><strong>1</strong></div>
+                <div class="metric-row"><span>Dispatch tasks still open</span><strong>2</strong></div>
+              </div>
+              <div class="list">
+                <div class="item"><strong>Task flow should stay visible</strong><p>The support column keeps task-state counts close by so the operator can review the selected task without losing queue context.</p></div>
+              </div>
             </div>
           </div>
         `;
@@ -4182,21 +4313,30 @@
         return `
           <div class="card call-handling-list-card">
             <h2>Recent Delivery Events</h2>
-            <div class="list">
-              <div class="item action-item" data-call-detail="notifications-sms"><strong>SMS confirmation received</strong><p>Sarah Jones confirmed her 1:15 PM service window directly from the reminder text and the booking status updated automatically.</p></div>
-              <div class="item action-item" data-call-detail="notifications-email"><strong>Email reminder failed</strong><p>One reminder bounced due to invalid contact details and is waiting for CRM correction before the next workflow step can continue.</p></div>
-              <div class="item action-item" data-call-detail="notifications-owner"><strong>Owner alert acknowledged for emergency dispatch</strong><p>Urgent dispatch notification was opened by the owner and the emergency route stayed active without delay.</p></div>
-              <div class="item action-item" data-call-detail="notifications-voicemail"><strong>Voicemail transcript delivered to sales queue</strong><p>After-hours voicemail was transcribed and delivered to the morning sales follow-up lane with priority tags attached.</p></div>
+            <div class="panel-scroll">
+              <div class="list">
+                <div class="item action-item" data-call-detail="notifications-sms"><strong>SMS confirmation received</strong><p>Sarah Jones confirmed her 1:15 PM service window directly from the reminder text and the booking status updated automatically.</p></div>
+                <div class="item action-item" data-call-detail="notifications-email"><strong>Email reminder failed</strong><p>One reminder bounced due to invalid contact details and is waiting for CRM correction before the next workflow step can continue.</p></div>
+                <div class="item action-item" data-call-detail="notifications-owner"><strong>Owner alert acknowledged for emergency dispatch</strong><p>Urgent dispatch notification was opened by the owner and the emergency route stayed active without delay.</p></div>
+                <div class="item action-item" data-call-detail="notifications-voicemail"><strong>Voicemail transcript delivered to sales queue</strong><p>After-hours voicemail was transcribed and delivered to the morning sales follow-up lane with priority tags attached.</p></div>
+              </div>
             </div>
           </div>
           <div class="card call-handling-summary-card">
             <h2>Notification & Escalation Status</h2>
-            <div class="metric-list">
-              <div class="metric-row"><span>Sound alerts</span><strong>On</strong></div>
-              <div class="metric-row"><span>Failed notifications</span><strong>1</strong></div>
-              <div class="metric-row"><span>Unread system notices</span><strong>3</strong></div>
-              <div class="metric-row"><span>Reminders sent today</span><strong>14</strong></div>
-              <div class="metric-row"><span>Owner escalations sent</span><strong>3</strong></div>
+            <div class="panel-scroll">
+              <div class="metric-list">
+                <div class="metric-row"><span>Sound alerts</span><strong>On</strong></div>
+                <div class="metric-row"><span>Failed notifications</span><strong>1</strong></div>
+                <div class="metric-row"><span>Unread system notices</span><strong>3</strong></div>
+                <div class="metric-row"><span>Reminders sent today</span><strong>14</strong></div>
+                <div class="metric-row"><span>Owner escalations sent</span><strong>3</strong></div>
+                <div class="metric-row"><span>Fallback messages sent</span><strong>2</strong></div>
+                <div class="metric-row"><span>Alert acknowledgements</span><strong>5</strong></div>
+              </div>
+              <div class="list">
+                <div class="item"><strong>Delivery events must stay testable</strong><p>This column should keep enough notice rows visible to prove that notification tracking stays independent from the selected delivery detail.</p></div>
+              </div>
             </div>
           </div>
         `;
@@ -4205,25 +4345,34 @@
       return `
         <div class="card call-handling-list-card">
           <h2>Intent & Behavior Queue</h2>
-          <div class="list">
-            <div class="item action-item" data-call-detail="calls-john"><div class="item-top"><strong>John Smith</strong><span class="stamp">11:02 AM</span></div><p>Intent detected: quote request. Behavior switched to sales agent, after-hours callback queued, and CRM lead record created automatically.</p><div class="tag-row"><span class="tag blue">Sales Agent</span><span class="tag">Quote</span><span class="tag green">Workflow Triggered</span></div></div>
-            <div class="item urgent-item action-item" data-call-detail="calls-maria"><div class="item-top"><strong>Maria Lopez</strong><span class="stamp urgent-stamp">10:47 AM</span></div><p>Intent detected: emergency plumbing. Behavior switched to emergency response, urgency routing activated, and same-day dispatch task created immediately.</p><div class="tag-row"><span class="tag red urgent-tag">Emergency</span><span class="tag orange">Dispatch</span><span class="tag blue">Intent Route</span></div></div>
-            <div class="item action-item" data-call-detail="calls-sarah"><div class="item-top"><strong>Sarah Jones</strong><span class="stamp">09:36 AM</span></div><p>Intent detected: appointment booking. Behavior switched to booking agent, appointment reserved, and confirmation messages sent automatically.</p><div class="tag-row"><span class="tag green">Booked</span><span class="tag blue">Booking Agent</span></div></div>
-            <div class="item action-item" data-call-detail="calls-carlos"><div class="item-top"><strong>Carlos Rivera</strong><span class="stamp">09:11 AM</span></div><p>Language detected: Spanish. Behavior switched to multilingual information path, inventory question answered, and follow-up note stored for the owner.</p><div class="tag-row"><span class="tag blue">Spanish</span><span class="tag">Info Agent</span><span class="tag green">Handled</span></div></div>
-            <div class="item action-item" data-call-detail="calls-linda"><div class="item-top"><strong>Linda Park</strong><span class="stamp">08:54 AM</span></div><p>Intent detected: support question. Behavior shifted into service support mode, account history was checked, and the issue was routed to communication follow-up.</p><div class="tag-row"><span class="tag blue">Support</span><span class="tag">History Check</span><span class="tag green">Routed</span></div></div>
-            <div class="item action-item" data-call-detail="calls-omar"><div class="item-top"><strong>Omar Hassan</strong><span class="stamp">08:22 AM</span></div><p>Intent detected: reservations / scheduling adjustment. Behavior kept the caller in booking logic while preserving the existing appointment record.</p><div class="tag-row"><span class="tag blue">Reschedule</span><span class="tag">Booking Agent</span><span class="tag green">Updated</span></div></div>
+          <div class="panel-scroll">
+            <div class="list">
+              <div class="item action-item" data-call-detail="calls-john"><div class="item-top"><strong>John Smith</strong><span class="stamp">11:02 AM</span></div><p>Intent detected: quote request. Behavior switched to sales agent, after-hours callback queued, and CRM lead record created automatically.</p><div class="tag-row"><span class="tag blue">Sales Agent</span><span class="tag">Quote</span><span class="tag green">Workflow Triggered</span></div></div>
+              <div class="item urgent-item action-item" data-call-detail="calls-maria"><div class="item-top"><strong>Maria Lopez</strong><span class="stamp urgent-stamp">10:47 AM</span></div><p>Intent detected: emergency plumbing. Behavior switched to emergency response, urgency routing activated, and same-day dispatch task created immediately.</p><div class="tag-row"><span class="tag red urgent-tag">Emergency</span><span class="tag orange">Dispatch</span><span class="tag blue">Intent Route</span></div></div>
+              <div class="item action-item" data-call-detail="calls-sarah"><div class="item-top"><strong>Sarah Jones</strong><span class="stamp">09:36 AM</span></div><p>Intent detected: appointment booking. Behavior switched to booking agent, appointment reserved, and confirmation messages sent automatically.</p><div class="tag-row"><span class="tag green">Booked</span><span class="tag blue">Booking Agent</span></div></div>
+              <div class="item action-item" data-call-detail="calls-carlos"><div class="item-top"><strong>Carlos Rivera</strong><span class="stamp">09:11 AM</span></div><p>Language detected: Spanish. Behavior switched to multilingual information path, inventory question answered, and follow-up note stored for the owner.</p><div class="tag-row"><span class="tag blue">Spanish</span><span class="tag">Info Agent</span><span class="tag green">Handled</span></div></div>
+              <div class="item action-item" data-call-detail="calls-linda"><div class="item-top"><strong>Linda Park</strong><span class="stamp">08:54 AM</span></div><p>Intent detected: support question. Behavior shifted into service support mode, account history was checked, and the issue was routed to communication follow-up.</p><div class="tag-row"><span class="tag blue">Support</span><span class="tag">History Check</span><span class="tag green">Routed</span></div></div>
+              <div class="item action-item" data-call-detail="calls-omar"><div class="item-top"><strong>Omar Hassan</strong><span class="stamp">08:22 AM</span></div><p>Intent detected: reservations / scheduling adjustment. Behavior kept the caller in booking logic while preserving the existing appointment record.</p><div class="tag-row"><span class="tag blue">Reschedule</span><span class="tag">Booking Agent</span><span class="tag green">Updated</span></div></div>
+            </div>
           </div>
         </div>
         <div class="card call-handling-summary-card">
           <h2>Live Call Intelligence</h2>
-          <div class="metric-list">
-            <div class="metric-row"><span>Calls this week</span><strong>96</strong></div>
-            <div class="metric-row"><span>Top detected intent</span><strong>Quote Requests</strong></div>
-            <div class="metric-row"><span>Behavior modes used today</span><strong>8</strong></div>
-            <div class="metric-row"><span>Languages detected today</span><strong>2</strong></div>
-            <div class="metric-row"><span>Urgent vs standard</span><strong>12% urgent</strong></div>
-            <div class="metric-row"><span>Workflow actions triggered</span><strong>41</strong></div>
-            <div class="metric-row"><span>Missed opportunity replacement</span><strong>+18 leads</strong></div>
+          <div class="panel-scroll">
+            <div class="metric-list">
+              <div class="metric-row"><span>Calls this week</span><strong>96</strong></div>
+              <div class="metric-row"><span>Top detected intent</span><strong>Quote Requests</strong></div>
+              <div class="metric-row"><span>Behavior modes used today</span><strong>8</strong></div>
+              <div class="metric-row"><span>Languages detected today</span><strong>2</strong></div>
+              <div class="metric-row"><span>Urgent vs standard</span><strong>12% urgent</strong></div>
+              <div class="metric-row"><span>Workflow actions triggered</span><strong>41</strong></div>
+              <div class="metric-row"><span>Missed opportunity replacement</span><strong>+18 leads</strong></div>
+              <div class="metric-row"><span>After-hours calls captured</span><strong>7</strong></div>
+              <div class="metric-row"><span>Owner-visible call notes</span><strong>9</strong></div>
+            </div>
+            <div class="list">
+              <div class="item"><strong>Keep call detail independent</strong><p>This support column should hold enough live metrics to prove it scrolls separately from both the queue and the selected call detail.</p></div>
+            </div>
           </div>
         </div>
       `;
@@ -4604,16 +4753,26 @@
       return `
         <div class="card request-list-card">
           <h2>${config.sectionTitle}</h2>
-          <div class="list">
-            ${config.items.map(renderRequestItem).join("")}
+          <div class="panel-scroll">
+            <div class="list">
+              ${config.items.map(renderRequestItem).join("")}
+            </div>
           </div>
         </div>
         <div class="card request-summary-card">
           <h2>${config.summaryTitle}</h2>
-          <div class="metric-list">
-            ${config.summaryRows.map(([label, value]) => `<div class="metric-row"><span>${label}</span><strong>${value}</strong></div>`).join("")}
+          <div class="panel-scroll">
+            <div class="metric-list">
+              ${config.summaryRows.map(([label, value]) => `<div class="metric-row"><span>${label}</span><strong>${value}</strong></div>`).join("")}
+              <div class="metric-row"><span>Visible requests in this view</span><strong>${config.items.length}</strong></div>
+              <div class="metric-row"><span>Owner reviews due today</span><strong>2</strong></div>
+              <div class="metric-row"><span>Requests implemented this week</span><strong>6</strong></div>
+            </div>
+            <div class="list">
+              <div class="item"><strong>Request context stays nearby</strong><p>${config.summaryCopy}</p></div>
+              <div class="item"><strong>Use this as the queue reference</strong><p>The request support panel should keep queue counts and implementation pressure visible while the selected request stays in focus.</p></div>
+            </div>
           </div>
-          <p>${config.summaryCopy}</p>
         </div>
       `;
     }
@@ -4979,16 +5138,26 @@
       return `
         <div class="card communication-list-card">
           <h2>${config.sectionTitle}</h2>
-          <div class="list">
-            ${config.items.map(renderCommunicationItem).join("")}
+          <div class="panel-scroll">
+            <div class="list">
+              ${config.items.map(renderCommunicationItem).join("")}
+            </div>
           </div>
         </div>
         <div class="card communication-summary-card">
           <h2>${config.summaryTitle}</h2>
-          <div class="metric-list">
-            ${config.summaryRows.map(([label, value]) => `<div class="metric-row"><span>${label}</span><strong>${value}</strong></div>`).join("")}
+          <div class="panel-scroll">
+            <div class="metric-list">
+              ${config.summaryRows.map(([label, value]) => `<div class="metric-row"><span>${label}</span><strong>${value}</strong></div>`).join("")}
+              <div class="metric-row"><span>Visible items in this lane</span><strong>${config.items.length}</strong></div>
+              <div class="metric-row"><span>Owner-visible threads</span><strong>3</strong></div>
+              <div class="metric-row"><span>Needs wording review</span><strong>1</strong></div>
+            </div>
+            <div class="list">
+              <div class="item"><strong>Channel context stays separate</strong><p>${config.summaryCopy}</p></div>
+              <div class="item"><strong>Use this as the communication overview</strong><p>The support column should keep counts and status visible without forcing the selected thread to compete with the whole communication board.</p></div>
+            </div>
           </div>
-          <p>${config.summaryCopy}</p>
         </div>
       `;
     }
@@ -5181,6 +5350,14 @@
                 <strong>Why it matters</strong>
                 <p>This event can now be reviewed right beside the active dashboard view, which keeps the operator oriented instead of forcing a scroll to a bottom detail block.</p>
               </div>
+              <div class="workspace-detail-section">
+                <strong>Operational context</strong>
+                <p>This detail belongs to the live call-handling queue, where the system keeps intent detection, behavior choice, and next-owner routing visible together for the operator.</p>
+              </div>
+              <div class="workspace-detail-section">
+                <strong>Next review checkpoint</strong>
+                <p>Keep this item visible until the next human owner confirms the routed action, verifies the record outcome, and confirms the queue no longer needs active attention.</p>
+              </div>
               <div class="workspace-detail-actions">
                 <button class="workspace-detail-btn" type="button" data-close-workspace-detail>Close</button>
               </div>
@@ -5220,6 +5397,14 @@
               <div class="workspace-detail-section">
                 <strong>Queue context</strong>
                 <p>This item belongs to ${action.lane || "the owner queue"} and is grouped under ${action.bucket || "the current view"} so it stays visible until somebody acts on it.</p>
+              </div>
+              <div class="workspace-detail-section">
+                <strong>Risk if ignored</strong>
+                <p>Leaving this item unresolved keeps the owner-facing queue noisy and increases the chance that revenue, routing, or communication pressure will slip into the next operating window.</p>
+              </div>
+              <div class="workspace-detail-section">
+                <strong>Why it stays in view</strong>
+                <p>The selected action remains paired with its source queue so the owner can verify both the decision itself and the live queue pressure around it without losing context.</p>
               </div>
               <div class="workspace-detail-actions">
                 ${isPending ? `<button class="workspace-detail-btn primary" type="button" data-resolve-action="${action.id}">Resolved</button>` : ""}
@@ -5261,6 +5446,14 @@
                 <strong>Queue context</strong>
                 <p>${requestItem.sections.context}</p>
               </div>
+              <div class="workspace-detail-section">
+                <strong>Operational effect</strong>
+                <p>This request changes a live workflow, visibility rule, or setup layer, which is why it stays inside an owner-facing request queue instead of being handled informally in notes.</p>
+              </div>
+              <div class="workspace-detail-section">
+                <strong>Review checkpoint</strong>
+                <p>Keep this request visible until the requested change is either published, explicitly rejected, or moved into the resolved history with enough proof context.</p>
+              </div>
               <div class="workspace-detail-actions">
                 <button class="workspace-detail-btn" type="button" data-close-workspace-detail>Close</button>
               </div>
@@ -5299,6 +5492,14 @@
               <div class="workspace-detail-section">
                 <strong>Queue context</strong>
                 <p>${communicationItem.sections.context}</p>
+              </div>
+              <div class="workspace-detail-section">
+                <strong>Channel impact</strong>
+                <p>This communication event stays visible because it changed the operational state, customer expectation, or owner visibility path tied to the active record.</p>
+              </div>
+              <div class="workspace-detail-section">
+                <strong>What to verify next</strong>
+                <p>Confirm the selected communication has the right owner, the right channel context, and the correct next-step note before removing it from attention.</p>
               </div>
               <div class="workspace-detail-actions">
                 <button class="workspace-detail-btn" type="button" data-close-workspace-detail>Close</button>
