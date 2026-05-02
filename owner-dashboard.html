@@ -650,6 +650,27 @@
       align-content:start;
     }
 
+    .mobile-stage-section{
+      display:grid;
+      gap:10px;
+      align-content:start;
+    }
+
+    .mobile-stage-section-label{
+      color:var(--text-muted);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      padding:0 4px;
+    }
+
+    .mobile-stage-list{
+      display:grid;
+      gap:10px;
+      align-content:start;
+    }
+
     .mobile-stage-card{
       border-radius:18px;
       border:1px solid rgba(255,255,255,.08);
@@ -683,6 +704,7 @@
     .mobile-stage-card.module-card{
       display:grid;
       gap:10px;
+      width:100%;
     }
 
     .mobile-stage-card.module-card .state-pill{
@@ -715,6 +737,55 @@
       font-size:18px;
       font-weight:900;
       flex:0 0 auto;
+    }
+
+    .mobile-summary-list{
+      display:grid;
+      gap:12px;
+      align-content:start;
+    }
+
+    .mobile-summary-card{
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+      padding:16px;
+      display:grid;
+      gap:8px;
+      text-align:left;
+    }
+
+    .mobile-summary-card .label{
+      color:var(--text-muted);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .mobile-summary-card .value{
+      color:#fff;
+      font-size:38px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.05em;
+    }
+
+    .mobile-summary-card .meta{
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.45;
+      font-weight:600;
+    }
+
+    .mobile-summary-card.metric-orange{
+      border-color:rgba(255,138,61,.16);
+      background:linear-gradient(180deg, rgba(255,138,61,.10), rgba(255,255,255,.025));
+    }
+
+    .mobile-summary-card.metric-blue{
+      border-color:rgba(78,165,255,.16);
+      background:linear-gradient(180deg, rgba(78,165,255,.10), rgba(255,255,255,.025));
     }
 
     .workspace-title{
@@ -4324,9 +4395,9 @@
         <div class="workspace-fixed-view panel-only">
           <div class="mobile-stage-grid">
             ${groups.map(group => `
-              <div class="card">
-                <span class="eyebrow">${group.label}</span>
-                <div class="mobile-stage-grid">
+              <section class="mobile-stage-section">
+                <div class="mobile-stage-section-label">${group.label}</div>
+                <div class="mobile-stage-list">
                   ${modules.filter(module => module.state === group.key).map(module => `
                     <button class="mobile-stage-card module-card" type="button" data-mobile-module="${module.id}">
                       <span class="state-pill">${module.badgeLabel || stateLabel[module.state]}</span>
@@ -4335,7 +4406,7 @@
                     </button>
                   `).join("")}
                 </div>
-              </div>
+              </section>
             `).join("")}
           </div>
         </div>
@@ -4377,6 +4448,93 @@
         }
       }
       return `<div class="workspace-fixed-view panel-only">${markup}</div>`;
+    }
+
+    function renderMobileOverviewStage(submenu) {
+      if (submenu === "Summary") {
+        return `
+          <div class="workspace-fixed-view panel-only">
+            <div class="mobile-summary-list">
+              <div class="mobile-summary-card metric-orange">
+                <div class="label">Revenue at risk</div>
+                <div class="value">$1,240</div>
+                <div class="meta">Quotes and bookings waiting on action</div>
+              </div>
+              <div class="mobile-summary-card metric-blue">
+                <div class="label">Bookings today</div>
+                <div class="value">12</div>
+                <div class="meta">3 new bookings since 9am</div>
+              </div>
+              <div class="mobile-summary-card">
+                <div class="label">Approvals waiting</div>
+                <div class="value">4</div>
+                <div class="meta">Routing, discounts, and exceptions</div>
+              </div>
+              <div class="mobile-summary-card">
+                <div class="label">Urgent escalations</div>
+                <div class="value">3</div>
+                <div class="meta">Immediate owner review needed</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (submenu === "Alerts") {
+        return `
+          <div class="workspace-fixed-view panel-only">
+            <div class="mobile-summary-list">
+              <div class="mobile-summary-card metric-orange">
+                <div class="label">Unread alerts</div>
+                <div class="value">11</div>
+                <div class="meta">Urgent items, confirmations, and owner-visible issues</div>
+              </div>
+              <div class="mobile-summary-card">
+                <div class="label">Urgent items</div>
+                <div class="value">3</div>
+                <div class="meta">Needs response before workflow slips</div>
+              </div>
+              <div class="mobile-summary-card">
+                <div class="label">Open complaints</div>
+                <div class="value">1</div>
+                <div class="meta">Customer issue reopened after follow-up</div>
+              </div>
+              <div class="mobile-summary-card">
+                <div class="label">Reminder failures</div>
+                <div class="value">1</div>
+                <div class="meta">CRM correction needed before more automation goes out</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="workspace-fixed-view panel-only">
+          <div class="mobile-summary-list">
+            <div class="mobile-summary-card metric-blue">
+              <div class="label">Booked today</div>
+              <div class="value">12</div>
+              <div class="meta">9 completed, 6 confirmations still open</div>
+            </div>
+            <div class="mobile-summary-card">
+              <div class="label">Booked value</div>
+              <div class="value">$1,145</div>
+              <div class="meta">$780 completed so far today</div>
+            </div>
+            <div class="mobile-summary-card">
+              <div class="label">Follow-up queue</div>
+              <div class="value">17</div>
+              <div class="meta">Callbacks, reminders, and review requests due today</div>
+            </div>
+            <div class="mobile-summary-card">
+              <div class="label">Owner decisions due</div>
+              <div class="value">4</div>
+              <div class="meta">Approvals and routing choices still open today</div>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     function renderMobileWorkspace(module, resolvedMarkup) {
@@ -4435,7 +4593,9 @@
       workspaceTitle.textContent = activeSubmenu || module.title;
       workspaceCopy.textContent = "";
 
-      if (supportsWorkspaceDetail(activeModule)) {
+      if (activeModule === "overview") {
+        workspace.innerHTML = renderMobileOverviewStage(activeSubmenu);
+      } else if (supportsWorkspaceDetail(activeModule)) {
         workspace.innerHTML = extractMobilePrimaryMarkup(resolvedMarkup);
       } else {
         const needsFixedViewWrap = typeof resolvedMarkup === "string" && !resolvedMarkup.includes("workspace-fixed-view");
