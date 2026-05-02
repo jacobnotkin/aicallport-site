@@ -788,6 +788,110 @@
       background:linear-gradient(180deg, rgba(78,165,255,.10), rgba(255,255,255,.025));
     }
 
+    .mobile-primary-list{
+      display:grid;
+      gap:12px;
+      align-content:start;
+    }
+
+    .mobile-primary-card{
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.07);
+      background:rgba(255,255,255,.03);
+      padding:16px;
+      display:grid;
+      gap:10px;
+      text-align:left;
+      color:inherit;
+      width:100%;
+      cursor:pointer;
+    }
+
+    .mobile-primary-card.orange{
+      background:linear-gradient(180deg, rgba(255,138,61,.10), rgba(255,255,255,.03));
+      border-color:rgba(255,138,61,.16);
+    }
+
+    .mobile-primary-card.teal{
+      background:linear-gradient(180deg, rgba(57,181,186,.10), rgba(255,255,255,.03));
+      border-color:rgba(57,181,186,.16);
+    }
+
+    .mobile-primary-card.blue{
+      background:linear-gradient(180deg, rgba(78,165,255,.10), rgba(255,255,255,.03));
+      border-color:rgba(78,165,255,.16);
+    }
+
+    .mobile-primary-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .mobile-primary-top strong{
+      color:#fff;
+      font-size:16px;
+      line-height:1.25;
+      font-weight:800;
+      letter-spacing:-.02em;
+    }
+
+    .mobile-primary-copy{
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.5;
+      font-weight:700;
+    }
+
+    .mobile-primary-meta{
+      color:var(--text-muted);
+      font-size:11px;
+      line-height:1.45;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .mobile-primary-tags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .mobile-compound-panel{
+      display:grid;
+      gap:16px;
+    }
+
+    .mobile-compound-section{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+      display:grid;
+      gap:12px;
+    }
+
+    .mobile-compound-section h3{
+      margin:0;
+      color:#fff;
+      font-size:18px;
+      line-height:1.2;
+      font-weight:800;
+      letter-spacing:-.02em;
+    }
+
+    .mobile-compound-section .metric-list,
+    .mobile-compound-section .list{
+      margin:0;
+    }
+
+    .mobile-compact-search{
+      display:grid;
+      gap:10px;
+    }
+
     .workspace-title{
       margin:0;
       color:#fff;
@@ -4537,6 +4641,321 @@
       `;
     }
 
+    function truncateMobileCopy(text, maxLength = 120) {
+      const normalized = String(text || "").replace(/\s+/g, " ").trim();
+      if (normalized.length <= maxLength) return normalized;
+      return `${normalized.slice(0, maxLength).trimEnd()}…`;
+    }
+
+    function flattenPanelScroll(root) {
+      root.querySelectorAll(".panel-scroll").forEach(panel => {
+        const fragment = document.createDocumentFragment();
+        while (panel.firstChild) {
+          fragment.appendChild(panel.firstChild);
+        }
+        panel.replaceWith(fragment);
+      });
+    }
+
+    function parseFeedbackMobileEntries(submenu) {
+      const markup = workspaceData.feedback.views[submenu];
+      const temp = document.createElement("div");
+      temp.innerHTML = markup;
+      const cards = [...temp.querySelectorAll(".card")];
+      const primary = cards[0];
+      if (!primary) return [];
+      return [...primary.querySelectorAll(".item")].map((item, index) => ({
+        id: `${submenu}-${index}`,
+        title: item.querySelector("strong")?.textContent?.trim() || "Feedback item",
+        stamp: item.querySelector(".stamp")?.textContent?.trim() || "",
+        body: item.querySelector("p")?.textContent?.trim() || "",
+        tagsHtml: item.querySelector(".tag-row")?.innerHTML || "",
+        colorClass: primary.classList.contains("orange")
+          ? "orange"
+          : primary.classList.contains("green")
+            ? "teal"
+            : primary.classList.contains("amber")
+              ? "orange"
+              : "blue"
+      }));
+    }
+
+    function parseBillingMobileSections(submenu) {
+      const markup = workspaceData.billing.views[submenu];
+      const temp = document.createElement("div");
+      temp.innerHTML = markup;
+      return [...temp.querySelectorAll(".card")].map((card, index) => {
+        const clone = card.cloneNode(true);
+        const heading = clone.querySelector("h2");
+        const title = heading?.textContent?.trim() || "Billing section";
+        heading?.remove();
+        flattenPanelScroll(clone);
+        const firstMetric = clone.querySelector(".metric-row");
+        const firstItem = clone.querySelector(".item strong");
+        const firstParagraph = clone.querySelector("p");
+        const preview = firstMetric
+          ? firstMetric.textContent.replace(/\s+/g, " ").trim()
+          : firstItem
+            ? firstItem.textContent.replace(/\s+/g, " ").trim()
+            : firstParagraph
+              ? firstParagraph.textContent.replace(/\s+/g, " ").trim()
+              : "Open billing details.";
+        return {
+          id: `${submenu}-${index}`,
+          title,
+          preview: truncateMobileCopy(preview, 92),
+          detailHtml: clone.innerHTML
+        };
+      });
+    }
+
+    function renderMobileCRMStage() {
+      return `
+        <div class="workspace-fixed-view panel-only">
+          <div class="mobile-primary-list">
+            <div class="card teal">
+              <h2>Clients</h2>
+              <p class="helper-line" style="margin:0">Choose a client to open the record. Search and upload controls stay secondary on mobile.</p>
+            </div>
+            ${crmClients.map(client => `
+              <button class="mobile-primary-card blue" type="button" data-mobile-crm-client="${client.name}">
+                <div class="mobile-primary-top">
+                  <strong>${client.name}</strong>
+                  <span class="tag ${clientStatusTag(client.status)}">${client.status}</span>
+                </div>
+                <div class="mobile-primary-copy">${client.source} • ${client.phone}</div>
+                <div class="mobile-primary-meta">${truncateMobileCopy(client.nextStepAction, 74)}</div>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMobileCRMDetail(detail) {
+      const client = crmClients.find(entry => entry.name === detail.key);
+      if (!client) return `<div class="workspace-detail-empty">This client record is no longer available.</div>`;
+      return `
+        <div class="workspace-detail-panel">
+          <div class="workspace-detail-inner">
+            <div class="workspace-detail-top">
+              <div>
+                <span class="eyebrow">Client Record</span>
+                <h2>${client.name}</h2>
+                <p>${truncateMobileCopy(client.nextStepAction, 160)}</p>
+              </div>
+              <button class="workspace-detail-close" type="button" data-close-workspace-detail aria-label="Close detail">×</button>
+            </div>
+            <div class="workspace-detail-stat-grid">
+              <div class="workspace-detail-stat">
+                <div class="label">Status</div>
+                <div class="value">${client.status}</div>
+              </div>
+              <div class="workspace-detail-stat">
+                <div class="label">Source</div>
+                <div class="value">${client.source}</div>
+              </div>
+              <div class="workspace-detail-stat">
+                <div class="label">Phone</div>
+                <div class="value">${client.phone}</div>
+              </div>
+              <div class="workspace-detail-stat">
+                <div class="label">Next booking</div>
+                <div class="value">${client.nextBooking}</div>
+              </div>
+            </div>
+            <div class="workspace-detail-section">
+              <strong>Address</strong>
+              <p>${client.address}</p>
+            </div>
+            <div class="workspace-detail-section">
+              <strong>Last activity</strong>
+              <p>${client.lastActivity}</p>
+            </div>
+            <div class="workspace-detail-section">
+              <strong>Next step owner</strong>
+              <p>${client.nextStepBy} should act by ${client.nextStepAt}.</p>
+            </div>
+            <div class="workspace-detail-actions">
+              <button class="workspace-detail-btn" type="button" data-close-workspace-detail>Close</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMobileRecommendedStage(submenu) {
+      const items = filterRecommendedActions(submenu);
+      const title = submenu === "Resolved" ? "Resolved Actions" : submenu;
+      const cardClass = submenu === "Resolved" ? "teal" : "orange";
+      return `
+        <div class="workspace-fixed-view panel-only">
+          <div class="mobile-primary-list">
+            <div class="card ${cardClass}">
+              <h2>${title}</h2>
+              <div class="panel-scroll">
+                <div class="mobile-primary-list">
+                  ${items.map(item => {
+                    const base = submenu === "Resolved"
+                      ? `
+                        <button class="mobile-primary-card teal" type="button">
+                          <div class="mobile-primary-top">
+                            <strong>${item.title}</strong>
+                            <span class="stamp">${item.stamp}</span>
+                          </div>
+                          <div class="mobile-primary-copy">${truncateMobileCopy(item.body, 72)}</div>
+                          <div class="mobile-primary-tags">${renderActionTags((item.tags || []).slice(0, 1))}</div>
+                        </button>
+                      `
+                      : `
+                        <button class="mobile-primary-card ${item.urgent ? "orange" : "blue"}" type="button" data-action-detail="${item.id}">
+                          <div class="mobile-primary-top">
+                            <strong>${item.title}</strong>
+                            <span class="stamp">${item.stamp}</span>
+                          </div>
+                          <div class="mobile-primary-copy">${truncateMobileCopy(item.body, 72)}</div>
+                          <div class="mobile-primary-tags">${renderActionTags((item.tags || []).slice(0, 1))}</div>
+                        </button>
+                      `;
+                    return base;
+                  }).join("")}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMobileCompoundFromMarkup(markup) {
+      const temp = document.createElement("div");
+      temp.innerHTML = markup;
+      const cards = [...temp.querySelectorAll(".card")];
+      const sections = cards.map(card => {
+        const title = card.querySelector("h2")?.textContent || "Details";
+        const clone = card.cloneNode(true);
+        clone.querySelector("h2")?.remove();
+        return `
+          <section class="mobile-compound-section">
+            <h3>${title}</h3>
+            ${clone.innerHTML}
+          </section>
+        `;
+      }).join("");
+
+      return `
+        <div class="workspace-fixed-view panel-only">
+          <div class="card mobile-compound-panel">
+            ${sections}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMobileFeedbackStage(submenu) {
+      const items = parseFeedbackMobileEntries(submenu);
+      const titleMap = {
+        Complaints: "Open Complaints",
+        Suggestions: "Customer Suggestions",
+        Requests: "Feature Requests",
+        "Release Notes": "Recent Updates"
+      };
+      return `
+        <div class="workspace-fixed-view panel-only">
+          <div class="mobile-primary-list">
+            <div class="card ${submenu === "Complaints" ? "orange" : submenu === "Release Notes" ? "green" : "blue"}">
+              <h2>${titleMap[submenu] || submenu}</h2>
+              <p class="helper-line" style="margin:0">Open one item at a time to review the detail without carrying the full support summary on mobile.</p>
+            </div>
+            ${items.map(item => `
+              <button class="mobile-primary-card ${item.colorClass}" type="button" data-mobile-feedback-item="${item.id}">
+                <div class="mobile-primary-top">
+                  <strong>${item.title}</strong>
+                  <span class="stamp">${item.stamp}</span>
+                </div>
+                <div class="mobile-primary-copy">${truncateMobileCopy(item.body, 78)}</div>
+                <div class="mobile-primary-tags">${item.tagsHtml}</div>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMobileFeedbackDetail(submenu, detailId) {
+      const item = parseFeedbackMobileEntries(submenu).find(entry => entry.id === detailId);
+      if (!item) return `<div class="workspace-detail-empty">This feedback item is no longer available.</div>`;
+      return `
+        <div class="workspace-detail-panel">
+          <div class="workspace-detail-inner">
+            <div class="workspace-detail-top">
+              <div>
+                <span class="eyebrow">${submenu}</span>
+                <h2>${item.title}</h2>
+                <p>${item.body}</p>
+              </div>
+              <button class="workspace-detail-close" type="button" data-close-workspace-detail aria-label="Close detail">×</button>
+            </div>
+            <div class="tag-row">${item.tagsHtml}</div>
+            <div class="workspace-detail-section">
+              <strong>Why this stays visible</strong>
+              <p>Owners should be able to review one feedback item at a time without carrying the whole support summary and secondary panel on mobile.</p>
+            </div>
+            <div class="workspace-detail-actions">
+              <button class="workspace-detail-btn" type="button" data-close-workspace-detail>Close</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMobileBillingStage(submenu) {
+      const sections = parseBillingMobileSections(submenu);
+      return `
+        <div class="workspace-fixed-view panel-only">
+          <div class="mobile-primary-list">
+            <div class="card blue">
+              <h2>${submenu}</h2>
+              <p class="helper-line" style="margin:0">Open one billing section at a time so plan, invoices, and payment details stay readable on mobile.</p>
+            </div>
+            ${sections.map(section => `
+              <button class="mobile-primary-card blue" type="button" data-mobile-billing-section="${section.id}">
+                <div class="mobile-primary-top">
+                  <strong>${section.title}</strong>
+                </div>
+                <div class="mobile-primary-copy">${section.preview}</div>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMobileBillingDetail(submenu, detailId) {
+      const section = parseBillingMobileSections(submenu).find(entry => entry.id === detailId);
+      if (!section) return `<div class="workspace-detail-empty">This billing section is no longer available.</div>`;
+      return `
+        <div class="workspace-detail-panel">
+          <div class="workspace-detail-inner">
+            <div class="workspace-detail-top">
+              <div>
+                <span class="eyebrow">Billing</span>
+                <h2>${section.title}</h2>
+                <p>Review one billing section at a time on mobile.</p>
+              </div>
+              <button class="workspace-detail-close" type="button" data-close-workspace-detail aria-label="Close detail">×</button>
+            </div>
+            <div class="workspace-detail-section">
+              ${section.detailHtml}
+            </div>
+            <div class="workspace-detail-actions">
+              <button class="workspace-detail-btn" type="button" data-close-workspace-detail>Close</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function renderMobileWorkspace(module, resolvedMarkup) {
       headerActions.innerHTML = "";
       workspaceDetailOverlay.classList.remove("open");
@@ -4577,7 +4996,14 @@
       if (mobileStage === "detail" && activeWorkspaceDetail) {
         workspaceTitle.textContent = activeSubmenu || module.title;
         workspaceCopy.textContent = "";
-        workspace.innerHTML = `<div class="workspace-fixed-view panel-only">${renderWorkspaceDetailMarkup(activeWorkspaceDetail)}</div>`;
+        const mobileDetailMarkup = activeWorkspaceDetail.module === "crm"
+          ? renderMobileCRMDetail(activeWorkspaceDetail)
+          : activeWorkspaceDetail.module === "feedback"
+            ? renderMobileFeedbackDetail(activeSubmenu, activeWorkspaceDetail.key)
+            : activeWorkspaceDetail.module === "billing"
+              ? renderMobileBillingDetail(activeSubmenu, activeWorkspaceDetail.key)
+              : renderWorkspaceDetailMarkup(activeWorkspaceDetail);
+        workspace.innerHTML = `<div class="workspace-fixed-view panel-only">${mobileDetailMarkup}</div>`;
         document.querySelectorAll("[data-close-workspace-detail]").forEach(button => {
           button.addEventListener("click", closeWorkspaceDetail);
         });
@@ -4595,8 +5021,18 @@
 
       if (activeModule === "overview") {
         workspace.innerHTML = renderMobileOverviewStage(activeSubmenu);
+      } else if (activeModule === "crm") {
+        workspace.innerHTML = renderMobileCRMStage();
+      } else if (activeModule === "recommended-actions") {
+        workspace.innerHTML = renderMobileRecommendedStage(activeSubmenu);
+      } else if (activeModule === "feedback") {
+        workspace.innerHTML = renderMobileFeedbackStage(activeSubmenu);
+      } else if (activeModule === "billing") {
+        workspace.innerHTML = renderMobileBillingStage(activeSubmenu);
       } else if (supportsWorkspaceDetail(activeModule)) {
         workspace.innerHTML = extractMobilePrimaryMarkup(resolvedMarkup);
+      } else if (activeModule === "feedback" || activeModule === "billing") {
+        workspace.innerHTML = renderMobileCompoundFromMarkup(resolvedMarkup);
       } else {
         const needsFixedViewWrap = typeof resolvedMarkup === "string" && !resolvedMarkup.includes("workspace-fixed-view");
         workspace.innerHTML = needsFixedViewWrap
@@ -6554,7 +6990,28 @@
         renderMobileWorkspace(module, resolvedMarkup);
         if (activeModule === "crm") {
           activeSubmenu = "Clients";
-          attachCRMClientSearch();
+          workspace.querySelectorAll("[data-mobile-crm-client]").forEach(button => {
+            button.addEventListener("click", () => openWorkspaceDetail({
+              module: "crm",
+              key: button.dataset.mobileCrmClient
+            }));
+          });
+        }
+        if (activeModule === "feedback") {
+          workspace.querySelectorAll("[data-mobile-feedback-item]").forEach(button => {
+            button.addEventListener("click", () => openWorkspaceDetail({
+              module: "feedback",
+              key: button.dataset.mobileFeedbackItem
+            }));
+          });
+        }
+        if (activeModule === "billing") {
+          workspace.querySelectorAll("[data-mobile-billing-section]").forEach(button => {
+            button.addEventListener("click", () => openWorkspaceDetail({
+              module: "billing",
+              key: button.dataset.mobileBillingSection
+            }));
+          });
         }
         if (activeModule === "recommended-actions") {
           attachRecommendedActionHandlers();
@@ -6567,9 +7024,6 @@
         }
         if (activeModule === "communication-board") {
           attachCommunicationHandlers();
-        }
-        if (activeModule === "billing" && window.AICallPortBilling && mobileStage === "content") {
-          window.AICallPortBilling.loadAndApplyDashboardBilling(workspace, activeSubmenu);
         }
         return;
       }
