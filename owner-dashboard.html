@@ -579,6 +579,12 @@
       display:none;
     }
 
+    .mobile-shell-actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
     .mobile-menu-btn{
       min-height:40px;
       padding:0 14px;
@@ -592,6 +598,25 @@
       text-transform:uppercase;
       white-space:nowrap;
       cursor:pointer;
+    }
+
+    .mobile-back-btn{
+      min-height:40px;
+      padding:0 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:#eef6ff;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+      cursor:pointer;
+    }
+
+    .mobile-back-btn.is-hidden{
+      display:none;
     }
 
     .mobile-active-context{
@@ -617,6 +642,79 @@
       line-height:1.3;
       text-transform:uppercase;
       letter-spacing:.1em;
+    }
+
+    .mobile-stage-grid{
+      display:grid;
+      gap:12px;
+      align-content:start;
+    }
+
+    .mobile-stage-card{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+      padding:16px;
+      text-align:left;
+      color:var(--text-primary);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .mobile-stage-card strong{
+      display:block;
+      font-size:18px;
+      line-height:1.15;
+      letter-spacing:-.03em;
+    }
+
+    .mobile-stage-card p{
+      margin:8px 0 0;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.45;
+      font-weight:600;
+    }
+
+    .mobile-stage-card .stamp{
+      margin-top:10px;
+      display:inline-flex;
+    }
+
+    .mobile-stage-card.module-card{
+      display:grid;
+      gap:10px;
+    }
+
+    .mobile-stage-card.module-card .state-pill{
+      justify-self:start;
+      display:inline-flex;
+      align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(78,165,255,.12);
+      color:var(--blue-soft);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .mobile-stage-card.submenu-card{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .mobile-stage-card.submenu-card strong{
+      font-size:17px;
+    }
+
+    .mobile-stage-card .chevron{
+      color:var(--text-muted);
+      font-size:18px;
+      font-weight:900;
+      flex:0 0 auto;
     }
 
     .workspace-title{
@@ -2738,36 +2836,21 @@
       .layout{grid-template-columns:1fr}
       .layout{min-height:calc(100dvh - 36px)}
       .sidebar-backdrop{
-        display:block;
-        position:absolute;
-        inset:0;
-        z-index:12;
-        background:rgba(3,8,18,.64);
-        opacity:0;
-        pointer-events:none;
-        transition:opacity .18s ease;
+        display:none !important;
       }
       .sidebar{
-        position:absolute;
-        left:0;
-        top:0;
-        bottom:0;
-        width:min(320px, 86vw);
-        z-index:18;
-        border-right:1px solid rgba(255,255,255,.08);
-        border-bottom:none;
-        transform:translateX(calc(-100% - 16px));
-        transition:transform .22s ease;
-        box-shadow:18px 0 44px rgba(0,0,0,.38);
-      }
-      .layout.mobile-nav-open .sidebar{
-        transform:translateX(0);
-      }
-      .layout.mobile-nav-open .sidebar-backdrop{
-        opacity:1;
-        pointer-events:auto;
+        display:none !important;
       }
       .main{padding:14px}
+      .main{
+        min-height:0;
+        display:grid;
+        grid-template-rows:auto minmax(0,1fr);
+      }
+      .workspace{
+        min-height:0;
+        overflow:hidden;
+      }
       .workspace-content{
         min-height:0;
         overflow:hidden;
@@ -2777,10 +2860,19 @@
         align-items:center;
         justify-content:space-between;
         gap:12px;
-        padding-bottom:4px;
+        padding-bottom:2px;
       }
       .workspace-top{grid-template-columns:1fr}
-      .header-actions{justify-content:flex-start}
+      .workspace-copy{
+        display:none;
+      }
+      .workspace-title{
+        font-size:20px;
+      }
+      .header-actions,
+      .submenu-bar{
+        display:none;
+      }
       .workspace-content-layout.has-detail{grid-template-columns:1fr}
       .workspace-content-layout.detail-recommended-actions,
       .workspace-content-layout.detail-recommended-actions.has-detail{grid-template-columns:1fr}
@@ -2826,13 +2918,15 @@
         max-height:none;
         padding-right:0;
       }
+      .mobile-stage-grid{
+        grid-template-columns:1fr;
+      }
     }
 
     @media (max-width:760px){
       .page{padding:10px;min-height:100dvh;height:100dvh}
       .shell{width:calc(100vw - 20px);min-height:calc(100dvh - 20px);height:calc(100dvh - 20px);border-radius:24px}
       .layout{min-height:calc(100dvh - 20px)}
-      .sidebar{width:min(300px, calc(100vw - 34px))}
       .panel-grid.cols-2,
       .panel-grid.cols-3,
       .panel-grid.cols-4,
@@ -2848,14 +2942,45 @@
       .table-head,
       .table-row{grid-template-columns:1fr}
       .workspace-header{
-        gap:12px;
-      }
-      .workspace-copy{
-        font-size:14px;
-        line-height:1.45;
+        gap:10px;
+        padding:14px 14px 10px;
       }
       .workspace-title{
-        font-size:22px;
+        font-size:18px;
+        line-height:1.1;
+      }
+      .mobile-active-module{
+        font-size:13px;
+      }
+      .mobile-active-submenu{
+        font-size:10px;
+      }
+      .mobile-menu-btn,
+      .mobile-back-btn{
+        min-height:38px;
+        padding:0 12px;
+        font-size:10px;
+      }
+      .card{
+        padding:14px;
+      }
+      .card h2{font-size:20px}
+      .card h3{font-size:16px}
+      .card p,
+      .item p,
+      .metric-row span,
+      .metric-row strong{
+        font-size:12px;
+      }
+      .item strong{
+        font-size:15px;
+        line-height:1.3;
+      }
+      .tag,
+      .chip,
+      .submenu-btn,
+      .action-btn{
+        font-size:10px;
       }
       .workspace-detail-mobile{width:calc(100vw - 20px);max-height:calc(100vh - 20px);padding:16px}
       .workspace-detail-stat-grid{grid-template-columns:1fr}
@@ -2898,7 +3023,10 @@
         <main class="main">
           <section class="workspace-header">
             <div class="mobile-shell-bar">
-              <button class="mobile-menu-btn" id="mobileMenuToggle" type="button" aria-expanded="false" aria-controls="moduleNav">Modules</button>
+              <div class="mobile-shell-actions">
+                <button class="mobile-back-btn is-hidden" id="mobileBackBtn" type="button">Back</button>
+                <button class="mobile-menu-btn" id="mobileMenuToggle" type="button" aria-expanded="false" aria-controls="moduleNav">Modules</button>
+              </div>
               <div class="mobile-active-context">
                 <span class="mobile-active-module" id="mobileActiveModule">Overview</span>
                 <span class="mobile-active-submenu" id="mobileActiveSubmenu">Summary</span>
@@ -4030,6 +4158,7 @@
     const layoutElement = document.querySelector(".layout");
     const sidebarBackdrop = document.getElementById("sidebarBackdrop");
     const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+    const mobileBackBtn = document.getElementById("mobileBackBtn");
     const mobileActiveModule = document.getElementById("mobileActiveModule");
     const mobileActiveSubmenu = document.getElementById("mobileActiveSubmenu");
     const clientProfileOverlay = document.getElementById("clientProfileOverlay");
@@ -4078,9 +4207,17 @@
     let activeModule = "overview";
     let activeSubmenu = "Summary";
     let activeWorkspaceDetail = null;
+    let mobileStage = isMobileShell() ? "modules" : "content";
+    let previousMobileShell = isMobileShell();
 
     function isMobileShell() {
       return window.innerWidth <= 980;
+    }
+
+    function defaultSubmenuForModule(moduleId) {
+      if (moduleId === "crm") return "Clients";
+      const module = modules.find(item => item.id === moduleId);
+      return module && module.submenus.length ? module.submenus[0] : "";
     }
 
     function setMobileNavOpen(nextOpen) {
@@ -4094,11 +4231,30 @@
 
     function syncMobileHeader() {
       const module = modules.find(m => m.id === activeModule);
+      if (mobileBackBtn) {
+        mobileBackBtn.classList.toggle("is-hidden", !isMobileShell() || mobileStage === "modules");
+      }
       if (mobileActiveModule) {
-        mobileActiveModule.textContent = module ? module.name : "Module";
+        if (!isMobileShell()) {
+          mobileActiveModule.textContent = module ? module.name : "Module";
+        } else if (mobileStage === "modules") {
+          mobileActiveModule.textContent = "Modules";
+        } else {
+          mobileActiveModule.textContent = module ? module.name : "Module";
+        }
       }
       if (mobileActiveSubmenu) {
-        mobileActiveSubmenu.textContent = activeSubmenu || "";
+        if (!isMobileShell()) {
+          mobileActiveSubmenu.textContent = activeSubmenu || "";
+        } else if (mobileStage === "modules") {
+          mobileActiveSubmenu.textContent = "Choose module";
+        } else if (mobileStage === "submenu") {
+          mobileActiveSubmenu.textContent = "Choose section";
+        } else if (mobileStage === "detail") {
+          mobileActiveSubmenu.textContent = "Detail";
+        } else {
+          mobileActiveSubmenu.textContent = activeSubmenu || "List";
+        }
       }
     }
 
@@ -4131,12 +4287,162 @@
       moduleNav.querySelectorAll(".module-link").forEach(button => {
         button.addEventListener("click", () => {
           activeModule = button.dataset.module;
-          activeSubmenu = activeModule === "crm" ? "Clients" : modules.find(m => m.id === activeModule).submenus[0];
+          activeSubmenu = defaultSubmenuForModule(activeModule);
           activeWorkspaceDetail = null;
           setMobileNavOpen(false);
+          if (isMobileShell()) {
+            mobileStage = "submenu";
+          }
           renderAll();
         });
       });
+    }
+
+    function handleMobileBack() {
+      if (!isMobileShell()) return;
+      if (mobileStage === "detail") {
+        activeWorkspaceDetail = null;
+        mobileStage = "content";
+      } else if (mobileStage === "content") {
+        activeWorkspaceDetail = null;
+        mobileStage = "submenu";
+      } else if (mobileStage === "submenu") {
+        activeWorkspaceDetail = null;
+        mobileStage = "modules";
+      }
+      renderAll();
+    }
+
+    function renderMobileModulesStage() {
+      const groups = [
+        { key: "active", label: "Active now" },
+        { key: "upgrade", label: "Available upgrades" },
+        { key: "soon", label: "Coming soon" }
+      ];
+
+      return `
+        <div class="workspace-fixed-view panel-only">
+          <div class="mobile-stage-grid">
+            ${groups.map(group => `
+              <div class="card">
+                <span class="eyebrow">${group.label}</span>
+                <div class="mobile-stage-grid">
+                  ${modules.filter(module => module.state === group.key).map(module => `
+                    <button class="mobile-stage-card module-card" type="button" data-mobile-module="${module.id}">
+                      <span class="state-pill">${module.badgeLabel || stateLabel[module.state]}</span>
+                      <strong>${module.name}</strong>
+                      <p>${workspaceData[module.id]?.title || module.name}</p>
+                    </button>
+                  `).join("")}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMobileSubmenuStage(module) {
+      return `
+        <div class="workspace-fixed-view panel-only">
+          <div class="mobile-stage-grid">
+            ${module.submenus.map(name => `
+              <button class="mobile-stage-card submenu-card" type="button" data-mobile-submenu="${name}">
+                <div>
+                  <strong>${name}</strong>
+                  <p>Open ${name.toLowerCase()} in ${module.name}.</p>
+                </div>
+                <span class="chevron">›</span>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function extractMobilePrimaryMarkup(markup) {
+      const temp = document.createElement("div");
+      temp.innerHTML = markup;
+      const selectorMap = {
+        "recommended-actions": [".recommended-action-list", ".card.green.scroll-card", ".card.orange.recommended-action-list", ".card"],
+        "call-handling": [".call-handling-list-card", ".card"],
+        "requests": [".request-list-card", ".card"],
+        "communication-board": [".communication-list-card", ".card"]
+      };
+      const selectors = selectorMap[activeModule] || [".card"];
+      for (const selector of selectors) {
+        const match = temp.querySelector(selector);
+        if (match) {
+          return `<div class="workspace-fixed-view panel-only">${match.outerHTML}</div>`;
+        }
+      }
+      return `<div class="workspace-fixed-view panel-only">${markup}</div>`;
+    }
+
+    function renderMobileWorkspace(module, resolvedMarkup) {
+      headerActions.innerHTML = "";
+      workspaceDetailOverlay.classList.remove("open");
+      workspaceDetailOverlay.setAttribute("aria-hidden", "true");
+      workspaceDetailMobile.innerHTML = "";
+
+      if (mobileStage === "modules") {
+        workspaceTitle.textContent = "Modules";
+        workspaceCopy.textContent = "";
+        workspace.innerHTML = renderMobileModulesStage();
+        workspace.querySelectorAll("[data-mobile-module]").forEach(button => {
+          button.addEventListener("click", () => {
+            activeModule = button.dataset.mobileModule;
+            activeSubmenu = defaultSubmenuForModule(activeModule);
+            activeWorkspaceDetail = null;
+            mobileStage = "submenu";
+            renderAll();
+          });
+        });
+        return;
+      }
+
+      if (mobileStage === "submenu") {
+        workspaceTitle.textContent = module.name || module.title;
+        workspaceCopy.textContent = "";
+        workspace.innerHTML = renderMobileSubmenuStage(modules.find(item => item.id === activeModule));
+        workspace.querySelectorAll("[data-mobile-submenu]").forEach(button => {
+          button.addEventListener("click", () => {
+            activeSubmenu = button.dataset.mobileSubmenu;
+            activeWorkspaceDetail = null;
+            mobileStage = "content";
+            renderAll();
+          });
+        });
+        return;
+      }
+
+      if (mobileStage === "detail" && activeWorkspaceDetail) {
+        workspaceTitle.textContent = activeSubmenu || module.title;
+        workspaceCopy.textContent = "";
+        workspace.innerHTML = `<div class="workspace-fixed-view panel-only">${renderWorkspaceDetailMarkup(activeWorkspaceDetail)}</div>`;
+        document.querySelectorAll("[data-close-workspace-detail]").forEach(button => {
+          button.addEventListener("click", closeWorkspaceDetail);
+        });
+        document.querySelectorAll(".workspace-detail-panel [data-resolve-action]").forEach(button => {
+          button.addEventListener("click", event => {
+            event.stopPropagation();
+            resolveRecommendedAction(button.dataset.resolveAction);
+          });
+        });
+        return;
+      }
+
+      workspaceTitle.textContent = activeSubmenu || module.title;
+      workspaceCopy.textContent = "";
+
+      if (supportsWorkspaceDetail(activeModule)) {
+        workspace.innerHTML = extractMobilePrimaryMarkup(resolvedMarkup);
+      } else {
+        const needsFixedViewWrap = typeof resolvedMarkup === "string" && !resolvedMarkup.includes("workspace-fixed-view");
+        workspace.innerHTML = needsFixedViewWrap
+          ? `<div class="workspace-fixed-view stack-view">${resolvedMarkup}</div>`
+          : resolvedMarkup;
+      }
     }
 
     function clientStatusTag(status) {
@@ -5694,6 +6000,12 @@
     }
 
     function closeWorkspaceDetail() {
+      if (isMobileShell()) {
+        activeWorkspaceDetail = null;
+        mobileStage = "content";
+        renderAll();
+        return;
+      }
       const shouldRefreshRecommended = activeWorkspaceDetail && activeWorkspaceDetail.module === "recommended-actions";
       activeWorkspaceDetail = null;
       if (shouldRefreshRecommended) {
@@ -5704,6 +6016,12 @@
     }
 
     function openWorkspaceDetail(detail) {
+      if (isMobileShell()) {
+        activeWorkspaceDetail = detail;
+        mobileStage = "detail";
+        renderAll();
+        return;
+      }
       activeWorkspaceDetail = detail;
       if (detail.module === "recommended-actions") {
         renderWorkspace();
@@ -6045,6 +6363,11 @@
         button.addEventListener("click", () => {
           activeSubmenu = button.dataset.submenu;
           activeWorkspaceDetail = null;
+          if (isMobileShell()) {
+            mobileStage = "content";
+            renderAll();
+            return;
+          }
           renderWorkspace();
           renderSubmenu(module);
           syncMobileHeader();
@@ -6067,6 +6390,29 @@
       const shouldWrapDetail = supportsWorkspaceDetail(activeModule);
       const resolvedMarkup = viewMarkup || module.views[activeSubmenu] || "";
       const needsFixedViewWrap = !shouldWrapDetail && typeof resolvedMarkup === "string" && !resolvedMarkup.includes("workspace-fixed-view");
+      if (isMobileShell()) {
+        renderMobileWorkspace(module, resolvedMarkup);
+        if (activeModule === "crm") {
+          activeSubmenu = "Clients";
+          attachCRMClientSearch();
+        }
+        if (activeModule === "recommended-actions") {
+          attachRecommendedActionHandlers();
+        }
+        if (activeModule === "call-handling") {
+          attachCallHandlingHandlers();
+        }
+        if (activeModule === "requests") {
+          attachRequestHandlers();
+        }
+        if (activeModule === "communication-board") {
+          attachCommunicationHandlers();
+        }
+        if (activeModule === "billing" && window.AICallPortBilling && mobileStage === "content") {
+          window.AICallPortBilling.loadAndApplyDashboardBilling(workspace, activeSubmenu);
+        }
+        return;
+      }
       workspace.innerHTML = shouldWrapDetail
         ? `
           <div class="workspace-content-layout detail-${activeModule}">
@@ -6125,8 +6471,18 @@
 
     if (mobileMenuToggle) {
       mobileMenuToggle.addEventListener("click", () => {
+        if (isMobileShell()) {
+          activeWorkspaceDetail = null;
+          mobileStage = "modules";
+          renderAll();
+          return;
+        }
         setMobileNavOpen(!layoutElement.classList.contains("mobile-nav-open"));
       });
+    }
+
+    if (mobileBackBtn) {
+      mobileBackBtn.addEventListener("click", handleMobileBack);
     }
 
     if (sidebarBackdrop) {
@@ -6138,15 +6494,32 @@
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") {
         setMobileNavOpen(false);
-        closeWorkspaceDetail();
+        if (isMobileShell()) {
+          handleMobileBack();
+        } else {
+          closeWorkspaceDetail();
+        }
       }
     });
 
     window.addEventListener("resize", () => {
-      if (!isMobileShell()) {
+      const nowMobile = isMobileShell();
+      if (!nowMobile) {
         setMobileNavOpen(false);
       }
-      syncWorkspaceDetailUI();
+      if (nowMobile !== previousMobileShell) {
+        previousMobileShell = nowMobile;
+        if (!nowMobile) {
+          mobileStage = "content";
+        } else if (mobileStage === "content" && !activeWorkspaceDetail) {
+          mobileStage = "modules";
+        }
+        renderAll();
+        return;
+      }
+      if (!nowMobile) {
+        syncWorkspaceDetailUI();
+      }
       syncMobileHeader();
     });
 
