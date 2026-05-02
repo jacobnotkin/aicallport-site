@@ -127,6 +127,10 @@
       overflow:hidden;
     }
 
+    .sidebar-backdrop{
+      display:none;
+    }
+
     .brand{
       display:flex;
       align-items:center;
@@ -571,6 +575,50 @@
       align-items:start;
     }
 
+    .mobile-shell-bar{
+      display:none;
+    }
+
+    .mobile-menu-btn{
+      min-height:40px;
+      padding:0 14px;
+      border-radius:14px;
+      border:1px solid rgba(78,165,255,.22);
+      background:linear-gradient(180deg, rgba(78,165,255,.14), rgba(78,165,255,.08));
+      color:#eef6ff;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+      cursor:pointer;
+    }
+
+    .mobile-active-context{
+      display:grid;
+      gap:2px;
+      min-width:0;
+      justify-items:end;
+      text-align:right;
+    }
+
+    .mobile-active-module{
+      color:#fff;
+      font-size:14px;
+      font-weight:800;
+      line-height:1.2;
+      letter-spacing:-.02em;
+    }
+
+    .mobile-active-submenu{
+      color:var(--text-secondary);
+      font-size:11px;
+      font-weight:700;
+      line-height:1.3;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+
     .workspace-title{
       margin:0;
       color:#fff;
@@ -830,6 +878,7 @@
     }
 
     .workspace-fixed-view.stack-view > .panel-grid:first-child{
+      height:100%;
       min-height:100%;
       align-items:stretch;
       grid-auto-rows:minmax(0,1fr);
@@ -2679,7 +2728,44 @@
 
     @media (max-width:980px){
       .layout{grid-template-columns:1fr}
-      .sidebar{border-right:none;border-bottom:1px solid rgba(255,255,255,.06)}
+      .sidebar-backdrop{
+        display:block;
+        position:absolute;
+        inset:0;
+        z-index:12;
+        background:rgba(3,8,18,.64);
+        opacity:0;
+        pointer-events:none;
+        transition:opacity .18s ease;
+      }
+      .sidebar{
+        position:absolute;
+        left:0;
+        top:0;
+        bottom:0;
+        width:min(320px, 86vw);
+        z-index:18;
+        border-right:1px solid rgba(255,255,255,.08);
+        border-bottom:none;
+        transform:translateX(calc(-100% - 16px));
+        transition:transform .22s ease;
+        box-shadow:18px 0 44px rgba(0,0,0,.38);
+      }
+      .layout.mobile-nav-open .sidebar{
+        transform:translateX(0);
+      }
+      .layout.mobile-nav-open .sidebar-backdrop{
+        opacity:1;
+        pointer-events:auto;
+      }
+      .main{padding:14px}
+      .mobile-shell-bar{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        padding-bottom:4px;
+      }
       .workspace-top{grid-template-columns:1fr}
       .header-actions{justify-content:flex-start}
       .workspace-content-layout.has-detail{grid-template-columns:1fr}
@@ -2698,6 +2784,7 @@
       .page{padding:10px}
       .shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}
       .layout{min-height:calc(100vh - 20px)}
+      .sidebar{width:min(300px, calc(100vw - 34px))}
       .panel-grid.cols-2,
       .panel-grid.cols-3,
       .panel-grid.cols-4,
@@ -2721,6 +2808,7 @@
   <div class="page">
     <div class="shell">
       <div class="layout">
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
         <aside class="sidebar">
           <div class="brand">
             <div class="logo-wrap">
@@ -2751,6 +2839,13 @@
 
         <main class="main">
           <section class="workspace-header">
+            <div class="mobile-shell-bar">
+              <button class="mobile-menu-btn" id="mobileMenuToggle" type="button" aria-expanded="false" aria-controls="moduleNav">Modules</button>
+              <div class="mobile-active-context">
+                <span class="mobile-active-module" id="mobileActiveModule">Overview</span>
+                <span class="mobile-active-submenu" id="mobileActiveSubmenu">Summary</span>
+              </div>
+            </div>
             <div class="workspace-top">
               <div>
                 <h1 class="workspace-title" id="workspaceTitle">Overview</h1>
@@ -3550,136 +3645,282 @@
         views: {
           Complaints: `
             <div class="panel-grid cols-2">
-              <div class="card orange">
+              <div class="card orange scroll-card">
                 <h2>Open Complaints</h2>
-                <div class="list">
-                  <div class="item">
-                    <div class="item-top"><strong>Caller was transferred into the wrong service path</strong><span class="stamp">Critical</span></div>
-                    <p>Complaint from Acme client record 24418. The owner can review transcript, routing decision, and the exact call outcome from one place.</p>
-                    <div class="tag-row"><span class="tag red">Routing Issue</span><span class="tag orange">Owner Review</span></div>
-                  </div>
-                  <div class="item">
-                    <div class="item-top"><strong>Reminder message timing felt too early</strong><span class="stamp">Open</span></div>
-                    <p>Customer asked for reminder timing to be adjusted for afternoon service windows. Linked to Scheduling rules and confirmation flow.</p>
-                    <div class="tag-row"><span class="tag blue">Scheduling</span><span class="tag orange">Open</span></div>
-                  </div>
-                  <div class="item">
-                    <div class="item-top"><strong>Spanish caller requested clearer fallback</strong><span class="stamp">Review</span></div>
-                    <p>Language detection worked, but fallback phrasing needs refinement for one call path. Linked to multilingual handling.</p>
-                    <div class="tag-row"><span class="tag blue">Languages</span><span class="tag orange">Review</span></div>
+                <div class="panel-scroll">
+                  <div class="list">
+                    <div class="item">
+                      <div class="item-top"><strong>Caller was transferred into the wrong service path</strong><span class="stamp">Critical</span></div>
+                      <p>Complaint from Acme client record 24418. The owner can review transcript, routing decision, and the exact call outcome from one place.</p>
+                      <div class="tag-row"><span class="tag red">Routing Issue</span><span class="tag orange">Owner Review</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Reminder message timing felt too early</strong><span class="stamp">Open</span></div>
+                      <p>Customer asked for reminder timing to be adjusted for afternoon service windows. Linked to Scheduling rules and confirmation flow.</p>
+                      <div class="tag-row"><span class="tag blue">Scheduling</span><span class="tag orange">Open</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Spanish caller requested clearer fallback</strong><span class="stamp">Review</span></div>
+                      <p>Language detection worked, but fallback phrasing needs refinement for one call path. Linked to multilingual handling.</p>
+                      <div class="tag-row"><span class="tag blue">Languages</span><span class="tag orange">Review</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Dispatch notification went to the wrong owner</strong><span class="stamp">Queued</span></div>
+                      <p>Escalation alert reached the backup owner account instead of the active manager for that service area.</p>
+                      <div class="tag-row"><span class="tag blue">Notifications</span><span class="tag orange">Queued</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>After-hours fallback sounded too generic</strong><span class="stamp">Review</span></div>
+                      <p>Owner wants the overnight fallback voice to sound clearer for emergency plumbing callers and less like a generic voicemail box.</p>
+                      <div class="tag-row"><span class="tag blue">After Hours</span><span class="tag orange">Voice Review</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Callback promise was not reflected in owner queue</strong><span class="stamp">Open</span></div>
+                      <p>The caller was told to expect a follow-up within 20 minutes, but that promise did not appear in the owner-facing action lane.</p>
+                      <div class="tag-row"><span class="tag blue">Outbound</span><span class="tag orange">Workflow Gap</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Job completion text arrived before technician closed visit</strong><span class="stamp">Critical</span></div>
+                      <p>Completion message went out while the technician was still on-site, creating confusion for the customer and dispatch team.</p>
+                      <div class="tag-row"><span class="tag red">Scheduling</span><span class="tag orange">Automation Timing</span></div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="card blue">
+              <div class="card blue scroll-card">
                 <h2>Complaint Handling</h2>
-                <div class="metric-list">
-                  <div class="metric-row"><span>Open complaints</span><strong>6</strong></div>
-                  <div class="metric-row"><span>Critical complaints</span><strong>2</strong></div>
-                  <div class="metric-row"><span>Resolved this week</span><strong>11</strong></div>
-                  <div class="metric-row"><span>Average response time</span><strong>6h 20m</strong></div>
+                <div class="panel-scroll">
+                  <div class="metric-list">
+                    <div class="metric-row"><span>Open complaints</span><strong>6</strong></div>
+                    <div class="metric-row"><span>Critical complaints</span><strong>2</strong></div>
+                    <div class="metric-row"><span>Resolved this week</span><strong>11</strong></div>
+                    <div class="metric-row"><span>Average response time</span><strong>6h 20m</strong></div>
+                    <div class="metric-row"><span>Owner-reviewed today</span><strong>4</strong></div>
+                    <div class="metric-row"><span>Linked to routing logic</span><strong>3</strong></div>
+                  </div>
+                  <p>This workspace lets the owner see the issue, connected module, severity, and what should happen next without losing the complaint in support email.</p>
+                  <div class="item">
+                    <div class="item-top"><strong>Current response rule</strong><span class="stamp">Visible</span></div>
+                    <p>High-severity complaints stay visible here until the owner reviews routing, notes, and next-step handling.</p>
+                  </div>
+                  <div class="item">
+                    <div class="item-top"><strong>Escalation expectation</strong><span class="stamp">Enabled</span></div>
+                    <p>Complaint threads marked critical stay pinned here until the routing fix, owner note, and customer response all happen in sequence.</p>
+                  </div>
+                  <div class="item">
+                    <div class="item-top"><strong>What should scroll here</strong><span class="stamp">Test</span></div>
+                    <p>This support column is intentionally filled with more live context so it stretches to the bottom and proves independent internal scrolling.</p>
+                  </div>
                 </div>
-                <p style="margin-top:12px">This workspace lets the owner see the issue, connected module, severity, and what should happen next without losing the complaint in support email.</p>
               </div>
             </div>
           `,
           Suggestions: `
             <div class="panel-grid cols-2">
-              <div class="card teal">
+              <div class="card teal scroll-card">
                 <h2>Customer Suggestions</h2>
-                <div class="list">
-                  <div class="item">
-                    <div class="item-top"><strong>Add weekend-only reminder rule</strong><span class="stamp">Popular</span></div>
-                    <p>Requested by 4 active accounts that want different reminder timing on Saturday jobs.</p>
-                    <div class="tag-row"><span class="tag blue">Scheduling</span><span class="tag green">4 Requests</span></div>
-                  </div>
-                  <div class="item">
-                    <div class="item-top"><strong>Show lead value in callback queue</strong><span class="stamp">New</span></div>
-                    <p>Sales-focused teams want the callback list prioritized by estimated deal value inside Outbound Follow-Up.</p>
-                    <div class="tag-row"><span class="tag blue">Outbound</span><span class="tag orange">Product Review</span></div>
-                  </div>
-                  <div class="item">
-                    <div class="item-top"><strong>More visible urgent-call sound options</strong><span class="stamp">Queued</span></div>
-                    <p>Owners want stronger sound/visual distinction when emergency routing is triggered.</p>
-                    <div class="tag-row"><span class="tag red">Call Handling</span><span class="tag">Queued</span></div>
+                <div class="panel-scroll">
+                  <div class="list">
+                    <div class="item">
+                      <div class="item-top"><strong>Add weekend-only reminder rule</strong><span class="stamp">Popular</span></div>
+                      <p>Requested by 4 active accounts that want different reminder timing on Saturday jobs.</p>
+                      <div class="tag-row"><span class="tag blue">Scheduling</span><span class="tag green">4 Requests</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Show lead value in callback queue</strong><span class="stamp">New</span></div>
+                      <p>Sales-focused teams want the callback list prioritized by estimated deal value inside Outbound Follow-Up.</p>
+                      <div class="tag-row"><span class="tag blue">Outbound</span><span class="tag orange">Product Review</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>More visible urgent-call sound options</strong><span class="stamp">Queued</span></div>
+                      <p>Owners want stronger sound/visual distinction when emergency routing is triggered.</p>
+                      <div class="tag-row"><span class="tag red">Call Handling</span><span class="tag">Queued</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Bulk note template for repeated follow-up</strong><span class="stamp">Review</span></div>
+                      <p>Teams want a reusable follow-up note block inside Communication Board and Outbound Follow-Up.</p>
+                      <div class="tag-row"><span class="tag blue">Communication</span><span class="tag orange">Review</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Optional owner digest by urgency level</strong><span class="stamp">New</span></div>
+                      <p>Owners want a quick digest that separates emergency items, approvals, and low-priority follow-up into clearer groups.</p>
+                      <div class="tag-row"><span class="tag blue">Overview</span><span class="tag orange">Digest</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Show missed-call reason inside callback lane</strong><span class="stamp">Queued</span></div>
+                      <p>Teams want callback tasks to show whether the missed call came from after-hours overflow, missed dispatch, or quote follow-up.</p>
+                      <div class="tag-row"><span class="tag blue">Call Handling</span><span class="tag orange">Queued</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Separate reminder templates for med spas</strong><span class="stamp">Review</span></div>
+                      <p>Appointment-heavy accounts want different reminder language for beauty and wellness workflows than home-service jobs.</p>
+                      <div class="tag-row"><span class="tag blue">Scheduling</span><span class="tag orange">Vertical Fit</span></div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="card">
+              <div class="card scroll-card">
                 <h2>Suggestion Signals</h2>
-                <div class="metric-list">
-                  <div class="metric-row"><span>Open suggestions</span><strong>18</strong></div>
-                  <div class="metric-row"><span>Most requested area</span><strong>Scheduling</strong></div>
-                  <div class="metric-row"><span>Accepted for review</span><strong>7</strong></div>
-                  <div class="metric-row"><span>Shipped recently</span><strong>3</strong></div>
+                <div class="panel-scroll">
+                  <div class="metric-list">
+                    <div class="metric-row"><span>Open suggestions</span><strong>18</strong></div>
+                    <div class="metric-row"><span>Most requested area</span><strong>Scheduling</strong></div>
+                    <div class="metric-row"><span>Accepted for review</span><strong>7</strong></div>
+                    <div class="metric-row"><span>Shipped recently</span><strong>3</strong></div>
+                  </div>
+                  <div class="item">
+                    <div class="item-top"><strong>Signal summary</strong><span class="stamp">Live</span></div>
+                    <p>This panel stays tall so the owner can keep suggestion counts and review status visible while scanning the request lane.</p>
+                  </div>
+                  <div class="item">
+                    <div class="item-top"><strong>Accepted this month</strong><span class="stamp">5</span></div>
+                    <p>Accepted ideas move into visible review so the owner can see which operational suggestions are actually being considered.</p>
+                  </div>
+                  <div class="item">
+                    <div class="item-top"><strong>Most repeated pain point</strong><span class="stamp">Reminders</span></div>
+                    <p>Reminder timing, message clarity, and callback urgency are currently the most repeated customer and owner suggestions.</p>
+                  </div>
                 </div>
               </div>
             </div>
           `,
           Requests: `
             <div class="panel-grid cols-2">
-              <div class="card">
+              <div class="card scroll-card">
                 <h2>Feature Requests</h2>
-                <div class="list">
-                  <div class="item">
-                    <div class="item-top"><strong>Add referral export by month</strong><span class="stamp">Requested</span></div>
-                    <p>Owner wants a monthly export of referred active accounts and credits applied in Billing.</p>
-                    <div class="tag-row"><span class="tag blue">Referrals</span><span class="tag orange">Backlog</span></div>
-                  </div>
-                  <div class="item">
-                    <div class="item-top"><strong>Task auto-close after confirmed callback</strong><span class="stamp">Review</span></div>
-                    <p>Requested by two teams using Outbound Follow-Up and Advanced Management together.</p>
-                    <div class="tag-row"><span class="tag blue">Advanced Mgmt</span><span class="tag blue">Outbound</span></div>
-                  </div>
-                  <div class="item">
-                    <div class="item-top"><strong>Per-language usage chart</strong><span class="stamp">Planned</span></div>
-                    <p>Multilingual accounts want a simpler breakdown of call volume by active language pack.</p>
-                    <div class="tag-row"><span class="tag blue">Languages</span><span class="tag green">Planned</span></div>
+                <div class="panel-scroll">
+                  <div class="list">
+                    <div class="item">
+                      <div class="item-top"><strong>Add referral export by month</strong><span class="stamp">Requested</span></div>
+                      <p>Owner wants a monthly export of referred active accounts and credits applied in Billing.</p>
+                      <div class="tag-row"><span class="tag blue">Referrals</span><span class="tag orange">Backlog</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Task auto-close after confirmed callback</strong><span class="stamp">Review</span></div>
+                      <p>Requested by two teams using Outbound Follow-Up and Advanced Management together.</p>
+                      <div class="tag-row"><span class="tag blue">Advanced Mgmt</span><span class="tag blue">Outbound</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Per-language usage chart</strong><span class="stamp">Planned</span></div>
+                      <p>Multilingual accounts want a simpler breakdown of call volume by active language pack.</p>
+                      <div class="tag-row"><span class="tag blue">Languages</span><span class="tag green">Planned</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Owner summary email with pending approvals</strong><span class="stamp">Queued</span></div>
+                      <p>Requested as a daily digest view for owners who want a quick pending-items summary outside the dashboard.</p>
+                      <div class="tag-row"><span class="tag blue">Approvals</span><span class="tag orange">Queued</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Bulk reschedule tool for weather delays</strong><span class="stamp">Review</span></div>
+                      <p>Service teams want one owner-facing control to shift a full day of appointments when weather or outages affect route timing.</p>
+                      <div class="tag-row"><span class="tag blue">Scheduling</span><span class="tag orange">Workflow</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Approval lock for high-value estimates</strong><span class="stamp">Planned</span></div>
+                      <p>Quote-heavy teams want estimate confirmation to pause until the owner reviews jobs above a set deal threshold.</p>
+                      <div class="tag-row"><span class="tag blue">Sales</span><span class="tag green">Planned</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Dedicated owner queue for language exceptions</strong><span class="stamp">Queued</span></div>
+                      <p>Multilingual accounts want language fallback issues grouped in a single visible owner lane instead of mixed into general notes.</p>
+                      <div class="tag-row"><span class="tag blue">Languages</span><span class="tag orange">Queued</span></div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="card amber">
+              <div class="card amber scroll-card">
                 <h2>Request Status</h2>
-                <div class="metric-list">
-                  <div class="metric-row"><span>Total open requests</span><strong>9</strong></div>
-                  <div class="metric-row"><span>Under product review</span><strong>4</strong></div>
-                  <div class="metric-row"><span>Planned</span><strong>3</strong></div>
-                  <div class="metric-row"><span>Not this cycle</span><strong>2</strong></div>
+                <div class="panel-scroll">
+                  <div class="metric-list">
+                    <div class="metric-row"><span>Total open requests</span><strong>9</strong></div>
+                    <div class="metric-row"><span>Under product review</span><strong>4</strong></div>
+                    <div class="metric-row"><span>Planned</span><strong>3</strong></div>
+                    <div class="metric-row"><span>Not this cycle</span><strong>2</strong></div>
+                  </div>
+                  <p>Feature requests stay visible here so the owner can see what has been received, what is under review, and what has already moved into the roadmap.</p>
+                  <div class="item">
+                    <div class="item-top"><strong>Roadmap visibility</strong><span class="stamp">Visible</span></div>
+                    <p>This support panel should fill the full workspace height just like the request lane beside it.</p>
+                  </div>
+                  <div class="item">
+                    <div class="item-top"><strong>Longest waiting request</strong><span class="stamp">18 days</span></div>
+                    <p>The oldest owner-visible feature request is still in review so this panel keeps pressure visible beside the request queue.</p>
+                  </div>
+                  <div class="item">
+                    <div class="item-top"><strong>Requests reviewed this week</strong><span class="stamp">6</span></div>
+                    <p>Review counts stay here so the owner can see whether product feedback is moving or sitting idle.</p>
+                  </div>
                 </div>
-                <p style="margin-top:12px">Feature requests stay visible here so the owner can see what has been received, what is under review, and what has already moved into the roadmap.</p>
               </div>
             </div>
           `,
           "Release Notes": `
             <div class="panel-grid cols-2">
-              <div class="card green">
+              <div class="card green scroll-card">
                 <h2>Recent Updates</h2>
-                <div class="list">
-                  <div class="item">
-                    <div class="item-top"><strong>Improved multilingual fallback handling</strong><span class="stamp">Apr 22</span></div>
-                    <p>Language-detection flow now gives cleaner fallback behavior when the caller switches languages mid-conversation.</p>
-                    <div class="tag-row"><span class="tag blue">Languages</span><span class="tag green">Released</span></div>
-                  </div>
-                  <div class="item">
-                    <div class="item-top"><strong>Billing now shows referral credits line-by-line</strong><span class="stamp">Apr 20</span></div>
-                    <p>Owners can now see each referred active client listed as a separate monthly credit in Billing.</p>
-                    <div class="tag-row"><span class="tag blue">Billing</span><span class="tag green">Released</span></div>
-                  </div>
-                  <div class="item">
-                    <div class="item-top"><strong>New approval visibility in Advanced Management</strong><span class="stamp">Apr 18</span></div>
-                    <p>Approvals & Requests now surface more clearly in the management layer for owner review.</p>
-                    <div class="tag-row"><span class="tag blue">Advanced Mgmt</span><span class="tag green">Released</span></div>
+                <div class="panel-scroll">
+                  <div class="list">
+                    <div class="item">
+                      <div class="item-top"><strong>Improved multilingual fallback handling</strong><span class="stamp">Apr 22</span></div>
+                      <p>Language-detection flow now gives cleaner fallback behavior when the caller switches languages mid-conversation.</p>
+                      <div class="tag-row"><span class="tag blue">Languages</span><span class="tag green">Released</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Billing now shows referral credits line-by-line</strong><span class="stamp">Apr 20</span></div>
+                      <p>Owners can now see each referred active client listed as a separate monthly credit in Billing.</p>
+                      <div class="tag-row"><span class="tag blue">Billing</span><span class="tag green">Released</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>New approval visibility in Advanced Management</strong><span class="stamp">Apr 18</span></div>
+                      <p>Approvals & Requests now surface more clearly in the management layer for owner review.</p>
+                      <div class="tag-row"><span class="tag blue">Advanced Mgmt</span><span class="tag green">Released</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Complaint review lane added to Feedback</strong><span class="stamp">Apr 15</span></div>
+                      <p>Complaint handling now stays in one owner-facing module instead of living only in support email threads.</p>
+                      <div class="tag-row"><span class="tag blue">Feedback</span><span class="tag green">Released</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Updated callback queue visibility in Outbound Follow-Up</strong><span class="stamp">Apr 12</span></div>
+                      <p>Owners can now see callback urgency and pending follow-up windows more clearly before the next sales move is made.</p>
+                      <div class="tag-row"><span class="tag blue">Outbound</span><span class="tag green">Released</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Scheduling confirmation stamps now stay in one lane</strong><span class="stamp">Apr 10</span></div>
+                      <p>Reminder, confirmation, and reschedule events now remain visible in one owner-facing timeline instead of splitting across modules.</p>
+                      <div class="tag-row"><span class="tag blue">Scheduling</span><span class="tag green">Released</span></div>
+                    </div>
+                    <div class="item">
+                      <div class="item-top"><strong>Approval request counts added to management view</strong><span class="stamp">Apr 08</span></div>
+                      <p>Open approval counts now remain visible in the management layer so owners can react before live work stalls.</p>
+                      <div class="tag-row"><span class="tag blue">Advanced Mgmt</span><span class="tag green">Released</span></div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="card blue">
+              <div class="card blue scroll-card">
                 <h2>Update Transparency</h2>
-                <div class="metric-list">
-                  <div class="metric-row"><span>Updates this month</span><strong>6</strong></div>
-                  <div class="metric-row"><span>Feedback-linked updates</span><strong>4</strong></div>
-                  <div class="metric-row"><span>Operational fixes</span><strong>3</strong></div>
-                  <div class="metric-row"><span>New capability releases</span><strong>2</strong></div>
+                <div class="panel-scroll">
+                  <div class="metric-list">
+                    <div class="metric-row"><span>Updates this month</span><strong>6</strong></div>
+                    <div class="metric-row"><span>Feedback-linked updates</span><strong>4</strong></div>
+                    <div class="metric-row"><span>Operational fixes</span><strong>3</strong></div>
+                    <div class="metric-row"><span>New capability releases</span><strong>2</strong></div>
+                  </div>
+                  <p>Release notes should not feel hidden. This module shows owners what changed, what feedback influenced it, and which operational areas improved.</p>
+                  <div class="item">
+                    <div class="item-top"><strong>Visibility goal</strong><span class="stamp">Always On</span></div>
+                    <p>This side panel should stretch to the bottom and scroll internally when updates grow longer.</p>
+                  </div>
+                  <div class="item">
+                    <div class="item-top"><strong>Customer-linked changes</strong><span class="stamp">4</span></div>
+                    <p>Recent updates tied directly to owner or customer feedback stay listed here so release notes feel connected to real requests.</p>
+                  </div>
+                  <div class="item">
+                    <div class="item-top"><strong>Owner-facing fixes this month</strong><span class="stamp">3</span></div>
+                    <p>Operational visibility improvements, routing clarity, and approval lane updates now remain visible in this release tracker.</p>
+                  </div>
                 </div>
-                <p style="margin-top:12px">Release notes should not feel hidden. This module shows owners what changed, what feedback influenced it, and which operational areas improved.</p>
               </div>
             </div>
           `
@@ -3728,6 +3969,11 @@
     const workspaceTitle = document.getElementById("workspaceTitle");
     const workspaceCopy = document.getElementById("workspaceCopy");
     const headerActions = document.getElementById("headerActions");
+    const layoutElement = document.querySelector(".layout");
+    const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+    const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+    const mobileActiveModule = document.getElementById("mobileActiveModule");
+    const mobileActiveSubmenu = document.getElementById("mobileActiveSubmenu");
     const clientProfileOverlay = document.getElementById("clientProfileOverlay");
     const workspaceDetailOverlay = document.getElementById("workspaceDetailOverlay");
     const workspaceDetailMobile = document.getElementById("workspaceDetailMobile");
@@ -3775,6 +4021,29 @@
     let activeSubmenu = "Summary";
     let activeWorkspaceDetail = null;
 
+    function isMobileShell() {
+      return window.innerWidth <= 980;
+    }
+
+    function setMobileNavOpen(nextOpen) {
+      if (!layoutElement) return;
+      const shouldOpen = !!nextOpen && isMobileShell();
+      layoutElement.classList.toggle("mobile-nav-open", shouldOpen);
+      if (mobileMenuToggle) {
+        mobileMenuToggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+      }
+    }
+
+    function syncMobileHeader() {
+      const module = modules.find(m => m.id === activeModule);
+      if (mobileActiveModule) {
+        mobileActiveModule.textContent = module ? module.name : "Module";
+      }
+      if (mobileActiveSubmenu) {
+        mobileActiveSubmenu.textContent = activeSubmenu || "";
+      }
+    }
+
     function renderModuleNav() {
       const groups = [
         { key: "active", label: "Active Now" },
@@ -3806,6 +4075,7 @@
           activeModule = button.dataset.module;
           activeSubmenu = activeModule === "crm" ? "Clients" : modules.find(m => m.id === activeModule).submenus[0];
           activeWorkspaceDetail = null;
+          setMobileNavOpen(false);
           renderAll();
         });
       });
@@ -5719,6 +5989,7 @@
           activeWorkspaceDetail = null;
           renderWorkspace();
           renderSubmenu(module);
+          syncMobileHeader();
         });
       });
     }
@@ -5775,6 +6046,7 @@
       renderModuleNav();
       renderSubmenu(module);
       renderWorkspace();
+      syncMobileHeader();
     }
 
     closeClientProfile.addEventListener("click", () => {
@@ -5793,14 +6065,31 @@
       }
     });
 
+    if (mobileMenuToggle) {
+      mobileMenuToggle.addEventListener("click", () => {
+        setMobileNavOpen(!layoutElement.classList.contains("mobile-nav-open"));
+      });
+    }
+
+    if (sidebarBackdrop) {
+      sidebarBackdrop.addEventListener("click", () => {
+        setMobileNavOpen(false);
+      });
+    }
+
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") {
+        setMobileNavOpen(false);
         closeWorkspaceDetail();
       }
     });
 
     window.addEventListener("resize", () => {
+      if (!isMobileShell()) {
+        setMobileNavOpen(false);
+      }
       syncWorkspaceDetailUI();
+      syncMobileHeader();
     });
 
     renderAll();
