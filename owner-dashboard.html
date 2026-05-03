@@ -627,6 +627,10 @@
       text-align:right;
     }
 
+    .mobile-active-context .is-hidden{
+      display:none;
+    }
+
     .mobile-active-module{
       color:#fff;
       font-size:14px;
@@ -675,7 +679,7 @@
       border-radius:18px;
       border:1px solid rgba(255,255,255,.08);
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
-      padding:16px;
+      padding:13px 14px;
       text-align:left;
       color:var(--text-primary);
       box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
@@ -683,8 +687,8 @@
 
     .mobile-stage-card strong{
       display:block;
-      font-size:18px;
-      line-height:1.15;
+      font-size:16px;
+      line-height:1.12;
       letter-spacing:-.03em;
     }
 
@@ -703,7 +707,7 @@
 
     .mobile-stage-card.module-card{
       display:grid;
-      gap:10px;
+      gap:8px;
       width:100%;
     }
 
@@ -711,7 +715,7 @@
       justify-self:start;
       display:inline-flex;
       align-items:center;
-      padding:6px 10px;
+      padding:5px 9px;
       border-radius:999px;
       background:rgba(78,165,255,.12);
       color:var(--blue-soft);
@@ -725,11 +729,11 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
+      gap:10px;
     }
 
     .mobile-stage-card.submenu-card strong{
-      font-size:17px;
+      font-size:16px;
     }
 
     .mobile-stage-card .chevron{
@@ -798,9 +802,9 @@
       border-radius:22px;
       border:1px solid rgba(255,255,255,.07);
       background:rgba(255,255,255,.03);
-      padding:16px;
+      padding:14px;
       display:grid;
-      gap:10px;
+      gap:8px;
       text-align:left;
       color:inherit;
       width:100%;
@@ -831,7 +835,7 @@
 
     .mobile-primary-top strong{
       color:#fff;
-      font-size:16px;
+      font-size:15px;
       line-height:1.25;
       font-weight:800;
       letter-spacing:-.02em;
@@ -839,8 +843,8 @@
 
     .mobile-primary-copy{
       color:var(--text-secondary);
-      font-size:13px;
-      line-height:1.5;
+      font-size:12px;
+      line-height:1.42;
       font-weight:700;
     }
 
@@ -1142,6 +1146,7 @@
       height:100%;
       min-height:0;
       overflow:auto;
+      overflow-x:hidden;
       overscroll-behavior:contain;
       padding-right:4px;
     }
@@ -1411,6 +1416,8 @@
       top:auto;
       height:100%;
       min-height:0;
+      width:100%;
+      overflow-x:hidden;
       border-radius:22px;
       border:1px solid rgba(78,165,255,.14);
       background:
@@ -1423,6 +1430,7 @@
     .workspace-detail-inner{
       height:100%;
       overflow:auto;
+      overflow-x:hidden;
       overscroll-behavior:contain;
       padding:18px;
       display:grid;
@@ -1535,6 +1543,8 @@
       font-size:13px;
       line-height:1.6;
       font-weight:600;
+      overflow-wrap:anywhere;
+      word-break:break-word;
     }
 
     .workspace-detail-stat-grid{
@@ -4412,11 +4422,12 @@
       if (mobileActiveModule) {
         if (!isMobileShell()) {
           mobileActiveModule.textContent = module ? module.name : "Module";
-        } else if (mobileStage === "modules") {
-          mobileActiveModule.textContent = "Modules";
+        } else if (mobileStage === "content" || mobileStage === "detail") {
+          mobileActiveModule.textContent = module ? module.name : "";
         } else {
-          mobileActiveModule.textContent = module ? module.name : "Module";
+          mobileActiveModule.textContent = "";
         }
+        mobileActiveModule.classList.toggle("is-hidden", isMobileShell() && !mobileActiveModule.textContent);
       }
       if (mobileActiveSubmenu) {
         if (!isMobileShell()) {
@@ -4425,11 +4436,10 @@
           mobileActiveSubmenu.textContent = "Choose module";
         } else if (mobileStage === "submenu") {
           mobileActiveSubmenu.textContent = "Choose section";
-        } else if (mobileStage === "detail") {
-          mobileActiveSubmenu.textContent = "Detail";
         } else {
-          mobileActiveSubmenu.textContent = activeSubmenu || "List";
+          mobileActiveSubmenu.textContent = "";
         }
+        mobileActiveSubmenu.classList.toggle("is-hidden", isMobileShell() && !mobileActiveSubmenu.textContent);
       }
     }
 
@@ -4506,7 +4516,6 @@
                     <button class="mobile-stage-card module-card" type="button" data-mobile-module="${module.id}">
                       <span class="state-pill">${module.badgeLabel || stateLabel[module.state]}</span>
                       <strong>${module.name}</strong>
-                      <p>${workspaceData[module.id]?.title || module.name}</p>
                     </button>
                   `).join("")}
                 </div>
@@ -4525,7 +4534,6 @@
               <button class="mobile-stage-card submenu-card" type="button" data-mobile-submenu="${name}">
                 <div>
                   <strong>${name}</strong>
-                  <p>Open ${name.toLowerCase()} in ${module.name}.</p>
                 </div>
                 <span class="chevron">›</span>
               </button>
@@ -4713,10 +4721,6 @@
       return `
         <div class="workspace-fixed-view panel-only">
           <div class="mobile-primary-list">
-            <div class="card teal">
-              <h2>Clients</h2>
-              <p class="helper-line" style="margin:0">Choose a client to open the record. Search and upload controls stay secondary on mobile.</p>
-            </div>
             ${crmClients.map(client => `
               <button class="mobile-primary-card blue" type="button" data-mobile-crm-client="${client.name}">
                 <div class="mobile-primary-top">
@@ -4724,7 +4728,6 @@
                   <span class="tag ${clientStatusTag(client.status)}">${client.status}</span>
                 </div>
                 <div class="mobile-primary-copy">${client.source} • ${client.phone}</div>
-                <div class="mobile-primary-meta">${truncateMobileCopy(client.nextStepAction, 74)}</div>
               </button>
             `).join("")}
           </div>
@@ -4786,42 +4789,33 @@
 
     function renderMobileRecommendedStage(submenu) {
       const items = filterRecommendedActions(submenu);
-      const title = submenu === "Resolved" ? "Resolved Actions" : submenu;
-      const cardClass = submenu === "Resolved" ? "teal" : "orange";
       return `
         <div class="workspace-fixed-view panel-only">
           <div class="mobile-primary-list">
-            <div class="card ${cardClass}">
-              <h2>${title}</h2>
-              <div class="panel-scroll">
-                <div class="mobile-primary-list">
-                  ${items.map(item => {
-                    const base = submenu === "Resolved"
-                      ? `
-                        <button class="mobile-primary-card teal" type="button">
-                          <div class="mobile-primary-top">
-                            <strong>${item.title}</strong>
-                            <span class="stamp">${item.stamp}</span>
-                          </div>
-                          <div class="mobile-primary-copy">${truncateMobileCopy(item.body, 72)}</div>
-                          <div class="mobile-primary-tags">${renderActionTags((item.tags || []).slice(0, 1))}</div>
-                        </button>
-                      `
-                      : `
-                        <button class="mobile-primary-card ${item.urgent ? "orange" : "blue"}" type="button" data-action-detail="${item.id}">
-                          <div class="mobile-primary-top">
-                            <strong>${item.title}</strong>
-                            <span class="stamp">${item.stamp}</span>
-                          </div>
-                          <div class="mobile-primary-copy">${truncateMobileCopy(item.body, 72)}</div>
-                          <div class="mobile-primary-tags">${renderActionTags((item.tags || []).slice(0, 1))}</div>
-                        </button>
-                      `;
-                    return base;
-                  }).join("")}
-                </div>
-              </div>
-            </div>
+            ${items.map(item => {
+              const base = submenu === "Resolved"
+                ? `
+                  <button class="mobile-primary-card teal" type="button">
+                    <div class="mobile-primary-top">
+                      <strong>${item.title}</strong>
+                      <span class="stamp">${item.stamp}</span>
+                    </div>
+                    <div class="mobile-primary-copy">${truncateMobileCopy(item.body, 72)}</div>
+                    <div class="mobile-primary-tags">${renderActionTags((item.tags || []).slice(0, 1))}</div>
+                  </button>
+                `
+                : `
+                  <button class="mobile-primary-card ${item.urgent ? "orange" : "blue"}" type="button" data-action-detail="${item.id}">
+                    <div class="mobile-primary-top">
+                      <strong>${item.title}</strong>
+                      <span class="stamp">${item.stamp}</span>
+                    </div>
+                    <div class="mobile-primary-copy">${truncateMobileCopy(item.body, 72)}</div>
+                    <div class="mobile-primary-tags">${renderActionTags((item.tags || []).slice(0, 1))}</div>
+                  </button>
+                `;
+              return base;
+            }).join("")}
           </div>
         </div>
       `;
@@ -4854,19 +4848,9 @@
 
     function renderMobileFeedbackStage(submenu) {
       const items = parseFeedbackMobileEntries(submenu);
-      const titleMap = {
-        Complaints: "Open Complaints",
-        Suggestions: "Customer Suggestions",
-        Requests: "Feature Requests",
-        "Release Notes": "Recent Updates"
-      };
       return `
         <div class="workspace-fixed-view panel-only">
           <div class="mobile-primary-list">
-            <div class="card ${submenu === "Complaints" ? "orange" : submenu === "Release Notes" ? "green" : "blue"}">
-              <h2>${titleMap[submenu] || submenu}</h2>
-              <p class="helper-line" style="margin:0">Open one item at a time to review the detail without carrying the full support summary on mobile.</p>
-            </div>
             ${items.map(item => `
               <button class="mobile-primary-card ${item.colorClass}" type="button" data-mobile-feedback-item="${item.id}">
                 <div class="mobile-primary-top">
@@ -4914,10 +4898,6 @@
       return `
         <div class="workspace-fixed-view panel-only">
           <div class="mobile-primary-list">
-            <div class="card blue">
-              <h2>${submenu}</h2>
-              <p class="helper-line" style="margin:0">Open one billing section at a time so plan, invoices, and payment details stay readable on mobile.</p>
-            </div>
             ${sections.map(section => `
               <button class="mobile-primary-card blue" type="button" data-mobile-billing-section="${section.id}">
                 <div class="mobile-primary-top">
