@@ -53,10 +53,10 @@
     <main class="main">
       <section class="topbar"><div class="topbar-left"><h1>Requests</h1><p>Review setup edits, support issues, staff access requests, and owner approvals without losing track of the operational work behind them.</p></div><div class="topbar-right"><div class="chip">1 Open Approval</div><div class="chip">4 Total Requests</div><a class="action-btn" href="#">Archive</a><a class="action-btn" href="#">Filter</a><a class="action-btn primary" href="#">New Request</a></div></section>
       <section class="summary-grid">
-        <div class="card"><div class="label">Open Requests</div><div class="value">4</div><div class="meta">Across support and setup</div></div>
-        <div class="card"><div class="label">Owner Approval</div><div class="value">1</div><div class="meta">Needs decision today</div></div>
-        <div class="card"><div class="label">Support Issues</div><div class="value">2</div><div class="meta">One resolved, one active</div></div>
-        <div class="card"><div class="label">Access Changes</div><div class="value">1</div><div class="meta">Waiting on approval</div></div>
+        <div class="card"><div class="label">Open Requests</div><div class="value" id="openRequestsValue">0</div><div class="meta" id="openRequestsMeta">Awaiting review or follow-up</div></div>
+        <div class="card"><div class="label">Approved</div><div class="value" id="approvedRequestsValue">0</div><div class="meta" id="approvedRequestsMeta">Accepted founder beta requests</div></div>
+        <div class="card"><div class="label">Reviewing</div><div class="value" id="reviewingRequestsValue">0</div><div class="meta" id="reviewingRequestsMeta">Currently being reviewed</div></div>
+        <div class="card"><div class="label">New Requests</div><div class="value" id="newRequestsValue">0</div><div class="meta" id="newRequestsMeta">Fresh submissions to review</div></div>
       </section>
       <section class="split">
         <div class="card">
@@ -179,6 +179,14 @@
     const reviewNotes = document.getElementById("reviewNotes");
     const saveNotesButton = document.getElementById("saveNotesButton");
     const notesMessage = document.getElementById("notesMessage");
+    const openRequestsValue = document.getElementById("openRequestsValue");
+    const approvedRequestsValue = document.getElementById("approvedRequestsValue");
+    const reviewingRequestsValue = document.getElementById("reviewingRequestsValue");
+    const newRequestsValue = document.getElementById("newRequestsValue");
+    const openRequestsMeta = document.getElementById("openRequestsMeta");
+    const approvedRequestsMeta = document.getElementById("approvedRequestsMeta");
+    const reviewingRequestsMeta = document.getElementById("reviewingRequestsMeta");
+    const newRequestsMeta = document.getElementById("newRequestsMeta");
     const requestRowsById = new Map();
     let activeRequestId = "";
 
@@ -220,6 +228,35 @@
       return String(status || "new").replace(/(^|\s)\S/g, (char) => char.toUpperCase());
     }
 
+    function pluralize(count, singular, plural) {
+      return `${count} ${count === 1 ? singular : plural}`;
+    }
+
+    function updateSummaryCards(rows) {
+      const counts = rows.reduce((acc, row) => {
+        const status = (row.status || "new").toLowerCase();
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {});
+
+      const approvedCount = counts.approved || 0;
+      const reviewingCount = counts.reviewing || 0;
+      const newCount = counts.new || 0;
+      const shortlistedCount = counts.shortlisted || 0;
+      const contactedCount = counts.contacted || 0;
+      const openCount = newCount + reviewingCount + shortlistedCount + contactedCount;
+
+      openRequestsValue.textContent = String(openCount);
+      approvedRequestsValue.textContent = String(approvedCount);
+      reviewingRequestsValue.textContent = String(reviewingCount);
+      newRequestsValue.textContent = String(newCount);
+
+      openRequestsMeta.textContent = `${pluralize(shortlistedCount + contactedCount, "request needs", "requests need")} follow-up beyond brand-new intake`;
+      approvedRequestsMeta.textContent = approvedCount ? `${pluralize(approvedCount, "business approved", "businesses approved")}` : "No approvals yet";
+      reviewingRequestsMeta.textContent = reviewingCount ? `${pluralize(reviewingCount, "request in active review", "requests in active review")}` : "No requests in review";
+      newRequestsMeta.textContent = newCount ? `${pluralize(newCount, "submission waiting", "submissions waiting")} for first review` : "No fresh submissions waiting";
+    }
+
     function openRequestModal(id) {
       const row = requestRowsById.get(id);
       if (!row) return;
@@ -255,6 +292,7 @@
     function renderRequests(rows) {
       requestRowsById.clear();
       rows.forEach((row) => requestRowsById.set(row.id, row));
+      updateSummaryCards(rows);
 
       if (!rows.length) {
         requestsList.innerHTML = `
