@@ -46,6 +46,28 @@ export default async function handler(req, res) {
         return json(res, 200, { request: data });
       }
 
+      if (action === "update-beta-notes") {
+        const id = body.id || "";
+        const reviewNotes = typeof body.reviewNotes === "string" ? body.reviewNotes : "";
+
+        if (!id) {
+          return json(res, 400, { error: "Application id is required." });
+        }
+
+        const { data, error } = await supabaseAdmin
+          .from("beta_applications")
+          .update({ review_notes: reviewNotes })
+          .eq("id", id)
+          .select("*")
+          .single();
+
+        if (error) {
+          return json(res, 500, { error: error.message || "Unable to update request notes." });
+        }
+
+        return json(res, 200, { request: data });
+      }
+
       return json(res, 400, { error: "Unsupported action." });
     }
 
