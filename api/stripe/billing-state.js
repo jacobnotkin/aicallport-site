@@ -5,17 +5,52 @@ import {
   getStripe,
   getSupabaseAdmin,
   getUserFromBearer,
-  json
+  json,
+  readJsonBody
 } from "./_shared.js";
 
 export const config = { api: { bodyParser: true } };
 export { runtime };
 
 export default async function handler(req, res) {
-  if (req.method !== "GET") return json(res, 405, { error: "Method not allowed" });
-
   try {
     const supabaseAdmin = getSupabaseAdmin();
+    if (req.method === "POST") {
+      const body = await readJsonBody(req);
+      const action = body.action || "";
+
+      if (action === "update-beta-status") {
+        const id = body.id || "";
+        const status = body.status || "";
+        const allowedStatuses = ["new", "reviewing", "shortlisted", "approved", "rejected", "contacted"];
+
+        if (!id || !status) {
+          return json(res, 400, { error: "Application id and status are required." });
+        }
+
+        if (!allowedStatuses.includes(status)) {
+          return json(res, 400, { error: "Invalid status value." });
+        }
+
+        const { data, error } = await supabaseAdmin
+          .from("beta_applications")
+          .update({ status })
+          .eq("id", id)
+          .select("*")
+          .single();
+
+        if (error) {
+          return json(res, 500, { error: error.message || "Unable to update request status." });
+        }
+
+        return json(res, 200, { request: data });
+      }
+
+      return json(res, 400, { error: "Unsupported action." });
+    }
+
+    if (req.method !== "GET") return json(res, 405, { error: "Method not allowed" });
+
     const view = req.query.view || "";
 
     if (view === "beta-applications") {
