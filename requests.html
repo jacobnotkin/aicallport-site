@@ -51,7 +51,7 @@
       <div class="sidebar-foot"><strong>Request Queue</strong><p>Requests should cover setup edits, staff access, number changes, support issues, and any owner approvals that need tracking.</p></div>
     </aside>
     <main class="main">
-      <section class="topbar"><div class="topbar-left"><h1>Requests</h1><p>Review setup edits, support issues, staff access requests, and owner approvals without losing track of the operational work behind them.</p></div><div class="topbar-right"><div class="chip" id="openApprovalChip">0 Open Approval</div><div class="chip" id="totalRequestsChip">0 Total Requests</div><label class="action-btn" for="statusFilter">Filter</label><select class="action-btn" id="statusFilter" aria-label="Filter requests by status"><option value="all">All</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="shortlisted">Shortlisted</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="contacted">Contacted</option></select><a class="action-btn primary" href="#">New Request</a></div></section>
+      <section class="topbar"><div class="topbar-left"><h1>Requests</h1><p>Review setup edits, support issues, staff access requests, and owner approvals without losing track of the operational work behind them.</p></div><div class="topbar-right"><div class="chip" id="openApprovalChip">0 Open Approval</div><div class="chip" id="totalRequestsChip">0 Total Requests</div><label class="action-btn" for="searchRequests">Search</label><input class="action-btn" id="searchRequests" type="search" placeholder="Find request" aria-label="Search requests" /><label class="action-btn" for="statusFilter">Filter</label><select class="action-btn" id="statusFilter" aria-label="Filter requests by status"><option value="all">All</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="shortlisted">Shortlisted</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="contacted">Contacted</option></select><a class="action-btn primary" href="#">New Request</a></div></section>
       <section class="summary-grid">
         <div class="card"><div class="label">Open Requests</div><div class="value" id="openRequestsValue">0</div><div class="meta" id="openRequestsMeta">Awaiting review or follow-up</div></div>
         <div class="card"><div class="label">Approved</div><div class="value" id="approvedRequestsValue">0</div><div class="meta" id="approvedRequestsMeta">Accepted founder beta requests</div></div>
@@ -189,6 +189,7 @@
     const newRequestsMeta = document.getElementById("newRequestsMeta");
     const openApprovalChip = document.getElementById("openApprovalChip");
     const totalRequestsChip = document.getElementById("totalRequestsChip");
+    const searchRequests = document.getElementById("searchRequests");
     const statusFilter = document.getElementById("statusFilter");
     const requestRowsById = new Map();
     let allRequestRows = [];
@@ -265,8 +266,28 @@
 
     function getFilteredRows(rows) {
       const filterValue = statusFilter.value || "all";
-      if (filterValue === "all") return rows;
-      return rows.filter((row) => (row.status || "new").toLowerCase() === filterValue);
+      const searchValue = (searchRequests.value || "").trim().toLowerCase();
+
+      return rows.filter((row) => {
+        const matchesStatus = filterValue === "all"
+          ? true
+          : (row.status || "new").toLowerCase() === filterValue;
+
+        if (!matchesStatus) return false;
+        if (!searchValue) return true;
+
+        const haystack = [
+          row.company_name,
+          row.full_name,
+          row.email,
+          row.phone
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return haystack.includes(searchValue);
+      });
     }
 
     function openRequestModal(id) {
@@ -418,6 +439,9 @@
     }
 
     statusFilter.addEventListener("change", () => {
+      renderRequests(allRequestRows);
+    });
+    searchRequests.addEventListener("input", () => {
       renderRequests(allRequestRows);
     });
 
