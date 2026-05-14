@@ -51,7 +51,7 @@
       <div class="sidebar-foot"><strong>Request Queue</strong><p>Requests should cover setup edits, staff access, number changes, support issues, and any owner approvals that need tracking.</p></div>
     </aside>
     <main class="main">
-      <section class="topbar"><div class="topbar-left"><h1>Requests</h1><p>Review setup edits, support issues, staff access requests, and owner approvals without losing track of the operational work behind them.</p></div><div class="topbar-right"><div class="chip">1 Open Approval</div><div class="chip">4 Total Requests</div><a class="action-btn" href="#">Archive</a><a class="action-btn" href="#">Filter</a><a class="action-btn primary" href="#">New Request</a></div></section>
+      <section class="topbar"><div class="topbar-left"><h1>Requests</h1><p>Review setup edits, support issues, staff access requests, and owner approvals without losing track of the operational work behind them.</p></div><div class="topbar-right"><div class="chip" id="openApprovalChip">0 Open Approval</div><div class="chip" id="totalRequestsChip">0 Total Requests</div><label class="action-btn" for="statusFilter">Filter</label><select class="action-btn" id="statusFilter" aria-label="Filter requests by status"><option value="all">All</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="shortlisted">Shortlisted</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="contacted">Contacted</option></select><a class="action-btn primary" href="#">New Request</a></div></section>
       <section class="summary-grid">
         <div class="card"><div class="label">Open Requests</div><div class="value" id="openRequestsValue">0</div><div class="meta" id="openRequestsMeta">Awaiting review or follow-up</div></div>
         <div class="card"><div class="label">Approved</div><div class="value" id="approvedRequestsValue">0</div><div class="meta" id="approvedRequestsMeta">Accepted founder beta requests</div></div>
@@ -187,7 +187,11 @@
     const approvedRequestsMeta = document.getElementById("approvedRequestsMeta");
     const reviewingRequestsMeta = document.getElementById("reviewingRequestsMeta");
     const newRequestsMeta = document.getElementById("newRequestsMeta");
+    const openApprovalChip = document.getElementById("openApprovalChip");
+    const totalRequestsChip = document.getElementById("totalRequestsChip");
+    const statusFilter = document.getElementById("statusFilter");
     const requestRowsById = new Map();
+    let allRequestRows = [];
     let activeRequestId = "";
 
     function escapeHtml(value) {
@@ -250,11 +254,19 @@
       approvedRequestsValue.textContent = String(approvedCount);
       reviewingRequestsValue.textContent = String(reviewingCount);
       newRequestsValue.textContent = String(newCount);
+      openApprovalChip.textContent = `${openCount} Open Approval${openCount === 1 ? "" : "s"}`;
+      totalRequestsChip.textContent = `${rows.length} Total Request${rows.length === 1 ? "" : "s"}`;
 
       openRequestsMeta.textContent = `${pluralize(shortlistedCount + contactedCount, "request needs", "requests need")} follow-up beyond brand-new intake`;
       approvedRequestsMeta.textContent = approvedCount ? `${pluralize(approvedCount, "business approved", "businesses approved")}` : "No approvals yet";
       reviewingRequestsMeta.textContent = reviewingCount ? `${pluralize(reviewingCount, "request in active review", "requests in active review")}` : "No requests in review";
       newRequestsMeta.textContent = newCount ? `${pluralize(newCount, "submission waiting", "submissions waiting")} for first review` : "No fresh submissions waiting";
+    }
+
+    function getFilteredRows(rows) {
+      const filterValue = statusFilter.value || "all";
+      if (filterValue === "all") return rows;
+      return rows.filter((row) => (row.status || "new").toLowerCase() === filterValue);
     }
 
     function openRequestModal(id) {
@@ -291,16 +303,18 @@
 
     function renderRequests(rows) {
       requestRowsById.clear();
+      allRequestRows = rows.slice();
       rows.forEach((row) => requestRowsById.set(row.id, row));
       updateSummaryCards(rows);
+      const filteredRows = getFilteredRows(rows);
 
-      if (!rows.length) {
+      if (!filteredRows.length) {
         requestsList.innerHTML = `
           <div class="request">
             <div class="request-top">
               <div>
-                <strong>No beta requests yet</strong>
-                <span>New founder beta submissions will appear here.</span>
+                <strong>No matching requests</strong>
+                <span>There are no requests for the current status filter.</span>
               </div>
             </div>
           </div>
@@ -308,7 +322,7 @@
         return;
       }
 
-      requestsList.innerHTML = rows.map((row) => {
+      requestsList.innerHTML = filteredRows.map((row) => {
         const status = row.status || "new";
         const statusClass = getStatusTagClass(status);
         return `
@@ -403,6 +417,10 @@
       }
     }
 
+    statusFilter.addEventListener("change", () => {
+      renderRequests(allRequestRows);
+    });
+
     async function saveNotes() {
       if (!activeRequestId) return;
 
@@ -448,7 +466,7 @@
       if (event.target === requestModal) closeModal();
     });
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && requestModal.classList.contains("open")) { 
+      if (event.key === "Escape" && requestModal.classList.contains("open")) {
         closeModal();
       }
     });
