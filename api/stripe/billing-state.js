@@ -19,6 +19,7 @@ export default async function handler(req, res) {
       const body = await readJsonBody(req);
       const action = body.action || "";
       const allowedLeadStatuses = ["new", "reviewing", "qualified", "approved", "rejected", "on_hold", "converted"];
+      const allowedCompanyStatuses = ["lead", "approved", "onboarding", "active", "paused", "churned"];
 
       if (action === "update-beta-status") {
         const id = body.id || "";
@@ -277,6 +278,76 @@ export default async function handler(req, res) {
           lead: updatedLead,
           company
         });
+      }
+
+      if (action === "update-client-status") {
+        const id = body.id || "";
+        const status = body.status || "";
+
+        if (!id || !status) {
+          return json(res, 400, { error: "Client id and status are required." });
+        }
+
+        if (!allowedCompanyStatuses.includes(status)) {
+          return json(res, 400, { error: "Invalid client status value." });
+        }
+
+        const { data, error } = await supabaseAdmin
+          .from("companies")
+          .update({ status })
+          .eq("id", id)
+          .select("*, contacts(*)")
+          .single();
+
+        if (error) {
+          return json(res, 500, { error: error.message || "Unable to update client status." });
+        }
+
+        return json(res, 200, { client: data });
+      }
+
+      if (action === "update-client-next-action") {
+        const id = body.id || "";
+        const nextAction = typeof body.nextAction === "string" ? body.nextAction.trim() : "";
+
+        if (!id) {
+          return json(res, 400, { error: "Client id is required." });
+        }
+
+        const { data, error } = await supabaseAdmin
+          .from("companies")
+          .update({ next_action: nextAction || null })
+          .eq("id", id)
+          .select("*, contacts(*)")
+          .single();
+
+        if (error) {
+          return json(res, 500, { error: error.message || "Unable to update client next action." });
+        }
+
+        return json(res, 200, { client: data });
+      }
+
+      if (action === "update-client-notes") {
+        const id = body.id || "";
+        const notes = typeof body.notes === "string" ? body.notes : "";
+
+        if (!id) {
+          return json(res, 400, { error: "Client id is required." });
+        }
+
+        const { data, error } = await supabaseAdmin
+          .from("companies")
+          .update({ notes })
+          .eq("id", id)
+          .select("*, contacts(*)")
+          .single();
+
+        if (error) {
+          return json(res, 500, { error: error.message || "Unable to update client notes." });
+        }
+
+        return json(res, 200, { client: data });
       }
 
       return json(res, 400, { error: "Unsupported action." });
