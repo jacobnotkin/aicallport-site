@@ -51,7 +51,7 @@
       <div class="sidebar-foot"><strong>Request Queue</strong><p>Requests should cover setup edits, staff access, number changes, support issues, and any owner approvals that need tracking.</p></div>
     </aside>
     <main class="main">
-      <section class="topbar"><div class="topbar-left"><h1>Requests</h1></div><div class="topbar-right"><button class="chip chip-button" id="openApprovalChip" data-chip-filter="open" type="button">0 Open Approval</button><button class="chip chip-button" id="totalRequestsChip" data-chip-filter="all" type="button">0 Total Requests</button><label class="action-btn" for="searchRequests">Search</label><input class="action-btn" id="searchRequests" type="search" placeholder="Find request" aria-label="Search requests" /><label class="action-btn" for="statusFilter">Filter</label><select class="action-btn" id="statusFilter" aria-label="Filter requests by status"><option value="all">All</option><option value="open">Open</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="shortlisted">Shortlisted</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="contacted">Contacted</option></select><label class="action-btn" for="sortRequests">Sort</label><select class="action-btn" id="sortRequests" aria-label="Sort requests"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="status">Status</option></select><a class="action-btn primary" href="#">New Request</a></div></section>
+      <section class="topbar"><div class="topbar-left"><h1>Requests</h1></div><div class="topbar-right"><button class="chip chip-button" id="openApprovalChip" data-chip-filter="open" type="button">0 Open Approval</button><button class="chip chip-button" id="totalRequestsChip" data-chip-filter="all" type="button">0 Total Requests</button><div class="chip" id="contactedStageChip">0 Contacted</div><div class="chip" id="onboardingStageChip">0 Onboarding</div><div class="chip" id="activatedStageChip">0 Activated</div><label class="action-btn" for="searchRequests">Search</label><input class="action-btn" id="searchRequests" type="search" placeholder="Find request" aria-label="Search requests" /><label class="action-btn" for="statusFilter">Filter</label><select class="action-btn" id="statusFilter" aria-label="Filter requests by status"><option value="all">All</option><option value="open">Open</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="shortlisted">Shortlisted</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="contacted">Contacted</option></select><label class="action-btn" for="sortRequests">Sort</label><select class="action-btn" id="sortRequests" aria-label="Sort requests"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="status">Status</option></select><a class="action-btn primary" href="#">New Request</a></div></section>
       <section class="summary-grid">
         <button class="card summary-card" id="openRequestsCard" data-summary-filter="open" type="button"><div class="label">Open Requests</div><div class="value" id="openRequestsValue">0</div><div class="meta" id="openRequestsMeta">Awaiting review or follow-up</div></button>
         <button class="card summary-card" id="approvedRequestsCard" data-summary-filter="approved" type="button"><div class="label">Approved</div><div class="value" id="approvedRequestsValue">0</div><div class="meta" id="approvedRequestsMeta">Accepted founder beta requests</div></button>
@@ -210,6 +210,9 @@
     const newRequestsMeta = document.getElementById("newRequestsMeta");
     const openApprovalChip = document.getElementById("openApprovalChip");
     const totalRequestsChip = document.getElementById("totalRequestsChip");
+    const contactedStageChip = document.getElementById("contactedStageChip");
+    const onboardingStageChip = document.getElementById("onboardingStageChip");
+    const activatedStageChip = document.getElementById("activatedStageChip");
     const chipButtons = Array.from(document.querySelectorAll(".chip-button"));
     const searchRequests = document.getElementById("searchRequests");
     const statusFilter = document.getElementById("statusFilter");
@@ -306,6 +309,11 @@
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       }, {});
+      const activationCounts = rows.reduce((acc, row) => {
+        const stage = (row.activation_stage || "not_started").toLowerCase();
+        acc[stage] = (acc[stage] || 0) + 1;
+        return acc;
+      }, {});
 
       const approvedCount = counts.approved || 0;
       const reviewingCount = counts.reviewing || 0;
@@ -313,6 +321,9 @@
       const shortlistedCount = counts.shortlisted || 0;
       const contactedCount = counts.contacted || 0;
       const openCount = newCount + reviewingCount + shortlistedCount + contactedCount;
+      const contactedStageCount = activationCounts.contacted || 0;
+      const onboardingCount = activationCounts.onboarding || 0;
+      const activatedCount = activationCounts.activated || 0;
 
       openRequestsValue.textContent = String(openCount);
       approvedRequestsValue.textContent = String(approvedCount);
@@ -320,6 +331,9 @@
       newRequestsValue.textContent = String(newCount);
       openApprovalChip.textContent = `${openCount} Open Approval${openCount === 1 ? "" : "s"}`;
       totalRequestsChip.textContent = `${rows.length} Total Request${rows.length === 1 ? "" : "s"}`;
+      contactedStageChip.textContent = `${contactedStageCount} Contacted`;
+      onboardingStageChip.textContent = `${onboardingCount} Onboarding`;
+      activatedStageChip.textContent = `${activatedCount} Activated`;
 
       openRequestsMeta.textContent = `${pluralize(shortlistedCount + contactedCount, "request needs", "requests need")} follow-up beyond brand-new intake`;
       approvedRequestsMeta.textContent = approvedCount ? `${pluralize(approvedCount, "business approved", "businesses approved")}` : "No approvals yet";
