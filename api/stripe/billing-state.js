@@ -18,6 +18,7 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
       const body = await readJsonBody(req);
       const action = body.action || "";
+      const allowedLeadStatuses = ["new", "reviewing", "qualified", "approved", "rejected", "on_hold", "converted"];
 
       if (action === "update-beta-status") {
         const id = body.id || "";
@@ -93,6 +94,189 @@ export default async function handler(req, res) {
         }
 
         return json(res, 200, { request: data });
+      }
+
+      if (action === "update-lead-status") {
+        const id = body.id || "";
+        const status = body.status || "";
+
+        if (!id || !status) {
+          return json(res, 400, { error: "Lead id and status are required." });
+        }
+
+        if (!allowedLeadStatuses.includes(status)) {
+          return json(res, 400, { error: "Invalid lead status value." });
+        }
+
+        const { data, error } = await supabaseAdmin
+          .from("leads")
+          .update({ status })
+          .eq("id", id)
+          .select("*")
+          .single();
+
+        if (error) {
+          return json(res, 500, { error: error.message || "Unable to update lead status." });
+        }
+
+        return json(res, 200, { lead: data });
+      }
+
+      if (action === "update-lead-next-action") {
+        const id = body.id || "";
+        const nextAction = typeof body.nextAction === "string" ? body.nextAction.trim() : "";
+
+        if (!id) {
+          return json(res, 400, { error: "Lead id is required." });
+        }
+
+        const { data, error } = await supabaseAdmin
+          .from("leads")
+          .update({ next_action: nextAction || null })
+          .eq("id", id)
+          .select("*")
+          .single();
+
+        if (error) {
+          return json(res, 500, { error: error.message || "Unable to update next action." });
+        }
+
+        return json(res, 200, { lead: data });
+      }
+
+      if (action === "update-lead-notes") {
+        const id = body.id || "";
+        const notes = typeof body.notes === "string" ? body.notes : "";
+
+        if (!id) {
+          return json(res, 400, { error: "Lead id is required." });
+        }
+
+        const { data, error } = await supabaseAdmin
+          .from("leads")
+          .update({ notes })
+          .eq("id", id)
+          .select("*")
+          .single();
+
+        if (error) {
+          return json(res, 500, { error: error.message || "Unable to update lead notes." });
+        }
+
+        return json(res, 200, { lead: data });
+      }
+
+      if (action === "convert-lead-to-company") {
+        const id = body.id || "";
+
+        if (!id) {
+          return json(res, 400, { error: "Lead id is required." });
+        }
+
+        const { data: lead, error: leadError } = await supabaseAdmin
+          .from("leads")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (leadError || !lead) {
+          return json(res, 404, { error: leadError?.message || "Lead not found." });
+        }
+
+        if (lead.converted_company_id) {
+          const { data: existingCompany } = await supabaseAdmin
+            .from("companies")
+            .select("*")
+            .eq("id", lead.converted_company_id)
+            .maybeSingle();
+
+          return json(res, 200, {
+            lead,
+            company: existingCompany || null
+          });
+        }
+
+        let company = null;
+
+        const { data: existingCompany } = await supabaseAdmin
+          .from("companies")
+          .select("*")
+          .eq("source_id", lead.id)
+          .maybeSingle();
+
+        if (existingCompany?.id) {
+          company = existingCompany;
+        } else {
+          const companyPayload = {
+            name: lead.company_name,
+            country: lead.country || null,
+            business_type: lead.business_type || null,
+            website: lead.website || null,
+            status: "approved",
+            owner_user_id: lead.assigned_to || null,
+            source_type: lead.lead_source_type || "direct",
+            source_id: lead.id,
+            notes: lead.notes || null
+          };
+
+          const { data: insertedCompany, error: companyError } = await supabaseAdmin
+            .from("companies")
+            .insert(companyPayload)
+            .select("*")
+            .single();
+
+          if (companyError || !insertedCompany) {
+            return json(res, 500, { error: companyError?.message || "Unable to create company from lead." });
+          }
+
+          company = insertedCompany;
+        }
+
+        if (lead.contact_name || lead.email || lead.phone) {
+          const { data: existingContact } = await supabaseAdmin
+            .from("contacts")
+            .select("id")
+            .eq("company_id", company.id)
+            .eq("is_primary", true)
+            .maybeSingle();
+
+          if (!existingContact?.id) {
+            const { error: contactError } = await supabaseAdmin
+              .from("contacts")
+              .insert({
+                company_id: company.id,
+                full_name: lead.contact_name || lead.company_name || "Primary Contact",
+                email: lead.email || null,
+                phone: lead.phone || null,
+                role: "Lead Contact",
+                is_primary: true,
+                notes: lead.biggest_problem || null
+              });
+
+            if (contactError) {
+              return json(res, 500, { error: contactError.message || "Company was created but contact creation failed." });
+            }
+          }
+        }
+
+        const { data: updatedLead, error: updateLeadError } = await supabaseAdmin
+          .from("leads")
+          .update({
+            converted_company_id: company.id,
+            status: "converted"
+          })
+          .eq("id", id)
+          .select("*")
+          .single();
+
+        if (updateLeadError || !updatedLead) {
+          return json(res, 500, { error: updateLeadError?.message || "Company was created but lead conversion update failed." });
+        }
+
+        return json(res, 200, {
+          lead: updatedLead,
+          company
+        });
       }
 
       return json(res, 400, { error: "Unsupported action." });
