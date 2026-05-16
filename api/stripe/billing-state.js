@@ -312,6 +312,19 @@ export default async function handler(req, res) {
       return json(res, 200, { leads: data || [] });
     }
 
+    if (view === "clients") {
+      const { data, error } = await supabaseAdmin
+        .from("companies")
+        .select("*, contacts(*)")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        return json(res, 500, { error: error.message || "Unable to load clients." });
+      }
+
+      return json(res, 200, { clients: data || [] });
+    }
+
     const stripe = getStripe();
     const authUser = await getUserFromBearer(req, supabaseAdmin);
     const sessionId = req.query.session_id || "";
