@@ -51,7 +51,7 @@
       <div class="sidebar-foot"><strong>Request Queue</strong><p>Requests should cover setup edits, staff access, number changes, support issues, and any owner approvals that need tracking.</p></div>
     </aside>
     <main class="main">
-      <section class="topbar"><div class="topbar-left"><h1>Requests</h1><p>Review setup edits, support issues, staff access requests, and owner approvals without losing track of the operational work behind them.</p></div><div class="topbar-right"><button class="chip chip-button" id="openApprovalChip" data-chip-filter="open" type="button">0 Open Approval</button><button class="chip chip-button" id="totalRequestsChip" data-chip-filter="all" type="button">0 Total Requests</button><label class="action-btn" for="searchRequests">Search</label><input class="action-btn" id="searchRequests" type="search" placeholder="Find request" aria-label="Search requests" /><label class="action-btn" for="statusFilter">Filter</label><select class="action-btn" id="statusFilter" aria-label="Filter requests by status"><option value="all">All</option><option value="open">Open</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="shortlisted">Shortlisted</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="contacted">Contacted</option></select><a class="action-btn primary" href="#">New Request</a></div></section>
+      <section class="topbar"><div class="topbar-left"><h1>Requests</h1><p>Review setup edits, support issues, staff access requests, and owner approvals without losing track of the operational work behind them.</p></div><div class="topbar-right"><button class="chip chip-button" id="openApprovalChip" data-chip-filter="open" type="button">0 Open Approval</button><button class="chip chip-button" id="totalRequestsChip" data-chip-filter="all" type="button">0 Total Requests</button><label class="action-btn" for="searchRequests">Search</label><input class="action-btn" id="searchRequests" type="search" placeholder="Find request" aria-label="Search requests" /><label class="action-btn" for="statusFilter">Filter</label><select class="action-btn" id="statusFilter" aria-label="Filter requests by status"><option value="all">All</option><option value="open">Open</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="shortlisted">Shortlisted</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="contacted">Contacted</option></select><label class="action-btn" for="sortRequests">Sort</label><select class="action-btn" id="sortRequests" aria-label="Sort requests"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="status">Status</option></select><a class="action-btn primary" href="#">New Request</a></div></section>
       <section class="summary-grid">
         <button class="card summary-card" id="openRequestsCard" data-summary-filter="open" type="button"><div class="label">Open Requests</div><div class="value" id="openRequestsValue">0</div><div class="meta" id="openRequestsMeta">Awaiting review or follow-up</div></button>
         <button class="card summary-card" id="approvedRequestsCard" data-summary-filter="approved" type="button"><div class="label">Approved</div><div class="value" id="approvedRequestsValue">0</div><div class="meta" id="approvedRequestsMeta">Accepted founder beta requests</div></button>
@@ -192,6 +192,7 @@
     const chipButtons = Array.from(document.querySelectorAll(".chip-button"));
     const searchRequests = document.getElementById("searchRequests");
     const statusFilter = document.getElementById("statusFilter");
+    const sortRequests = document.getElementById("sortRequests");
     const summaryCards = Array.from(document.querySelectorAll(".summary-card"));
     const requestRowsById = new Map();
     let allRequestRows = [];
@@ -243,6 +244,25 @@
       return ["new", "reviewing", "shortlisted", "contacted"].includes((status || "new").toLowerCase());
     }
 
+    function getStatusSortRank(status) {
+      switch ((status || "new").toLowerCase()) {
+        case "new":
+          return 0;
+        case "reviewing":
+          return 1;
+        case "shortlisted":
+          return 2;
+        case "contacted":
+          return 3;
+        case "approved":
+          return 4;
+        case "rejected":
+          return 5;
+        default:
+          return 6;
+      }
+    }
+
     function updateSummaryCardState() {
       const activeFilter = statusFilter.value || "all";
       summaryCards.forEach((card) => {
@@ -284,8 +304,9 @@
     function getFilteredRows(rows) {
       const filterValue = statusFilter.value || "all";
       const searchValue = (searchRequests.value || "").trim().toLowerCase();
+      const sortValue = sortRequests.value || "newest";
 
-      return rows.filter((row) => {
+      const filteredRows = rows.filter((row) => {
         const rowStatus = (row.status || "new").toLowerCase();
         const matchesStatus = filterValue === "all"
           ? true
@@ -307,6 +328,19 @@
           .toLowerCase();
 
         return haystack.includes(searchValue);
+      });
+
+      return filteredRows.sort((left, right) => {
+        if (sortValue === "oldest") {
+          return new Date(left.created_at).getTime() - new Date(right.created_at).getTime();
+        }
+
+        if (sortValue === "status") {
+          const rankDiff = getStatusSortRank(left.status) - getStatusSortRank(right.status);
+          if (rankDiff !== 0) return rankDiff;
+        }
+
+        return new Date(right.created_at).getTime() - new Date(left.created_at).getTime();
       });
     }
 
@@ -462,6 +496,9 @@
       renderRequests(allRequestRows);
     });
     searchRequests.addEventListener("input", () => {
+      renderRequests(allRequestRows);
+    });
+    sortRequests.addEventListener("change", () => {
       renderRequests(allRequestRows);
     });
     summaryCards.forEach((card) => {
