@@ -115,6 +115,19 @@ export default async function handler(req, res) {
       return json(res, 200, { requests: data || [] });
     }
 
+    if (view === "leads") {
+      const { data, error } = await supabaseAdmin
+        .from("leads")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        return json(res, 500, { error: error.message || "Unable to load leads." });
+      }
+
+      return json(res, 200, { leads: data || [] });
+    }
+
     const stripe = getStripe();
     const authUser = await getUserFromBearer(req, supabaseAdmin);
     const sessionId = req.query.session_id || "";
