@@ -3974,6 +3974,13 @@
       const state = {
         module: "Overview",
         focus: 0,
+        clients: {
+          loaded: false,
+          loading: false,
+          error: "",
+          items: [],
+          selectedId: ""
+        },
         leads: {
           loaded: false,
           loading: false,
@@ -4075,6 +4082,263 @@
           next: nextActionText,
           context: `${sourceLabel} source • ${summarizeCallVolume(row.monthly_call_volume)} • ${problemText}`
         };
+      }
+
+      function buildClientDetail(row, primaryContact, stageLabel) {
+        const cityBits = [row.city, row.region, row.country].filter(Boolean);
+        const locationText = cityBits.length ? cityBits.join(", ") : "Location not set yet";
+        const contactSummary = primaryContact
+          ? [primaryContact.full_name, primaryContact.phone, primaryContact.email].filter(Boolean).join(" • ")
+          : "Primary contact not connected yet.";
+        const sourceText = row.source_type ? titleCase(String(row.source_type).replaceAll("-", " ")) : "Unknown source";
+        const notesText = row.notes || "No client operations notes have been added yet.";
+
+        return {
+          reason: `${escapeHtml(row.name)} matters because it is now a real company record created from the live lead pipeline, so this is the handoff point from acquisition into onboarding and operations.`,
+          status: `${stageLabel} client record • ${locationText}.`,
+          next: row.status === "approved"
+            ? "Move this approved company into onboarding and attach the first live system setup tasks."
+            : "Continue the next operational stage for this client record.",
+          context: `${sourceText} source • ${contactSummary} • ${notesText}`
+        };
+      }
+
+      function mapClientRowToItem(row) {
+        const stageLabel = titleCase(row.status || "approved");
+        const primaryContact = Array.isArray(row.contacts)
+          ? row.contacts.find((contact) => contact.is_primary) || row.contacts[0]
+          : null;
+        const locationBits = [row.city, row.region, row.country].filter(Boolean);
+        const locationText = locationBits.length ? locationBits.join(", ") : "Location not set yet";
+        const contactSummary = primaryContact
+          ? [primaryContact.full_name, primaryContact.phone, primaryContact.email].filter(Boolean).join(" • ")
+          : "Primary contact not connected yet";
+        const sourceText = row.source_type ? titleCase(String(row.source_type).replaceAll("-", " ")) : "Unknown source";
+        const healthText = row.status === "active"
+          ? "Live and active"
+          : row.status === "onboarding"
+            ? "Onboarding in progress"
+            : row.status === "approved"
+              ? "Ready for onboarding"
+              : row.status === "paused"
+                ? "Paused"
+                : row.status === "churned"
+                  ? "Inactive"
+                  : "Needs review";
+
+        return {
+          id: row.id,
+          eyebrow: stageLabel,
+          title: escapeHtml(row.name || "Unnamed Client"),
+          text: escapeHtml(`${locationText} • ${sourceText} pipeline record created from live conversion.`),
+          meta: sourceText,
+          owner: row.owner_user_id ? "Assigned internally" : "Unassigned",
+          contact: escapeHtml(contactSummary),
+          location: escapeHtml(locationText),
+          stage: stageLabel,
+          modules: row.status === "approved" ? "Client record, contact, onboarding handoff" : "Client record and operational pipeline",
+          health: healthText,
+          nextAction: row.status === "approved"
+            ? "Open onboarding and attach the first setup steps."
+            : row.status === "onboarding"
+              ? "Continue setup and move toward active operations."
+              : "Review client record and next operational task.",
+          detail: buildClientDetail(row, primaryContact, stageLabel)
+        };
+      }
+
+      function buildClientContext(rows) {
+        const approvedCount = rows.filter((row) => row.status === "approved").length;
+        const onboardingCount = rows.filter((row) => row.status === "onboarding").length;
+        const activeCount = rows.filter((row) => row.status === "active").length;
+        const countries = Array.from(new Set(rows.map((row) => row.country).filter(Boolean)));
+
+        return [
+          { title: "Pipeline Visibility", text: `${rows.length} company records are now visible after lead conversion.` },
+          { title: "Stage Mix", text: `${approvedCount} approved • ${onboardingCount} onboarding • ${activeCount} active.` },
+          { title: "Geography", text: countries.length ? `Live company records span ${countries.join(", ")}.` : "Country values have not been filled on these company records yet." },
+          { title: "Operational Handoff", text: "This module now shows the exact handoff point between converted leads and operational client onboarding." },
+          { title: "Next Goal", text: "Once onboarding logic is live, approved companies should move forward here instead of staying only in lead review." }
+        ];
+      }
+
+      function buildClientsConfig(rows) {
+        const items = rows.map(mapClientRowToItem);
+        const approvedCount = rows.filter((row) => row.status === "approved").length;
+        const onboardingCount = rows.filter((row) => row.status === "onboarding").length;
+        const activeCount = rows.filter((row) => row.status === "active").length;
+        const pausedCount = rows.filter((row) => row.status === "paused").length;
+
+        if (!items.length) {
+          items.push({
+            eyebrow: "Empty",
+            title: "No live clients yet",
+            text: "Client records will appear here after leads are converted into companies.",
+            meta: "Waiting",
+            owner: "Founder review",
+            contact: "No client contacts yet",
+            location: "System",
+            stage: "Empty",
+            modules: "Client record pipeline not started yet",
+            health: "Awaiting first conversion",
+            nextAction: "Convert an approved lead into a company.",
+            detail: {
+              reason: "This module is ready to show the second half of the pipeline once the first company conversion happens.",
+              status: "No rows were returned from the companies table.",
+              next: "Convert an approved lead into a company to create the first live client record.",
+              context: "After the first conversion, this module will become the visible bridge between acquisition and onboarding."
+            }
+          });
+        }
+
+        return {
+          title: "Clients",
+          description: "Real company records created from lead conversion, ready for onboarding and operations.",
+          actions: ["Open Leads", "Refresh"],
+          summary: [
+            { label: "Client Records", value: String(rows.length), note: "Real companies in the system" },
+            { label: "Approved", value: String(approvedCount), note: "Converted and ready for onboarding" },
+            { label: "Onboarding", value: String(onboardingCount), note: "Setup in progress" },
+            { label: "Active", value: String(activeCount), note: "Live client operations" }
+          ],
+          queueTitle: "Client List",
+          queueDescription: "Converted companies, onboarding records, active clients, and paused accounts.",
+          detailTitle: "Selected Client Detail",
+          detailDescription: "Real company record created from the lead pipeline and prepared for operations.",
+          contextTitle: "Client Health / Context",
+          contextDescription: "Pipeline context, stage mix, and operational handoff visibility.",
+          items,
+          context: buildClientContext(rows)
+        };
+      }
+
+      function getClientLoadingConfig(message) {
+        return {
+          title: "Clients",
+          description: "Real company records created from lead conversion, ready for onboarding and operations.",
+          actions: ["Open Leads", "Refresh"],
+          summary: [
+            { label: "Client Records", value: "…", note: "Loading clients" },
+            { label: "Approved", value: "…", note: "Loading approved companies" },
+            { label: "Onboarding", value: "…", note: "Loading onboarding records" },
+            { label: "Active", value: "…", note: "Loading active clients" }
+          ],
+          queueTitle: "Client List",
+          queueDescription: "Converted companies, onboarding records, active clients, and paused accounts.",
+          detailTitle: "Selected Client Detail",
+          detailDescription: "Real company record created from the lead pipeline and prepared for operations.",
+          contextTitle: "Client Health / Context",
+          contextDescription: "Pipeline context, stage mix, and operational handoff visibility.",
+          items: [
+            {
+              eyebrow: "Loading",
+              title: "Loading live clients",
+              text: message,
+              meta: "Syncing",
+              owner: "System",
+              contact: "Please wait",
+              location: "System",
+              stage: "Loading",
+              modules: "Loading client records",
+              health: "Syncing",
+              nextAction: "Wait for client records to load.",
+              detail: {
+                reason: "The dashboard is pulling real company records from Supabase.",
+                status: message,
+                next: "Wait for the first live client payload.",
+                context: "This replaces the static client demo records with real converted companies."
+              }
+            }
+          ],
+          context: [
+            { title: "Sync Status", text: message },
+            { title: "Source", text: "Loading from /api/stripe/billing-state?view=clients." },
+            { title: "Module Goal", text: "This module makes the lead-to-company handoff visible inside the dashboard." }
+          ]
+        };
+      }
+
+      function getClientErrorConfig(message) {
+        return {
+          title: "Clients",
+          description: "Real company records created from lead conversion, ready for onboarding and operations.",
+          actions: ["Open Leads", "Refresh"],
+          summary: [
+            { label: "Client Records", value: "!", note: "Client sync failed" },
+            { label: "Approved", value: "!", note: "Client sync failed" },
+            { label: "Onboarding", value: "!", note: "Client sync failed" },
+            { label: "Active", value: "!", note: "Client sync failed" }
+          ],
+          queueTitle: "Client List",
+          queueDescription: "Converted companies, onboarding records, active clients, and paused accounts.",
+          detailTitle: "Selected Client Detail",
+          detailDescription: "Real company record created from the lead pipeline and prepared for operations.",
+          contextTitle: "Client Health / Context",
+          contextDescription: "Pipeline context, stage mix, and operational handoff visibility.",
+          items: [
+            {
+              eyebrow: "Error",
+              title: "Unable to load live clients",
+              text: message,
+              meta: "Failed",
+              owner: "System",
+              contact: "Check API response",
+              location: "System",
+              stage: "Error",
+              modules: "Client sync unavailable",
+              health: "Sync failed",
+              nextAction: "Retry the client request after checking the API.",
+              detail: {
+                reason: "The dashboard could not retrieve live company records, so the second half of the pipeline is hidden.",
+                status: message,
+                next: "Retry the request or inspect /api/stripe/billing-state?view=clients.",
+                context: "This does not change the database; it only means the dashboard fetch failed."
+              }
+            }
+          ],
+          context: [
+            { title: "Sync Status", text: message },
+            { title: "Source", text: "The request to /api/stripe/billing-state?view=clients failed." },
+            { title: "Next Step", text: "Refresh the module or inspect the API route response directly." }
+          ]
+        };
+      }
+
+      async function ensureClientsLoaded(force = false) {
+        if (state.clients.loading) return;
+        if (state.clients.loaded && !force) return;
+
+        state.clients.loading = true;
+        state.clients.error = "";
+        render();
+
+        try {
+          const response = await fetch("/api/stripe/billing-state?view=clients", {
+            headers: {
+              "Accept": "application/json"
+            }
+          });
+
+          const payload = await response.json();
+          if (!response.ok) {
+            throw new Error(payload.error || "Unable to load clients.");
+          }
+
+          state.clients.items = Array.isArray(payload.clients) ? payload.clients : [];
+          state.clients.loaded = true;
+
+          if (state.clients.selectedId) {
+            const selectedIndex = state.clients.items.findIndex((item) => item.id === state.clients.selectedId);
+            state.focus = selectedIndex >= 0 ? selectedIndex : 0;
+          } else {
+            state.focus = 0;
+          }
+        } catch (error) {
+          state.clients.error = error.message || "Unable to load clients.";
+        } finally {
+          state.clients.loading = false;
+          render();
+        }
       }
 
       function mapLeadRowToItem(row) {
@@ -4446,8 +4710,26 @@
         workspace.querySelectorAll("[data-focus]").forEach((button) => {
           button.addEventListener("click", () => {
             state.focus = Number(button.dataset.focus);
+            state.clients.selectedId = config.items[Number(button.dataset.focus)]?.id || "";
             renderClientsModule(config);
           });
+        });
+
+        workspace.querySelectorAll(".workspace-actions .btn").forEach((button) => {
+          const label = button.textContent.trim();
+          if (label === "Refresh") {
+            button.addEventListener("click", () => {
+              ensureClientsLoaded(true);
+            });
+          }
+
+          if (label === "Open Leads") {
+            button.addEventListener("click", () => {
+              state.module = "Leads";
+              state.focus = 0;
+              render();
+            });
+          }
         });
       }
 
@@ -7692,8 +7974,22 @@
       }
 
       function renderWorkspace() {
-        if (state.module === "Clients" && dashboard.Clients) {
-          renderClientsModule(dashboard.Clients);
+        if (state.module === "Clients") {
+          if (!state.clients.loaded && !state.clients.loading && !state.clients.error) {
+            ensureClientsLoaded();
+          }
+
+          if (state.clients.loading && !state.clients.loaded) {
+            renderClientsModule(getClientLoadingConfig("Loading live client records from Supabase."));
+            return;
+          }
+
+          if (state.clients.error && !state.clients.loaded) {
+            renderClientsModule(getClientErrorConfig(state.clients.error));
+            return;
+          }
+
+          renderClientsModule(buildClientsConfig(state.clients.items));
           return;
         }
         if (state.module === "Calls" && dashboard.Calls) {
