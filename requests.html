@@ -51,7 +51,7 @@
       <div class="sidebar-foot"><strong>Request Queue</strong><p>Requests should cover setup edits, staff access, number changes, support issues, and any owner approvals that need tracking.</p></div>
     </aside>
     <main class="main">
-      <section class="topbar"><div class="topbar-left"><h1>Requests</h1></div><div class="topbar-right"><button class="chip chip-button" id="openApprovalChip" data-chip-filter="open" type="button">0 Open Approval</button><button class="chip chip-button" id="totalRequestsChip" data-chip-filter="all" type="button">0 Total Requests</button><div class="chip" id="contactedStageChip">0 Contacted</div><div class="chip" id="onboardingStageChip">0 Onboarding</div><div class="chip" id="activatedStageChip">0 Activated</div><label class="action-btn" for="searchRequests">Search</label><input class="action-btn" id="searchRequests" type="search" placeholder="Find request" aria-label="Search requests" /><label class="action-btn" for="statusFilter">Filter</label><select class="action-btn" id="statusFilter" aria-label="Filter requests by status"><option value="all">All</option><option value="open">Open</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="shortlisted">Shortlisted</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="contacted">Contacted</option></select><label class="action-btn" for="sortRequests">Sort</label><select class="action-btn" id="sortRequests" aria-label="Sort requests"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="status">Status</option></select><a class="action-btn primary" href="#">New Request</a></div></section>
+      <section class="topbar"><div class="topbar-left"><h1>Requests</h1></div><div class="topbar-right"><button class="chip chip-button" id="openApprovalChip" data-chip-filter="open" type="button">0 Open Approval</button><button class="chip chip-button" id="totalRequestsChip" data-chip-filter="all" type="button">0 Total Requests</button><button class="chip chip-button" id="contactedStageChip" data-activation-filter="contacted" type="button">0 Contacted</button><button class="chip chip-button" id="onboardingStageChip" data-activation-filter="onboarding" type="button">0 Onboarding</button><button class="chip chip-button" id="activatedStageChip" data-activation-filter="activated" type="button">0 Activated</button><label class="action-btn" for="searchRequests">Search</label><input class="action-btn" id="searchRequests" type="search" placeholder="Find request" aria-label="Search requests" /><label class="action-btn" for="statusFilter">Filter</label><select class="action-btn" id="statusFilter" aria-label="Filter requests by status"><option value="all">All</option><option value="open">Open</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="shortlisted">Shortlisted</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="contacted">Contacted</option></select><label class="action-btn" for="sortRequests">Sort</label><select class="action-btn" id="sortRequests" aria-label="Sort requests"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="status">Status</option></select><a class="action-btn primary" href="#">New Request</a></div></section>
       <section class="summary-grid">
         <button class="card summary-card" id="openRequestsCard" data-summary-filter="open" type="button"><div class="label">Open Requests</div><div class="value" id="openRequestsValue">0</div><div class="meta" id="openRequestsMeta">Awaiting review or follow-up</div></button>
         <button class="card summary-card" id="approvedRequestsCard" data-summary-filter="approved" type="button"><div class="label">Approved</div><div class="value" id="approvedRequestsValue">0</div><div class="meta" id="approvedRequestsMeta">Accepted founder beta requests</div></button>
@@ -214,6 +214,7 @@
     const onboardingStageChip = document.getElementById("onboardingStageChip");
     const activatedStageChip = document.getElementById("activatedStageChip");
     const chipButtons = Array.from(document.querySelectorAll(".chip-button"));
+    const activationStageChips = [contactedStageChip, onboardingStageChip, activatedStageChip];
     const searchRequests = document.getElementById("searchRequests");
     const statusFilter = document.getElementById("statusFilter");
     const sortRequests = document.getElementById("sortRequests");
@@ -221,6 +222,7 @@
     const requestRowsById = new Map();
     let allRequestRows = [];
     let activeRequestId = "";
+    let activeActivationFilter = "all";
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -299,7 +301,11 @@
         card.classList.toggle("active", card.dataset.summaryFilter === activeFilter);
       });
       chipButtons.forEach((chip) => {
-        chip.classList.toggle("active", chip.dataset.chipFilter === activeFilter);
+        if (chip.dataset.chipFilter) {
+          chip.classList.toggle("active", chip.dataset.chipFilter === activeFilter);
+        } else if (chip.dataset.activationFilter) {
+          chip.classList.toggle("active", chip.dataset.activationFilter === activeActivationFilter);
+        }
       });
     }
 
@@ -346,16 +352,22 @@
       const filterValue = statusFilter.value || "all";
       const searchValue = (searchRequests.value || "").trim().toLowerCase();
       const sortValue = sortRequests.value || "newest";
+      const activationFilterValue = activeActivationFilter || "all";
 
       const filteredRows = rows.filter((row) => {
         const rowStatus = (row.status || "new").toLowerCase();
+        const rowActivationStage = (row.activation_stage || "not_started").toLowerCase();
         const matchesStatus = filterValue === "all"
           ? true
           : filterValue === "open"
             ? isOpenStatus(rowStatus)
             : rowStatus === filterValue;
+        const matchesActivationStage = activationFilterValue === "all"
+          ? true
+          : rowActivationStage === activationFilterValue;
 
         if (!matchesStatus) return false;
+        if (!matchesActivationStage) return false;
         if (!searchValue) return true;
 
         const haystack = [
@@ -597,8 +609,16 @@
       });
     });
     chipButtons.forEach((chip) => {
+      if (!chip.dataset.chipFilter) return;
       chip.addEventListener("click", () => {
         statusFilter.value = chip.dataset.chipFilter || "all";
+        renderRequests(allRequestRows);
+      });
+    });
+    activationStageChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const nextFilter = chip.dataset.activationFilter || "all";
+        activeActivationFilter = activeActivationFilter === nextFilter ? "all" : nextFilter;
         renderRequests(allRequestRows);
       });
     });
