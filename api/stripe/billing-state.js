@@ -68,6 +68,33 @@ export default async function handler(req, res) {
         return json(res, 200, { request: data });
       }
 
+      if (action === "update-beta-activation-stage") {
+        const id = body.id || "";
+        const activationStage = body.activationStage || "";
+        const allowedStages = ["not_started", "contacted", "onboarding", "activated"];
+
+        if (!id || !activationStage) {
+          return json(res, 400, { error: "Application id and activation stage are required." });
+        }
+
+        if (!allowedStages.includes(activationStage)) {
+          return json(res, 400, { error: "Invalid activation stage value." });
+        }
+
+        const { data, error } = await supabaseAdmin
+          .from("beta_applications")
+          .update({ activation_stage: activationStage })
+          .eq("id", id)
+          .select("*")
+          .single();
+
+        if (error) {
+          return json(res, 500, { error: error.message || "Unable to update activation stage." });
+        }
+
+        return json(res, 200, { request: data });
+      }
+
       return json(res, 400, { error: "Unsupported action." });
     }
 
