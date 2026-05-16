@@ -129,6 +129,10 @@
           <div class="detail-label">Current Status</div>
           <div class="detail-value" id="modalCurrentStatus">—</div>
         </div>
+        <div class="detail-card">
+          <div class="detail-label">Activation Stage</div>
+          <div class="detail-value" id="modalActivationStage">—</div>
+        </div>
       </div>
       <div class="detail-actions">
         <div class="status-field">
@@ -144,6 +148,19 @@
         </div>
         <button class="save-btn" id="saveStatusButton" type="button">Save Status</button>
         <div class="status-message" id="statusMessage"></div>
+      </div>
+      <div class="detail-actions">
+        <div class="status-field">
+          <label for="activationStageSelect">Activation Stage</label>
+          <select class="status-select" id="activationStageSelect">
+            <option value="not_started">not started</option>
+            <option value="contacted">contacted</option>
+            <option value="onboarding">onboarding</option>
+            <option value="activated">activated</option>
+          </select>
+        </div>
+        <button class="save-btn" id="saveActivationButton" type="button">Save Stage</button>
+        <div class="status-message" id="activationMessage"></div>
       </div>
       <div class="notes-section">
         <div class="notes-field">
@@ -173,9 +190,13 @@
     const modalProblem = document.getElementById("modalProblem");
     const modalFeedback = document.getElementById("modalFeedback");
     const modalCurrentStatus = document.getElementById("modalCurrentStatus");
+    const modalActivationStage = document.getElementById("modalActivationStage");
     const statusSelect = document.getElementById("statusSelect");
     const saveStatusButton = document.getElementById("saveStatusButton");
     const statusMessage = document.getElementById("statusMessage");
+    const activationStageSelect = document.getElementById("activationStageSelect");
+    const saveActivationButton = document.getElementById("saveActivationButton");
+    const activationMessage = document.getElementById("activationMessage");
     const reviewNotes = document.getElementById("reviewNotes");
     const saveNotesButton = document.getElementById("saveNotesButton");
     const notesMessage = document.getElementById("notesMessage");
@@ -234,6 +255,12 @@
 
     function titleCaseStatus(status) {
       return String(status || "new").replace(/(^|\s)\S/g, (char) => char.toUpperCase());
+    }
+
+    function formatActivationStage(stage) {
+      return String(stage || "not_started")
+        .replace(/_/g, " ")
+        .replace(/(^|\s)\S/g, (char) => char.toUpperCase());
     }
 
     function pluralize(count, singular, plural) {
@@ -360,9 +387,12 @@
       modalProblem.textContent = row.biggest_problem_today || "—";
       modalFeedback.textContent = row.willing_to_provide_feedback || "—";
       modalCurrentStatus.textContent = titleCaseStatus(row.status);
+      modalActivationStage.textContent = formatActivationStage(row.activation_stage);
       statusSelect.value = row.status || "new";
+      activationStageSelect.value = row.activation_stage || "not_started";
       reviewNotes.value = row.review_notes || "";
       statusMessage.textContent = "";
+      activationMessage.textContent = "";
       notesMessage.textContent = "";
       requestModal.classList.add("open");
       requestModal.setAttribute("aria-hidden", "false");
@@ -373,6 +403,7 @@
       requestModal.setAttribute("aria-hidden", "true");
       activeRequestId = "";
       statusMessage.textContent = "";
+      activationMessage.textContent = "";
       notesMessage.textContent = "";
     }
 
@@ -400,6 +431,7 @@
       requestsList.innerHTML = filteredRows.map((row) => {
         const status = row.status || "new";
         const statusClass = getStatusTagClass(status);
+        const activationStage = row.activation_stage || "not_started";
         return `
           <div class="request" data-request-id="${escapeHtml(row.id)}">
             <div class="request-top">
@@ -416,6 +448,7 @@
             <div class="tag-row">
               <span class="tag blue">${escapeHtml(row.business_type || "Business")}</span>
               <span class="tag">${escapeHtml(row.willing_to_provide_feedback || "No feedback status")}</span>
+              <span class="tag">${escapeHtml(formatActivationStage(activationStage))}</span>
             </div>
           </div>
         `;
@@ -481,6 +514,7 @@
         }
 
         modalCurrentStatus.textContent = titleCaseStatus(payload.request?.status || statusSelect.value);
+        modalActivationStage.textContent = formatActivationStage(payload.request?.activation_stage || activationStageSelect.value);
         modalStatusLine.textContent = `Submitted ${formatCreatedAt(payload.request?.created_at)} • ${titleCaseStatus(payload.request?.status || statusSelect.value)}`;
         statusMessage.textContent = "Status updated successfully.";
         await loadRequests();
@@ -489,6 +523,47 @@
       } finally {
         saveStatusButton.disabled = false;
         saveStatusButton.textContent = "Save Status";
+      }
+    }
+
+    async function saveActivationStage() {
+      if (!activeRequestId) return;
+
+      saveActivationButton.disabled = true;
+      saveActivationButton.textContent = "Saving...";
+      activationMessage.textContent = "";
+
+      try {
+        const response = await fetch("/api/stripe/billing-state", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            action: "update-beta-activation-stage",
+            id: activeRequestId,
+            activationStage: activationStageSelect.value
+          })
+        });
+
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.error || "Unable to update activation stage.");
+        }
+
+        if (payload.request?.id) {
+          requestRowsById.set(payload.request.id, payload.request);
+        }
+
+        modalActivationStage.textContent = formatActivationStage(payload.request?.activation_stage || activationStageSelect.value);
+        activationMessage.textContent = "Activation stage updated successfully.";
+        await loadRequests();
+      } catch (error) {
+        activationMessage.textContent = error.message || "Unable to update activation stage.";
+      } finally {
+        saveActivationButton.disabled = false;
+        saveActivationButton.textContent = "Save Stage";
       }
     }
 
@@ -564,6 +639,7 @@
       }
     });
     saveStatusButton.addEventListener("click", saveStatus);
+    saveActivationButton.addEventListener("click", saveActivationStage);
     saveNotesButton.addEventListener("click", saveNotes);
 
     loadRequests();
