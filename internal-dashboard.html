@@ -1071,6 +1071,64 @@
       text-transform:uppercase;
     }
 
+    .editor-stack{
+      display:grid;
+      gap:10px;
+    }
+
+    .editor-field{
+      display:grid;
+      gap:7px;
+    }
+
+    .editor-field label{
+      color:var(--text-muted);
+      font-size:8px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .editor-input,
+    .editor-select,
+    .editor-textarea{
+      width:100%;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#fff;
+      font-size:11px;
+      font-weight:700;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .editor-input,
+    .editor-select{
+      min-height:34px;
+      padding:0 10px;
+    }
+
+    .editor-textarea{
+      min-height:110px;
+      padding:10px;
+      line-height:1.45;
+      resize:vertical;
+    }
+
+    .editor-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+
+    .editor-message{
+      color:var(--text-soft);
+      font-size:10px;
+      font-weight:700;
+      line-height:1.35;
+    }
+
     @media (max-width:1400px){
       .workspace-columns{grid-template-columns:240px minmax(0, 1fr) 240px}
     }
@@ -3920,7 +3978,8 @@
           loaded: false,
           loading: false,
           error: "",
-          items: []
+          items: [],
+          selectedId: ""
         }
       };
       const primaryNav = document.getElementById("moduleNav");
@@ -4030,6 +4089,11 @@
         const contactParts = [row.contact_name, row.phone, row.email].filter(Boolean);
 
         return {
+          id: row.id,
+          rawStatus: row.status || "new",
+          rawNotes: row.notes || "",
+          rawNextAction: row.next_action || "",
+          convertedCompanyId: row.converted_company_id || "",
           eyebrow: statusLabel,
           title: escapeHtml(row.company_name || "Unnamed Lead"),
           text: escapeHtml(problemText),
@@ -4219,15 +4283,39 @@
 
           state.leads.items = Array.isArray(payload.leads) ? payload.leads : [];
           state.leads.loaded = true;
+
+          if (state.leads.selectedId) {
+            const selectedIndex = state.leads.items.findIndex((item) => item.id === state.leads.selectedId);
+            state.focus = selectedIndex >= 0 ? selectedIndex : 0;
+          } else {
+            state.focus = 0;
+          }
         } catch (error) {
           state.leads.error = error.message || "Unable to load leads.";
         } finally {
           state.leads.loading = false;
-          if (state.module === "Leads") {
-            state.focus = 0;
-          }
           render();
         }
+      }
+
+      async function postLeadAction(action, payload) {
+        const response = await fetch("/api/stripe/billing-state", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            action,
+            ...payload
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Unable to update lead.");
+        }
+
+        return data;
       }
 
       function renderClientsModule(config) {
@@ -5562,6 +5650,8 @@
 
       function renderLeadsModule(config) {
         const selected = config.items[state.focus] || config.items[0];
+        const canEditSelected = Boolean(selected?.id);
+        const convertButtonLabel = selected?.convertedCompanyId ? "Converted To Company" : "Convert To Company";
 
         workspace.innerHTML = `
           <div class="workspace-head">
@@ -5658,6 +5748,44 @@
                         <div class="split-row"><strong>Decision path</strong><span>Leads • Approvals • Clients • Onboarding</span></div>
                       </div>
                     </div>
+                    <div class="detail-section">
+                      <strong>Lead Controls</strong>
+                      <div class="editor-stack">
+                        <div class="editor-field">
+                          <label for="leadStatusSelect">Lead Status</label>
+                          <select class="editor-select" id="leadStatusSelect" ${canEditSelected ? "" : "disabled"}>
+                            <option value="new" ${selected.rawStatus === "new" ? "selected" : ""}>new</option>
+                            <option value="reviewing" ${selected.rawStatus === "reviewing" ? "selected" : ""}>reviewing</option>
+                            <option value="qualified" ${selected.rawStatus === "qualified" ? "selected" : ""}>qualified</option>
+                            <option value="approved" ${selected.rawStatus === "approved" ? "selected" : ""}>approved</option>
+                            <option value="rejected" ${selected.rawStatus === "rejected" ? "selected" : ""}>rejected</option>
+                            <option value="on_hold" ${selected.rawStatus === "on_hold" ? "selected" : ""}>on hold</option>
+                            <option value="converted" ${selected.rawStatus === "converted" ? "selected" : ""}>converted</option>
+                          </select>
+                        </div>
+                        <div class="editor-actions">
+                          <button class="btn accent" id="saveLeadStatusButton" type="button" ${canEditSelected ? "" : "disabled"}>Save Status</button>
+                          <div class="editor-message" id="leadStatusMessage"></div>
+                        </div>
+                        <div class="editor-field">
+                          <label for="leadNextActionInput">Next Action</label>
+                          <input class="editor-input" id="leadNextActionInput" type="text" value="${selected.rawNextAction || ""}" placeholder="Add next action..." ${canEditSelected ? "" : "disabled"} />
+                        </div>
+                        <div class="editor-actions">
+                          <button class="btn" id="saveLeadNextActionButton" type="button" ${canEditSelected ? "" : "disabled"}>Save Next Action</button>
+                          <div class="editor-message" id="leadNextActionMessage"></div>
+                        </div>
+                        <div class="editor-field">
+                          <label for="leadNotesTextarea">Internal Notes</label>
+                          <textarea class="editor-textarea" id="leadNotesTextarea" placeholder="Add founder notes, fit observations, or onboarding context..." ${canEditSelected ? "" : "disabled"}>${selected.rawNotes || ""}</textarea>
+                        </div>
+                        <div class="editor-actions">
+                          <button class="btn" id="saveLeadNotesButton" type="button" ${canEditSelected ? "" : "disabled"}>Save Notes</button>
+                          <button class="btn" id="convertLeadButton" type="button" ${(canEditSelected && !selected.convertedCompanyId) ? "" : "disabled"}>${convertButtonLabel}</button>
+                          <div class="editor-message" id="leadNotesMessage"></div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="detail-footer">${buttons(config.actions)}</div>
                   </div>
                 </div>
@@ -5688,6 +5816,7 @@
         workspace.querySelectorAll("[data-focus]").forEach((button) => {
           button.addEventListener("click", () => {
             state.focus = Number(button.dataset.focus);
+            state.leads.selectedId = config.items[Number(button.dataset.focus)]?.id || "";
             renderLeadsModule(config);
           });
         });
@@ -5699,6 +5828,109 @@
             });
           }
         });
+
+        const saveLeadStatusButton = document.getElementById("saveLeadStatusButton");
+        const leadStatusSelect = document.getElementById("leadStatusSelect");
+        const leadStatusMessage = document.getElementById("leadStatusMessage");
+        const saveLeadNextActionButton = document.getElementById("saveLeadNextActionButton");
+        const leadNextActionInput = document.getElementById("leadNextActionInput");
+        const leadNextActionMessage = document.getElementById("leadNextActionMessage");
+        const saveLeadNotesButton = document.getElementById("saveLeadNotesButton");
+        const leadNotesTextarea = document.getElementById("leadNotesTextarea");
+        const leadNotesMessage = document.getElementById("leadNotesMessage");
+        const convertLeadButton = document.getElementById("convertLeadButton");
+
+        if (saveLeadStatusButton && canEditSelected) {
+          saveLeadStatusButton.addEventListener("click", async () => {
+            saveLeadStatusButton.disabled = true;
+            saveLeadStatusButton.textContent = "Saving...";
+            leadStatusMessage.textContent = "";
+
+            try {
+              state.leads.selectedId = selected.id;
+              await postLeadAction("update-lead-status", {
+                id: selected.id,
+                status: leadStatusSelect.value
+              });
+              leadStatusMessage.textContent = "Lead status updated.";
+              await ensureLeadsLoaded(true);
+            } catch (error) {
+              leadStatusMessage.textContent = error.message || "Unable to update lead status.";
+            } finally {
+              saveLeadStatusButton.disabled = false;
+              saveLeadStatusButton.textContent = "Save Status";
+            }
+          });
+        }
+
+        if (saveLeadNextActionButton && canEditSelected) {
+          saveLeadNextActionButton.addEventListener("click", async () => {
+            saveLeadNextActionButton.disabled = true;
+            saveLeadNextActionButton.textContent = "Saving...";
+            leadNextActionMessage.textContent = "";
+
+            try {
+              state.leads.selectedId = selected.id;
+              await postLeadAction("update-lead-next-action", {
+                id: selected.id,
+                nextAction: leadNextActionInput.value
+              });
+              leadNextActionMessage.textContent = "Next action updated.";
+              await ensureLeadsLoaded(true);
+            } catch (error) {
+              leadNextActionMessage.textContent = error.message || "Unable to update next action.";
+            } finally {
+              saveLeadNextActionButton.disabled = false;
+              saveLeadNextActionButton.textContent = "Save Next Action";
+            }
+          });
+        }
+
+        if (saveLeadNotesButton && canEditSelected) {
+          saveLeadNotesButton.addEventListener("click", async () => {
+            saveLeadNotesButton.disabled = true;
+            saveLeadNotesButton.textContent = "Saving...";
+            leadNotesMessage.textContent = "";
+
+            try {
+              state.leads.selectedId = selected.id;
+              await postLeadAction("update-lead-notes", {
+                id: selected.id,
+                notes: leadNotesTextarea.value
+              });
+              leadNotesMessage.textContent = "Lead notes updated.";
+              await ensureLeadsLoaded(true);
+            } catch (error) {
+              leadNotesMessage.textContent = error.message || "Unable to update lead notes.";
+            } finally {
+              saveLeadNotesButton.disabled = false;
+              saveLeadNotesButton.textContent = "Save Notes";
+            }
+          });
+        }
+
+        if (convertLeadButton && canEditSelected && !selected.convertedCompanyId) {
+          convertLeadButton.addEventListener("click", async () => {
+            convertLeadButton.disabled = true;
+            convertLeadButton.textContent = "Converting...";
+            leadNotesMessage.textContent = "";
+
+            try {
+              state.leads.selectedId = selected.id;
+              const payload = await postLeadAction("convert-lead-to-company", {
+                id: selected.id
+              });
+              const companyName = payload.company?.name || "company";
+              leadNotesMessage.textContent = `Converted into ${companyName}.`;
+              await ensureLeadsLoaded(true);
+            } catch (error) {
+              leadNotesMessage.textContent = error.message || "Unable to convert lead.";
+            } finally {
+              convertLeadButton.disabled = false;
+              convertLeadButton.textContent = "Convert To Company";
+            }
+          });
+        }
       }
 
       function renderReferralModule(config) {
