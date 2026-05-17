@@ -1,3 +1,6 @@
+Last login: Fri May  8 00:25:36 on console
+yakovnotkin@Yakovs-MacBook-Air ~ % cat "/Users/yakovnotkin/Documents/New project/internal-dashboard.html"
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +11,7 @@
     name="description"
     content="AI Call Port internal company dashboard for clients, calls, templates, workflows, CRM, voice operations, approvals, alerts, issues, and launch control."
   />
+  <!-- CODEX-CLIENT-CONTROLS-MARKER -->
   <style>
     :root{
       --bg-1:#07111b;
@@ -1069,6 +1073,64 @@
       font-weight:800;
       letter-spacing:.06em;
       text-transform:uppercase;
+    }
+
+    .editor-stack{
+      display:grid;
+      gap:10px;
+    }
+
+    .editor-field{
+      display:grid;
+      gap:7px;
+    }
+
+    .editor-field label{
+      color:var(--text-muted);
+      font-size:8px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .editor-input,
+    .editor-select,
+    .editor-textarea{
+      width:100%;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#fff;
+      font-size:11px;
+      font-weight:700;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .editor-input,
+    .editor-select{
+      min-height:34px;
+      padding:0 10px;
+    }
+
+    .editor-textarea{
+      min-height:110px;
+      padding:10px;
+      line-height:1.45;
+      resize:vertical;
+    }
+
+    .editor-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+
+    .editor-message{
+      color:var(--text-soft);
+      font-size:10px;
+      font-weight:700;
+      line-height:1.35;
     }
 
     @media (max-width:1400px){
@@ -3913,7 +3975,24 @@
         }
       };
 
-      const state = { module: "Overview", focus: 0 };
+      const state = {
+        module: "Overview",
+        focus: 0,
+        clients: {
+          loaded: false,
+          loading: false,
+          error: "",
+          items: [],
+          selectedId: ""
+        },
+        leads: {
+          loaded: false,
+          loading: false,
+          error: "",
+          items: [],
+          selectedId: ""
+        }
+      };
       const primaryNav = document.getElementById("moduleNav");
       const growthNav = document.getElementById("growthModuleNav");
       const adminNav = document.getElementById("adminModuleNav");
@@ -3965,6 +4044,546 @@
         if (normalized.includes("risk")) return "risk";
         if (normalized.includes("paused")) return "paused";
         return "";
+      }
+
+      function escapeHtml(value = "") {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function titleCase(value = "") {
+        return String(value)
+          .split(/[_\s]+/)
+          .filter(Boolean)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(" ");
+      }
+
+      function summarizeCallVolume(value) {
+        if (Number.isFinite(value) && value > 0) {
+          return `${value} monthly calls/leads`;
+        }
+        return "Monthly call volume not set";
+      }
+
+      function buildLeadDetail(row) {
+        const sourceLabel = titleCase((row.lead_source_type || "direct").replaceAll("-", " "));
+        const priorityLabel = titleCase(row.priority || "normal");
+        const statusLabel = titleCase(row.status || "new");
+        const fitText = row.fit_score !== null && row.fit_score !== undefined
+          ? `Fit score ${row.fit_score}/10`
+          : "Fit score not set yet";
+        const problemText = row.biggest_problem || "No lead problem summary has been added yet.";
+        const nextActionText = row.next_action || "No next action has been assigned yet.";
+
+        return {
+          reason: `${escapeHtml(row.company_name)} matters because it is already inside the live intake system and should move through one clean approval path instead of living only in beta requests.`,
+          status: `${statusLabel} • ${priorityLabel} priority • ${fitText}.`,
+          next: nextActionText,
+          context: `${sourceLabel} source • ${summarizeCallVolume(row.monthly_call_volume)} • ${problemText}`
+        };
+      }
+
+      function buildClientDetail(row, primaryContact, stageLabel) {
+        const cityBits = [row.city, row.region, row.country].filter(Boolean);
+        const locationText = cityBits.length ? cityBits.join(", ") : "Location not set yet";
+        const contactSummary = primaryContact
+          ? [primaryContact.full_name, primaryContact.phone, primaryContact.email].filter(Boolean).join(" • ")
+          : "Primary contact not connected yet.";
+        const sourceText = row.source_type ? titleCase(String(row.source_type).replaceAll("-", " ")) : "Unknown source";
+        const notesText = row.notes || "No client operations notes have been added yet.";
+
+        return {
+          reason: `${escapeHtml(row.name)} matters because it is now a real company record created from the live lead pipeline, so this is the handoff point from acquisition into onboarding and operations.`,
+          status: `${stageLabel} client record • ${locationText}.`,
+          next: row.status === "approved"
+            ? "Move this approved company into onboarding and attach the first live system setup tasks."
+            : "Continue the next operational stage for this client record.",
+          context: `${sourceText} source • ${contactSummary} • ${notesText}`
+        };
+      }
+
+      function mapClientRowToItem(row) {
+        const stageLabel = titleCase(row.status || "approved");
+        const primaryContact = Array.isArray(row.contacts)
+          ? row.contacts.find((contact) => contact.is_primary) || row.contacts[0]
+          : null;
+        const locationBits = [row.city, row.region, row.country].filter(Boolean);
+        const locationText = locationBits.length ? locationBits.join(", ") : "Location not set yet";
+        const contactSummary = primaryContact
+          ? [primaryContact.full_name, primaryContact.phone, primaryContact.email].filter(Boolean).join(" • ")
+          : "Primary contact not connected yet";
+        const sourceText = row.source_type ? titleCase(String(row.source_type).replaceAll("-", " ")) : "Unknown source";
+        const healthText = row.status === "active"
+          ? "Live and active"
+          : row.status === "onboarding"
+            ? "Onboarding in progress"
+            : row.status === "approved"
+              ? "Ready for onboarding"
+              : row.status === "paused"
+                ? "Paused"
+                : row.status === "churned"
+                  ? "Inactive"
+                  : "Needs review";
+
+        return {
+          id: row.id,
+          eyebrow: stageLabel,
+          title: escapeHtml(row.name || "Unnamed Client"),
+          text: escapeHtml(`${locationText} • ${sourceText} pipeline record created from live conversion.`),
+          meta: sourceText,
+          owner: row.owner_user_id ? "Assigned internally" : "Unassigned",
+          contact: escapeHtml(contactSummary),
+          location: escapeHtml(locationText),
+          stage: stageLabel,
+          modules: row.status === "approved" ? "Client record, contact, onboarding handoff" : "Client record and operational pipeline",
+          health: healthText,
+          nextAction: row.status === "approved"
+            ? "Open onboarding and attach the first setup steps."
+            : row.status === "onboarding"
+              ? "Continue setup and move toward active operations."
+              : "Review client record and next operational task.",
+          detail: buildClientDetail(row, primaryContact, stageLabel)
+        };
+      }
+
+      function buildClientContext(rows) {
+        const approvedCount = rows.filter((row) => row.status === "approved").length;
+        const onboardingCount = rows.filter((row) => row.status === "onboarding").length;
+        const activeCount = rows.filter((row) => row.status === "active").length;
+        const countries = Array.from(new Set(rows.map((row) => row.country).filter(Boolean)));
+
+        return [
+          { title: "Pipeline Visibility", text: `${rows.length} company records are now visible after lead conversion.` },
+          { title: "Stage Mix", text: `${approvedCount} approved • ${onboardingCount} onboarding • ${activeCount} active.` },
+          { title: "Geography", text: countries.length ? `Live company records span ${countries.join(", ")}.` : "Country values have not been filled on these company records yet." },
+          { title: "Operational Handoff", text: "This module now shows the exact handoff point between converted leads and operational client onboarding." },
+          { title: "Next Goal", text: "Once onboarding logic is live, approved companies should move forward here instead of staying only in lead review." }
+        ];
+      }
+
+      function buildClientsConfig(rows) {
+        const items = rows.map(mapClientRowToItem);
+        const approvedCount = rows.filter((row) => row.status === "approved").length;
+        const onboardingCount = rows.filter((row) => row.status === "onboarding").length;
+        const activeCount = rows.filter((row) => row.status === "active").length;
+        const pausedCount = rows.filter((row) => row.status === "paused").length;
+
+        if (!items.length) {
+          items.push({
+            eyebrow: "Empty",
+            title: "No live clients yet",
+            text: "Client records will appear here after leads are converted into companies.",
+            meta: "Waiting",
+            owner: "Founder review",
+            contact: "No client contacts yet",
+            location: "System",
+            stage: "Empty",
+            modules: "Client record pipeline not started yet",
+            health: "Awaiting first conversion",
+            nextAction: "Convert an approved lead into a company.",
+            detail: {
+              reason: "This module is ready to show the second half of the pipeline once the first company conversion happens.",
+              status: "No rows were returned from the companies table.",
+              next: "Convert an approved lead into a company to create the first live client record.",
+              context: "After the first conversion, this module will become the visible bridge between acquisition and onboarding."
+            }
+          });
+        }
+
+        return {
+          title: "Clients",
+          description: "Real company records created from lead conversion, ready for onboarding and operations.",
+          actions: ["Open Leads", "Refresh"],
+          summary: [
+            { label: "Client Records", value: String(rows.length), note: "Real companies in the system" },
+            { label: "Approved", value: String(approvedCount), note: "Converted and ready for onboarding" },
+            { label: "Onboarding", value: String(onboardingCount), note: "Setup in progress" },
+            { label: "Active", value: String(activeCount), note: "Live client operations" }
+          ],
+          queueTitle: "Client List",
+          queueDescription: "Converted companies, onboarding records, active clients, and paused accounts.",
+          detailTitle: "Selected Client Detail",
+          detailDescription: "Real company record created from the lead pipeline and prepared for operations.",
+          contextTitle: "Client Health / Context",
+          contextDescription: "Pipeline context, stage mix, and operational handoff visibility.",
+          items,
+          context: buildClientContext(rows)
+        };
+      }
+
+      function getClientLoadingConfig(message) {
+        return {
+          title: "Clients",
+          description: "Real company records created from lead conversion, ready for onboarding and operations.",
+          actions: ["Open Leads", "Refresh"],
+          summary: [
+            { label: "Client Records", value: "…", note: "Loading clients" },
+            { label: "Approved", value: "…", note: "Loading approved companies" },
+            { label: "Onboarding", value: "…", note: "Loading onboarding records" },
+            { label: "Active", value: "…", note: "Loading active clients" }
+          ],
+          queueTitle: "Client List",
+          queueDescription: "Converted companies, onboarding records, active clients, and paused accounts.",
+          detailTitle: "Selected Client Detail",
+          detailDescription: "Real company record created from the lead pipeline and prepared for operations.",
+          contextTitle: "Client Health / Context",
+          contextDescription: "Pipeline context, stage mix, and operational handoff visibility.",
+          items: [
+            {
+              eyebrow: "Loading",
+              title: "Loading live clients",
+              text: message,
+              meta: "Syncing",
+              owner: "System",
+              contact: "Please wait",
+              location: "System",
+              stage: "Loading",
+              modules: "Loading client records",
+              health: "Syncing",
+              nextAction: "Wait for client records to load.",
+              detail: {
+                reason: "The dashboard is pulling real company records from Supabase.",
+                status: message,
+                next: "Wait for the first live client payload.",
+                context: "This replaces the static client demo records with real converted companies."
+              }
+            }
+          ],
+          context: [
+            { title: "Sync Status", text: message },
+            { title: "Source", text: "Loading from /api/stripe/billing-state?view=clients." },
+            { title: "Module Goal", text: "This module makes the lead-to-company handoff visible inside the dashboard." }
+          ]
+        };
+      }
+
+      function getClientErrorConfig(message) {
+        return {
+          title: "Clients",
+          description: "Real company records created from lead conversion, ready for onboarding and operations.",
+          actions: ["Open Leads", "Refresh"],
+          summary: [
+            { label: "Client Records", value: "!", note: "Client sync failed" },
+            { label: "Approved", value: "!", note: "Client sync failed" },
+            { label: "Onboarding", value: "!", note: "Client sync failed" },
+            { label: "Active", value: "!", note: "Client sync failed" }
+          ],
+          queueTitle: "Client List",
+          queueDescription: "Converted companies, onboarding records, active clients, and paused accounts.",
+          detailTitle: "Selected Client Detail",
+          detailDescription: "Real company record created from the lead pipeline and prepared for operations.",
+          contextTitle: "Client Health / Context",
+          contextDescription: "Pipeline context, stage mix, and operational handoff visibility.",
+          items: [
+            {
+              eyebrow: "Error",
+              title: "Unable to load live clients",
+              text: message,
+              meta: "Failed",
+              owner: "System",
+              contact: "Check API response",
+              location: "System",
+              stage: "Error",
+              modules: "Client sync unavailable",
+              health: "Sync failed",
+              nextAction: "Retry the client request after checking the API.",
+              detail: {
+                reason: "The dashboard could not retrieve live company records, so the second half of the pipeline is hidden.",
+                status: message,
+                next: "Retry the request or inspect /api/stripe/billing-state?view=clients.",
+                context: "This does not change the database; it only means the dashboard fetch failed."
+              }
+            }
+          ],
+          context: [
+            { title: "Sync Status", text: message },
+            { title: "Source", text: "The request to /api/stripe/billing-state?view=clients failed." },
+            { title: "Next Step", text: "Refresh the module or inspect the API route response directly." }
+          ]
+        };
+      }
+
+      async function ensureClientsLoaded(force = false) {
+        if (state.clients.loading) return;
+        if (state.clients.loaded && !force) return;
+
+        state.clients.loading = true;
+        state.clients.error = "";
+        render();
+
+        try {
+          const response = await fetch("/api/stripe/billing-state?view=clients", {
+            headers: {
+              "Accept": "application/json"
+            }
+          });
+
+          const payload = await response.json();
+          if (!response.ok) {
+            throw new Error(payload.error || "Unable to load clients.");
+          }
+
+          state.clients.items = Array.isArray(payload.clients) ? payload.clients : [];
+          state.clients.loaded = true;
+
+          if (state.clients.selectedId) {
+            const selectedIndex = state.clients.items.findIndex((item) => item.id === state.clients.selectedId);
+            state.focus = selectedIndex >= 0 ? selectedIndex : 0;
+          } else {
+            state.focus = 0;
+          }
+        } catch (error) {
+          state.clients.error = error.message || "Unable to load clients.";
+        } finally {
+          state.clients.loading = false;
+          render();
+        }
+      }
+
+      function mapLeadRowToItem(row) {
+        const statusLabel = titleCase(row.status || "new");
+        const priorityLabel = titleCase(row.priority || "normal");
+        const sourceLabel = titleCase((row.lead_source_type || "direct").replaceAll("-", " "));
+        const problemText = row.biggest_problem || "No lead pain point has been added yet.";
+        const fitText = row.fit_score !== null && row.fit_score !== undefined
+          ? `Fit score ${row.fit_score}/10`
+          : "Fit score not set yet";
+        const countryText = row.country || "Country not set";
+        const contactParts = [row.contact_name, row.phone, row.email].filter(Boolean);
+
+        return {
+          id: row.id,
+          rawStatus: row.status || "new",
+          rawNotes: row.notes || "",
+          rawNextAction: row.next_action || "",
+          convertedCompanyId: row.converted_company_id || "",
+          eyebrow: statusLabel,
+          title: escapeHtml(row.company_name || "Unnamed Lead"),
+          text: escapeHtml(problemText),
+          meta: priorityLabel,
+          contact: escapeHtml(contactParts.join(" • ") || "No contact details yet"),
+          source: sourceLabel,
+          fit: fitText,
+          country: escapeHtml(countryText),
+          statusPill: statusLabel,
+          nextStep: escapeHtml(row.next_action || "Review and assign next action."),
+          detail: buildLeadDetail(row)
+        };
+      }
+
+      function buildLeadContext(rows) {
+        const sourceCounts = rows.reduce((accumulator, row) => {
+          const key = row.lead_source_type || "direct";
+          accumulator[key] = (accumulator[key] || 0) + 1;
+          return accumulator;
+        }, {});
+        const topSourceEntry = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1])[0];
+        const topSource = topSourceEntry
+          ? `${titleCase(topSourceEntry[0].replaceAll("-", " "))} (${topSourceEntry[1]})`
+          : "No source data yet";
+        const qualifiedCount = rows.filter((row) => ["qualified", "approved", "converted"].includes(row.status)).length;
+        const reviewCount = rows.filter((row) => ["new", "reviewing"].includes(row.status)).length;
+        const betaLinkedCount = rows.filter((row) => row.beta_application_id).length;
+
+        return [
+          { title: "Lead Mix", text: `${rows.length} total leads • ${qualifiedCount} qualified/approved • ${reviewCount} still in review.` },
+          { title: "Source Performance", text: `Top current source: ${topSource}.` },
+          { title: "Beta Intake Link", text: `${betaLinkedCount} leads are already linked back to beta applications.` },
+          { title: "Current Bottleneck", text: "The main bottleneck is moving reviewed leads into clear approval, rejection, or onboarding next steps." },
+          { title: "Decision Standard", text: "Use the live lead queue to keep fit review, founder decisions, and onboarding readiness in one place." }
+        ];
+      }
+
+      function buildLeadsConfig(rows) {
+        const items = rows.map(mapLeadRowToItem);
+        const newCount = rows.filter((row) => row.status === "new").length;
+        const betaRequestCount = rows.filter((row) => row.beta_application_id).length;
+        const qualifiedCount = rows.filter((row) => ["qualified", "approved", "converted"].includes(row.status)).length;
+        const followUpCount = rows.filter((row) => row.next_action && row.status !== "converted" && row.status !== "rejected").length;
+
+        if (!items.length) {
+          items.push({
+            eyebrow: "Empty",
+            title: "No live leads yet",
+            text: "The leads table is connected, but no lead records are available to render right now.",
+            meta: "Waiting",
+            contact: "No contact details yet",
+            source: "Leads table",
+            fit: "No fit scores yet",
+            country: "System",
+            statusPill: "Requested",
+            nextStep: "Create or sync the first lead records.",
+            detail: {
+              reason: "This module is now wired to the real database and is ready for the first live lead records.",
+              status: "No rows were returned from the leads table.",
+              next: "Keep syncing beta applications or create new leads through the next intake flow.",
+              context: "Once rows exist, this module will stop showing the empty-state record automatically."
+            }
+          });
+        }
+
+        return {
+          title: "Leads",
+          description: "Live intake, beta-fit review, source tracking, and next-step control for AI Call Port demand.",
+          actions: ["Open Beta Requests", "Review Fit", "Refresh"],
+          summary: [
+            { label: "New Leads", value: String(newCount), note: "Current live queue" },
+            { label: "Beta Requests", value: String(betaRequestCount), note: "Linked from beta intake" },
+            { label: "Qualified", value: String(qualifiedCount), note: "Qualified, approved, or converted" },
+            { label: "Needs Follow-Up", value: String(followUpCount), note: "Leads with next actions set" }
+          ],
+          queueTitle: "Lead Queue",
+          detailTitle: "Selected Lead Detail",
+          contextTitle: "Lead Context / Fit",
+          items,
+          context: buildLeadContext(rows)
+        };
+      }
+
+      function getLeadLoadingConfig(message) {
+        return {
+          title: "Leads",
+          description: "Live intake, beta-fit review, source tracking, and next-step control for AI Call Port demand.",
+          actions: ["Open Beta Requests", "Review Fit", "Refresh"],
+          summary: [
+            { label: "New Leads", value: "…", note: "Loading lead queue" },
+            { label: "Beta Requests", value: "…", note: "Loading linked beta intake" },
+            { label: "Qualified", value: "…", note: "Loading fit review state" },
+            { label: "Needs Follow-Up", value: "…", note: "Loading next actions" }
+          ],
+          queueTitle: "Lead Queue",
+          detailTitle: "Selected Lead Detail",
+          contextTitle: "Lead Context / Fit",
+          items: [
+            {
+              eyebrow: "Loading",
+              title: "Loading live leads",
+              text: message,
+              meta: "Syncing",
+              contact: "Please wait",
+              source: "Dashboard API",
+              fit: "Loading",
+              country: "System",
+              statusPill: "Requested",
+              nextStep: "Refresh automatically after load.",
+              detail: {
+                reason: "The dashboard is pulling the real lead queue from Supabase.",
+                status: message,
+                next: "Wait for the first live lead payload.",
+                context: "This replaces placeholder lead data with the real intake table."
+              }
+            }
+          ],
+          context: [
+            { title: "Sync Status", text: message },
+            { title: "Source", text: "Loading from /api/stripe/billing-state?view=leads." },
+            { title: "Module Goal", text: "This is the first live growth module replacing static internal dashboard placeholder data." }
+          ]
+        };
+      }
+
+      function getLeadErrorConfig(message) {
+        return {
+          title: "Leads",
+          description: "Live intake, beta-fit review, source tracking, and next-step control for AI Call Port demand.",
+          actions: ["Open Beta Requests", "Review Fit", "Refresh"],
+          summary: [
+            { label: "New Leads", value: "!", note: "Lead sync failed" },
+            { label: "Beta Requests", value: "!", note: "Lead sync failed" },
+            { label: "Qualified", value: "!", note: "Lead sync failed" },
+            { label: "Needs Follow-Up", value: "!", note: "Lead sync failed" }
+          ],
+          queueTitle: "Lead Queue",
+          detailTitle: "Selected Lead Detail",
+          contextTitle: "Lead Context / Fit",
+          items: [
+            {
+              eyebrow: "Error",
+              title: "Unable to load live leads",
+              text: message,
+              meta: "Failed",
+              contact: "Check API response",
+              source: "Dashboard API",
+              fit: "Unavailable",
+              country: "System",
+              statusPill: "Risk",
+              nextStep: "Retry refresh after checking the API error.",
+              detail: {
+                reason: "The dashboard could not retrieve the live leads payload, so placeholder-free rendering is blocked.",
+                status: message,
+                next: "Retry the request or inspect /api/stripe/billing-state?view=leads.",
+                context: "This does not change the database; it only means the dashboard fetch failed."
+              }
+            }
+          ],
+          context: [
+            { title: "Sync Status", text: message },
+            { title: "Source", text: "The request to /api/stripe/billing-state?view=leads failed." },
+            { title: "Next Step", text: "Refresh the module or inspect the API route response directly." }
+          ]
+        };
+      }
+
+      async function ensureLeadsLoaded(force = false) {
+        if (state.leads.loading) return;
+        if (state.leads.loaded && !force) return;
+
+        state.leads.loading = true;
+        state.leads.error = "";
+        render();
+
+        try {
+          const response = await fetch("/api/stripe/billing-state?view=leads", {
+            headers: {
+              "Accept": "application/json"
+            }
+          });
+
+          const payload = await response.json();
+          if (!response.ok) {
+            throw new Error(payload.error || "Unable to load leads.");
+          }
+
+          state.leads.items = Array.isArray(payload.leads) ? payload.leads : [];
+          state.leads.loaded = true;
+
+          if (state.leads.selectedId) {
+            const selectedIndex = state.leads.items.findIndex((item) => item.id === state.leads.selectedId);
+            state.focus = selectedIndex >= 0 ? selectedIndex : 0;
+          } else {
+            state.focus = 0;
+          }
+        } catch (error) {
+          state.leads.error = error.message || "Unable to load leads.";
+        } finally {
+          state.leads.loading = false;
+          render();
+        }
+      }
+
+      async function postLeadAction(action, payload) {
+        const response = await fetch("/api/stripe/billing-state", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            action,
+            ...payload
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Unable to update lead.");
+        }
+
+        return data;
       }
 
       function renderClientsModule(config) {
@@ -4042,6 +4661,41 @@
                       </div>
                     </div>
                     <div class="detail-section">
+                      <strong>Client Controls</strong>
+                      <div class="editor-stack">
+                        <div class="editor-field">
+                          <label for="clientStatusSelect">Client Stage</label>
+                          <select class="editor-select" id="clientStatusSelect" ${canEditSelected ? "" : "disabled"}>
+                            <option value="approved" ${selected.rawStatus === "approved" ? "selected" : ""}>approved</option>
+                            <option value="onboarding" ${selected.rawStatus === "onboarding" ? "selected" : ""}>onboarding</option>
+                            <option value="active" ${selected.rawStatus === "active" ? "selected" : ""}>active</option>
+                            <option value="paused" ${selected.rawStatus === "paused" ? "selected" : ""}>paused</option>
+                            <option value="churned" ${selected.rawStatus === "churned" ? "selected" : ""}>churned</option>
+                          </select>
+                        </div>
+                        <div class="editor-actions">
+                          <button class="btn accent" id="saveClientStatusButton" type="button" ${canEditSelected ? "" : "disabled"}>Save Stage</button>
+                          <div class="editor-message" id="clientStatusMessage"></div>
+                        </div>
+                        <div class="editor-field">
+                          <label for="clientNextActionInput">Next Action</label>
+                          <input class="editor-input" id="clientNextActionInput" type="text" value="${selected.rawNextAction || ""}" placeholder="Add next client action..." ${canEditSelected ? "" : "disabled"} />
+                        </div>
+                        <div class="editor-actions">
+                          <button class="btn" id="saveClientNextActionButton" type="button" ${canEditSelected ? "" : "disabled"}>Save Next Action</button>
+                          <div class="editor-message" id="clientNextActionMessage"></div>
+                        </div>
+                        <div class="editor-field">
+                          <label for="clientNotesTextarea">Client Notes</label>
+                          <textarea class="editor-textarea" id="clientNotesTextarea" placeholder="Add onboarding notes, setup context, or client operations notes..." ${canEditSelected ? "" : "disabled"}>${selected.rawNotes || ""}</textarea>
+                        </div>
+                        <div class="editor-actions">
+                          <button class="btn" id="saveClientNotesButton" type="button" ${canEditSelected ? "" : "disabled"}>Save Notes</button>
+                          <div class="editor-message" id="clientNotesMessage"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="detail-section">
                       <strong>Why this account matters</strong>
                       <p>${selected.detail.reason}</p>
                     </div>
@@ -4095,8 +4749,26 @@
         workspace.querySelectorAll("[data-focus]").forEach((button) => {
           button.addEventListener("click", () => {
             state.focus = Number(button.dataset.focus);
+            state.clients.selectedId = config.items[Number(button.dataset.focus)]?.id || "";
             renderClientsModule(config);
           });
+        });
+
+        workspace.querySelectorAll(".workspace-actions .btn").forEach((button) => {
+          const label = button.textContent.trim();
+          if (label === "Refresh") {
+            button.addEventListener("click", () => {
+              ensureClientsLoaded(true);
+            });
+          }
+
+          if (label === "Open Leads") {
+            button.addEventListener("click", () => {
+              state.module = "Leads";
+              state.focus = 0;
+              render();
+            });
+          }
         });
       }
 
@@ -5299,6 +5971,8 @@
 
       function renderLeadsModule(config) {
         const selected = config.items[state.focus] || config.items[0];
+        const canEditSelected = Boolean(selected?.id);
+        const convertButtonLabel = selected?.convertedCompanyId ? "Converted To Company" : "Convert To Company";
 
         workspace.innerHTML = `
           <div class="workspace-head">
@@ -5395,6 +6069,44 @@
                         <div class="split-row"><strong>Decision path</strong><span>Leads • Approvals • Clients • Onboarding</span></div>
                       </div>
                     </div>
+                    <div class="detail-section">
+                      <strong>Lead Controls</strong>
+                      <div class="editor-stack">
+                        <div class="editor-field">
+                          <label for="leadStatusSelect">Lead Status</label>
+                          <select class="editor-select" id="leadStatusSelect" ${canEditSelected ? "" : "disabled"}>
+                            <option value="new" ${selected.rawStatus === "new" ? "selected" : ""}>new</option>
+                            <option value="reviewing" ${selected.rawStatus === "reviewing" ? "selected" : ""}>reviewing</option>
+                            <option value="qualified" ${selected.rawStatus === "qualified" ? "selected" : ""}>qualified</option>
+                            <option value="approved" ${selected.rawStatus === "approved" ? "selected" : ""}>approved</option>
+                            <option value="rejected" ${selected.rawStatus === "rejected" ? "selected" : ""}>rejected</option>
+                            <option value="on_hold" ${selected.rawStatus === "on_hold" ? "selected" : ""}>on hold</option>
+                            <option value="converted" ${selected.rawStatus === "converted" ? "selected" : ""}>converted</option>
+                          </select>
+                        </div>
+                        <div class="editor-actions">
+                          <button class="btn accent" id="saveLeadStatusButton" type="button" ${canEditSelected ? "" : "disabled"}>Save Status</button>
+                          <div class="editor-message" id="leadStatusMessage"></div>
+                        </div>
+                        <div class="editor-field">
+                          <label for="leadNextActionInput">Next Action</label>
+                          <input class="editor-input" id="leadNextActionInput" type="text" value="${selected.rawNextAction || ""}" placeholder="Add next action..." ${canEditSelected ? "" : "disabled"} />
+                        </div>
+                        <div class="editor-actions">
+                          <button class="btn" id="saveLeadNextActionButton" type="button" ${canEditSelected ? "" : "disabled"}>Save Next Action</button>
+                          <div class="editor-message" id="leadNextActionMessage"></div>
+                        </div>
+                        <div class="editor-field">
+                          <label for="leadNotesTextarea">Internal Notes</label>
+                          <textarea class="editor-textarea" id="leadNotesTextarea" placeholder="Add founder notes, fit observations, or onboarding context..." ${canEditSelected ? "" : "disabled"}>${selected.rawNotes || ""}</textarea>
+                        </div>
+                        <div class="editor-actions">
+                          <button class="btn" id="saveLeadNotesButton" type="button" ${canEditSelected ? "" : "disabled"}>Save Notes</button>
+                          <button class="btn" id="convertLeadButton" type="button" ${(canEditSelected && !selected.convertedCompanyId) ? "" : "disabled"}>${convertButtonLabel}</button>
+                          <div class="editor-message" id="leadNotesMessage"></div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="detail-footer">${buttons(config.actions)}</div>
                   </div>
                 </div>
@@ -5425,9 +6137,121 @@
         workspace.querySelectorAll("[data-focus]").forEach((button) => {
           button.addEventListener("click", () => {
             state.focus = Number(button.dataset.focus);
+            state.leads.selectedId = config.items[Number(button.dataset.focus)]?.id || "";
             renderLeadsModule(config);
           });
         });
+
+        workspace.querySelectorAll(".workspace-actions .btn").forEach((button) => {
+          if (button.textContent.trim() === "Refresh") {
+            button.addEventListener("click", () => {
+              ensureLeadsLoaded(true);
+            });
+          }
+        });
+
+        const saveLeadStatusButton = document.getElementById("saveLeadStatusButton");
+        const leadStatusSelect = document.getElementById("leadStatusSelect");
+        const leadStatusMessage = document.getElementById("leadStatusMessage");
+        const saveLeadNextActionButton = document.getElementById("saveLeadNextActionButton");
+        const leadNextActionInput = document.getElementById("leadNextActionInput");
+        const leadNextActionMessage = document.getElementById("leadNextActionMessage");
+        const saveLeadNotesButton = document.getElementById("saveLeadNotesButton");
+        const leadNotesTextarea = document.getElementById("leadNotesTextarea");
+        const leadNotesMessage = document.getElementById("leadNotesMessage");
+        const convertLeadButton = document.getElementById("convertLeadButton");
+
+        if (saveLeadStatusButton && canEditSelected) {
+          saveLeadStatusButton.addEventListener("click", async () => {
+            saveLeadStatusButton.disabled = true;
+            saveLeadStatusButton.textContent = "Saving...";
+            leadStatusMessage.textContent = "";
+
+            try {
+              state.leads.selectedId = selected.id;
+              await postLeadAction("update-lead-status", {
+                id: selected.id,
+                status: leadStatusSelect.value
+              });
+              leadStatusMessage.textContent = "Lead status updated.";
+              await ensureLeadsLoaded(true);
+            } catch (error) {
+              leadStatusMessage.textContent = error.message || "Unable to update lead status.";
+            } finally {
+              saveLeadStatusButton.disabled = false;
+              saveLeadStatusButton.textContent = "Save Status";
+            }
+          });
+        }
+
+        if (saveLeadNextActionButton && canEditSelected) {
+          saveLeadNextActionButton.addEventListener("click", async () => {
+            saveLeadNextActionButton.disabled = true;
+            saveLeadNextActionButton.textContent = "Saving...";
+            leadNextActionMessage.textContent = "";
+
+            try {
+              state.leads.selectedId = selected.id;
+              await postLeadAction("update-lead-next-action", {
+                id: selected.id,
+                nextAction: leadNextActionInput.value
+              });
+              leadNextActionMessage.textContent = "Next action updated.";
+              await ensureLeadsLoaded(true);
+            } catch (error) {
+              leadNextActionMessage.textContent = error.message || "Unable to update next action.";
+            } finally {
+              saveLeadNextActionButton.disabled = false;
+              saveLeadNextActionButton.textContent = "Save Next Action";
+            }
+          });
+        }
+
+        if (saveLeadNotesButton && canEditSelected) {
+          saveLeadNotesButton.addEventListener("click", async () => {
+            saveLeadNotesButton.disabled = true;
+            saveLeadNotesButton.textContent = "Saving...";
+            leadNotesMessage.textContent = "";
+
+            try {
+              state.leads.selectedId = selected.id;
+              await postLeadAction("update-lead-notes", {
+                id: selected.id,
+                notes: leadNotesTextarea.value
+              });
+              leadNotesMessage.textContent = "Lead notes updated.";
+              await ensureLeadsLoaded(true);
+            } catch (error) {
+              leadNotesMessage.textContent = error.message || "Unable to update lead notes.";
+            } finally {
+              saveLeadNotesButton.disabled = false;
+              saveLeadNotesButton.textContent = "Save Notes";
+            }
+          });
+        }
+
+        if (convertLeadButton && canEditSelected && !selected.convertedCompanyId) {
+          convertLeadButton.addEventListener("click", async () => {
+            convertLeadButton.disabled = true;
+            convertLeadButton.textContent = "Converting...";
+            leadNotesMessage.textContent = "";
+
+            try {
+              state.leads.selectedId = selected.id;
+              const payload = await postLeadAction("convert-lead-to-company", {
+                id: selected.id
+              });
+              const companyName = payload.company?.name || "company";
+              leadNotesMessage.textContent = `Converted into ${companyName}.`;
+              await ensureLeadsLoaded(true);
+            } catch (error) {
+              leadNotesMessage.textContent = error.message || "Unable to convert lead.";
+            } finally {
+              convertLeadButton.disabled = false;
+              convertLeadButton.textContent = "Convert To Company";
+            }
+          });
+        }
       }
 
       function renderReferralModule(config) {
@@ -7189,8 +8013,22 @@
       }
 
       function renderWorkspace() {
-        if (state.module === "Clients" && dashboard.Clients) {
-          renderClientsModule(dashboard.Clients);
+        if (state.module === "Clients") {
+          if (!state.clients.loaded && !state.clients.loading && !state.clients.error) {
+            ensureClientsLoaded();
+          }
+
+          if (state.clients.loading && !state.clients.loaded) {
+            renderClientsModule(getClientLoadingConfig("Loading live client records from Supabase."));
+            return;
+          }
+
+          if (state.clients.error && !state.clients.loaded) {
+            renderClientsModule(getClientErrorConfig(state.clients.error));
+            return;
+          }
+
+          renderClientsModule(buildClientsConfig(state.clients.items));
           return;
         }
         if (state.module === "Calls" && dashboard.Calls) {
@@ -7229,8 +8067,22 @@
           renderActivityLogModule(dashboard["Activity Log"]);
           return;
         }
-        if (state.module === "Leads" && placeholders.Leads) {
-          renderLeadsModule(placeholders.Leads);
+        if (state.module === "Leads") {
+          if (!state.leads.loaded && !state.leads.loading && !state.leads.error) {
+            ensureLeadsLoaded();
+          }
+
+          if (state.leads.loading && !state.leads.loaded) {
+            renderLeadsModule(getLeadLoadingConfig("Loading live leads from Supabase."));
+            return;
+          }
+
+          if (state.leads.error && !state.leads.loaded) {
+            renderLeadsModule(getLeadErrorConfig(state.leads.error));
+            return;
+          }
+
+          renderLeadsModule(buildLeadsConfig(state.leads.items));
           return;
         }
         if (state.module === "Referral System" && placeholders["Referral System"]) {
@@ -7303,3 +8155,4 @@
   <script src="ai-assistant.js"></script>
 </body>
 </html>
+yakovnotkin@Yakovs-MacBook-Air ~ % 
