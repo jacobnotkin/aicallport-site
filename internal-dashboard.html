@@ -4063,18 +4063,62 @@
         if (Number.isFinite(value) && value > 0) {
           return `${value} monthly calls/leads`;
         }
-        return "Monthly call volume not set";
+        return "Monthly call volume still being reviewed";
+      }
+
+      function buildLeadFitText(row) {
+        if (row.fit_score !== null && row.fit_score !== undefined) {
+          return `Fit score ${row.fit_score}/10`;
+        }
+        return row.status === "converted"
+          ? "Converted into company pipeline"
+          : "Founder fit review pending";
+      }
+
+      function buildLeadProblemText(row) {
+        if (row.biggest_problem) {
+          return row.biggest_problem;
+        }
+        return row.beta_application_id
+          ? "Founder beta request submitted and waiting for operational review."
+          : "Lead summary is still being filled in.";
+      }
+
+      function buildLeadNextActionText(row) {
+        if (row.next_action) {
+          return row.next_action;
+        }
+        if (row.status === "converted") {
+          return "Move this record into onboarding and live client setup.";
+        }
+        if (row.status === "approved") {
+          return "Confirm acceptance and start onboarding preparation.";
+        }
+        if (row.status === "reviewing") {
+          return "Complete fit review and set the next founder action.";
+        }
+        return row.beta_application_id
+          ? "Review founder beta request and assign next action."
+          : "Review this lead and assign the next action.";
+      }
+
+      function buildLeadLocationText(row) {
+        const locationBits = [row.city, row.region, row.country].filter(Boolean);
+        if (locationBits.length) {
+          return locationBits.join(", ");
+        }
+        return row.beta_application_id
+          ? "Location pending from founder beta intake"
+          : "Location still being collected";
       }
 
       function buildLeadDetail(row) {
         const sourceLabel = titleCase((row.lead_source_type || "direct").replaceAll("-", " "));
         const priorityLabel = titleCase(row.priority || "normal");
         const statusLabel = titleCase(row.status || "new");
-        const fitText = row.fit_score !== null && row.fit_score !== undefined
-          ? `Fit score ${row.fit_score}/10`
-          : "Fit score not set yet";
-        const problemText = row.biggest_problem || "No lead problem summary has been added yet.";
-        const nextActionText = row.next_action || "No next action has been assigned yet.";
+        const fitText = buildLeadFitText(row);
+        const problemText = buildLeadProblemText(row);
+        const nextActionText = buildLeadNextActionText(row);
 
         return {
           reason: `${escapeHtml(row.company_name)} matters because it is already inside the live intake system and should move through one clean approval path instead of living only in beta requests.`,
@@ -4345,11 +4389,9 @@
         const statusLabel = titleCase(row.status || "new");
         const priorityLabel = titleCase(row.priority || "normal");
         const sourceLabel = titleCase((row.lead_source_type || "direct").replaceAll("-", " "));
-        const problemText = row.biggest_problem || "No lead pain point has been added yet.";
-        const fitText = row.fit_score !== null && row.fit_score !== undefined
-          ? `Fit score ${row.fit_score}/10`
-          : "Fit score not set yet";
-        const countryText = row.country || "Country not set";
+        const problemText = buildLeadProblemText(row);
+        const fitText = buildLeadFitText(row);
+        const countryText = buildLeadLocationText(row);
         const contactParts = [row.contact_name, row.phone, row.email].filter(Boolean);
 
         return {
@@ -4367,7 +4409,7 @@
           fit: fitText,
           country: escapeHtml(countryText),
           statusPill: statusLabel,
-          nextStep: escapeHtml(row.next_action || "Review and assign next action."),
+          nextStep: escapeHtml(buildLeadNextActionText(row)),
           detail: buildLeadDetail(row)
         };
       }
