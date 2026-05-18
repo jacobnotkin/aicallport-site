@@ -1114,6 +1114,11 @@
       line-height: 1.5;
     }
 
+    .success-state.is-error {
+      border-color: rgba(236,78,93,.28);
+      background: rgba(236,78,93,.08);
+    }
+
     @media (max-width: 980px) {
       html, body {
         overflow: auto;
@@ -1602,6 +1607,8 @@
     const moduleTitle = document.getElementById("moduleTitle");
     const moduleDescription = document.getElementById("moduleDescription");
     const moduleBenefits = document.getElementById("moduleBenefits");
+    const successTitle = successState.querySelector("strong");
+    const successMessage = successState.querySelector("p");
 
     const moduleMap = {
       "call-handling": {
@@ -1716,6 +1723,13 @@
       body.classList.remove("modal-open");
     }
 
+    function setSubmissionState(type, title, message) {
+      successState.classList.add("is-visible");
+      successState.classList.toggle("is-error", type === "error");
+      successTitle.textContent = title;
+      successMessage.textContent = message;
+    }
+
     openModal.addEventListener("click", showModal);
     heroStepButtons.forEach((button) => {
       button.addEventListener("click", function () {
@@ -1751,7 +1765,7 @@
       });
     });
 
-    modal.addEventListener("click", function (event) { 
+    modal.addEventListener("click", function (event) {
       if (event.target === modal) {
         hideModal();
       }
@@ -1763,10 +1777,58 @@
       }
     });
 
-    betaForm.addEventListener("submit", function (event) {
+    betaForm.addEventListener("submit", async function (event) {
       event.preventDefault();
-      successState.classList.add("is-visible");
+
+      const formData = new FormData(betaForm);
+      const payload = {
+        action: "submit-beta-application",
+        fullName: String(formData.get("full_name") || "").trim(),
+        companyName: String(formData.get("company_name") || "").trim(),
+        email: String(formData.get("email") || "").trim(),
+        phone: String(formData.get("phone") || "").trim(),
+        businessType: String(formData.get("business_type") || "").trim(),
+        volume: String(formData.get("volume") || "").trim(),
+        problem: String(formData.get("problem") || "").trim(),
+        feedbackCommitment: String(formData.get("feedback_commitment") || "").trim()
+      };
+
+      submitStepButton.disabled = true;
+      submitStepButton.textContent = "Submitting...";
+      successState.classList.remove("is-visible", "is-error");
       nextStepButton.classList.remove("is-pulsing");
+
+      try {
+        const response = await fetch("/api/stripe/billing-state", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || "Unable to submit founder beta request.");
+        }
+
+        setSubmissionState(
+          "success",
+          "Request received",
+          "Your founder beta request has been submitted. We’ll review it and contact you directly if your business is selected for the next guided rollout round."
+        );
+        betaForm.reset();
+      } catch (error) {
+        setSubmissionState(
+          "error",
+          "Submission failed",
+          error.message || "We couldn’t submit your founder beta request right now. Please try again in a moment."
+        );
+      } finally {
+        submitStepButton.disabled = false;
+        submitStepButton.textContent = "Submit Request";
+      }
     });
 
     setModule("call-handling");
