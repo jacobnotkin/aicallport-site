@@ -4,36 +4,40 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Call Port — Founder Beta</title>
-
+  <meta
+    name="description"
+    content="Founder beta access for 10 selected service businesses. AI Call Port handles calls, lead follow-up, and scheduling in one system."
+  />
   <style>
     :root {
-      --bg: #000;
-      --white: #f7f7f8;
-      --muted: rgba(247, 247, 248, 0.72);
-      --soft: rgba(247, 247, 248, 0.68);
-      --orange: #f6b95f;
-      --orange-strong: #eca045;
-      --blue: #64b9ff;
-      --glass: rgba(7, 13, 22, 0.82);
-      --glass-2: rgba(8, 18, 31, 0.9);
-      --border: rgba(255, 255, 255, 0.15); 
-      --field: rgba(255, 255, 255, 0.05);
-      --field-border: rgba(255, 255, 255, 0.12);
-      --shadow: 0 26px 76px rgba(0, 0, 0, 0.34);
+      --bg: #050505;
+      --text: #f5f5f7;
+      --muted: rgba(245, 245, 247, 0.7);
+      --line: rgba(255, 255, 255, 0.14);
+      --glass: rgba(8, 12, 18, 0.58);
+      --glass-strong: rgba(8, 12, 18, 0.76);
+      --accent: #f5a33b;
+      --accent-soft: #ffd19a;
+      --blue: #6db7ff;
+      --max: 1280px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body {
-      width: 100%;
-      min-height: 100%;
-      background: #000;
-      color: var(--white);
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Arial, sans-serif;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    body.modal-open {
+    html,
+    body {
+      height: 100%;
       overflow: hidden;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
 
     a {
@@ -41,19 +45,12 @@
       text-decoration: none;
     }
 
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
     .hero {
-      position: relative;
-      width: 100%;
       min-height: 100vh;
+      position: relative;
       overflow: hidden;
-      background: #000;
+      display: flex;
+      align-items: center;
     }
 
     .hero-img {
@@ -62,1715 +59,489 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: 58% top;
+      object-position: 62% 8%;
       z-index: 1;
     }
 
-    .hero::before {
-      content: "";
+    .overlay {
       position: absolute;
       inset: 0;
       z-index: 2;
-      pointer-events: none;
       background:
         linear-gradient(
           90deg,
-          rgba(0,0,0,.78) 0%,
-          rgba(0,0,0,.54) 27%,
-          rgba(0,0,0,.18) 52%,
-          rgba(0,0,0,.02) 100%
+          rgba(0, 0, 0, 0.86) 0%,
+          rgba(0, 0, 0, 0.62) 28%,
+          rgba(0, 0, 0, 0.24) 56%,
+          rgba(0, 0, 0, 0.06) 100%
         ),
-        linear-gradient(
-          180deg,
-          rgba(0,0,0,.20) 0%,
-          rgba(0,0,0,0) 42%,
-          rgba(0,0,0,.30) 100%
-        );
+        radial-gradient(circle at 82% 78%, rgba(245, 163, 59, 0.16), transparent 34rem),
+        radial-gradient(circle at 64% 18%, rgba(109, 183, 255, 0.1), transparent 28rem),
+        radial-gradient(circle at 50% 48%, rgba(109, 183, 255, 0.07), transparent 18rem);
     }
 
-    .topbar {
+    .nav {
       position: absolute;
-      top: clamp(30px, 5vh, 52px);
-      left: clamp(46px, 6vw, 96px);
-      right: clamp(46px, 6vw, 96px);
-      z-index: 5;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 4;
+      width: min(100% - 72px, var(--max));
+      margin: 0 auto;
+      padding: 28px 0;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: flex-start;
+      gap: 18px;
     }
 
     .brand {
       display: flex;
-      gap: 13px;
       align-items: center;
+      gap: 14px;
     }
 
     .brand-mark {
       width: 42px;
       height: 42px;
-      border-radius: 12px;
+      border-radius: 13px;
+      border: 1px solid rgba(245, 163, 59, 0.48);
+      background: rgba(0, 0, 0, 0.34);
       display: grid;
       place-items: center;
-      border: 1px solid rgba(255,196,109,.46);
-      color: var(--orange-strong);
-      font-size: 22px;
-      font-weight: 900;
-      background: rgba(0,0,0,.34);
+      color: var(--accent);
+      font-weight: 800;
+      backdrop-filter: blur(18px);
     }
 
-    .brand-copy strong {
+    .brand strong {
       display: block;
       font-size: 17px;
-      font-weight: 850;
-      letter-spacing: -.03em;
-      line-height: 1;
+      letter-spacing: -0.02em;
     }
 
-    .brand-copy span {
+    .brand span:last-child {
       display: block;
-      margin-top: 5px;
+      margin-top: 2px;
+      color: var(--muted);
       font-size: 13px;
-      color: var(--orange);
-      font-weight: 650;
     }
 
-    .launch-wrap {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .launch-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      height: 40px;
-      padding: 0 20px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,196,109,.50);
-      background: rgba(0,0,0,.30);
-      color: var(--orange);
-      font-size: 13px;
-      font-weight: 850;
-      text-transform: uppercase;
-      letter-spacing: .065em;
-      white-space: nowrap;
-    }
-
-    .launch-pill::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--orange);
-      box-shadow: 0 0 18px rgba(255,196,109,.55);
-    }
-
-    .copy {
-      position: absolute;
-      z-index: 4;
-      left: clamp(46px, 6vw, 96px);
-      top: 48%;
-      transform: translateY(-45%);
-      width: min(700px, 47vw);
-    }
-
+    .nav-pill,
     .eyebrow {
       display: inline-flex;
       align-items: center;
-      height: 34px;
-      padding: 0 17px;
+      justify-content: center;
       border-radius: 999px;
-      background: rgba(65,155,245,.18);
-      border: 1px solid rgba(101,185,255,.25);
-      color: #7bc3ff;
+      backdrop-filter: blur(18px);
+      white-space: nowrap;
+    }
+
+    .nav-pill {
+      min-height: 40px;
+      padding: 0 16px;
+      border: 1px solid rgba(245, 163, 59, 0.38);
+      background: rgba(0, 0, 0, 0.32);
+      color: var(--accent-soft);
       font-size: 13px;
-      font-weight: 850;
-      letter-spacing: .13em;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 3;
+      width: min(100% - 72px, var(--max));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 620px) 1fr;
+      align-items: center;
+      gap: 28px;
+      padding-top: 82px;
+    }
+
+    .copy {
+      display: grid;
+      gap: 0;
+      align-content: start;
+      padding-top: 14px;
+    }
+
+    .eyebrow {
+      padding: 8px 14px;
+      color: var(--blue);
+      background: rgba(109, 183, 255, 0.12);
+      border: 1px solid rgba(109, 183, 255, 0.18);
+      font-size: 13px;
+      font-weight: 750;
       text-transform: uppercase;
-      margin-bottom: clamp(18px, 2.8vh, 30px);
+      letter-spacing: 0.09em;
+      margin-bottom: 28px;
+      width: fit-content;
     }
 
     h1 {
-      font-size: clamp(34px, 3.7vw, 56px);
-      line-height: .95;
-      letter-spacing: -.076em;
-      font-weight: 900;
-      max-width: 590px;
-      text-wrap: balance;
+      font-size: clamp(37px, 4.75vw, 64px);
+      line-height: 0.94;
+      letter-spacing: -0.075em;
+      font-weight: 850;
+      max-width: 620px;
     }
 
-    .orange { color: var(--orange); }
-
-    .subhead {
-      margin-top: clamp(22px, 2.8vh, 32px);
-      max-width: 560px;
-      color: rgba(247,247,248,.78);
-      font-size: clamp(17px, 1.25vw, 21px);
-      line-height: 1.38;
-      letter-spacing: -.02em;
+    h1 span {
+      color: var(--accent);
     }
 
-    .cta {
-      margin-top: clamp(18px, 2.4vh, 28px);
-      width: min(338px, 100%);
-      min-height: 64px;
-      border: 0;
-      border-radius: 14px;
+    .sub {
+      max-width: 450px;
+      margin-top: 24px;
+      font-size: clamp(16px, 1.05vw, 18px);
+      line-height: 1.42;
+      letter-spacing: -0.025em;
+      color: rgba(245, 245, 247, 0.78);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .btn {
+      min-height: 54px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 30px;
-      background: linear-gradient(180deg, #ffd48d 0%, #f6a63a 100%);
-      box-shadow: 0 8px 22px rgba(245,163,59,.18);
-      color: #050505;
-      font-size: 18px;
-      font-weight: 850;
-      letter-spacing: -.02em;
-      cursor: pointer;
-    }
-
-    .cta span {
-      font-size: 30px;
-      font-weight: 300;
-    }
-
-    .hero-secondary-actions {
-      margin-top: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .hero-chip {
-      min-height: 40px;
-      padding: 0 14px;
+      padding: 0 26px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color: rgba(247,247,248,.84);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: border-color .2s ease, background .2s ease, transform .2s ease;
+      font-weight: 740;
+      letter-spacing: -0.01em;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      font-size: 14px;
     }
 
-    .hero-chip:hover {
-      transform: translateY(-1px);
-      border-color: rgba(246,185,95,.28);
-      background: rgba(246,185,95,.07);
+    .btn:hover {
+      transform: translateY(-2px);
     }
 
-    .commitment {
-      margin-top: 15px;
-      display: flex;
+    .btn-primary {
+      color: #050505;
+      background: linear-gradient(180deg, #ffd38d, #f5a33b);
+      box-shadow: 0 18px 44px rgba(245, 163, 59, 0.26);
+    }
+
+    .lock-note {
+      display: inline-flex;
       align-items: center;
       gap: 10px;
-      color: rgba(247,247,248,.64);
-      font-size: 13px;
+      margin-top: 12px;
+      color: rgba(245, 245, 247, 0.72);
+      font-size: 12px;
     }
 
-    .commitment svg {
-      width: 15px;
-      height: 15px;
-      flex: 0 0 15px;
+    .lock-note::before {
+      content: "⌂";
+      color: rgba(245, 245, 247, 0.56);
+      font-size: 14px;
+      line-height: 1;
+      transform: translateY(-1px);
     }
 
     .trust-row {
-      position: absolute;
-      left: clamp(46px, 6vw, 96px);
-      bottom: clamp(22px, 4.8vh, 50px);
-      z-index: 4;
       display: grid;
-      grid-template-columns: 175px 190px 170px;
-      gap: 30px;
-      align-items: start;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 38px;
+      max-width: 620px;
     }
 
     .trust-item {
-      display: grid;
-      grid-template-columns: 25px 1fr;
-      gap: 12px;
+      position: relative;
+      padding-top: 2px;
+      padding-left: 38px;
+      min-height: 48px;
     }
 
-    .trust-item:not(:last-child) {
-      border-right: 1px solid rgba(255,255,255,.20);
-      padding-right: 24px;
+    .trust-item:not(:first-child) {
+      border-left: 1px solid rgba(255, 255, 255, 0.12);
+      padding-left: 46px;
     }
 
-    .trust-icon {
-      width: 23px;
-      height: 23px;
-      color: var(--orange);
+    .trust-item::before {
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--accent-soft);
+      font-size: 20px;
+      line-height: 1;
     }
+
+    .trust-item.secure::before { content: "◈"; }
+    .trust-item.founder::before { content: "◎"; }
+    .trust-item.live::before { content: "⚡"; }
 
     .trust-item strong {
       display: block;
+      color: rgba(245, 245, 247, 0.92);
       font-size: 14px;
-      font-weight: 850;
-      letter-spacing: -.02em;
-      margin-bottom: 5px;
+      letter-spacing: -0.02em;
     }
 
     .trust-item span {
       display: block;
-      color: rgba(247,247,248,.68);
+      margin-top: 4px;
+      color: rgba(245, 245, 247, 0.58);
       font-size: 12px;
-      line-height: 1.25;
-    }
-
-    .right-stack {
-      position: absolute;
-      z-index: 6;
-      right: clamp(52px, 6vw, 100px);
-      bottom: clamp(24px, 3.8vh, 42px);
-      width: clamp(275px, 20vw, 325px);
-      display: grid;
-      gap: 12px;
-    }
-
-    .countdown-card,
-    .price-card {
-      border-radius: 17px;
-      border: 1px solid rgba(101,185,255,.20);
-      background: linear-gradient(180deg, rgba(11,24,39,.78), rgba(7,11,18,.72));
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-    }
-
-    .countdown-card {
-      padding: 14px 18px;
-    }
-
-    .countdown-title,
-    .price-title,
-    .included-title,
-    .modal-kicker {
-      color: #74c4ff;
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-    }
-
-    .countdown-title {
-      margin-bottom: 12px;
-    }
-
-    .countdown-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .time-box {
-      min-height: 50px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.045);
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 7px 4px;
-    }
-
-    .time-box strong {
-      display: block;
-      color: var(--orange);
-      font-size: 21px;
-      line-height: 1;
-      font-weight: 900;
-      letter-spacing: -.04em;
-    }
-
-    .time-box span {
-      display: block;
-      margin-top: 5px;
-      color: rgba(247,247,248,.68);
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-    }
-
-    .price-card {
-      padding: clamp(20px, 1.8vw, 25px);
-    }
-
-    .price-title {
-      margin-bottom: 14px;
-    }
-
-    .beta-copy {
-      color: rgba(247,247,248,.68);
-      font-size: 12.5px;
-      line-height: 1.38;
-      margin-bottom: 16px;
-    }
-
-    .price-row {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .old-price {
-      color: rgba(247,247,248,.42);
-      font-size: 20px;
-      font-weight: 850;
-      text-decoration: line-through;
-      text-decoration-thickness: 2px;
-    }
-
-    .price {
-      color: var(--orange);
-      font-size: clamp(40px, 3.7vw, 52px);
-      line-height: .92;
-      font-weight: 900;
-      letter-spacing: -.065em;
-    }
-
-    .price small {
-      color: rgba(247,247,248,.75);
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: -.02em;
-    }
-
-    .locked {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 14px;
-      color: rgba(247,247,248,.72);
-      font-size: 12.5px;
       line-height: 1.35;
     }
 
-    .locked svg {
-      width: 16px;
-      height: 16px;
-      flex: 0 0 16px;
+    .side {
+      display: grid;
+      justify-items: end;
+      align-items: center;
     }
 
-    .line {
+    .price-card {
+      width: min(100%, 328px);
+      margin-top: 248px;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: linear-gradient(180deg, rgba(10, 18, 28, 0.68), rgba(6, 8, 13, 0.46));
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.38);
+      backdrop-filter: blur(24px);
+      padding: 24px 22px 20px;
+    }
+
+    .price-title {
+      color: var(--blue);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .price-main {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .now {
+      color: var(--accent-soft);
+      font-size: 50px;
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      font-weight: 850;
+    }
+
+    .now small {
+      color: rgba(245, 245, 247, 0.76);
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .lock {
+      color: rgba(245, 245, 247, 0.76);
+      font-size: 13px;
+      line-height: 1.48;
+      margin-bottom: 14px;
+    }
+
+    .divider {
       height: 1px;
-      background: rgba(255,255,255,.13);
-      margin: 18px 0;
+      background: rgba(255, 255, 255, 0.13);
+      margin: 14px 0;
     }
 
     .included-title {
-      margin-bottom: 13px;
+      color: rgba(245, 245, 247, 0.92);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 12px;
     }
 
     .included {
-      list-style: none;
       display: grid;
-      gap: 9px;
+      gap: 10px;
+      list-style: none;
     }
 
     .included li {
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      color: rgba(247,247,248,.80);
-      font-size: 12.5px;
-      line-height: 1.28;
+      color: rgba(245, 245, 247, 0.78);
+      font-size: 12px;
+      line-height: 1.35;
     }
 
-    .check {
-      width: 19px;
-      height: 19px;
-      border-radius: 50%;
-      border: 2px solid var(--blue);
+    .included li::before {
+      content: "✓";
       color: var(--blue);
-      display: grid;
-      place-items: center;
-      font-size: 11px;
       font-weight: 900;
-      flex: 0 0 19px;
-      margin-top: -2px;
+      margin-top: 1px;
     }
 
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 28px 4px;
-      background: rgba(0,0,0,.68);
-      backdrop-filter: blur(10px);
-    }
-
-    .modal.is-open {
-      display: flex;
-    }
-
-    .modal-panel {
-      width: min(930px, 100%);
-      max-height: min(98vh, 920px);
-      border-radius: 24px;
-      border: 1px solid rgba(101,185,255,.18);
-      background: linear-gradient(180deg, rgba(9,16,28,.96), rgba(7,11,18,.98));
-      box-shadow: 0 32px 90px rgba(0,0,0,.45);
-      padding: 8px 22px 24px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 6px;
-    }
-
-    .modal-head h2 {
-      font-size: clamp(24px, 2.6vw, 34px);
-      line-height: .98;
-      letter-spacing: -.05em;
-      margin-top: 0;
-    }
-
-    .modal-head p {
-      margin-top: 4px;
-      color: var(--muted);
-      max-width: 600px;
-      line-height: 1.4;
-      font-size: 14px;
-    }
-
-    .modal-close {
-      width: 38px;
-      height: 38px;
-      border: 1px solid var(--field-border);
-      background: rgba(255,255,255,.04);
-      color: var(--white);
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 24px;
-      line-height: 1;
-    }
-
-    .pipeline-steps {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-
-    .pipeline-step {
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.035);
-      padding: 10px 12px;
-      color: rgba(247,247,248,.5);
-      cursor: pointer;
-      transition: border-color .2s ease, background .2s ease, color .2s ease;
-    }
-
-    .pipeline-step:hover {
-      border-color: rgba(101,185,255,.18);
-      background: rgba(255,255,255,.05);
-      color: rgba(247,247,248,.82);
-    }
-
-    .pipeline-step strong {
-      display: block;
-      font-size: 12px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .pipeline-step span {
-      display: block;
-      font-size: 12px;
-      color: inherit;
-    }
-
-    .pipeline-step.is-active {
-      border-color: rgba(101,185,255,.24);
-      background: rgba(101,185,255,.08);
-      color: rgba(247,247,248,.92);
-    }
-
-    .pipeline-step.is-complete {
-      border-color: rgba(246,185,95,.22);
-      background: rgba(246,185,95,.08);
-      color: rgba(247,247,248,.82);
-    }
-
-    .pipeline-body {
-      flex: 1;
-      min-height: 0;
-      display: grid;
-      padding-bottom: 14px;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding-right: 4px;
-    }
-
-    .pipeline-body::-webkit-scrollbar {
-      width: 10px;
-    }
-
-    .pipeline-body::-webkit-scrollbar-track {
-      background: rgba(255,255,255,.03);
-      border-radius: 999px;
-    }
-
-    .pipeline-body::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,.16);
-      border-radius: 999px;
-    }
-
-    .pipeline-body::-webkit-scrollbar-thumb:hover {
-      background: rgba(255,255,255,.24);
-    }
-
-    .step-card,
-    .offer-card,
-    .form-card {
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      padding: 22px;
-    }
-
-    .form-card {
-      padding-bottom: 14px;
-    }
-
-    .step-card {
-      display: none;
-    }
-
-    .step-card.is-active {
-      display: block;
-    }
-
-    .step-layout {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      gap: 16px;
-      align-items: stretch;
-    }
-
-    .step-copy h4,
-    .module-detail h4,
-    .preview-note h4,
-    .form-shell h4 {
-      font-size: 24px;
-      line-height: 1;
-      letter-spacing: -.04em;
-      margin-bottom: 10px;
-    }
-
-    .step-copy p,
-    .module-detail p,
-    .form-shell p {
-      color: var(--muted);
-      line-height: 1.4;
-      font-size: 14px;
-    }
-
-    .offer-pricing {
+    .small-note {
       margin-top: 14px;
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .offer-pricing .was {
-      color: rgba(247,247,248,.42);
-      font-size: 22px;
-      font-weight: 850;
-      text-decoration: line-through;
-    }
-
-    .offer-pricing .now {
-      color: var(--orange);
-      font-size: 48px;
-      font-weight: 900;
-      letter-spacing: -.06em;
-      line-height: .95;
-    }
-
-    .offer-pricing .now small {
-      color: rgba(247,247,248,.78);
-      font-size: 17px;
-      font-weight: 700;
-    }
-
-    .offer-note {
-      margin-top: 14px;
-      color: var(--muted);
-      line-height: 1.45;
-      font-size: 14px;
-    }
-
-    .summary-grid {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .summary-item {
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-    }
-
-    .summary-item strong {
-      display: block;
-      font-size: 12px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: rgba(247,247,248,.62);
-      margin-bottom: 7px;
-    }
-
-    .summary-item span {
-      display: block;
-      color: rgba(247,247,248,.88);
-      line-height: 1.4;
-      font-size: 14px;
-    }
-
-    .module-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    .module-button {
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-      color: rgba(247,247,248,.8);
-      border-radius: 14px;
-      padding: 12px;
-      text-align: left;
-      cursor: pointer;
-      transition: border-color .2s ease, background .2s ease, color .2s ease;
-    }
-
-    .module-button strong {
-      display: block;
-      font-size: 14px;
-      margin-bottom: 6px;
-      letter-spacing: -.02em;
-    }
-
-    .module-button span {
-      display: block;
-      font-size: 12px;
-      line-height: 1.35;
-      color: rgba(247,247,248,.58);
-    }
-
-    .module-button.is-active {
-      border-color: rgba(101,185,255,.26);
-      background: rgba(101,185,255,.08);
-      color: rgba(247,247,248,.96);
-    }
-
-    .module-button.is-active span {
-      color: rgba(247,247,248,.72);
-    }
-
-    .module-detail {
-      border-radius: 18px;
-      border: 1px solid rgba(101,185,255,.14);
-      background: linear-gradient(180deg, rgba(10,22,38,.58), rgba(6,10,18,.52));
-      padding: 18px;
-      min-height: 100%;
-    }
-
-    .module-detail ul {
-      list-style: none;
-      display: grid;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    .module-detail li {
-      display: flex;
-      gap: 10px;
-      color: rgba(247,247,248,.76);
-      line-height: 1.45;
-      font-size: 14px;
-    }
-
-    .module-detail li::before {
-      content: "•";
-      color: var(--orange);
-    }
-
-    .preview-shell {
-      display: grid;
-      grid-template-columns: 228px 1fr;
-      gap: 16px;
-      align-items: stretch;
-    }
-
-    .preview-phone {
-      border-radius: 30px;
-      border: 1px solid rgba(255,255,255,.1);
-      background: linear-gradient(180deg, rgba(8,13,22,.94), rgba(4,7,13,.96));
-      padding: 12px;
-      box-shadow: 0 22px 56px rgba(0,0,0,.32);
-    }
-
-    .preview-screen {
-      border-radius: 20px;
-      background: linear-gradient(180deg, rgba(15,21,34,.94), rgba(8,11,18,.98));
-      min-height: 372px;
-      padding: 16px 14px;
-    }
-
-    .preview-screen h5 {
-      font-size: 16px;
-      margin-bottom: 4px;
-    }
-
-    .preview-screen p {
-      color: rgba(247,247,248,.58);
-      font-size: 12px;
-      margin-bottom: 14px;
-    }
-
-    .preview-metrics {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .preview-metric {
-      border-radius: 14px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.07);
-      padding: 10px;
-    }
-
-    .preview-metric strong {
-      display: block;
-      font-size: 22px;
-      color: var(--orange);
-      margin-bottom: 6px;
-    }
-
-    .preview-metric span {
-      display: block;
-      color: rgba(247,247,248,.65);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
-    .preview-activity {
-      display: grid;
-      gap: 6px;
-      margin-top: 12px;
-    }
-
-    .preview-activity div {
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.06);
-      background: rgba(255,255,255,.03);
-      padding: 9px 11px;
-      color: rgba(247,247,248,.76);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
-    .preview-notes {
-      display: grid;
-      gap: 10px;
-    }
-
-    .preview-note {
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.035);
-      padding: 14px;
-    }
-
-    .preview-note strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    .preview-note span {
-      display: block;
-      color: rgba(247,247,248,.68);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    .form-shell {
-      display: grid;
-      gap: 12px;
-    }
-
-    .form-card h3 {
-      font-size: 13px;
-      color: rgba(247,247,248,.88);
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .form-meta {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .form-meta-item {
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-      padding: 9px 11px;
-    }
-
-    .form-meta-item strong {
-      display: block;
-      margin-bottom: 5px;
+      color: rgba(245, 245, 247, 0.54);
       font-size: 11px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: rgba(247,247,248,.62);
-    }
-
-    .form-meta-item span {
-      display: block;
-      color: rgba(247,247,248,.84);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px 12px;
-    }
-
-    .field,
-    .field-full {
-      display: grid;
-      gap: 8px;
-    }
-
-    .field-full {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      color: rgba(247,247,248,.86);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      border: 1px solid var(--field-border);
-      background: var(--field);
-      color: var(--white);
-      border-radius: 12px;
-      padding: 11px 12px;
-      outline: none;
-    }
-
-    textarea {
-      min-height: 70px;
-      resize: none;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: rgba(101,185,255,.48);
-      box-shadow: 0 0 0 3px rgba(101,185,255,.10);
-    }
-
-    .pipeline-actions {
-      margin-top: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      min-height: 54px;
-      padding-top: 14px;
-    }
-
-    .pipeline-left-actions,
-    .pipeline-right-actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .pipeline-right-actions {
-      margin-left: auto;
-    }
-
-    .ghost-btn,
-    .next-btn,
-    .submit-btn {
-      min-height: 54px;
-      border-radius: 14px;
-      border: 0;
-      padding: 0 22px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      cursor: pointer;
-      font-weight: 850;
-      transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
-    }
-
-    .ghost-btn:hover,
-    .next-btn:hover,
-    .submit-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .ghost-btn {
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      color: rgba(247,247,248,.84);
-    }
-
-    .next-btn,
-    .submit-btn {
-      background: linear-gradient(180deg, #ffd48d 0%, #f6a63a 100%);
-      color: #050505;
-      box-shadow: 0 10px 26px rgba(246,166,58,.22);
-    }
-
-    .next-btn.is-pulsing {
-      animation: nextPulse 2.4s ease-in-out infinite;
-    }
-
-    @keyframes nextPulse {
-      0%, 100% {
-        box-shadow: 0 10px 26px rgba(246,166,58,.20);
-        filter: brightness(1);
-      }
-      50% {
-        box-shadow: 0 14px 30px rgba(246,166,58,.34);
-        filter: brightness(1.06);
-      }
-    }
-
-    .form-note,
-    .step-note {
-      color: var(--muted);
-      font-size: 13px;
       line-height: 1.45;
     }
 
-    .form-note {
-      margin-top: 14px;
-      padding-top: 2px;
-    }
-
-    .success-state {
-      display: none;
-      border-radius: 18px;
-      border: 1px solid rgba(101,185,255,.18);
-      background: rgba(101,185,255,.06);
-      padding: 14px;
-      margin-top: 12px;
-    }
-
-    .success-state.is-visible {
-      display: block;
-    }
-
-    .success-state strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 18px;
-    }
-
-    .success-state p {
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    @media (max-width: 980px) {
-      html, body {
+    @media (max-width: 1040px) {
+      html,
+      body {
         overflow: auto;
-        height: auto;
       }
 
       .hero {
-        min-height: 100vh;
-        height: auto;
-        padding-bottom: 36px;
+        min-height: auto;
+      }
+
+      .overlay {
+        background:
+          linear-gradient(180deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.78) 40%, rgba(0, 0, 0, 0.98) 100%),
+          radial-gradient(circle at 80% 22%, rgba(245, 163, 59, 0.16), transparent 28rem);
       }
 
       .hero-img {
-        object-position: 68% center;
+        object-position: 66% top;
       }
 
-      .topbar {
-        position: relative;
-        top: auto;
-        left: auto;
-        right: auto;
-        padding: 26px 24px 0;
+      .wrap {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 170px 0 56px;
+        min-height: 960px;
+        align-items: end;
       }
 
-      .launch-wrap {
+      .side {
+        justify-items: start;
+      }
+
+      .price-card {
+        margin-top: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav,
+      .wrap {
+        width: min(100% - 32px, var(--max));
+      }
+
+      .nav-pill,
+      .brand span:last-child {
         display: none;
       }
 
-      .copy {
-        position: relative;
-        left: auto;
-        top: auto;
-        transform: none;
-        width: auto;
-        padding: 84px 24px 0;
-      }
-
       h1 {
-        font-size: clamp(42px, 12vw, 62px);
+        font-size: clamp(43px, 13vw, 62px);
       }
 
-      .right-stack {
-        position: relative;
-        right: auto;
-        bottom: auto;
-        width: calc(100% - 48px);
-        max-width: 420px;
-        margin: 34px 24px 0;
+      .sub {
+        font-size: 18px;
+      }
+
+      .actions,
+      .btn {
+        width: 100%;
+      }
+
+      .price-card {
+        width: 100%;
       }
 
       .trust-row {
-        position: relative;
-        left: auto;
-        bottom: auto;
-        grid-template-columns: 1fr;
-        gap: 18px;
-        padding: 30px 24px 0;
-      }
-
-      .trust-item:not(:last-child) {
-        border-right: 0;
-        padding-right: 0;
-      }
-
-      .pipeline-steps {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .step-layout,
-      .preview-shell {
         grid-template-columns: 1fr;
       }
 
-      .form-meta,
-      .module-grid,
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .pipeline-actions {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .pipeline-left-actions,
-      .pipeline-right-actions {
-        width: 100%;
-      }
-
-      .ghost-btn,
-      .next-btn,
-      .submit-btn,
-      .hero-chip {
-        width: 100%;
+      .trust-item:not(:first-child) {
+        border-left: none;
+        padding-left: 38px;
       }
     }
   </style>
 </head>
 <body>
-  <section class="hero">
-    <img class="hero-img" src="hero-clean.png" alt="Service business owner in an HVAC workshop" />
+  <main>
+    <section class="hero">
+      <img class="hero-img" src="hero-clean.png" alt="Service business owner using an AI dashboard on a smartphone" />
+      <div class="overlay"></div>
 
-    <header class="topbar">
-      <a href="#" class="brand" aria-label="AI Call Port">
-        <span class="brand-mark">AI</span>
-        <span class="brand-copy">
-          <strong>AI Call Port</strong>
-          <span>Founder beta access</span>
-        </span>
-      </a>
-      <div class="launch-wrap"><span class="launch-pill">Coming Live • June 1, 2026</span></div>
-    </header>
+      <nav class="nav">
+        <a class="brand" href="#">
+          <span class="brand-mark">AI</span>
+          <span>
+            <strong>AI Call Port</strong>
+            <span>Founder beta access</span>
+          </span>
+        </a>
+        <span class="nav-pill">Founder Beta</span>
+      </nav>
 
-    <main class="copy">
-      <div class="eyebrow">Founder Beta</div>
-      <h1>The <span class="orange">AI Operating</span><br>System For<br>Service Businesses.</h1>
-      <p class="subhead">AI Call Port controls the full sales and service pipeline with an intelligent AI call agent, guided staff operation, owner oversight, and follow-through until real results are achieved.</p>
-      <button class="cta" type="button" id="openModal">Start Request <span>→</span></button>
-      <div class="hero-secondary-actions">
-        <button class="hero-chip" type="button" data-open-step="0">Pricing</button>
-        <button class="hero-chip" type="button" data-open-step="1">What’s Included</button>
-        <button class="hero-chip" type="button" data-open-step="2">Dashboard Preview</button>
-      </div>
-      <div class="commitment">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-        <span>Guided activation • Guided operation • No technical skills required</span>
-      </div>
-    </main>
+      <div class="wrap">
+        <div class="copy">
+          <div class="eyebrow">Founder Beta</div>
+          <h1>AI That Runs Your<br><span>Calls, Leads,</span> and<br>Scheduling —<br><span>Automatically.</span></h1>
+          <p class="sub">Handles calls, follows up with leads, and books jobs automatically — so you never miss an opportunity.</p>
 
-    <aside class="right-stack" aria-label="Founder beta offer">
-      <div class="countdown-card">
-        <div class="countdown-title">Launch Countdown</div>
-        <div class="countdown-grid">
-          <div class="time-box"><strong id="days">--</strong><span>Days</span></div>
-          <div class="time-box"><strong id="hours">--</strong><span>Hours</span></div>
-          <div class="time-box"><strong id="minutes">--</strong><span>Min</span></div>
-          <div class="time-box"><strong id="seconds">--</strong><span>Sec</span></div>
+          <div class="actions">
+            <a href="mailto:hello@aicallport.com?subject=Founder%20Beta%20Request" class="btn btn-primary">Apply for Founder Access</a>
+          </div>
+
+          <div class="lock-note">No long-term commitment. Cancel anytime.</div>
+
+          <div class="trust-row">
+            <div class="trust-item secure">
+              <strong>Secure &amp; Reliable</strong>
+              <span>Enterprise-grade security</span>
+            </div>
+            <div class="trust-item founder">
+              <strong>Founder-Led</strong>
+              <span>Built with your feedback</span>
+            </div>
+            <div class="trust-item live">
+              <strong>Live in Minutes</strong>
+              <span>Quick setup, real results</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="price-card">
-        <div class="price-title">Founder Beta Access</div>
-        <p class="beta-copy">We are selecting 10 service businesses for early access to a guided, adaptive, upgradeable AI operating system built for ongoing control and real results.</p>
-        <div class="price-row">
-          <span class="old-price">$1,400</span>
-          <span class="price">$349<small>/mo</small></span>
-        </div>
-        <div class="locked">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-          <span>Guaranteed for 12 months if accepted</span>
-        </div>
-        <div class="line"></div>
-        <div class="included-title">Includes</div>
-        <ul class="included">
-          <li><span class="check">✓</span>Intelligent AI call agent with intent and language detection</li>
-          <li><span class="check">✓</span>Sales and service pipeline control</li>
-          <li><span class="check">✓</span>Owner oversight, alerts, and guided staff action</li>
-          <li><span class="check">✓</span>Post-job follow-up and old-customer reactivation</li>
-          <li><span class="check">✓</span>Fast guided activation with no technical skills required</li>
-        </ul>
-      </div>
-    </aside>
+        <aside class="side">
+          <div class="price-card" aria-label="Founder beta pricing">
+            <div class="price-title">Founder Beta Access</div>
+            <div class="price-main">
+              <span class="now">$349<small>/mo</small></span>
+            </div>
+            <p class="lock">Locked for 12 months if accepted. Paid monthly with no long-term commitment.</p>
 
-    <section class="trust-row" aria-label="Benefits">
-      <div class="trust-item">
-        <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
-        <div><strong>Secure & Reliable</strong><span>Built for real business use</span></div>
-      </div>
-      <div class="trust-item">
-        <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <div><strong>10 Businesses Only</strong><span>Limited founder beta rollout</span></div>
-      </div>
-      <div class="trust-item">
-        <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg>
-        <div><strong>Live in Minutes</strong><span>Fast online activation</span></div>
+            <div class="divider"></div>
+
+            <div class="included-title">Includes Everything</div>
+            <ul class="included">
+              <li>AI call handling</li>
+              <li>Lead follow-up and recovery</li>
+              <li>Smart scheduling</li>
+              <li>CRM and pipeline visibility</li>
+              <li>Owner alerts &amp; reports</li>
+              <li>And much more</li>
+            </ul>
+
+            <p class="small-note">Includes 1,000 monthly voice minutes during the founder beta.</p>
+          </div>
+        </aside>
       </div>
     </section>
-  </section>
-
-  <div class="modal" id="betaModal" aria-hidden="true">
-    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modal-head">
-        <div>
-          <div class="modal-kicker">Founder Beta Request</div>
-          <h2 id="modalTitle">Request Founder Beta Access</h2>
-          <p>We’re selecting 10 service businesses for early access to a guided AI operating system that controls pipeline movement, communication, follow-through, and owner visibility.</p>
-        </div>
-        <button class="modal-close" type="button" id="closeModal" aria-label="Close">×</button>
-      </div>
-
-      <div class="pipeline-steps" aria-label="Request Pipeline">
-        <div class="pipeline-step is-active" data-step-indicator="0">
-          <strong>Step 1</strong>
-          <span>Offer</span>
-        </div>
-        <div class="pipeline-step" data-step-indicator="1">
-          <strong>Step 2</strong>
-          <span>Included</span>
-        </div>
-        <div class="pipeline-step" data-step-indicator="2">
-          <strong>Step 3</strong>
-          <span>Preview</span>
-        </div>
-        <div class="pipeline-step" data-step-indicator="3">
-          <strong>Step 4</strong>
-          <span>Request</span>
-        </div>
-      </div>
-
-      <div class="pipeline-body">
-        <section class="step-card is-active" data-step="0">
-          <div class="step-layout">
-            <div class="step-copy offer-card">
-              <div class="modal-kicker">Founder Beta Offer</div>
-              <h4>Understand the offer before you apply.</h4>
-              <p>Get early access to a guided, adaptive AI operating system built to control sales, service, communication, and follow-through across your business.</p>
-
-              <div class="offer-pricing">
-                <span class="was">$1,400</span>
-                <span class="now">$349<small>/mo</small></span>
-              </div>
-
-              <p class="offer-note">Guaranteed for 12 months if accepted. Paid monthly with no long-term commitment, guided activation, and no technical complexity.</p>
-            </div>
-
-            <div class="step-card is-active">
-              <div class="modal-kicker">Founder Beta Summary</div>
-              <div class="summary-grid">
-                <div class="summary-item">
-                  <strong>Availability</strong>
-                  <span>Only 10 businesses will be accepted into this founder beta.</span>
-                </div>
-                <div class="summary-item">
-                  <strong>Commitment</strong>
-                  <span>Monthly billing, no long-term contract, and founder beta pricing locked if accepted.</span>
-                </div>
-                <div class="summary-item">
-                  <strong>Why It’s Different</strong>
-                  <span>This is not one isolated AI tool. It is a connected operating system built for ongoing control and real results.</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="step-card" data-step="1">
-          <div class="step-layout">
-            <div class="step-copy offer-card">
-              <div class="modal-kicker">What’s Included</div>
-              <h4>Explore the founder beta modules.</h4>
-              <p>Each module controls a specific part of the workflow while feeding the rest of the operating system.</p>
-
-              <div class="module-grid">
-                <button class="module-button is-active" type="button" data-module="call-handling">
-                  <strong>AI Call Handling</strong>
-                  <span>Detects intent, language, urgency, and next action.</span>
-                </button>
-                <button class="module-button" type="button" data-module="after-hours">
-                  <strong>After-Hours Support</strong>
-                  <span>Keeps nights, weekends, and emergencies covered.</span>
-                </button>
-                <button class="module-button" type="button" data-module="booking">
-                  <strong>Pipeline Control</strong>
-                  <span>Moves leads, bookings, and service actions forward.</span>
-                </button>
-                <button class="module-button" type="button" data-module="multilingual">
-                  <strong>Staff Guidance</strong>
-                  <span>Directs team actions through role-based dashboards.</span>
-                </button>
-                <button class="module-button" type="button" data-module="voice-minutes">
-                  <strong>Customer Reactivation</strong>
-                  <span>Works old customer lists and post-job follow-up.</span>
-                </button>
-                <button class="module-button" type="button" data-module="feedback">
-                  <strong>Adaptive Improvement</strong>
-                  <span>Improves during live use and owner-requested changes.</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="module-detail" id="moduleDetail">
-              <div class="modal-kicker">Module Detail</div>
-              <h4 id="moduleTitle">AI Call Handling</h4>
-              <p id="moduleDescription">The intelligent AI call agent automatically detects customer intent, recognizes language, handles urgency, and routes every interaction into the correct operational flow.</p>
-              <ul id="moduleBenefits">
-                <li>Captures inbound intent without relying on manual availability.</li>
-                <li>Routes conversations based on service type, urgency, language, or business rules.</li>
-                <li>Activates the next operational step instead of stopping at the response.</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section class="step-card" data-step="2">
-          <div class="preview-shell">
-            <div class="preview-phone">
-              <div class="preview-screen">
-                <h5>Overview</h5>
-                <p>Live operating preview of your business</p>
-
-                <div class="preview-metrics">
-                  <div class="preview-metric">
-                    <strong>6</strong>
-                    <span>Active calls now</span>
-                  </div>
-                  <div class="preview-metric">
-                    <strong>12</strong>
-                    <span>Appointments booked</span>
-                  </div>
-                  <div class="preview-metric">
-                    <strong>8</strong>
-                    <span>New leads captured</span>
-                  </div>
-                  <div class="preview-metric">
-                    <strong>5</strong>
-                    <span>Jobs booked</span>
-                  </div>
-                </div>
-
-                <div class="preview-activity">
-                  <div>Acme Plumbing — emergency plumbing — live request</div>
-                  <div>Bay City Rooter — follow-up scheduled automatically</div>
-                  <div>Northline Drain Pros — booking confirmed</div>
-                  <div>Fieldstone HVAC — quote request routed</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="preview-notes">
-              <div class="preview-note">
-                <strong>15 active modules in your dashboard</strong>
-                <span>See calls, leads, service actions, workflows, and operational movement in one place instead of across disconnected tools.</span>
-              </div>
-              <div class="preview-note">
-                <strong>Role-based views with owner control</strong>
-                <span>Each salesperson and service team member gets a limited dashboard while the owner keeps full-system visibility and alerts.</span>
-              </div>
-              <div class="preview-note">
-                <strong>Built for live business use</strong>
-                <span>This system guides daily operation, tracks responsiveness, and keeps sales and service execution moving toward results.</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="step-card" data-step="3">
-          <div class="form-shell">
-            <div>
-              <div class="modal-kicker">Final Step</div>
-              <h4>Submit your founder beta request.</h4>
-              <p>Share the essentials and we’ll review whether your business is a fit for this guided operating system and founder beta rollout.</p>
-            </div>
-
-            <div class="form-card">
-              <div class="form-meta">
-                <div class="form-meta-item">
-                  <strong>Review</strong>
-                  <span>Every request is reviewed manually before acceptance.</span>
-                </div>
-                <div class="form-meta-item">
-                  <strong>Pricing</strong>
-                  <span>$349/mo if accepted, locked for 12 months.</span>
-                </div>
-                <div class="form-meta-item">
-                  <strong>Commitment</strong>
-                  <span>Paid monthly with no long-term contract.</span>
-                </div>
-              </div>
-
-              <h3>Application Form</h3>
-
-              <form id="betaForm" action="#" method="post">
-                <div class="form-grid">
-                  <div class="field">
-                    <label for="fullName">Full name</label>
-                    <input id="fullName" name="full_name" type="text" required />
-                  </div>
-
-                  <div class="field">
-                    <label for="companyName">Company name</label>
-                    <input id="companyName" name="company_name" type="text" required />
-                  </div>
-
-                  <div class="field">
-                    <label for="email">Email</label>
-                    <input id="email" name="email" type="email" required />
-                  </div>
-
-                  <div class="field">
-                    <label for="phone">Phone</label>
-                    <input id="phone" name="phone" type="tel" required />
-                  </div>
-
-                  <div class="field">
-                    <label for="businessType">Business type</label>
-                    <input id="businessType" name="business_type" type="text" placeholder="HVAC, plumbing, legal, dental..." required />
-                  </div>
-
-                  <div class="field">
-                    <label for="volume">Monthly inbound calls or leads</label>
-                    <select id="volume" name="volume" required>
-                      <option value="">Select one</option>
-                      <option>Under 50</option>
-                      <option>50–150</option>
-                      <option>150–500</option>
-                      <option>500+</option>
-                    </select>
-                  </div>
-
-                  <div class="field-full">
-                    <label for="problem">Biggest problem today</label>
-                    <textarea id="problem" name="problem" placeholder="Missed calls, slow follow-up, after-hours gaps, scheduling issues, lead qualification, visibility, etc." required></textarea>
-                  </div>
-
-                <div class="field">
-                  <label for="feedbackCommitment">Are you willing to provide feedback during beta?</label>
-                  <select id="feedbackCommitment" name="feedback_commitment" required>
-                    <option value="">Select one</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                  </select>
-                </div>
-              </div>
-
-                <div class="form-note">Applications are reviewed manually. Accepted businesses are contacted directly and guided through activation.</div>
-
-                <div class="success-state" id="successState">
-                  <strong>Request received</strong>
-                  <p>Your founder beta request has been submitted. We’ll review it and contact you directly if your business is selected for the next guided rollout round.</p>
-                </div>
-              </form>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <div class="pipeline-actions">
-        <div class="pipeline-left-actions">
-          <button class="ghost-btn" type="button" id="backStep">Back</button>
-        </div>
-        <div class="pipeline-right-actions">
-          <div class="step-note" id="stepNote">Review the founder beta offer, then continue.</div>
-          <button class="next-btn is-pulsing" type="button" id="nextStep">Next</button>
-          <button class="submit-btn" type="submit" id="submitStep" form="betaForm" style="display: none;">Submit Request</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const launchDate = new Date("2026-06-01T00:00:00").getTime();
-    const ids = ["days", "hours", "minutes", "seconds"];
-
-    function updateCountdown() {
-      const now = new Date().getTime();
-      const distance = Math.max(0, launchDate - now);
-      const values = [
-        Math.floor(distance / (1000 * 60 * 60 * 24)),
-        Math.floor((distance / (1000 * 60 * 60)) % 24),
-        Math.floor((distance / (1000 * 60)) % 60),
-        Math.floor((distance / 1000) % 60)
-      ];
-
-      ids.forEach((id, i) => {
-        document.getElementById(id).textContent = String(values[i]).padStart(2, "0");
-      });
-    }
-
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-
-    const body = document.body;
-    const modal = document.getElementById("betaModal");
-    const openModal = document.getElementById("openModal");
-    const heroStepButtons = Array.from(document.querySelectorAll("[data-open-step]"));
-    const closeModal = document.getElementById("closeModal");
-    const betaForm = document.getElementById("betaForm");
-    const successState = document.getElementById("successState");
-    const stepCards = Array.from(document.querySelectorAll("[data-step]"));
-    const stepIndicators = Array.from(document.querySelectorAll("[data-step-indicator]"));
-    const nextStepButton = document.getElementById("nextStep");
-    const submitStepButton = document.getElementById("submitStep");
-    const backStepButton = document.getElementById("backStep");
-    const stepNote = document.getElementById("stepNote");
-    const moduleButtons = Array.from(document.querySelectorAll(".module-button"));
-    const moduleTitle = document.getElementById("moduleTitle");
-    const moduleDescription = document.getElementById("moduleDescription");
-    const moduleBenefits = document.getElementById("moduleBenefits");
-
-    const moduleMap = {
-      "call-handling": {
-        title: "AI Call Handling",
-        description: "The intelligent AI call agent automatically detects customer intent, recognizes language, handles urgency, and routes every interaction into the correct operational flow.",
-        benefits: [
-          "Captures inbound intent without relying on manual availability.",
-          "Routes conversations based on service type, urgency, language, or business rules.",
-          "Activates the next operational step instead of stopping at the response."
-        ]
-      },
-      "after-hours": {
-        title: "Emergency & After-Hours Support",
-        description: "Keeps urgent, late-night, and after-hours calls from falling through by maintaining intelligent coverage when your team is unavailable.",
-        benefits: [
-          "Captures emergency demand without requiring staff on call.",
-          "Handles after-hours inquiries with business-specific responses.",
-          "Protects revenue from missed time-sensitive opportunities and stalled service flow."
-        ]
-      },
-      "booking": {
-        title: "Sales & Service Pipeline Control",
-        description: "Controls lead movement, qualification, scheduling, service coordination, and follow-through so opportunities continue moving until results are achieved.",
-        benefits: [
-          "Moves callers toward qualification, booking, and completion faster.",
-          "Reduces leakage between sales actions, service actions, and follow-up.",
-          "Keeps execution active instead of relying on manual chasing."
-        ]
-      },
-      "multilingual": {
-        title: "Staff Guidance & Role Dashboards",
-        description: "Each salesperson and service team member works from a limited dashboard with assigned actions, notification response expectations, and availability updates.",
-        benefits: [
-          "Shows each employee only the actions relevant to their role.",
-          "Improves accountability through notification response and availability discipline.",
-          "Gives the owner oversight without adding operational clutter."
-        ]
-      },
-      "voice-minutes": {
-        title: "Customer Reactivation & Follow-Up",
-        description: "Inspects old customer lists, organizes missed opportunities, and implements follow-up before and after the job to recover revenue and drive repeat business.",
-        benefits: [
-          "Reactivates existing customers instead of waiting only for new inbound demand.",
-          "Maintains communication after the job instead of letting the relationship go cold.",
-          "Creates more repeat business from data most companies ignore."
-        ]
-      },
-      "feedback": {
-        title: "Adaptive Improvement & Owner Requests",
-        description: "The system can improve during live operations when imperfections appear, and it can also be modified based on owner requests after those requests are analyzed before implementation.",
-        benefits: [
-          "Refines weak points during live use instead of staying static after setup.",
-          "Lets the owner shape the system without reckless changes.",
-          "Supports an upgrade path into future modules like accounting, marketing, and advertising."
-        ]
-      }
-    };
-
-    const stepNotes = [
-      "Review the founder beta offer, then continue.",
-      "Explore what’s included in the founder beta.",
-      "Preview how the system looks in operation.",
-      "Complete the request form and submit at the end."
-    ];
-
-    let currentStep = 0;
-
-    function syncPipeline() {
-      stepCards.forEach((card, index) => {
-        card.classList.toggle("is-active", index === currentStep);
-      });
-
-      stepIndicators.forEach((indicator, index) => {
-        indicator.classList.toggle("is-active", index === currentStep);
-        indicator.classList.toggle("is-complete", index < currentStep);
-      });
-
-      backStepButton.style.visibility = currentStep === 0 ? "hidden" : "visible";
-      nextStepButton.style.display = currentStep === stepCards.length - 1 ? "none" : "inline-flex";
-      submitStepButton.style.display = currentStep === stepCards.length - 1 ? "inline-flex" : "none";
-      nextStepButton.classList.toggle("is-pulsing", currentStep < stepCards.length - 1);
-      stepNote.textContent = stepNotes[currentStep];
-      stepNote.style.display = currentStep === stepCards.length - 1 ? "none" : "block";
-    }
-
-    function setModule(key) {
-      const module = moduleMap[key];
-      if (!module) return;
-
-      moduleButtons.forEach((button) => {
-        button.classList.toggle("is-active", button.dataset.module === key);
-      });
-
-      moduleTitle.textContent = module.title;
-      moduleDescription.textContent = module.description;
-      moduleBenefits.innerHTML = module.benefits.map((item) => `<li>${item}</li>`).join("");
-    }
-
-    function showModal(stepIndex = 0) {
-      modal.classList.add("is-open");
-      modal.setAttribute("aria-hidden", "false");
-      body.classList.add("modal-open");
-      currentStep = Math.max(0, Math.min(stepCards.length - 1, stepIndex));
-      successState.classList.remove("is-visible");
-      betaForm.reset();
-      syncPipeline();
-    }
-
-    function hideModal() {
-      modal.classList.remove("is-open");
-      modal.setAttribute("aria-hidden", "true");
-      body.classList.remove("modal-open");
-    }
-
-    openModal.addEventListener("click", showModal);
-    heroStepButtons.forEach((button) => {
-      button.addEventListener("click", function () {
-        showModal(Number(button.dataset.openStep));
-      });
-    });
-    closeModal.addEventListener("click", hideModal);
-
-    stepIndicators.forEach((indicator, index) => {
-      indicator.addEventListener("click", function () {
-        currentStep = index;
-        syncPipeline();
-      });
-    });
-
-    nextStepButton.addEventListener("click", function () {
-      if (currentStep < stepCards.length - 1) {
-        currentStep += 1;
-        syncPipeline();
-      }
-    });
-
-    backStepButton.addEventListener("click", function () {
-      if (currentStep > 0) {
-        currentStep -= 1;
-        syncPipeline();
-      }
-    });
-
-    moduleButtons.forEach((button) => {
-      button.addEventListener("click", function () {
-        setModule(button.dataset.module);
-      });
-    });
-
-    modal.addEventListener("click", function (event) {
-      if (event.target === modal) {
-        hideModal();
-      }
-    });
-
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && modal.classList.contains("is-open")) {
-        hideModal();
-      }
-    });
-
-    betaForm.addEventListener("submit", function (event) {
-      event.preventDefault();
-      successState.classList.add("is-visible");
-      nextStepButton.classList.remove("is-pulsing");
-    });
-
-    setModule("call-handling");
-    syncPipeline();
-  </script>
+  </main>
 </body>
 </html>
