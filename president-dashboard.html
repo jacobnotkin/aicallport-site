@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABC | President Dashboard Concept</title>
+  <meta
+    name="description"
+    content="President-level dashboard concept for AI-ABC, showing executive briefing, action center, accountability, and company structure."
+  />
+  <style>
+    :root {
+      --bg: #05080d;
+      --panel: rgba(9, 15, 24, 0.95);
+      --panel-soft: rgba(12, 19, 30, 0.86);
+      --panel-elevated: rgba(14, 22, 34, 0.98);
+      --text: #eff5fb;
+      --muted: rgba(239, 245, 251, 0.72);
+      --soft: rgba(239, 245, 251, 0.55);
+      --line: rgba(255, 255, 255, 0.09);
+      --line-strong: rgba(255, 255, 255, 0.14);
+      --blue: #63b7ff;
+      --blue-soft: #9cd7ff;
+      --orange: #ff7f34;
+      --orange-soft: #ffb778;
+      --green: #61d196;
+      --red: #ff7676;
+      --gold: #ffcb79;
+      --shadow: 0 34px 110px rgba(0, 0, 0, 0.50);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --max: 1520px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    }
+
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 14% 16%, rgba(99, 183, 255, 0.16), transparent 26%),
+        radial-gradient(circle at 82% 18%, rgba(255, 127, 52, 0.12), transparent 23%),
+        linear-gradient(180deg, #08101a 0%, #05080d 48%, #04070b 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.4;
+      mask-image: radial-gradient(circle at center, black 36%, transparent 88%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(var(--max), calc(100vw - 36px));
+      margin: 18px auto;
+      min-height: calc(100vh - 36px);
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background:
+        radial-gradient(circle at top right, rgba(255,183,120,.09), transparent 24%),
+        radial-gradient(circle at top left, rgba(99,183,255,.08), transparent 28%),
+        linear-gradient(180deg, rgba(8, 13, 21, 0.99), rgba(5, 9, 15, 0.99));
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.04);
+      overflow: hidden;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 286px 1fr;
+      min-height: calc(100vh - 36px);
+    }
+
+    .sidebar {
+      border-right: 1px solid rgba(255, 255, 255, 0.07);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)),
+        radial-gradient(circle at top left, rgba(99,183,255,.07), transparent 30%);
+      padding: 22px 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .brand {
+      padding: 18px 16px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),
+        radial-gradient(circle at top right, rgba(255,127,52,.10), transparent 42%);
+    }
+
+    .brand-mark {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,127,52,.36);
+      display: grid;
+      place-items: center;
+      color: var(--orange);
+      font-size: 24px;
+      font-weight: 900;
+      margin-bottom: 14px;
+      background: rgba(255,255,255,.025);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .brand h1 {
+      font-size: 34px;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      margin-bottom: 8px;
+      font-weight: 900;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 200px;
+    }
+
+    .nav-wing-label {
+      padding: 6px 4px 2px;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 14px;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      transition: 0.18s ease;
+    }
+
+    .nav a.active {
+      color: #fff7ef;
+      border-color: rgba(255,127,52,.3);
+      background:
+        linear-gradient(180deg, rgba(255,127,52,.20), rgba(255,127,52,.08)),
+        radial-gradient(circle at top right, rgba(255,183,120,.12), transparent 44%);
+      box-shadow: 0 10px 30px rgba(255,127,52,.12);
+    }
+
+    .nav a:hover {
+      color: #fff;
+      border-color: var(--line);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .nav .badge {
+      min-width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: rgba(255,127,52,.16);
+      border: 1px solid rgba(255,127,52,.24);
+      color: #fff4eb;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .sidebar-note,
+    .president-card,
+    .office-card {
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.018)),
+        radial-gradient(circle at top right, rgba(99,183,255,.05), transparent 44%);
+      padding: 18px 16px;
+    }
+
+    .sidebar-note {
+      margin-top: auto;
+    }
+
+    .sidebar-note p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .sidebar-note strong {
+      color: #fff;
+    }
+
+    .president-card h3 {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--orange-soft);
+      margin-bottom: 10px;
+      font-weight: 800;
+    }
+
+    .president-card strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.05;
+      margin-bottom: 8px;
+      letter-spacing: -0.04em;
+    }
+
+    .president-card p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .office-card {
+      padding: 12px;
+      background:
+        linear-gradient(180deg, rgba(8,21,38,.92), rgba(7,14,23,.98)),
+        radial-gradient(circle at top right, rgba(255,127,52,.08), transparent 44%);
+    }
+
+    .office-card h3 {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--orange-soft);
+      margin: 2px 4px 12px;
+      font-weight: 800;
+    }
+
+    .office-image {
+      height: 190px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.18)),
+        radial-gradient(circle at 50% 30%, rgba(255,205,135,.18), transparent 28%),
+        linear-gradient(180deg, #18273b 0%, #1b2330 40%, #0f1319 100%);
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .office-image::before {
+      content: "";
+      position: absolute;
+      inset: 12% 16% 18%;
+      border-radius: 10px;
+      background:
+        linear-gradient(180deg, rgba(255,226,176,.24), rgba(255,226,176,.05)),
+        linear-gradient(180deg, #2f3e53 0%, #202a38 100%);
+      clip-path: polygon(0 100%, 0 58%, 28% 58%, 32% 48%, 68% 48%, 72% 58%, 100% 58%, 100% 100%);
+      box-shadow: 0 18px 34px rgba(0,0,0,.35);
+    }
+
+    .office-image::after {
+      content: "";
+      position: absolute;
+      left: 20%;
+      right: 20%;
+      bottom: 22%;
+      height: 28%;
+      border-radius: 10px 10px 22px 22px;
+      background:
+        linear-gradient(180deg, rgba(91,66,45,.95), rgba(51,36,24,.98)),
+        linear-gradient(90deg, rgba(255,255,255,.08), transparent);
+      box-shadow: 0 22px 40px rgba(0,0,0,.34);
+    }
+
+    .office-copy {
+      padding: 12px 4px 4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .main {
+      padding: 24px 28px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 6px;
+    }
+
+    .launch-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      height: 40px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,127,52,.36);
+      background: rgba(255,127,52,.08);
+      color: var(--orange-soft);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .launch-pill::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 16px rgba(255,127,52,.44);
+    }
+
+    .status-strip {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .president-chip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(255,127,52,.26), rgba(99,183,255,.22));
+      border: 1px solid rgba(255,255,255,.16);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.95fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .hero-copy {
+      padding: 10px 2px 0;
+    }
+
+    .hero-copy h2 {
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      font-size: clamp(46px, 5vw, 70px);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      margin-bottom: 14px;
+    }
+
+    .hero-copy p {
+      color: var(--muted);
+      font-size: 20px;
+      line-height: 1.45;
+      max-width: 720px;
+    }
+
+    .ceo-card,
+    .kpi-card,
+    .panel,
+    .executive-card,
+    .goal-card,
+    .structure-node,
+    .summary-card,
+    .footer-banner {
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015)),
+        radial-gradient(circle at top right, rgba(99,183,255,.05), transparent 40%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .hero-side {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      align-content: start;
+    }
+
+    .kpi-card {
+      padding: 18px 16px 16px;
+      min-height: 158px;
+    }
+
+    .kpi-card h3 {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--soft);
+      line-height: 1.45;
+      min-height: 34px;
+    }
+
+    .kpi-card strong {
+      display: block;
+      font-size: 42px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin: 16px 0 8px;
+    }
+
+    .kpi-card span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .hero-brief {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.95fr);
+      gap: 18px;
+    }
+
+    .ceo-card {
+      padding: 22px 24px;
+      display: grid;
+      grid-template-columns: 84px 1fr auto;
+      gap: 18px;
+      align-items: center;
+      background:
+        radial-gradient(circle at top right, rgba(255,127,52,.16), transparent 32%),
+        radial-gradient(circle at bottom left, rgba(99,183,255,.12), transparent 32%),
+        linear-gradient(180deg, rgba(11, 24, 42, 0.98), rgba(8, 16, 28, 0.98));
+    }
+
+    .ceo-card .ceo-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.12);
+      font-size: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: var(--orange-soft);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .ceo-copy h3 {
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      font-size: 38px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin-bottom: 12px;
+    }
+
+    .ceo-copy p {
+      max-width: 580px;
+      color: #eef4fb;
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    .ceo-signoff {
+      text-align: right;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .ceo-signoff strong {
+      display: block;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 0.95fr;
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 22px 22px 20px;
+    }
+
+    .panel h3 {
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue-soft);
+      margin-bottom: 18px;
+    }
+
+    .action-list,
+    .activity-list,
+    .goal-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .action-item,
+    .activity-item,
+    .goal-item {
+      display: grid;
+      gap: 6px;
+      padding: 14px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.028);
+    }
+
+    .action-item-top,
+    .activity-item-top,
+    .goal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .action-item strong,
+    .activity-item strong,
+    .goal-item strong {
+      font-size: 17px;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+    }
+
+    .action-item p,
+    .activity-item p,
+    .goal-item p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .priority {
+      min-width: 70px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+
+    .priority.high {
+      color: #fff4ef;
+      background: rgba(255,127,52,.18);
+      border-color: rgba(255,127,52,.26);
+    }
+
+    .priority.medium {
+      color: #fff8ef;
+      background: rgba(255,203,121,.16);
+      border-color: rgba(255,203,121,.24);
+    }
+
+    .priority.low {
+      color: #ecf6ff;
+      background: rgba(99,183,255,.16);
+      border-color: rgba(99,183,255,.24);
+    }
+
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .summary-card {
+      padding: 16px 16px 14px;
+      min-height: 108px;
+    }
+
+    .summary-card h4 {
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+
+    .summary-card strong {
+      display: block;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin-bottom: 8px;
+    }
+
+    .summary-card span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .executive-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .executive-card {
+      padding: 18px 16px 16px;
+      display: grid;
+      gap: 14px;
+      position: relative;
+    }
+
+    .executive-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      border-radius: 24px 0 0 24px;
+      background: linear-gradient(180deg, rgba(99,183,255,.9), rgba(99,183,255,.2));
+    }
+
+    .executive-card.good-card::before {
+      background: linear-gradient(180deg, rgba(97,209,150,.92), rgba(97,209,150,.24));
+    }
+
+    .executive-card.attention-card::before {
+      background: linear-gradient(180deg, rgba(255,127,52,.92), rgba(255,127,52,.24));
+    }
+
+    .executive-card.opportunity-card::before {
+      background: linear-gradient(180deg, rgba(99,183,255,.92), rgba(99,183,255,.24));
+    }
+
+    .executive-head {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .executive-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.10);
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .executive-meta strong {
+      display: block;
+      font-size: 18px;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .executive-meta span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid transparent;
+    }
+
+    .status-chip.good {
+      color: #dcfff0;
+      background: rgba(97,209,150,.14);
+      border-color: rgba(97,209,150,.18);
+    }
+
+    .status-chip.attention {
+      color: #fff2e8;
+      background: rgba(255,127,52,.14);
+      border-color: rgba(255,127,52,.22);
+    }
+
+    .status-chip.opportunity {
+      color: #e8f5ff;
+      background: rgba(99,183,255,.14);
+      border-color: rgba(99,183,255,.22);
+    }
+
+    .executive-card p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .goals-panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .goal-track {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,.06);
+      margin-top: 10px;
+    }
+
+    .goal-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue), var(--blue-soft));
+    }
+
+    .goal-fill.orange {
+      background: linear-gradient(90deg, var(--orange), var(--orange-soft));
+    }
+
+    .goal-fill.green {
+      background: linear-gradient(90deg, #2fb36f, #76e39d);
+    }
+
+    .lower-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.95fr;
+      gap: 18px;
+    }
+
+    .hq-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.95fr;
+      gap: 18px;
+    }
+
+    .structure-wrap {
+      display: grid;
+      gap: 16px;
+    }
+
+    .structure-top {
+      display: grid;
+      place-items: center;
+      gap: 10px;
+    }
+
+    .structure-line {
+      width: 2px;
+      height: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.08));
+    }
+
+    .structure-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      position: relative;
+    }
+
+    .structure-row.executives::before,
+    .structure-row.directors::before {
+      content: "";
+      position: absolute;
+      top: -12px;
+      left: 12%;
+      right: 12%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+    }
+
+    .structure-node {
+      padding: 14px 12px;
+      text-align: center;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)),
+        radial-gradient(circle at top right, rgba(99,183,255,.05), transparent 42%);
+    }
+
+    .structure-node.president {
+      border-color: rgba(255,127,52,.22);
+      background:
+        linear-gradient(180deg, rgba(255,127,52,.16), rgba(255,127,52,.06)),
+        radial-gradient(circle at top right, rgba(255,183,120,.10), transparent 38%);
+    }
+
+    .structure-node strong {
+      display: block;
+      font-size: 15px;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    .structure-node span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .footer-banner {
+      margin-top: auto;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      background:
+        linear-gradient(180deg, rgba(8,26,46,.94), rgba(6,18,34,.98)),
+        radial-gradient(circle at top right, rgba(255,127,52,.10), transparent 34%);
+    }
+
+    .footer-banner strong {
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      font-size: 30px;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .footer-banner span {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+      max-width: 700px;
+      display: block;
+      margin-top: 8px;
+    }
+
+    .footer-sign {
+      color: var(--orange-soft);
+      font-size: 28px;
+      font-style: italic;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 1380px) {
+      .hero,
+      .hero-brief,
+      .grid-3,
+      .hq-grid,
+      .lower-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-side,
+      .executive-row,
+      .structure-row.executives,
+      .structure-row.directors,
+      .summary-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 1080px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: calc(100vw - 18px);
+        margin: 9px auto;
+      }
+
+      .main {
+        padding: 18px 16px 18px;
+      }
+
+      .hero-side,
+      .executive-row,
+      .summary-strip,
+      .structure-row.executives,
+      .structure-row.directors {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar,
+      .footer-banner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .ceo-card {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <h1>AI-ABC</h1>
+          <p>Bring Corporate Structure to Service Businesses.</p>
+        </div>
+
+        <div class="nav-wing-label">Headquarters</div>
+        <nav class="nav" aria-label="President dashboard navigation">
+          <a class="active" href="#"><span>Dashboard</span></a>
+          <a href="#"><span>Executive Team</span></a>
+          <a href="#"><span>Goals</span></a>
+          <a href="#"><span>Reports</span></a>
+          <a href="#"><span>Accountability</span></a>
+          <a href="#"><span>Approvals</span><span class="badge">3</span></a>
+          <a href="#"><span>Alerts</span><span class="badge">2</span></a>
+          <a href="#"><span>Company Structure</span></a>
+          <a href="#"><span>Documents</span></a>
+          <a href="#"><span>Settings</span></a>
+        </nav>
+
+        <div class="president-card">
+          <h3>President</h3>
+          <strong>You</strong>
+          <p>Owner, final decision-maker, financial confirmer, and strategic authority of the company.</p>
+        </div>
+
+        <div class="office-card">
+          <h3>President Office</h3>
+          <div class="office-image" aria-hidden="true"></div>
+          <div class="office-copy">The headquarters view should feel like a real company environment where executive reporting, approvals, and structure come together.</div>
+        </div>
+
+        <div class="sidebar-note">
+          <p><strong>The role of the President</strong> is not to do the work, but to ensure the work creates the results.</p>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div class="launch-pill">Stage A Coming Live • June 1, 2026</div>
+          <div class="status-strip">
+            <span>June 9, 2026</span>
+            <span>9:00 AM</span>
+            <div class="president-chip">
+              <div class="avatar">YP</div>
+              <div>
+                <strong style="display:block;font-size:14px;line-height:1.1;">President</strong>
+                <span style="font-size:12px;color:var(--soft);">Owner &amp; President</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section class="hero">
+          <div class="hero-copy">
+            <h2>Good Morning, President.</h2>
+            <p>Your executive team has prepared today’s briefing. AI-ABC is running the business through one operating structure, so you can govern by priorities, approvals, and outcomes instead of scattered updates.</p>
+          </div>
+
+          <div class="hero-side">
+            <div class="kpi-card">
+              <h3>Business Health</h3>
+              <strong>92</strong>
+              <span>Strong overall operating condition with high visibility and controlled execution.</span>
+            </div>
+            <div class="kpi-card">
+              <h3>Revenue Goal Progress</h3>
+              <strong>81%</strong>
+              <span>$18,400 of $25,000 approved monthly target is already visible.</span>
+            </div>
+            <div class="kpi-card">
+              <h3>Executive Attention Required</h3>
+              <strong>3</strong>
+              <span>One unresolved escalation, one financial confirmation, one approval sequence pending.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="hero-brief">
+          <div class="ceo-card">
+            <div class="ceo-avatar">CEO</div>
+            <div class="ceo-copy">
+              <div class="eyebrow">CEO Briefing</div>
+              <h3>Your business is strong.</h3>
+              <p>Revenue is on track and operations are performing well. A few items need your attention to keep us on course for the monthly goals and preserve clean financial truth.</p>
+            </div>
+            <div class="ceo-signoff">
+              <strong>David Martin, CEO</strong>
+              Full executive synthesis prepared for the President.
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>This Month</h3>
+            <div class="summary-strip" style="margin-top:0;">
+              <div class="summary-card">
+                <h4>Revenue Received</h4>
+                <strong>$18.4k</strong>
+                <span>Tracked across completed jobs and confirmed outcomes.</span>
+              </div>
+              <div class="summary-card">
+                <h4>Open Approvals</h4>
+                <strong>2</strong>
+                <span>Owner decision still required to keep workflow clean.</span>
+              </div>
+              <div class="summary-card">
+                <h4>Pending Financial Updates</h4>
+                <strong>2</strong>
+                <span>Revenue truth needs President confirmation before month close.</span>
+              </div>
+              <div class="summary-card">
+                <h4>Forecast</h4>
+                <strong>$24.8k</strong>
+                <span>Slightly behind target, but recoverable with disciplined follow-through.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid-3">
+          <div class="panel">
+            <h3>President Action Center</h3>
+            <div class="action-list">
+              <div class="action-item">
+                <div class="action-item-top">
+                  <strong>Approve estimate discount for Johnson Plumbing</strong>
+                  <span class="priority high">High</span>
+                </div>
+                <p>The CRO flagged a live revenue opportunity that needs your approval to close without delay.</p>
+              </div>
+              <div class="action-item">
+                <div class="action-item-top">
+                  <strong>Confirm financial outcomes for 2 completed jobs</strong>
+                  <span class="priority medium">Medium</span>
+                </div>
+                <p>The CFO cannot finalize revenue truth until paid, partial, lost, or open outcomes are confirmed.</p>
+              </div>
+              <div class="action-item">
+                <div class="action-item-top">
+                  <strong>Review service-department drift before it becomes a pattern</strong>
+                  <span class="priority low">Low</span>
+                </div>
+                <p>The COO sees early workflow slippage. Review now while the issue is still easy to correct.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Company Goals</h3>
+            <div class="goals-panel">
+              <div class="goal-item">
+                <div class="goal-top">
+                  <strong>Monthly Revenue</strong>
+                  <span style="color:var(--green);font-weight:800;">81%</span>
+                </div>
+                <p>$18,400 of $25,000 approved monthly target.</p>
+                <div class="goal-track"><div class="goal-fill green" style="width:81%"></div></div>
+              </div>
+              <div class="goal-item">
+                <div class="goal-top">
+                  <strong>Revenue Conversion</strong>
+                  <span style="color:var(--blue-soft);font-weight:800;">93%</span>
+                </div>
+                <p>Qualified opportunity to next-action discipline remains strong.</p>
+                <div class="goal-track"><div class="goal-fill" style="width:93%"></div></div>
+              </div>
+              <div class="goal-item">
+                <div class="goal-top">
+                  <strong>Gross Profit Margin</strong>
+                  <span style="color:var(--orange-soft);font-weight:800;">96%</span>
+                </div>
+                <p>Performance is near target but still sensitive to unresolved adjustments.</p>
+                <div class="goal-track"><div class="goal-fill orange" style="width:96%"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>President Activity Summary</h3>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-item-top">
+                  <strong>Executive Recommendations</strong>
+                  <span style="color:var(--blue-soft);font-weight:800;">12 / 3 / 7</span>
+                </div>
+                <p>Accepted: 12. Rejected: 3. Not reviewed: 7.</p>
+              </div>
+              <div class="activity-item">
+                <div class="activity-item-top">
+                  <strong>Financial Reconciliation</strong>
+                  <span style="color:var(--green);font-weight:800;">22 / 24</span>
+                </div>
+                <p>Required updates: 24. Completed: 22. Outstanding: 2.</p>
+              </div>
+              <div class="activity-item">
+                <div class="activity-item-top">
+                  <strong>Critical Issues</strong>
+                  <span style="color:var(--orange-soft);font-weight:800;">1 open</span>
+                </div>
+                <p>Escalated: 5. Reviewed: 4. Outstanding: 1.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="hq-grid">
+          <div class="panel">
+            <h3>Executive Team</h3>
+            <div class="executive-row">
+              <article class="executive-card good-card">
+                <div class="executive-head">
+                  <div class="executive-avatar">CEO</div>
+                  <div class="executive-meta">
+                    <strong>David Martin</strong>
+                    <span>Executive synthesis and company health.</span>
+                  </div>
+                </div>
+                <div class="status-chip good">Good</div>
+                <p>Everything is on track. Focus on the action center and keep monthly target discipline clean.</p>
+              </article>
+
+              <article class="executive-card good-card">
+                <div class="executive-head">
+                  <div class="executive-avatar">COO</div>
+                  <div class="executive-meta">
+                    <strong>Lisa Peterson</strong>
+                    <span>Operations, workflow, and execution reliability.</span>
+                  </div>
+                </div>
+                <div class="status-chip good">Good</div>
+                <p>Operations are running well. Technical productivity is stable, with early service drift worth watching.</p>
+              </article>
+
+              <article class="executive-card opportunity-card">
+                <div class="executive-head">
+                  <div class="executive-avatar">CRO</div>
+                  <div class="executive-meta">
+                    <strong>Mark Davis</strong>
+                    <span>Leads, pipeline, and revenue opportunity flow.</span>
+                  </div>
+                </div>
+                <div class="status-chip opportunity">Opportunity</div>
+                <p>Pipeline is strong this month. Conversions can improve further if owner decisions stay fast.</p>
+              </article>
+
+              <article class="executive-card attention-card">
+                <div class="executive-head">
+                  <div class="executive-avatar">CFO</div>
+                  <div class="executive-meta">
+                    <strong>Susan Lee</strong>
+                    <span>Revenue truth, estimates, payments, reconciliation.</span>
+                  </div>
+                </div>
+                <div class="status-chip attention">Needs Attention</div>
+                <p>Two financial outcomes remain unconfirmed. Reporting accuracy stays high once President updates are completed.</p>
+              </article>
+
+              <article class="executive-card attention-card">
+                <div class="executive-head">
+                  <div class="executive-avatar">CAO</div>
+                  <div class="executive-meta">
+                    <strong>Brian Scott</strong>
+                    <span>Approvals, governance, escalation, exceptions.</span>
+                  </div>
+                </div>
+                <div class="status-chip attention">Attention</div>
+                <p>One escalation still needs final resolution and two approvals remain pending inside the governance queue.</p>
+              </article>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Executive Briefings</h3>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-item-top">
+                  <strong>Daily Briefing</strong>
+                  <span style="color:var(--blue-soft);font-weight:800;">Today 9:00 AM</span>
+                </div>
+                <p>The CEO summary is prepared for the President and anchored to active revenue, approvals, and operating drift.</p>
+              </div>
+              <div class="activity-item">
+                <div class="activity-item-top">
+                  <strong>Weekly Briefing</strong>
+                  <span style="color:var(--muted);font-weight:800;">Every Monday</span>
+                </div>
+                <p>Cross-executive reporting consolidates revenue, operations, accountability, and unresolved risks into one leadership review.</p>
+              </div>
+              <div class="activity-item">
+                <div class="activity-item-top">
+                  <strong>Monthly Briefing</strong>
+                  <span style="color:var(--muted);font-weight:800;">First of month</span>
+                </div>
+                <p>Goal approval, financial truth, executive performance, and corporate structure changes are reviewed by the President.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="lower-grid">
+          <div class="panel">
+            <h3>Company Structure</h3>
+            <div class="structure-wrap">
+              <div class="structure-top">
+                <div class="structure-node president">
+                  <strong>President</strong>
+                  <span>You • Final authority</span>
+                </div>
+                <div class="structure-line"></div>
+                <div class="structure-node">
+                  <strong>CEO</strong>
+                  <span>Executive synthesis</span>
+                </div>
+              </div>
+
+              <div class="structure-row executives">
+                <div class="structure-node"><strong>COO</strong><span>Operations</span></div>
+                <div class="structure-node"><strong>CRO</strong><span>Revenue</span></div>
+                <div class="structure-node"><strong>CFO</strong><span>Financial Truth</span></div>
+                <div class="structure-node"><strong>CAO</strong><span>Governance</span></div>
+                <div class="structure-node"><strong>Future CMO</strong><span>Growth</span></div>
+              </div>
+
+              <div class="structure-row directors">
+                <div class="structure-node"><strong>Service Director</strong><span>Execution</span></div>
+                <div class="structure-node"><strong>Sales Director</strong><span>Conversion</span></div>
+                <div class="structure-node"><strong>Scheduling Director</strong><span>Booking</span></div>
+                <div class="structure-node"><strong>Dispatch Director</strong><span>Field Routing</span></div>
+                <div class="structure-node"><strong>Future HR Director</strong><span>People</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Why This Dashboard Exists</h3>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-item-top">
+                  <strong>Not a Feature Dashboard</strong>
+                </div>
+                <p>AI-ABC is shown here as a corporate operating structure, not as a pile of widgets and software tabs.</p>
+              </div>
+              <div class="activity-item">
+                <div class="activity-item-top">
+                  <strong>President-Level Governance</strong>
+                </div>
+                <p>The President sees the executive summary first, the action center second, and only then drills down into domain detail.</p>
+              </div>
+              <div class="activity-item">
+                <div class="activity-item-top">
+                  <strong>One Operating Environment</strong>
+                </div>
+                <p>Call handling, scheduling, revenue truth, accountability, and governance all live inside one command surface.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer class="footer-banner">
+          <div>
+            <strong>You are the President. AI-ABC is your executive operating structure.</strong>
+            <span>The system does the reporting, coordination, monitoring, and escalation work so the President can govern through decisions, approvals, financial truth, and company goals.</span>
+          </div>
+          <div class="footer-sign">— CEO</div>
+        </footer>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
