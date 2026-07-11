@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX Guided Activation Preview</title>
+  <style>
+    :root {
+      --bg: #050c14;
+      --panel: rgba(255,255,255,0.035);
+      --line: rgba(255,255,255,0.08);
+      --text: #eef4fb;
+      --muted: #9db0c5;
+      --blue: #79c8ff;
+      --gold: #f0be62;
+      --green: #42d392;
+      --violet: #b690ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(121,200,255,0.1), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(240,190,98,0.08), transparent 26%),
+        linear-gradient(180deg, #08111c 0%, #040911 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 34px 34px;
+      opacity: 0.14;
+      pointer-events: none;
+      mask-image: radial-gradient(circle at center, black 46%, transparent 90%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1440px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 24px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 10px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(121,200,255,0.08), transparent 22%),
+        linear-gradient(180deg, rgba(10,19,30,0.98), rgba(6,10,16,0.99));
+      box-shadow: 0 26px 80px rgba(0,0,0,0.36);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      width: fit-content;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(121,200,255,0.22);
+      background: rgba(121,200,255,0.08);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 2.6vw, 2.5rem);
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 920px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .steps {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .step {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.025);
+      display: grid;
+      gap: 6px;
+    }
+
+    .step.active {
+      border-color: rgba(240,190,98,0.18);
+      background: rgba(240,190,98,0.06);
+      box-shadow: 0 0 28px rgba(240,190,98,0.08);
+    }
+
+    .step-code {
+      color: var(--blue);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .step.active .step-code {
+      color: var(--gold);
+    }
+
+    .step-title {
+      font-size: 15px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .step-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .builder {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 0.9fr 1.08fr 0.82fr;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--panel);
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .profile-grid,
+    .config-grid,
+    .pricing-grid,
+    .why-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .field,
+    .module,
+    .price-row,
+    .reason {
+      padding: 12px 13px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.024);
+    }
+
+    .field-label,
+    .module-name,
+    .reason-title {
+      color: #dce7f3;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .field-value,
+    .module-copy,
+    .reason-copy,
+    .price-note {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .module-top,
+    .price-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pill.gold {
+      color: var(--gold);
+      border-color: rgba(240,190,98,0.18);
+      background: rgba(240,190,98,0.08);
+    }
+
+    .pill.blue {
+      color: var(--blue);
+      border-color: rgba(121,200,255,0.18);
+      background: rgba(121,200,255,0.08);
+    }
+
+    .pill.green {
+      color: var(--green);
+      border-color: rgba(66,211,146,0.18);
+      background: rgba(66,211,146,0.08);
+    }
+
+    .pill.violet {
+      color: var(--violet);
+      border-color: rgba(182,144,255,0.18);
+      background: rgba(182,144,255,0.08);
+    }
+
+    .price-amount {
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 850;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .total {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(240,190,98,0.18);
+      background: rgba(240,190,98,0.06);
+      display: grid;
+      gap: 6px;
+    }
+
+    .total-label {
+      color: #f3d69b;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .total-value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .actions {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      min-height: 36px;
+      padding: 0 12px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #f0be62 0%, #ffb24a 100%);
+      color: #07111b;
+    }
+
+    .btn.secondary {
+      border-color: rgba(121,200,255,0.22);
+      background: rgba(121,200,255,0.08);
+      color: var(--blue);
+    }
+
+    @media (max-width: 1120px) {
+      .builder {
+        grid-template-columns: 1fr;
+      }
+
+      .steps {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <span class="eyebrow">Guided Activation Preview</span>
+      <h1>Your recommended AI-ABCX configuration is ready for review.</h1>
+      <p>
+        This view shows the most important part of guided activation: the system evaluates the business, recommends the right structure, explains why it was chosen, and updates pricing transparently as the client adjusts the setup.
+      </p>
+    </section>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-code">Step 1</div>
+        <div class="step-title">Diagnose the business structure, workflow, tools, and current operating reality.</div>
+        <div class="step-copy">Collect company profile, service model, lead sources, scheduling needs, and growth goals.</div>
+      </div>
+      <div class="step active">
+        <div class="step-code">Step 2</div>
+        <div class="step-title">Review the configured system, explanation, and itemized pricing.</div>
+        <div class="step-copy">Adjust modules, levels, and combinations while the recommendation updates live.</div>
+      </div>
+      <div class="step">
+        <div class="step-code">Step 3</div>
+        <div class="step-title">Continue to live preview and confirm the final activation path.</div>
+        <div class="step-copy">Experience the dashboards before final activation and Stripe checkout.</div>
+      </div>
+    </div>
+
+    <div class="builder">
+      <section class="card">
+        <strong>Business Diagnosis</strong>
+        <div class="profile-grid">
+          <div class="field">
+            <div class="field-label">Business Type</div>
+            <div class="field-value">Home service company with estimate-driven sales and field execution.</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Team Structure</div>
+            <div class="field-value">Owner, 2 sales reps, 4 service reps, 1 office coordinator.</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Lead Sources</div>
+            <div class="field-value">Phone, website forms, Google Ads, and referral traffic.</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Scheduling Reality</div>
+            <div class="field-value">Manual scheduling is still active, but coordination pressure is rising.</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Current Goal</div>
+            <div class="field-value">Add structure, improve follow-up discipline, and gain more executive visibility.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <strong>Recommended Configuration</strong>
+        <div class="config-grid">
+          <div class="module">
+            <div class="module-top">
+              <div class="module-name">President Dashboard + CEO Briefing</div>
+              <span class="pill gold">Core</span>
+            </div>
+            <div class="module-copy">Daily executive summary, company visibility, recommended actions, and President decision control.</div>
+          </div>
+          <div class="module">
+            <div class="module-top">
+              <div class="module-name">Call Handling - Level A</div>
+              <span class="pill blue">Included</span>
+            </div>
+            <div class="module-copy">Capture inquiries, route information, and preserve intake truth for President visibility.</div>
+          </div>
+          <div class="module">
+            <div class="module-top">
+              <div class="module-name">Sales and Follow-Up - Level B</div>
+              <span class="pill green">Recommended</span>
+            </div>
+            <div class="module-copy">Stronger qualification, estimate follow-up support, and better revenue control across open opportunities.</div>
+          </div>
+          <div class="module">
+            <div class="module-top">
+              <div class="module-name">Scheduling and Dispatch - Level A</div>
+              <span class="pill blue">Included</span>
+            </div>
+            <div class="module-copy">Manual scheduling truth stays visible now, with a clean path to stronger coordination later.</div>
+          </div>
+          <div class="module">
+            <div class="module-top">
+              <div class="module-name">Marketing and Advertising - Level A</div>
+              <span class="pill violet">Optional</span>
+            </div>
+            <div class="module-copy">Can be activated independently now or connected more deeply as more lanes come online.</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <span class="btn secondary">Add Function</span>
+          <span class="btn secondary">Remove Function</span>
+          <span class="btn secondary">Recalculate</span>
+          <span class="btn primary">Continue to Live Preview</span>
+        </div>
+      </section>
+
+      <aside class="card">
+        <strong>Pricing and Explanation</strong>
+        <div class="pricing-grid">
+          <div class="price-row">
+            <div>
+              <div class="field-label">Core Corporate Structure</div>
+              <div class="price-note">President Dashboard, CEO lane, executive reporting base.</div>
+            </div>
+            <div class="price-amount">$620/mo</div>
+          </div>
+          <div class="price-row">
+            <div>
+              <div class="field-label">Call Handling - A</div>
+              <div class="price-note">Foundational intake and information capture.</div>
+            </div>
+            <div class="price-amount">$180/mo</div>
+          </div>
+          <div class="price-row">
+            <div>
+              <div class="field-label">Sales and Follow-Up - B</div>
+              <div class="price-note">Revenue coordination and opportunity visibility.</div>
+            </div>
+            <div class="price-amount">$240/mo</div>
+          </div>
+          <div class="price-row">
+            <div>
+              <div class="field-label">Scheduling and Dispatch - A</div>
+              <div class="price-note">Manual scheduling truth with President visibility.</div>
+            </div>
+            <div class="price-amount">$140/mo</div>
+          </div>
+        </div>
+
+        <div class="total">
+          <div class="total-label">Current Recommended Total</div>
+          <div class="total-value">$1,180 / month</div>
+          <div class="price-note">No setup fee. Monthly payments. No long-term commitment.</div>
+        </div>
+
+        <div class="why-list" style="margin-top:14px;">
+          <div class="reason">
+            <div class="reason-title">Why this configuration was chosen</div>
+            <div class="reason-copy">The business already has enough lead volume and team complexity to benefit from corporate structure, but manual scheduling is still appropriate at this stage.</div>
+          </div>
+          <div class="reason">
+            <div class="reason-title">Why Sales is Level B</div>
+            <div class="reason-copy">The company has multiple revenue opportunities in motion and needs stronger follow-up coordination before broader automation pressure is added elsewhere.</div>
+          </div>
+          <div class="reason">
+            <div class="reason-title">Why Scheduling stays A</div>
+            <div class="reason-copy">The system preserves manual truth now and keeps a clean upgrade path if the company decides to raise scheduling automation later.</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</body>
+</html>

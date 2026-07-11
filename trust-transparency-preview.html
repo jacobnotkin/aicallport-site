@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX Trust and Transparency Preview</title>
+  <style>
+    :root {
+      --bg: #050c14;
+      --panel: rgba(255,255,255,0.035);
+      --line: rgba(255,255,255,0.08);
+      --text: #eef4fb;
+      --muted: #9db0c5;
+      --blue: #79c8ff;
+      --green: #42d392;
+      --gold: #f0be62;
+      --red: #ff7f7f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(121,200,255,0.12), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(66,211,146,0.08), transparent 26%),
+        linear-gradient(180deg, #08111c 0%, #040911 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 34px 34px;
+      opacity: 0.14;
+      pointer-events: none;
+      mask-image: radial-gradient(circle at center, black 46%, transparent 90%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1420px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 24px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 8px;
+      padding: 14px 18px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(121,200,255,0.08), transparent 22%),
+        linear-gradient(180deg, rgba(10,19,30,0.98), rgba(6,10,16,0.99));
+      box-shadow: 0 26px 80px rgba(0,0,0,0.36);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      width: fit-content;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(121,200,255,0.22);
+      background: rgba(121,200,255,0.08);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 2.3vw, 2.2rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 920px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 0.82fr 1.18fr;
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--panel);
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .left-stack,
+    .board-list,
+    .qa-list,
+    .thread-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat,
+    .item,
+    .message,
+    .qa {
+      padding: 13px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.024);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      font-size: 1.9rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .stat-note,
+    .item-copy,
+    .qa-copy,
+    .message-copy {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .item-title,
+    .message-title,
+    .qa-title {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 820;
+      line-height: 1.4;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pill.blue {
+      color: var(--blue);
+      border-color: rgba(121,200,255,0.18);
+      background: rgba(121,200,255,0.08);
+    }
+
+    .pill.green {
+      color: var(--green);
+      border-color: rgba(66,211,146,0.18);
+      background: rgba(66,211,146,0.08);
+    }
+
+    .pill.gold {
+      color: var(--gold);
+      border-color: rgba(240,190,98,0.18);
+      background: rgba(240,190,98,0.08);
+    }
+
+    .pill.red {
+      color: var(--red);
+      border-color: rgba(255,127,127,0.18);
+      background: rgba(255,127,127,0.08);
+    }
+
+    .item-top,
+    .message-top,
+    .qa-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .chat-shell {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 12px;
+      background:
+        radial-gradient(circle at top right, rgba(121,200,255,0.08), transparent 24%),
+        rgba(255,255,255,0.04);
+    }
+
+    .chat-header {
+      padding: 13px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(121,200,255,0.18);
+      background: rgba(121,200,255,0.09);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .chat-header h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .chat-header p {
+      margin: 6px 0 0;
+      color: #dbe7f2;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .agent-badge {
+      min-width: 110px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(66,211,146,0.18);
+      background: rgba(66,211,146,0.08);
+      text-align: center;
+    }
+
+    .agent-badge span {
+      display: block;
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .agent-badge b {
+      display: block;
+      margin-top: 5px;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .composer {
+      padding: 12px 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.026);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .composer-text {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .send-btn {
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f0be62 0%, #ffb24a 100%);
+      color: #07111b;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 1080px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <span class="eyebrow">Trust and Transparency Preview</span>
+      <h1>Let clients ask, clarify, recommend, and raise concerns in one visible place.</h1>
+      <p>
+        This view shows the trust side of AI-ABCX: a structured communication board, clear client feedback visibility, and an AI customer service layer that answers routine questions without hiding the business behind a black box.
+      </p>
+    </section>
+
+    <div class="grid">
+      <section class="left-stack">
+        <div class="card">
+          <strong>Trust Signals</strong>
+          <div class="stat-grid">
+            <div class="stat">
+              <div class="stat-label">Open Questions</div>
+              <div class="stat-value">12</div>
+              <div class="stat-note">Visible to the company with clear status and response ownership.</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Recommendations</div>
+              <div class="stat-value">7</div>
+              <div class="stat-note">Client suggestions are grouped and ready for review.</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Complaints Needing Action</div>
+              <div class="stat-value">2</div>
+              <div class="stat-note">Raised early, assigned clearly, and tracked to resolution.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <strong>Why this matters</strong>
+          <div class="board-list">
+            <div class="item">
+              <div class="item-top">
+                <div class="item-title">Clients can see that the company is reachable, structured, and accountable.</div>
+                <span class="pill blue">Transparency</span>
+              </div>
+              <div class="item-copy">A visible communication board makes the system feel open rather than hidden behind automation.</div>
+            </div>
+            <div class="item">
+              <div class="item-top">
+                <div class="item-title">Questions do not have to wait for a sales rep or office manager every time.</div>
+                <span class="pill green">AI Help</span>
+              </div>
+              <div class="item-copy">The AI Customer Service Agent can answer routine questions while escalating anything sensitive or unresolved.</div>
+            </div>
+            <div class="item">
+              <div class="item-top">
+                <div class="item-title">Recommendations and complaints become operational input, not ignored noise.</div>
+                <span class="pill gold">Feedback</span>
+              </div>
+              <div class="item-copy">This helps improve the system from a real customer perspective over time.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card chat-shell">
+        <strong>Client Communication Board</strong>
+
+        <div class="chat-header">
+          <div>
+            <h2>Customer Questions, Recommendations, and Complaints</h2>
+            <p>Visible intake for trust-building communication, with AI support and clear escalation paths.</p>
+          </div>
+          <div class="agent-badge">
+            <span>AI Agent</span>
+            <b>Customer Service Online</b>
+          </div>
+        </div>
+
+        <div class="thread-list">
+          <div class="message">
+            <div class="message-top">
+              <div class="message-title">Question: “Can I confirm whether my appointment window is still active?”</div>
+              <span class="pill green">Answered</span>
+            </div>
+            <div class="message-copy">AI Customer Service confirmed the active window, provided the current record status, and linked the client to live follow-up if needed.</div>
+          </div>
+
+          <div class="message">
+            <div class="message-top">
+              <div class="message-title">Recommendation: “It would help if I could see when follow-up is expected after estimate review.”</div>
+              <span class="pill blue">Logged</span>
+            </div>
+            <div class="message-copy">Recommendation was added to the communication board and sent to the executive review lane for workflow clarity improvements.</div>
+          </div>
+
+          <div class="message">
+            <div class="message-top">
+              <div class="message-title">Complaint: “I was told someone would call back yesterday and did not hear from anyone.”</div>
+              <span class="pill red">Escalated</span>
+            </div>
+            <div class="message-copy">The system flagged this for immediate follow-up, preserved the complaint visibly, and assigned responsibility before the issue was lost.</div>
+          </div>
+        </div>
+
+        <div class="qa-list">
+          <div class="qa">
+            <div class="qa-top">
+              <div class="qa-title">AI Customer Service Q&amp;A</div>
+              <span class="pill gold">Live</span>
+            </div>
+            <div class="qa-copy">“You can ask about appointment status, estimate timing, payment clarification, service process, and next expected steps.”</div>
+          </div>
+        </div>
+
+        <div class="composer">
+          <div class="composer-text">Ask a question, share a recommendation, or raise a concern. Transparent communication stays visible to the company.</div>
+          <div class="send-btn">Send Message</div>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

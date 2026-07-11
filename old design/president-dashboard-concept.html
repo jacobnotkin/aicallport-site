@@ -1,0 +1,2601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABC President Headquarters</title>
+  <style>
+    :root {
+      --bg: #060b14;
+      --panel: #0d1524;
+      --panel-2: #101b2c;
+      --line: rgba(115, 147, 201, 0.15);
+      --soft-line: rgba(115, 147, 201, 0.1);
+      --text: #edf2fb;
+      --muted: #9ca8bf;
+      --gold: #e4b450;
+      --gold-soft: rgba(228, 180, 80, 0.2);
+      --green: #6ad98b;
+      --blue: #60a5fa;
+      --cyan: #6dd6f3;
+      --purple: #b16cff;
+      --pink: #ea6bd7;
+      --red: #f07a66;
+      --panel-shadow: 0 18px 38px rgba(0, 0, 0, 0.32);
+      --radius: 28px;
+      --radius-sm: 18px;
+      --sidebar: 270px;
+      --ask: 318px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(33, 74, 132, 0.26), transparent 34%),
+        linear-gradient(180deg, #07111e 0%, #040911 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      padding: 22px;
+    }
+
+    .frame {
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      min-height: calc(100vh - 44px);
+      background:
+        linear-gradient(180deg, rgba(14, 25, 41, 0.96), rgba(8, 14, 24, 0.98)),
+        radial-gradient(circle at top left, rgba(42, 78, 130, 0.22), transparent 34%);
+      border: 1px solid rgba(116, 144, 187, 0.18);
+      border-radius: 34px;
+      overflow: hidden;
+      box-shadow: 0 35px 90px rgba(0, 0, 0, 0.45);
+    }
+
+    .sidebar {
+      background: linear-gradient(180deg, rgba(9, 17, 31, 0.92), rgba(8, 14, 23, 0.98));
+      border-right: 1px solid var(--soft-line);
+      padding: 26px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .brand-card,
+    .philosophy-card {
+      border-radius: 28px;
+      border: 1px solid rgba(112, 136, 176, 0.16);
+      background:
+        linear-gradient(165deg, rgba(19, 32, 54, 0.96), rgba(11, 18, 30, 0.96)),
+        radial-gradient(circle at top left, rgba(77, 125, 199, 0.18), transparent 38%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .brand-card {
+      padding: 22px;
+    }
+
+    .brand-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      border: 1px solid rgba(228, 180, 80, 0.45);
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 0.12em;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .brand-subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.46em;
+      text-transform: uppercase;
+      line-height: 1.35;
+    }
+
+    .brand-description {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.45;
+      color: #d7deec;
+      max-width: 210px;
+    }
+
+    .sidebar-section-title {
+      margin: 4px 0 10px;
+      color: #7081a0;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      color: #d2d9e8;
+      text-decoration: none;
+      font-size: 18px;
+      border-radius: 18px;
+      border: 1px solid transparent;
+    }
+
+    .nav-item::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #8594b1;
+      opacity: 0.85;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(180deg, #f2c86b, #f0ba5a);
+      color: #151514;
+      border-color: rgba(255, 225, 160, 0.2);
+      box-shadow: 0 10px 28px rgba(230, 184, 82, 0.22);
+    }
+
+    .nav-item.active::before {
+      background: rgba(64, 42, 4, 0.7);
+    }
+
+    .philosophy-card {
+      margin-top: auto;
+      padding: 22px 20px;
+    }
+
+    .philosophy-title {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+
+    .philosophy-text {
+      margin: 0;
+      color: #e5ebf5;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .philosophy-text strong {
+      color: #ffffff;
+    }
+
+    .main {
+      padding: 34px 30px 34px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      min-width: 0;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(32, 68, 118, 0.24), transparent 28%),
+        linear-gradient(180deg, rgba(7, 15, 28, 0.94), rgba(7, 13, 21, 0.98));
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 28px;
+    }
+
+    .headline-kicker {
+      margin: 0 0 10px;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.48em;
+      text-transform: uppercase;
+    }
+
+    .headline {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(64px, 5.8vw, 92px);
+      line-height: 0.92;
+      letter-spacing: -0.045em;
+    }
+
+    .headline-subtext {
+      margin: 16px 0 0;
+      color: #d5ddec;
+      font-size: 21px;
+      line-height: 1.45;
+      max-width: 860px;
+    }
+
+    .president-bar {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .date-time {
+      color: #ebeff8;
+      font-size: 17px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .president-chip {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(228, 180, 80, 0.25);
+      background: rgba(14, 20, 31, 0.9);
+      min-width: 228px;
+    }
+
+    .president-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #efc85e;
+      color: #1a160d;
+      font-weight: 900;
+      font-size: 22px;
+      flex: 0 0 auto;
+    }
+
+    .president-role {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .president-label {
+      margin: 4px 0 0;
+      color: #dce3f2;
+      font-size: 14px;
+    }
+
+    .top-panels {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.95fr) minmax(320px, 0.95fr);
+      gap: 16px;
+    }
+
+    .panel {
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(13, 22, 38, 0.98), rgba(10, 16, 27, 0.98)),
+        radial-gradient(circle at top, rgba(53, 78, 120, 0.12), transparent 46%);
+      box-shadow: var(--panel-shadow);
+      min-width: 0;
+    }
+
+    .panel-inner {
+      padding: 22px 24px;
+    }
+
+    .brief-title {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+
+    .brief-heading {
+      margin: 0 0 14px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 31px;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .brief-points {
+      margin: 0;
+      padding-left: 18px;
+      color: #dee5f2;
+      display: grid;
+      gap: 8px;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .score-card,
+    .decision-card {
+      height: 100%;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+    }
+
+    .ring {
+      width: 112px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, #0f1726 52%, transparent 53%),
+        conic-gradient(var(--green) 0deg 331deg, rgba(119, 137, 169, 0.28) 331deg 360deg);
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 0 0 1px rgba(126, 154, 201, 0.08);
+    }
+
+    .ring-core {
+      text-align: center;
+      line-height: 1;
+    }
+
+    .ring-value {
+      display: block;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .ring-denom {
+      display: block;
+      margin-top: 4px;
+      color: #b1bbcd;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .score-kicker {
+      margin: 0 0 8px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+
+    .score-word {
+      margin: 0 0 10px;
+      color: var(--green);
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .score-lines {
+      margin: 0;
+      display: grid;
+      gap: 6px;
+      color: #dde5f1;
+      font-size: 15px;
+    }
+
+    .score-lines span {
+      color: var(--green);
+      font-weight: 800;
+      margin-left: 8px;
+    }
+
+    .decision-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .decision-title {
+      margin: 0;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+
+    .decision-count {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(228, 180, 80, 0.16);
+      color: var(--gold);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .decision-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .decision-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(127, 145, 173, 0.12);
+    }
+
+    .decision-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .decision-copy {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .priority {
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .priority-high {
+      background: rgba(219, 90, 90, 0.18);
+      color: #ff8383;
+    }
+
+    .priority-medium {
+      background: rgba(228, 180, 80, 0.18);
+      color: #efc86a;
+    }
+
+    .mid-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--ask);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .chamber-card {
+      overflow: hidden;
+      padding: 18px;
+    }
+
+    .chamber-header {
+      margin-bottom: 16px;
+    }
+
+    .chamber-kicker-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .chamber-kicker {
+      margin: 0;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+
+    .selection-pill {
+      border-radius: 999px;
+      padding: 8px 14px;
+      border: 1px solid rgba(228, 180, 80, 0.35);
+      color: #efcf83;
+      background: rgba(39, 30, 10, 0.28);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .chamber-copy {
+      margin: 0;
+      color: #d4dceb;
+      font-size: 16px;
+      line-height: 1.42;
+      max-width: 760px;
+    }
+
+    .council-stage {
+      position: relative;
+      min-height: 354px;
+      margin-bottom: 14px;
+      border-radius: 26px;
+      border: 1px solid rgba(116, 138, 174, 0.12);
+      background:
+        radial-gradient(circle at top center, rgba(58, 77, 113, 0.18), transparent 30%),
+        linear-gradient(180deg, rgba(9, 16, 28, 0.98), rgba(8, 14, 23, 0.98));
+      overflow: hidden;
+    }
+
+    .council-stage::before {
+      content: "";
+      position: absolute;
+      left: 6%;
+      right: 6%;
+      top: 142px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(204, 170, 89, 0.18), transparent);
+    }
+
+    .council-stage::after {
+      content: "";
+      position: absolute;
+      left: 7%;
+      right: 7%;
+      bottom: 42px;
+      height: 116px;
+      border-top: 4px solid rgba(215, 177, 84, 0.72);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      box-shadow: 0 -8px 26px rgba(228, 180, 80, 0.18);
+      pointer-events: none;
+    }
+
+    .stage-subtitle {
+      position: absolute;
+      inset: 20px 24px auto 24px;
+      text-align: center;
+      color: #97a5bc;
+      font-size: 12px;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+    }
+
+    .executive-track {
+      position: absolute;
+      inset: 82px 42px 0 42px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      pointer-events: none;
+    }
+
+    .executive {
+      position: relative;
+      width: clamp(108px, 12vw, 140px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 220ms ease, filter 220ms ease;
+    }
+
+    .executive.ceo-base {
+      transform: translateY(-18px) scale(1.08);
+    }
+
+    .executive.presenter {
+      transform: translateY(-30px) scale(1.12);
+      z-index: 3;
+    }
+
+    .executive.presenter.ceo-base {
+      transform: translateY(-42px) scale(1.15);
+    }
+
+    .executive-orb {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 3px solid currentColor;
+      background:
+        radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.16), rgba(14, 22, 37, 0.92) 45%, rgba(10, 15, 24, 1) 78%);
+      box-shadow: 0 0 22px currentColor, inset 0 0 16px rgba(255, 255, 255, 0.08);
+      opacity: 0.92;
+      transition: box-shadow 220ms ease, opacity 220ms ease, transform 220ms ease;
+    }
+
+    .executive.presenter .executive-orb {
+      box-shadow: 0 0 36px currentColor, 0 0 58px color-mix(in srgb, currentColor 22%, transparent), inset 0 0 18px rgba(255, 255, 255, 0.12);
+      transform: scale(1.06);
+      opacity: 1;
+    }
+
+    .executive-stem {
+      width: 2px;
+      height: 42px;
+      background: linear-gradient(180deg, color-mix(in srgb, currentColor 75%, white), rgba(255, 255, 255, 0.1));
+      box-shadow: 0 0 10px currentColor;
+      opacity: 0.8;
+    }
+
+    .executive-card {
+      width: 100%;
+      min-height: 108px;
+      border-radius: 20px;
+      border: 1px solid color-mix(in srgb, currentColor 50%, rgba(255, 255, 255, 0.12));
+      background: rgba(7, 11, 20, 0.82);
+      padding: 14px 12px 12px;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+    }
+
+    .executive.presenter .executive-card {
+      border-color: color-mix(in srgb, currentColor 85%, white);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32), 0 0 26px color-mix(in srgb, currentColor 14%, transparent);
+    }
+
+    .exec-code {
+      display: block;
+      font-size: 24px;
+      font-weight: 900;
+      color: currentColor;
+      line-height: 1;
+    }
+
+    .exec-title {
+      display: block;
+      margin-top: 6px;
+      color: #f0f4fb;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .exec-subtitle {
+      display: block;
+      margin-top: 8px;
+      color: #a8b4c9;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    .exec-underline {
+      width: 72%;
+      height: 6px;
+      border-radius: 999px;
+      margin-top: 10px;
+      background: currentColor;
+      opacity: 0.82;
+      box-shadow: 0 0 14px currentColor;
+    }
+
+    .executive[data-role="coo"] { color: var(--blue); }
+    .executive[data-role="cro"] { color: var(--green); }
+    .executive[data-role="cfo"] { color: var(--gold); }
+    .executive[data-role="ceo"] { color: #f0cb64; }
+    .executive[data-role="cso"] { color: var(--purple); }
+    .executive[data-role="cmo"] { color: var(--pink); }
+    .executive[data-role="hr"] { color: var(--cyan); }
+    .executive[data-role="cao"] { color: var(--red); }
+
+    .director-dock {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: -6px 0 12px;
+    }
+
+    .director-pill {
+      min-width: 170px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(110, 134, 173, 0.2);
+      background: rgba(11, 18, 31, 0.96);
+      color: #f0f3f9;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .director-pill:hover {
+      transform: translateY(-2px);
+      border-color: rgba(227, 180, 80, 0.42);
+    }
+
+    .director-pill.active {
+      border-color: rgba(227, 180, 80, 0.56);
+      background: linear-gradient(180deg, rgba(52, 44, 21, 0.68), rgba(23, 20, 12, 0.76));
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+    }
+
+    .director-name {
+      display: block;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.12;
+    }
+
+    .director-role {
+      display: block;
+      margin-top: 4px;
+      color: #b4bfd1;
+      font-size: 13px;
+      line-height: 1.18;
+    }
+
+    .surface {
+      border-radius: 28px;
+      border: 1px solid rgba(117, 139, 176, 0.18);
+      background:
+        linear-gradient(180deg, rgba(10, 16, 27, 0.98), rgba(8, 12, 21, 0.99)),
+        radial-gradient(circle at top, rgba(47, 74, 114, 0.11), transparent 46%);
+      overflow: hidden;
+    }
+
+    .surface-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      padding: 24px 28px 14px;
+    }
+
+    .surface-kicker {
+      margin: 0 0 8px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+
+    .surface-title {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.08;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .surface-subtitle {
+      margin: 10px 0 0;
+      color: #c7d1e1;
+      font-size: 18px;
+      line-height: 1.42;
+      max-width: 860px;
+    }
+
+    .surface-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .surface-control {
+      border-radius: 14px;
+      border: 1px solid rgba(108, 132, 170, 0.22);
+      background: rgba(16, 25, 40, 0.92);
+      color: #cfd8e7;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .surface-body {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 22px;
+      padding: 0 28px 28px;
+    }
+
+    .surface-tabs {
+      border-right: 1px solid rgba(109, 131, 166, 0.14);
+      padding-right: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .surface-tab {
+      border-radius: 14px;
+      border: 1px solid transparent;
+      padding: 14px 16px;
+      background: transparent;
+      color: #dce4ef;
+      text-align: left;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+    }
+
+    .surface-tab.active {
+      background: rgba(90, 118, 171, 0.18);
+      border-color: rgba(88, 148, 226, 0.35);
+      color: #f0f4fb;
+    }
+
+    .surface-content {
+      display: grid;
+      gap: 18px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric-card {
+      min-height: 126px;
+      border-radius: 20px;
+      border: 1px solid rgba(115, 142, 179, 0.16);
+      background: rgba(10, 16, 27, 0.88);
+      padding: 18px 18px 16px;
+    }
+
+    .metric-label {
+      margin: 0 0 10px;
+      color: #aab5c8;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      margin: 0 0 6px;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .metric-note {
+      margin: 0;
+      color: #b9c4d6;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .analysis-card {
+      min-height: 210px;
+      border-radius: 22px;
+      border: 1px solid rgba(116, 140, 176, 0.16);
+      background: rgba(10, 16, 27, 0.9);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .analysis-title {
+      margin: 0;
+      color: #dbe3f1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+
+    .pie {
+      width: 128px;
+      aspect-ratio: 1;
+      margin: 4px auto 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, #0d1625 30%, transparent 31%),
+        conic-gradient(#f4d36d 0 72deg, #62a8ff 72deg 170deg, #6adb8b 170deg 302deg, #c26fff 302deg 360deg);
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    .pie span {
+      font-weight: 900;
+      font-size: 24px;
+    }
+
+    .bars {
+      display: flex;
+      align-items: end;
+      gap: 12px;
+      height: 132px;
+      padding-top: 16px;
+    }
+
+    .bar {
+      flex: 1;
+      border-radius: 10px 10px 0 0;
+      background: linear-gradient(180deg, #7fdc87, #3d9c57);
+      box-shadow: 0 -8px 18px rgba(99, 216, 136, 0.16);
+    }
+
+    .bullets {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 10px;
+      color: #edf2fb;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .ask-panel {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .ask-kicker {
+      margin: 0;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+
+    .ask-identity {
+      border-radius: 24px;
+      border: 1px solid rgba(113, 139, 179, 0.16);
+      background: rgba(12, 19, 31, 0.92);
+      padding: 18px 18px 16px;
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+
+    .ask-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      font-weight: 900;
+      font-size: 22px;
+    }
+
+    .ask-name {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.02;
+      font-weight: 900;
+    }
+
+    .ask-role {
+      margin: 8px 0 0;
+      color: #d3dcec;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+
+    .online {
+      margin-top: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #7ce492;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .online::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .ask-question,
+    .ask-response {
+      border-radius: 22px;
+      border: 1px solid rgba(114, 137, 175, 0.16);
+      background: rgba(11, 18, 30, 0.92);
+      padding: 20px;
+    }
+
+    .ask-question h3,
+    .ask-response h3 {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+
+    .ask-question p {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .ask-response ul {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 10px;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .ask-buttons {
+      display: grid;
+      gap: 12px;
+    }
+
+    .ask-button {
+      width: 100%;
+      border: none;
+      border-radius: 18px;
+      padding: 18px 18px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .ask-button.primary {
+      background: linear-gradient(180deg, #f2c96d, #efbb59);
+      color: #17120a;
+      box-shadow: 0 14px 30px rgba(237, 186, 75, 0.18);
+    }
+
+    .ask-button.secondary {
+      background: rgba(19, 29, 46, 0.96);
+      color: #eaf0fa;
+      border: 1px solid rgba(117, 140, 177, 0.2);
+    }
+
+    @media (max-width: 1720px) {
+      .metric-grid,
+      .analysis-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 1500px) {
+      .frame {
+        grid-template-columns: 240px minmax(0, 1fr);
+      }
+
+      .top-panels {
+        grid-template-columns: 1fr;
+      }
+
+      .mid-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .ask-panel {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      body {
+        padding: 12px;
+      }
+
+      .frame {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--soft-line);
+      }
+
+      .topbar,
+      .surface-header,
+      .surface-body {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-grid,
+      .analysis-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .surface-tabs {
+        border-right: none;
+        padding-right: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <aside class="sidebar">
+      <section class="brand-card">
+        <div class="brand-row">
+          <div class="brand-badge">AI</div>
+          <div>
+            <h1 class="brand-title">AI-ABC</h1>
+            <p class="brand-subtitle">Company<br />Operating<br />System</p>
+          </div>
+        </div>
+        <p class="brand-description">Bring Corporate Structure to Service Businesses.</p>
+      </section>
+
+      <div>
+        <p class="sidebar-section-title">Executive Command</p>
+        <nav class="nav-list">
+          <a class="nav-item active" href="#">Executive Council</a>
+          <a class="nav-item" href="#">Board Score</a>
+          <a class="nav-item" href="#">Decisions on the Table</a>
+        </nav>
+      </div>
+
+      <div>
+        <p class="sidebar-section-title">Departments</p>
+        <nav class="nav-list">
+          <a class="nav-item" href="#">Operations</a>
+          <a class="nav-item" href="#">Revenue</a>
+          <a class="nav-item" href="#">Finance</a>
+          <a class="nav-item" href="#">Customer Success</a>
+          <a class="nav-item" href="#">Marketing</a>
+          <a class="nav-item" href="#">Human Resources</a>
+          <a class="nav-item" href="#">Governance</a>
+        </nav>
+      </div>
+
+      <section class="philosophy-card">
+        <h2 class="philosophy-title">President Philosophy</h2>
+        <p class="philosophy-text">The role of the <strong>President</strong> is not to do the work, but to ensure the work creates the results.</p>
+      </section>
+    </aside>
+
+    <main class="main">
+      <section class="topbar">
+        <div>
+          <p class="headline-kicker">Executive Intelligence Chamber</p>
+          <h2 class="headline">Good Morning,<br />President.</h2>
+          <p class="headline-subtext">Your executive council is assembled. Review company health, decisions, and department briefings from one operating structure.</p>
+        </div>
+
+        <div class="president-bar">
+          <div class="date-time" id="datetime">June 11, 2026 12:55 AM</div>
+          <div class="president-chip">
+            <div class="president-avatar">YP</div>
+            <div>
+              <p class="president-role">President</p>
+              <p class="president-label">Owner &amp; President</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="top-panels">
+        <article class="panel">
+          <div class="panel-inner">
+            <h3 class="brief-title">CEO Command Brief</h3>
+            <h4 class="brief-heading">President, the company is stable. Finance requires one confirmation today.</h4>
+            <ul class="brief-points" id="brief-points">
+              <li>Board Score remains strong because operations, revenue, and finance are visible inside one structure.</li>
+              <li>One payment outcome still needs confirmation before the month closes cleanly.</li>
+              <li>Stage A is operating correctly and scheduling remains the next structural unlock.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="panel score-card">
+          <div class="panel-inner score-grid">
+            <div class="ring">
+              <div class="ring-core">
+                <span class="ring-value" id="board-score-value">92</span>
+                <span class="ring-denom">/100</span>
+              </div>
+            </div>
+            <div>
+              <p class="score-kicker">Board Score</p>
+              <p class="score-word" id="board-score-word">Strong</p>
+              <div class="score-lines" id="board-score-lines">
+                <div>Revenue <span>94</span></div>
+                <div>Operations <span>91</span></div>
+                <div>Finance <span>89</span></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel decision-card">
+          <div class="panel-inner">
+            <div class="decision-header">
+              <h3 class="decision-title">Decisions on the Table</h3>
+              <div class="decision-count" id="decision-count">3</div>
+            </div>
+            <div class="decision-list" id="decision-list"></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="mid-layout">
+        <div class="panel chamber-card">
+          <div class="chamber-header">
+            <div class="chamber-kicker-row">
+              <h3 class="chamber-kicker">Interactive Executive Council</h3>
+              <div class="selection-pill" id="selected-pill">CEO Selected</div>
+            </div>
+            <p class="chamber-copy">Click an executive to receive a department presentation. Relevant directors appear below and can take over the same reporting surface.</p>
+          </div>
+
+          <div class="council-stage">
+            <div class="stage-subtitle">CEO remains fixed at center. Selected executive stands to present.</div>
+            <div class="executive-track" id="executive-track"></div>
+          </div>
+
+          <div class="director-dock" id="director-dock"></div>
+
+          <section class="surface" id="presentation-surface">
+            <div class="surface-header">
+              <div>
+                <p class="surface-kicker" id="surface-kicker">Executive Presentation</p>
+                <h3 class="surface-title" id="surface-title">Executive Command</h3>
+                <p class="surface-subtitle" id="surface-subtitle">The CEO opens the chamber by synthesizing operations, revenue, finance, and the next President decisions into one executive surface.</p>
+              </div>
+
+              <div class="surface-controls">
+                <div class="surface-control">MTD</div>
+                <div class="surface-control">vs Last Month</div>
+                <div class="surface-control">Rotate to Presentation</div>
+              </div>
+            </div>
+
+            <div class="surface-body">
+              <div class="surface-tabs" id="surface-tabs"></div>
+
+              <div class="surface-content">
+                <div class="metric-grid" id="metric-grid"></div>
+                <div class="analysis-grid">
+                  <article class="analysis-card">
+                    <h4 class="analysis-title">Company Health</h4>
+                    <div class="pie"><span id="analysis-health">92</span></div>
+                  </article>
+                  <article class="analysis-card">
+                    <h4 class="analysis-title">Trend</h4>
+                    <div class="bars" id="trend-bars"></div>
+                  </article>
+                  <article class="analysis-card">
+                    <h4 class="analysis-title">Executive Recommendation</h4>
+                    <ul class="bullets" id="analysis-bullets"></ul>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="panel ask-panel">
+          <h3 class="ask-kicker" id="ask-kicker">Ask CEO</h3>
+
+          <section class="ask-identity">
+            <div class="ask-icon" id="ask-icon">C</div>
+            <div>
+              <h4 class="ask-name" id="ask-name">Chief Executive Officer</h4>
+              <p class="ask-role" id="ask-role">Chief Executive Officer</p>
+              <div class="online">Online</div>
+            </div>
+          </section>
+
+          <section class="ask-question">
+            <h3 id="ask-question-kicker">Ask CEO</h3>
+            <p id="ask-question">What needs my attention across the company today?</p>
+          </section>
+
+          <section class="ask-response">
+            <h3 id="ask-response-kicker">CEO Response</h3>
+            <ul id="ask-response-list"></ul>
+          </section>
+
+          <div class="ask-buttons">
+            <button class="ask-button primary">Create Action Item</button>
+            <button class="ask-button secondary">Ask Follow-up</button>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const executiveOrder = ["coo", "cro", "cfo", "ceo", "cso", "cmo", "hr", "cao"];
+
+    const roles = {
+      ceo: {
+        id: "ceo",
+        type: "executive",
+        code: "CEO",
+        short: "CEO",
+        name: "Chief Executive Officer",
+        displayRole: "Executive Leader",
+        department: "Executive Command",
+        color: "#f0cb64",
+        surfaceKicker: "Executive Presentation",
+        surfaceTitle: "Executive Command",
+        surfaceSubtitle: "The CEO opens the chamber by synthesizing operations, revenue, finance, and the next President decisions into one executive surface.",
+        askPrompt: "What needs my attention across the company today?",
+        askBullets: [
+          "The company is stable overall and the board is still reading strong.",
+          "Finance requires one payment confirmation before the month closes cleanly.",
+          "Two President decisions remain on the table for review.",
+          "Stage A is strong, and the next unlock remains scheduling rather than emergency intervention."
+        ],
+        tabs: ["Board Score", "President Decisions", "Open Confirmations", "Expansion State"],
+        metrics: [
+          { label: "Board Score", value: "92", note: "Strong overall operating condition" },
+          { label: "President Decisions", value: "3", note: "Currently on the table" },
+          { label: "Open Confirmations", value: "1", note: "Finance still needs payment truth" },
+          { label: "Expansion State", value: "Stage A", note: "Scheduling remains structurally present but locked" }
+        ],
+        analysisHealth: "92",
+        trend: [46, 63, 75, 58, 84, 92, 68, 88],
+        recommendation: [
+          "Confirm the remaining financial outcome so the board closes cleanly.",
+          "Review the decisions table before opening any new expansion work.",
+          "Keep operations and revenue aligned around the current Stage A rhythm."
+        ],
+        directors: ["strategy", "executive_reporting", "accountability"]
+      },
+      coo: {
+        id: "coo",
+        type: "executive",
+        code: "COO",
+        short: "COO",
+        name: "Chief Operating Officer",
+        displayRole: "Operations",
+        department: "Operations",
+        color: "#60a5fa",
+        surfaceKicker: "Operations Presentation",
+        surfaceTitle: "Operations Overview",
+        surfaceSubtitle: "COO is presenting. Selected report: Service Capacity.",
+        askPrompt: "What needs my attention from COO today?",
+        askBullets: [
+          "Operations is healthy overall and field execution is visible at the owner layer.",
+          "Inbound communication and missed-call recovery are under control.",
+          "Service reporting is visible and reaching the President surface correctly.",
+          "Scheduling remains the next operational unlock, not a current failure."
+        ],
+        tabs: ["Executive Summary", "Scheduling", "Service Capacity", "Open Issues", "Technicians", "Reports"],
+        metrics: [
+          { label: "Jobs Completed", value: "1,125", note: "+12% this month" },
+          { label: "Open Issues", value: "2", note: "Review" },
+          { label: "Capacity", value: "78%", note: "Stable" },
+          { label: "Appointments", value: "18", note: "Today" }
+        ],
+        analysisHealth: "92",
+        trend: [34, 49, 67, 53, 74, 89],
+        recommendation: [
+          "Review service capacity before approving additional jobs this week.",
+          "Keep manual service reporting disciplined until scheduling unlocks.",
+          "Continue protecting communication quality and owner visibility."
+        ],
+        directors: ["communications", "service", "scheduling"]
+      },
+      cro: {
+        id: "cro",
+        type: "executive",
+        code: "CRO",
+        short: "CRO",
+        name: "Chief Revenue Officer",
+        displayRole: "Revenue",
+        department: "Revenue",
+        color: "#6ad98b",
+        surfaceKicker: "Revenue Presentation",
+        surfaceTitle: "Revenue Overview",
+        surfaceSubtitle: "CRO is presenting. Referral, legacy, and new lead lanes are visible in one revenue chain.",
+        askPrompt: "What is the most important revenue focus right now?",
+        askBullets: [
+          "Revenue opportunity is healthy and qualified lead flow remains visible.",
+          "Legacy reactivation and referral lanes are active inside the same revenue structure.",
+          "Sales follow-through remains visible before Stage B scheduling unlocks.",
+          "The current priority is protecting conversion discipline across every lead lane."
+        ],
+        tabs: ["Executive Summary", "Lead Flow", "Sales Capacity", "Referral Lane", "Reactivation", "Reports"],
+        metrics: [
+          { label: "Qualified Leads", value: "31", note: "This week" },
+          { label: "Referrals Active", value: "4", note: "Owner-entered lane" },
+          { label: "Legacy Records", value: "18", note: "Reactivation available" },
+          { label: "Conversion Signal", value: "Healthy", note: "Opportunity remains visible" }
+        ],
+        analysisHealth: "94",
+        trend: [42, 48, 55, 63, 74, 83],
+        recommendation: [
+          "Protect fast follow-up on qualified opportunities.",
+          "Use the referral lane to preserve higher-trust revenue opportunities.",
+          "Maintain estimate-entry discipline so finance can reconcile against reality."
+        ],
+        directors: ["sales", "reactivation", "lead_gen"]
+      },
+      cfo: {
+        id: "cfo",
+        type: "executive",
+        code: "CFO",
+        short: "CFO",
+        name: "Chief Financial Officer",
+        displayRole: "Finance",
+        department: "Finance",
+        color: "#e4b450",
+        surfaceKicker: "Finance Presentation",
+        surfaceTitle: "Finance Control",
+        surfaceSubtitle: "Finance presents revenue truth, payment confirmation, and the current financial condition to the President.",
+        askPrompt: "Why did profit margin drop this month?",
+        askBullets: [
+          "Profit margin declined because expenses rose faster than collected revenue.",
+          "One payment outcome still needs confirmation before the month closes.",
+          "Estimate-based forecast remains healthy, but collected cash is lower than projected revenue.",
+          "Recommendation: review expense pressure and preserve fast reconciliation discipline."
+        ],
+        tabs: ["Revenue Received", "Open Confirmations", "Expected Revenue", "Margin Signal"],
+        metrics: [
+          { label: "Revenue Received", value: "$18.4k", note: "Confirmed by owner entry" },
+          { label: "Open Confirmations", value: "1", note: "One completed job awaits payment truth" },
+          { label: "Expected Revenue", value: "$24.8k", note: "Forecast from estimate flow" },
+          { label: "Margin Signal", value: "Stable", note: "Expense pressure remains visible" }
+        ],
+        analysisHealth: "89",
+        trend: [31, 46, 59, 63, 71, 68, 74],
+        recommendation: [
+          "Finance is already active because the President is confirming actual money received.",
+          "Estimate truth and payment truth are both now visible inside one structure.",
+          "This is the beginning of real financial governance, not just reporting."
+        ],
+        directors: ["reconciliation", "revenue_control", "payroll"]
+      },
+      cso: {
+        id: "cso",
+        type: "executive",
+        code: "CSO",
+        short: "CSO",
+        name: "Chief Success Officer",
+        displayRole: "Customer Success",
+        department: "Customer Success",
+        color: "#b16cff",
+        surfaceKicker: "Customer Success Presentation",
+        surfaceTitle: "Customer Success Overview",
+        surfaceSubtitle: "Customer Success presents retention, review response, and client continuity at the owner layer.",
+        askPrompt: "Where is the biggest customer continuity risk right now?",
+        askBullets: [
+          "Customer continuity remains stable, but reviews still require disciplined handling.",
+          "Retention and support are structurally mapped and can expand from Stage A visibility.",
+          "The system can already identify continuity signals before broader CSO automation unlocks.",
+          "Recommendation: protect review follow-through and keep support accountability visible."
+        ],
+        tabs: ["Executive Summary", "Support", "Retention", "Reviews", "Referrals", "Customer Health"],
+        metrics: [
+          { label: "Retention Signal", value: "Stable", note: "No active churn flags" },
+          { label: "Review Responses", value: "7", note: "Need reply discipline" },
+          { label: "Open Support Items", value: "2", note: "Visible inside structure" },
+          { label: "Referral Health", value: "Good", note: "Owner entry path is active" }
+        ],
+        analysisHealth: "88",
+        trend: [38, 41, 47, 56, 61, 69],
+        recommendation: [
+          "Preserve continuity by routing support and reviews through one visible owner surface.",
+          "Use retention signals to identify service quality drift early.",
+          "Treat referrals as both revenue and customer-success signals."
+        ],
+        directors: ["support", "retention", "reviews"]
+      },
+      cmo: {
+        id: "cmo",
+        type: "executive",
+        code: "CMO",
+        short: "CMO",
+        name: "Chief Marketing Officer",
+        displayRole: "Marketing",
+        department: "Marketing",
+        color: "#ea6bd7",
+        surfaceKicker: "Marketing Presentation",
+        surfaceTitle: "Marketing Overview",
+        surfaceSubtitle: "Marketing remains structurally mapped for future expansion while demand-generation visibility grows around active lead lanes.",
+        askPrompt: "What marketing layer is available right now?",
+        askBullets: [
+          "Marketing is partially structural at Stage A and not yet a fully active control layer.",
+          "Demand signals are still visible through lead, referral, and reactivation activity.",
+          "Future campaign automation should attach to the same operating structure rather than a separate tool.",
+          "Recommendation: keep marketing structurally mapped, but prioritize revenue discipline first."
+        ],
+        tabs: ["Executive Summary", "Demand", "Campaign Readiness", "Brand Presence", "SEO", "Website"],
+        metrics: [
+          { label: "Demand Readiness", value: "Future", note: "Expansion layer" },
+          { label: "Brand Surface", value: "Visible", note: "Operating identity is consistent" },
+          { label: "Lead Signal", value: "31", note: "Visible via revenue chain" },
+          { label: "Expansion State", value: "Mapped", note: "Not yet active" }
+        ],
+        analysisHealth: "81",
+        trend: [22, 28, 30, 38, 44, 52],
+        recommendation: [
+          "Keep the operating structure ready for future campaign control.",
+          "Do not separate marketing from the revenue and customer lanes it should support.",
+          "Use future activation to connect advertising, SEO, and website operations."
+        ],
+        directors: ["advertising", "seo", "website"]
+      },
+      hr: {
+        id: "hr",
+        type: "executive",
+        code: "HR",
+        short: "HR",
+        name: "Head of People",
+        displayRole: "Human Resources",
+        department: "Human Resources",
+        color: "#6dd6f3",
+        surfaceKicker: "People Presentation",
+        surfaceTitle: "People Operations Overview",
+        surfaceSubtitle: "People operations are structurally mapped for training, accountability visibility, and workforce development as the company expands.",
+        askPrompt: "What is the current people-layer status?",
+        askBullets: [
+          "People operations are not fully active yet, but accountability structure is being prepared correctly.",
+          "Service and sales reporting already create the raw signals future HR visibility needs.",
+          "Training and workforce management should expand on top of existing reporting lanes.",
+          "Recommendation: keep accountability signals clean so future people governance has real data."
+        ],
+        tabs: ["Executive Summary", "Training", "Accountability", "Hiring", "People Ops", "Workforce Health"],
+        metrics: [
+          { label: "People Ops", value: "Future", note: "Expansion layer" },
+          { label: "Reporting Signals", value: "Visible", note: "Staff activity reaches owner layer" },
+          { label: "Training State", value: "Prepared", note: "Not yet active" },
+          { label: "Expansion State", value: "Mapped", note: "Awaiting unlock" }
+        ],
+        analysisHealth: "79",
+        trend: [18, 26, 31, 35, 43, 49],
+        recommendation: [
+          "Preserve accurate service and sales reporting because future people governance depends on it.",
+          "Treat accountability visibility as foundational, not optional.",
+          "Add workforce modules later without breaking the operating structure."
+        ],
+        directors: ["people_ops", "training", "workforce"]
+      },
+      cao: {
+        id: "cao",
+        type: "executive",
+        code: "CAO",
+        short: "CAO",
+        name: "Chief Administrative Officer",
+        displayRole: "Governance",
+        department: "Governance",
+        color: "#f07a66",
+        surfaceKicker: "Governance Presentation",
+        surfaceTitle: "Governance Control",
+        surfaceSubtitle: "Governance remains structurally present and unlocks when escalation, policy, and formal approvals move into the active control layer.",
+        askPrompt: "What governance layer is available right now?",
+        askBullets: [
+          "Governance is structurally mapped but remains locked until Stage C expansion.",
+          "The operating structure already shows where compliance, approvals, and escalation will connect.",
+          "This allows later governance activation without rebuilding the rest of the system.",
+          "Recommendation: keep reporting discipline high so governance has clean inputs when unlocked."
+        ],
+        tabs: ["Executive Summary", "Compliance", "Approvals", "Escalations", "Risk", "Policy"],
+        metrics: [
+          { label: "Governance State", value: "Locked", note: "Stage C unlock" },
+          { label: "Approvals Surface", value: "Prepared", note: "Future executive layer" },
+          { label: "Risk Visibility", value: "Mapped", note: "Awaiting unlock" },
+          { label: "Expansion State", value: "Stage C", note: "Not active yet" }
+        ],
+        analysisHealth: "74",
+        trend: [16, 18, 22, 24, 29, 34],
+        recommendation: [
+          "Do not force governance behavior before the appropriate expansion layer is active.",
+          "Keep approvals and escalation routes structurally clear now.",
+          "Use later CAO activation to formalize compliance, risk, and policy control."
+        ],
+        directors: ["compliance", "approval", "risk"]
+      },
+      strategy: {
+        id: "strategy",
+        type: "director",
+        parent: "ceo",
+        name: "Strategy Director",
+        displayRole: "Strategy Director",
+        color: "#f0cb64",
+        surfaceKicker: "Strategy Presentation",
+        surfaceTitle: "Strategic Direction",
+        surfaceSubtitle: "Strategy translates the President's priorities into coordinated executive direction.",
+        askPrompt: "What strategic focus should I hold this month?",
+        askBullets: [
+          "Keep the board focused on clean Stage A execution.",
+          "Do not unlock scheduling before communication, reporting, and financial truth remain stable.",
+          "Use the current operating structure to prepare cleanly for expansion rather than rushing features."
+        ],
+        tabs: ["Executive Summary", "Board Focus", "Expansion Gates", "Risk Priority"],
+        metrics: [
+          { label: "Primary Focus", value: "Stage A", note: "Preserve operating discipline" },
+          { label: "Board Alignment", value: "Strong", note: "Executives mapped correctly" },
+          { label: "Expansion Gate", value: "Scheduling", note: "Next structural unlock" },
+          { label: "Risk Mode", value: "Controlled", note: "No emergency drift" }
+        ],
+        analysisHealth: "91",
+        trend: [45, 51, 60, 66, 71, 77],
+        recommendation: [
+          "Preserve the operating structure before widening activation.",
+          "Keep reporting truth ahead of automation expansion.",
+          "Approve only the next unlock that the current signals can support."
+        ]
+      },
+      executive_reporting: {
+        id: "executive_reporting",
+        type: "director",
+        parent: "ceo",
+        name: "Executive Reporting Director",
+        displayRole: "Executive Reporting Director",
+        color: "#f0cb64",
+        surfaceKicker: "Executive Reporting",
+        surfaceTitle: "Executive Reporting Surface",
+        surfaceSubtitle: "Executive reporting consolidates COO, CRO, CFO, and future executive signals into one President-facing narrative.",
+        askPrompt: "What is the most important executive reporting signal right now?",
+        askBullets: [
+          "Finance remains the sharpest immediate signal because one payment outcome is still unconfirmed.",
+          "Operations and revenue are feeding the board correctly.",
+          "The President should review decisions before new structural expansion."
+        ],
+        tabs: ["Executive Summary", "Ops Feed", "Revenue Feed", "Finance Feed"],
+        metrics: [
+          { label: "Reporting Status", value: "Live", note: "Executive feeds connected" },
+          { label: "Primary Signal", value: "Finance", note: "Needs confirmation" },
+          { label: "Board Narrative", value: "Stable", note: "Clear President brief" },
+          { label: "Decision Load", value: "3", note: "On the table" }
+        ],
+        analysisHealth: "90",
+        trend: [42, 48, 54, 62, 69, 76],
+        recommendation: [
+          "Keep the President brief short, clear, and tied to actions.",
+          "Do not dilute the board with low-value noise.",
+          "Use reporting to govern priorities, not just summarize activity."
+        ]
+      },
+      accountability: {
+        id: "accountability",
+        type: "director",
+        parent: "ceo",
+        name: "Accountability Director",
+        displayRole: "Accountability Director",
+        color: "#f0cb64",
+        surfaceKicker: "Accountability Presentation",
+        surfaceTitle: "Accountability Oversight",
+        surfaceSubtitle: "Accountability tracks whether operational commitments are followed through and properly surfaced at the President layer.",
+        askPrompt: "Where is accountability drifting right now?",
+        askBullets: [
+          "The largest accountability gap is still payment confirmation discipline.",
+          "Operational and service reporting are present and already usable.",
+          "Future governance should expand from these current accountability signals."
+        ],
+        tabs: ["Executive Summary", "Follow-through", "Missing Updates", "Escalation Readiness"],
+        metrics: [
+          { label: "Main Gap", value: "Finance", note: "Payment truth still open" },
+          { label: "Ops Reporting", value: "Visible", note: "Service entries arriving" },
+          { label: "Escalation Mode", value: "Prepared", note: "Not fully active" },
+          { label: "President View", value: "Clear", note: "Signals are surfaced" }
+        ],
+        analysisHealth: "87",
+        trend: [33, 38, 42, 49, 58, 67],
+        recommendation: [
+          "Keep owner confirmation discipline tight.",
+          "Preserve clear staff reporting lanes.",
+          "Use accountability signals as the future foundation for governance."
+        ]
+      },
+      communications: {
+        id: "communications",
+        type: "director",
+        parent: "coo",
+        name: "Communications Director",
+        displayRole: "Communications Director",
+        color: "#60a5fa",
+        surfaceKicker: "Communications Presentation",
+        surfaceTitle: "Communications Control",
+        surfaceSubtitle: "AI call handling, outbound quality, and missed-call recovery are already active in Stage A.",
+        askPrompt: "How is communications performing right now?",
+        askBullets: [
+          "Inbound call handling remains stable and missed-call recovery is working.",
+          "Outbound and SMS communication quality remain visible inside one operating lane.",
+          "Communications is currently the strongest active operational layer."
+        ],
+        tabs: ["Executive Summary", "Inbound", "Missed Calls", "Outbound", "SMS"],
+        metrics: [
+          { label: "Inbound Today", value: "31", note: "Handled through Stage A" },
+          { label: "Recovered Calls", value: "6", note: "Missed-call recovery" },
+          { label: "Outbound Quality", value: "Stable", note: "Owner-visible" },
+          { label: "SMS Flow", value: "Active", note: "Campaign-ready" }
+        ],
+        analysisHealth: "95",
+        trend: [52, 57, 64, 71, 78, 84],
+        recommendation: [
+          "Preserve call quality and recovery speed.",
+          "Use communication performance as the backbone of Stage A trust.",
+          "Keep outbound tied to customer records and owner visibility."
+        ]
+      },
+      service: {
+        id: "service",
+        type: "director",
+        parent: "coo",
+        name: "Service Director",
+        displayRole: "Service Director",
+        color: "#60a5fa",
+        surfaceKicker: "Service Presentation",
+        surfaceTitle: "Service Follow-through",
+        surfaceSubtitle: "Field execution reporting and customer job completion visibility are already feeding the owner layer.",
+        askPrompt: "What does service need from me today?",
+        askBullets: [
+          "Service reporting is arriving and giving the owner real completion visibility.",
+          "This layer remains manual before scheduling unlocks, so discipline matters.",
+          "Recommendation: protect service completion and comments flow."
+        ],
+        tabs: ["Executive Summary", "Completed Jobs", "Field Comments", "Open Service Issues"],
+        metrics: [
+          { label: "Field Reports", value: "9", note: "Submitted to owner layer" },
+          { label: "Service Complete", value: "94%", note: "Manual reporting is strong" },
+          { label: "Open Service Issues", value: "2", note: "Need review" },
+          { label: "Owner Visibility", value: "Active", note: "Completion comments present" }
+        ],
+        analysisHealth: "91",
+        trend: [39, 47, 58, 64, 73, 81],
+        recommendation: [
+          "Keep field completion reports consistent.",
+          "Use customer number routing to preserve clean service history.",
+          "Do not add automation here until scheduling is structurally ready."
+        ]
+      },
+      scheduling: {
+        id: "scheduling",
+        type: "director",
+        parent: "coo",
+        name: "Scheduling Director",
+        displayRole: "Scheduling Director",
+        color: "#60a5fa",
+        surfaceKicker: "Scheduling Presentation",
+        surfaceTitle: "Scheduling Readiness",
+        surfaceSubtitle: "Future scheduling, confirmations, and rerouting control are structurally mapped but remain locked until Stage B.",
+        askPrompt: "Is scheduling active yet?",
+        askBullets: [
+          "Scheduling remains structurally present but not yet active.",
+          "The current system already captures appointment intent and prepares the later unlock.",
+          "Recommendation: keep using the Stage A handoff process until Stage B turns on."
+        ],
+        tabs: ["Executive Summary", "Readiness", "Confirmation Flow", "Rerouting", "Unlock Conditions"],
+        metrics: [
+          { label: "Scheduling State", value: "Locked", note: "Stage B required" },
+          { label: "Appointment Intent", value: "Visible", note: "Captured by AI agent" },
+          { label: "Confirmation Flow", value: "Prepared", note: "Not active yet" },
+          { label: "Unlock Gate", value: "Stage B", note: "Next structural expansion" }
+        ],
+        analysisHealth: "74",
+        trend: [18, 22, 26, 32, 37, 42],
+        recommendation: [
+          "Do not fake scheduling before the real expansion unlocks.",
+          "Preserve clean appointment-intent capture now.",
+          "Use Stage A reporting to prepare a safe Stage B launch."
+        ]
+      },
+      sales: {
+        id: "sales",
+        type: "director",
+        parent: "cro",
+        name: "Sales Director",
+        displayRole: "Sales Director",
+        color: "#6ad98b",
+        surfaceKicker: "Sales Presentation",
+        surfaceTitle: "Sales Follow-through",
+        surfaceSubtitle: "Sales handoff, estimate entry, and follow-up discipline are already visible in the owner-facing revenue chain.",
+        askPrompt: "What is the highest-value sales focus right now?",
+        askBullets: [
+          "Protect estimate-entry discipline so the system knows what revenue to expect.",
+          "Use customer-number routing to keep follow-up and reporting clean.",
+          "Recommendation: prioritize active opportunities with highest close probability."
+        ],
+        tabs: ["Executive Summary", "Open Leads", "Estimate Entry", "Follow-up", "Sales Capacity"],
+        metrics: [
+          { label: "Open Sales Leads", value: "12", note: "Need active follow-up" },
+          { label: "Estimates Entered", value: "8", note: "Revenue expectation visible" },
+          { label: "Follow-up Discipline", value: "Healthy", note: "Owner-visible" },
+          { label: "Close Pressure", value: "Moderate", note: "Prioritize best opportunities" }
+        ],
+        analysisHealth: "93",
+        trend: [35, 44, 58, 66, 75, 83],
+        recommendation: [
+          "Protect high-value follow-up first.",
+          "Require estimate amounts so finance can reconcile later.",
+          "Use sales activity to drive clear CRO reporting."
+        ]
+      },
+      reactivation: {
+        id: "reactivation",
+        type: "director",
+        parent: "cro",
+        name: "Reactivation Director",
+        displayRole: "Reactivation Director",
+        color: "#6ad98b",
+        surfaceKicker: "Reactivation Presentation",
+        surfaceTitle: "Legacy Reactivation",
+        surfaceSubtitle: "Uploaded customer records are sorted into a legacy lane and can be reactivated through one visible revenue structure.",
+        askPrompt: "How is the reactivation lane performing?",
+        askBullets: [
+          "Legacy records are visible and already structured for outbound reactivation.",
+          "This lane expands Stage A beyond pure inbound handling.",
+          "Recommendation: work the warmest historical customers first."
+        ],
+        tabs: ["Executive Summary", "Legacy Pool", "Warm Leads", "Outbound Reactivation"],
+        metrics: [
+          { label: "Legacy Records", value: "18", note: "Structured and visible" },
+          { label: "Warm Leads", value: "6", note: "Need active follow-up" },
+          { label: "Outbound State", value: "Active", note: "Calls and SMS available" },
+          { label: "Revenue Potential", value: "Healthy", note: "Stage A differentiator" }
+        ],
+        analysisHealth: "90",
+        trend: [28, 35, 39, 48, 57, 66],
+        recommendation: [
+          "Use legacy reactivation as a Stage A revenue advantage.",
+          "Separate historical customers from new customers with clear routing symbols.",
+          "Keep every reactivation attached to the same revenue pipeline."
+        ]
+      },
+      lead_gen: {
+        id: "lead_gen",
+        type: "director",
+        parent: "cro",
+        name: "Lead Generation Director",
+        displayRole: "Lead Generation Director",
+        color: "#6ad98b",
+        surfaceKicker: "Lead Generation Presentation",
+        surfaceTitle: "Lead Generation Control",
+        surfaceSubtitle: "Lead quality, source discipline, and lane routing are visible before broader marketing automation is activated.",
+        askPrompt: "How strong is lead generation right now?",
+        askBullets: [
+          "Lead generation is strongest where communication, referrals, and reactivation overlap.",
+          "Routing symbols are essential so each lead enters the correct pipeline.",
+          "Recommendation: preserve lead quality over volume."
+        ],
+        tabs: ["Executive Summary", "Lead Sources", "Lane Quality", "Routing Symbols"],
+        metrics: [
+          { label: "Lead Sources", value: "3", note: "New, legacy, referral" },
+          { label: "Routing Quality", value: "Clean", note: "Pipelines distinct" },
+          { label: "Lead Volume", value: "31", note: "Visible this week" },
+          { label: "Quality Signal", value: "Healthy", note: "Not diluted" }
+        ],
+        analysisHealth: "88",
+        trend: [31, 37, 42, 51, 59, 63],
+        recommendation: [
+          "Protect routing cleanliness across every lead type.",
+          "Do not mix referral, legacy, and new customers in one vague pool.",
+          "Use quality signals to decide later marketing expansion."
+        ]
+      },
+      reconciliation: {
+        id: "reconciliation",
+        type: "director",
+        parent: "cfo",
+        name: "Reconciliation Director",
+        displayRole: "Reconciliation Director",
+        color: "#e4b450",
+        surfaceKicker: "Reconciliation Presentation",
+        surfaceTitle: "Outcome Reconciliation",
+        surfaceSubtitle: "Completed jobs, missing payment truth, and owner confirmation discipline are all visible inside one finance lane.",
+        askPrompt: "What still needs financial confirmation?",
+        askBullets: [
+          "One completed job still needs payment truth from the President.",
+          "Reconciliation is the key difference between estimate visibility and actual revenue truth.",
+          "Recommendation: complete owner confirmation before month close."
+        ],
+        tabs: ["Executive Summary", "Completed Jobs", "Missing Truth", "Owner Confirmations"],
+        metrics: [
+          { label: "Completed Jobs", value: "9", note: "Visible in finance lane" },
+          { label: "Missing Truth", value: "1", note: "Needs owner confirmation" },
+          { label: "Confirmed Revenue", value: "$18.4k", note: "Owner-entered" },
+          { label: "Discipline", value: "Strong", note: "One item remains" }
+        ],
+        analysisHealth: "91",
+        trend: [37, 45, 56, 62, 70, 82],
+        recommendation: [
+          "Keep financial outcomes confirmed quickly after service completion.",
+          "Do not leave completed work unreconciled.",
+          "Use reconciliation as the base of CFO credibility."
+        ]
+      },
+      revenue_control: {
+        id: "revenue_control",
+        type: "director",
+        parent: "cfo",
+        name: "Revenue Control Director",
+        displayRole: "Revenue Control Director",
+        color: "#e4b450",
+        surfaceKicker: "Revenue Control Presentation",
+        surfaceTitle: "Revenue Control",
+        surfaceSubtitle: "Estimate expectation, forecast visibility, and revenue discipline remain visible before broader finance automation expands.",
+        askPrompt: "Is revenue control stable right now?",
+        askBullets: [
+          "Revenue expectation remains healthy because estimate entry is visible.",
+          "Collected cash still trails forecasted revenue until owner confirmation closes the loop.",
+          "Recommendation: preserve estimate accuracy and fast outcome entry."
+        ],
+        tabs: ["Executive Summary", "Estimate Flow", "Forecast", "Collected Revenue"],
+        metrics: [
+          { label: "Expected Revenue", value: "$24.8k", note: "Forecast from estimate flow" },
+          { label: "Collected Revenue", value: "$18.4k", note: "Confirmed by owner" },
+          { label: "Revenue Gap", value: "$6.4k", note: "Awaiting final truth" },
+          { label: "Control Status", value: "Visible", note: "Stage A already useful" }
+        ],
+        analysisHealth: "88",
+        trend: [34, 41, 49, 58, 66, 73],
+        recommendation: [
+          "Preserve estimate accuracy so expectations stay meaningful.",
+          "Do not confuse forecast with collected money.",
+          "Use revenue control to help the President govern by truth."
+        ]
+      },
+      payroll: {
+        id: "payroll",
+        type: "director",
+        parent: "cfo",
+        name: "Payroll Director",
+        displayRole: "Payroll Director",
+        color: "#e4b450",
+        surfaceKicker: "Payroll Presentation",
+        surfaceTitle: "Payroll Readiness",
+        surfaceSubtitle: "Payroll is structurally mapped for future finance expansion but remains a later-stage control lane.",
+        askPrompt: "Is payroll active yet?",
+        askBullets: [
+          "Payroll is not yet an active Stage A control layer.",
+          "The system structure already reserves a place for it inside finance governance.",
+          "Recommendation: do not expand payroll automation before core revenue truth is stable."
+        ],
+        tabs: ["Executive Summary", "Readiness", "Future Controls", "Expansion Gate"],
+        metrics: [
+          { label: "Payroll State", value: "Future", note: "Not active yet" },
+          { label: "Finance Priority", value: "Revenue Truth", note: "Current focus" },
+          { label: "Expansion Readiness", value: "Mapped", note: "Structure reserved" },
+          { label: "Unlock Order", value: "Later", note: "After core lanes mature" }
+        ],
+        analysisHealth: "72",
+        trend: [12, 16, 20, 23, 28, 32],
+        recommendation: [
+          "Keep payroll reserved but inactive for now.",
+          "Protect finance focus on real collected revenue.",
+          "Expand only when the core CFO lane is stable."
+        ]
+      },
+      support: {
+        id: "support",
+        type: "director",
+        parent: "cso",
+        name: "Support Director",
+        displayRole: "Support Director",
+        color: "#b16cff",
+        surfaceKicker: "Support Presentation",
+        surfaceTitle: "Support Control",
+        surfaceSubtitle: "Support requests, service follow-up, and customer continuity are visible in the same customer-success lane.",
+        askPrompt: "What support signal matters most right now?",
+        askBullets: [
+          "Support is not yet a heavy automation layer, but the reporting path is already visible.",
+          "Customer continuity depends on keeping service follow-up clean.",
+          "Recommendation: keep support tied to customer history and owner visibility."
+        ],
+        tabs: ["Executive Summary", "Open Support", "Follow-through", "Customer History"],
+        metrics: [
+          { label: "Support State", value: "Visible", note: "Inside customer lane" },
+          { label: "Open Items", value: "2", note: "Need reply discipline" },
+          { label: "Continuity", value: "Stable", note: "No active breakdown" },
+          { label: "Owner Visibility", value: "On", note: "Signals are present" }
+        ],
+        analysisHealth: "84",
+        trend: [29, 34, 41, 45, 53, 58],
+        recommendation: [
+          "Keep support tied to the same customer number logic.",
+          "Preserve visibility across service and follow-up.",
+          "Use support signals later for deeper CSO automation."
+        ]
+      },
+      retention: {
+        id: "retention",
+        type: "director",
+        parent: "cso",
+        name: "Retention Director",
+        displayRole: "Retention Director",
+        color: "#b16cff",
+        surfaceKicker: "Retention Presentation",
+        surfaceTitle: "Retention Control",
+        surfaceSubtitle: "Retention monitors whether customers stay engaged and move forward through the operating structure.",
+        askPrompt: "What is the current retention risk?",
+        askBullets: [
+          "Retention remains stable because continuity signals are visible early.",
+          "The biggest risk is unresolved follow-up after service or sales contact.",
+          "Recommendation: keep client next-step visibility clean."
+        ],
+        tabs: ["Executive Summary", "Continuity", "Reopen Risk", "Next Steps"],
+        metrics: [
+          { label: "Retention Signal", value: "Stable", note: "No broad churn pressure" },
+          { label: "Reopen Risk", value: "Low", note: "Two continuity watch items" },
+          { label: "Next-Step Visibility", value: "Good", note: "Owner can govern" },
+          { label: "Lane Health", value: "Healthy", note: "Signals are intact" }
+        ],
+        analysisHealth: "86",
+        trend: [30, 37, 42, 50, 57, 65],
+        recommendation: [
+          "Preserve next-step clarity after every completed interaction.",
+          "Use visible continuity to prevent quiet customer loss.",
+          "Keep retention anchored to service and sales outcomes."
+        ]
+      },
+      reviews: {
+        id: "reviews",
+        type: "director",
+        parent: "cso",
+        name: "Review Director",
+        displayRole: "Review Director",
+        color: "#b16cff",
+        surfaceKicker: "Review Presentation",
+        surfaceTitle: "Review & Reputation Control",
+        surfaceSubtitle: "Reviews are part of customer continuity and reputation health and should be visible before heavier CSO automation unlocks.",
+        askPrompt: "What is the review priority right now?",
+        askBullets: [
+          "Seven reviews still need reply discipline.",
+          "Review visibility matters because reputation is part of retention health.",
+          "Recommendation: keep review follow-through fast and owner-visible."
+        ],
+        tabs: ["Executive Summary", "Open Reviews", "Reputation Health", "Response Discipline"],
+        metrics: [
+          { label: "Open Reviews", value: "7", note: "Need response discipline" },
+          { label: "Reputation Health", value: "Stable", note: "No active crisis" },
+          { label: "Response Speed", value: "Moderate", note: "Needs faster follow-through" },
+          { label: "Owner Visibility", value: "Clear", note: "Review lane visible" }
+        ],
+        analysisHealth: "82",
+        trend: [26, 31, 38, 46, 52, 57],
+        recommendation: [
+          "Respond faster to open reviews.",
+          "Treat reviews as part of customer continuity, not just image.",
+          "Keep reputation work inside the same operating structure."
+        ]
+      },
+      advertising: {
+        id: "advertising",
+        type: "director",
+        parent: "cmo",
+        name: "Advertising Director",
+        displayRole: "Advertising Director",
+        color: "#ea6bd7",
+        surfaceKicker: "Advertising Presentation",
+        surfaceTitle: "Advertising Readiness",
+        surfaceSubtitle: "Advertising remains a future demand-generation layer prepared to attach to the same operating structure.",
+        askPrompt: "Is advertising active right now?",
+        askBullets: [
+          "Advertising is not yet an active control layer.",
+          "The operating structure already reserves a clear place for it.",
+          "Recommendation: expand advertising only after revenue and operations remain stable."
+        ],
+        tabs: ["Executive Summary", "Readiness", "Expansion Fit", "Future Control"],
+        metrics: [
+          { label: "Advertising State", value: "Future", note: "Not active yet" },
+          { label: "Expansion Fit", value: "Strong", note: "Structure reserved" },
+          { label: "Current Priority", value: "Revenue", note: "Protect core lane first" },
+          { label: "Readiness", value: "Mapped", note: "Awaiting future unlock" }
+        ],
+        analysisHealth: "70",
+        trend: [10, 14, 17, 21, 27, 31],
+        recommendation: [
+          "Do not activate advertising before the current operating lanes are mature.",
+          "Keep future marketing connected to real revenue outcomes.",
+          "Use the same structure rather than separate campaign software."
+        ]
+      },
+      seo: {
+        id: "seo",
+        type: "director",
+        parent: "cmo",
+        name: "SEO Director",
+        displayRole: "SEO Director",
+        color: "#ea6bd7",
+        surfaceKicker: "SEO Presentation",
+        surfaceTitle: "SEO Readiness",
+        surfaceSubtitle: "SEO remains a future marketing control layer prepared to connect to broader demand systems later.",
+        askPrompt: "What is the SEO layer status?",
+        askBullets: [
+          "SEO is structurally mapped, not actively governed yet.",
+          "When activated, it should feed the same demand and revenue structure.",
+          "Recommendation: prioritize present revenue truth over future search expansion."
+        ],
+        tabs: ["Executive Summary", "Visibility", "Future Demand", "Activation Readiness"],
+        metrics: [
+          { label: "SEO State", value: "Future", note: "Not active yet" },
+          { label: "Demand Link", value: "Mapped", note: "Will attach to revenue" },
+          { label: "Visibility Layer", value: "Reserved", note: "No active control" },
+          { label: "Priority", value: "Later", note: "After core stability" }
+        ],
+        analysisHealth: "68",
+        trend: [9, 13, 15, 19, 24, 29],
+        recommendation: [
+          "Keep SEO in the architecture, but not in the current operating focus.",
+          "Ensure future visibility work attaches to the same company memory and revenue structure.",
+          "Do not create detached marketing silos."
+        ]
+      },
+      website: {
+        id: "website",
+        type: "director",
+        parent: "cmo",
+        name: "Website Director",
+        displayRole: "Website Director",
+        color: "#ea6bd7",
+        surfaceKicker: "Website Presentation",
+        surfaceTitle: "Website Control",
+        surfaceSubtitle: "Website operations remain a future marketing and conversion layer prepared to connect to the operating system.",
+        askPrompt: "What is the website layer doing right now?",
+        askBullets: [
+          "Website operations are structurally reserved and not yet a live control surface.",
+          "When activated, the website should support revenue and customer pipelines rather than stand apart from them.",
+          "Recommendation: keep website work subordinate to operating structure."
+        ],
+        tabs: ["Executive Summary", "Conversion Path", "Demand Fit", "Future Activation"],
+        metrics: [
+          { label: "Website State", value: "Future", note: "Not active yet" },
+          { label: "Conversion Role", value: "Reserved", note: "Will support revenue" },
+          { label: "System Fit", value: "Mapped", note: "Inside architecture" },
+          { label: "Priority", value: "Later", note: "Current focus stays operational" }
+        ],
+        analysisHealth: "69",
+        trend: [11, 15, 18, 22, 26, 33],
+        recommendation: [
+          "Keep the website inside the operating system vision.",
+          "Do not treat the website as a detached marketing tool.",
+          "Activate only when it can feed real company structure."
+        ]
+      },
+      people_ops: {
+        id: "people_ops",
+        type: "director",
+        parent: "hr",
+        name: "People Ops Director",
+        displayRole: "People Ops Director",
+        color: "#6dd6f3",
+        surfaceKicker: "People Ops Presentation",
+        surfaceTitle: "People Ops Structure",
+        surfaceSubtitle: "People operations are structurally mapped and will expand on top of real staff activity signals already entering the owner layer.",
+        askPrompt: "What is people ops waiting on?",
+        askBullets: [
+          "People ops is waiting on stronger long-term accountability and training layers.",
+          "The foundation already exists because service and sales staff activity are reportable.",
+          "Recommendation: preserve clean reporting behavior now."
+        ],
+        tabs: ["Executive Summary", "Readiness", "Signals", "Future Workforce"],
+        metrics: [
+          { label: "People Ops State", value: "Future", note: "Awaiting unlock" },
+          { label: "Signal Quality", value: "Good", note: "Activity is visible" },
+          { label: "Training Base", value: "Prepared", note: "Structure exists" },
+          { label: "Expansion Fit", value: "Strong", note: "No redesign required" }
+        ],
+        analysisHealth: "76",
+        trend: [19, 23, 29, 35, 41, 48],
+        recommendation: [
+          "Use current reporting discipline as the future HR base.",
+          "Do not invent HR layers before the signals are clean.",
+          "Expand later without breaking the operating structure."
+        ]
+      },
+      training: {
+        id: "training",
+        type: "director",
+        parent: "hr",
+        name: "Training Director",
+        displayRole: "Training Director",
+        color: "#6dd6f3",
+        surfaceKicker: "Training Presentation",
+        surfaceTitle: "Training Readiness",
+        surfaceSubtitle: "Training remains a future layer that will expand from the same accountability and workflow structure already being built.",
+        askPrompt: "Is training active today?",
+        askBullets: [
+          "Training is not yet an active management layer.",
+          "The system is already producing the signals that future training should act on.",
+          "Recommendation: preserve clean workflow reporting first."
+        ],
+        tabs: ["Executive Summary", "Readiness", "Signals", "Future Programs"],
+        metrics: [
+          { label: "Training State", value: "Future", note: "Not active yet" },
+          { label: "Signal Base", value: "Visible", note: "Workflow events present" },
+          { label: "Readiness", value: "Mapped", note: "Architecture reserved" },
+          { label: "Priority", value: "Later", note: "After core stability" }
+        ],
+        analysisHealth: "71",
+        trend: [13, 18, 22, 27, 31, 37],
+        recommendation: [
+          "Keep training reserved for a later people layer.",
+          "Use current execution data as the future training input.",
+          "Do not separate workforce development from operating reality."
+        ]
+      },
+      workforce: {
+        id: "workforce",
+        type: "director",
+        parent: "hr",
+        name: "Workforce Director",
+        displayRole: "Workforce Director",
+        color: "#6dd6f3",
+        surfaceKicker: "Workforce Presentation",
+        surfaceTitle: "Workforce Readiness",
+        surfaceSubtitle: "Workforce planning remains a future structure layer that should grow on top of real execution, accountability, and capacity signals.",
+        askPrompt: "What is workforce planning waiting on?",
+        askBullets: [
+          "Workforce planning depends on stable scheduling, accountability, and people visibility.",
+          "The current structure already reserves this lane so future expansion does not require redesign.",
+          "Recommendation: build the core operating truth first."
+        ],
+        tabs: ["Executive Summary", "Readiness", "Capacity Signals", "Future Planning"],
+        metrics: [
+          { label: "Workforce State", value: "Future", note: "Not active yet" },
+          { label: "Capacity Signals", value: "Partial", note: "More Stage B needed" },
+          { label: "Planning Fit", value: "Mapped", note: "Reserved in HR lane" },
+          { label: "Unlock Need", value: "Stage B+", note: "Needs more structure" }
+        ],
+        analysisHealth: "68",
+        trend: [11, 14, 17, 22, 28, 34],
+        recommendation: [
+          "Do not fake workforce planning before real scheduling exists.",
+          "Preserve structural mapping now for future HR expansion.",
+          "Use real capacity data later, not assumptions."
+        ]
+      },
+      compliance: {
+        id: "compliance",
+        type: "director",
+        parent: "cao",
+        name: "Compliance Director",
+        displayRole: "Compliance Director",
+        color: "#f07a66",
+        surfaceKicker: "Compliance Presentation",
+        surfaceTitle: "Compliance Readiness",
+        surfaceSubtitle: "Compliance remains a future governance lane structurally reserved inside the operating system.",
+        askPrompt: "Is compliance active today?",
+        askBullets: [
+          "Compliance is structurally reserved but not active yet.",
+          "The system already shows where compliance will attach when governance expands.",
+          "Recommendation: preserve clean operating inputs now."
+        ],
+        tabs: ["Executive Summary", "Readiness", "Future Governance", "Structure Fit"],
+        metrics: [
+          { label: "Compliance State", value: "Locked", note: "Stage C future" },
+          { label: "Structure Fit", value: "Reserved", note: "No redesign later" },
+          { label: "Current Priority", value: "Signals", note: "Keep inputs clean" },
+          { label: "Expansion Path", value: "Clear", note: "CAO layer reserved" }
+        ],
+        analysisHealth: "65",
+        trend: [10, 12, 16, 20, 24, 28],
+        recommendation: [
+          "Keep compliance structurally present but inactive for now.",
+          "Do not bolt governance onto weak inputs.",
+          "Expand only when the core operating lanes are mature."
+        ]
+      },
+      approval: {
+        id: "approval",
+        type: "director",
+        parent: "cao",
+        name: "Approval Director",
+        displayRole: "Approval Director",
+        color: "#f07a66",
+        surfaceKicker: "Approval Presentation",
+        surfaceTitle: "Approval Control",
+        surfaceSubtitle: "Approval governance remains structurally mapped and will activate when formal decision routing moves into the CAO layer.",
+        askPrompt: "How should I think about approvals right now?",
+        askBullets: [
+          "Approvals are visible at the President layer but not yet governed through full CAO automation.",
+          "The structure already reserves the future approval chain.",
+          "Recommendation: keep present approvals disciplined and visible."
+        ],
+        tabs: ["Executive Summary", "Decision Routing", "Pending Approvals", "Future Control"],
+        metrics: [
+          { label: "Approval State", value: "Prepared", note: "President-visible now" },
+          { label: "Formal Automation", value: "Locked", note: "Future CAO layer" },
+          { label: "Current Load", value: "3", note: "On the table" },
+          { label: "Governance Path", value: "Mapped", note: "Clear expansion" }
+        ],
+        analysisHealth: "69",
+        trend: [13, 17, 23, 28, 35, 41],
+        recommendation: [
+          "Preserve clear President decision routing now.",
+          "Use future approval governance to formalize what is already visible.",
+          "Do not lose approvals in scattered communication."
+        ]
+      },
+      risk: {
+        id: "risk",
+        type: "director",
+        parent: "cao",
+        name: "Risk Director",
+        displayRole: "Risk Director",
+        color: "#f07a66",
+        surfaceKicker: "Risk Presentation",
+        surfaceTitle: "Risk Readiness",
+        surfaceSubtitle: "Risk remains a future governance layer that will expand on top of operational, financial, and customer signals already present in the system.",
+        askPrompt: "What is the current governance-risk status?",
+        askBullets: [
+          "The system can already see where risk signals originate, but formal CAO governance is not yet active.",
+          "Current risk discipline depends on keeping operations, revenue, and finance truthful.",
+          "Recommendation: preserve signal integrity before governance activation."
+        ],
+        tabs: ["Executive Summary", "Signal Sources", "Governance Readiness", "Future Escalation"],
+        metrics: [
+          { label: "Risk State", value: "Future", note: "Not active yet" },
+          { label: "Signal Base", value: "Visible", note: "Ops, revenue, finance" },
+          { label: "Governance Readiness", value: "Mapped", note: "Reserved in CAO lane" },
+          { label: "Current Action", value: "Discipline", note: "Protect signal truth" }
+        ],
+        analysisHealth: "67",
+        trend: [12, 15, 20, 24, 29, 33],
+        recommendation: [
+          "Do not over-automate governance before the core structure matures.",
+          "Use current executive signals as the raw material for future risk control.",
+          "Keep the CAO lane structurally intact."
+        ]
+      }
+    };
+
+    const decisions = [
+      { label: "Confirm Q2 Marketing Budget", priority: "High" },
+      { label: "Approve New Technician Hire", priority: "Medium" },
+      { label: "Review Unpaid Invoices Over 60 Days", priority: "Medium" }
+    ];
+
+    let selectedExecutiveId = "ceo";
+    let selectedRoleId = "ceo";
+    let selectedTab = 0;
+
+    const executiveTrack = document.getElementById("executive-track");
+    const directorDock = document.getElementById("director-dock");
+    const selectedPill = document.getElementById("selected-pill");
+    const decisionList = document.getElementById("decision-list");
+    const boardScoreValue = document.getElementById("board-score-value");
+    const boardScoreWord = document.getElementById("board-score-word");
+    const boardScoreLines = document.getElementById("board-score-lines");
+    const briefPoints = document.getElementById("brief-points");
+    const surfaceKicker = document.getElementById("surface-kicker");
+    const surfaceTitle = document.getElementById("surface-title");
+    const surfaceSubtitle = document.getElementById("surface-subtitle");
+    const surfaceTabs = document.getElementById("surface-tabs");
+    const metricGrid = document.getElementById("metric-grid");
+    const analysisHealth = document.getElementById("analysis-health");
+    const trendBars = document.getElementById("trend-bars");
+    const analysisBullets = document.getElementById("analysis-bullets");
+    const askKicker = document.getElementById("ask-kicker");
+    const askIcon = document.getElementById("ask-icon");
+    const askName = document.getElementById("ask-name");
+    const askRole = document.getElementById("ask-role");
+    const askQuestionKicker = document.getElementById("ask-question-kicker");
+    const askQuestion = document.getElementById("ask-question");
+    const askResponseKicker = document.getElementById("ask-response-kicker");
+    const askResponseList = document.getElementById("ask-response-list");
+
+    function getRole(id) {
+      return roles[id];
+    }
+
+    function getParentExecutiveId(id) {
+      const role = getRole(id);
+      return role.type === "director" ? role.parent : role.id;
+    }
+
+    function getCurrentRole() {
+      return getRole(selectedRoleId);
+    }
+
+    function titleCase(value) {
+      return value
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+    }
+
+    function renderDecisions() {
+      decisionList.innerHTML = decisions
+        .map(
+          (item) => `
+            <div class="decision-row">
+              <p class="decision-copy">${item.label}</p>
+              <span class="priority priority-${item.priority.toLowerCase()}">${item.priority}</span>
+            </div>
+          `
+        )
+        .join("");
+    }
+
+    function renderExecutives() {
+      executiveTrack.innerHTML = executiveOrder
+        .map((id) => {
+          const role = getRole(id);
+          const isPresenter = id === selectedExecutiveId;
+          const classes = [
+            "executive",
+            id === "ceo" ? "ceo-base" : "",
+            isPresenter ? "presenter" : ""
+          ]
+            .filter(Boolean)
+            .join(" ");
+
+          return `
+            <button class="${classes}" data-role="${role.id}" type="button" aria-label="${role.name}">
+              <span class="executive-orb"></span>
+              <span class="executive-stem"></span>
+              <span class="executive-card">
+                <span class="exec-code">${role.code}</span>
+                <span class="exec-title">${role.name.replace(/\s+/g, "<br />")}</span>
+                <span class="exec-subtitle">${role.displayRole}</span>
+                <span class="exec-underline"></span>
+              </span>
+            </button>
+          `;
+        })
+        .join("");
+
+      executiveTrack.querySelectorAll(".executive").forEach((node) => {
+        node.addEventListener("click", () => selectExecutive(node.dataset.role));
+      });
+    }
+
+    function renderDirectors() {
+      const executive = getRole(selectedExecutiveId);
+      directorDock.innerHTML = executive.directors
+        .map((id) => {
+          const director = getRole(id);
+          const active = selectedRoleId === id ? "active" : "";
+          return `
+            <button class="director-pill ${active}" data-role="${director.id}" type="button">
+              <span class="director-name">${director.name}</span>
+              <span class="director-role">${director.displayRole}</span>
+            </button>
+          `;
+        })
+        .join("");
+
+      directorDock.querySelectorAll(".director-pill").forEach((node) => {
+        node.addEventListener("click", () => selectDirector(node.dataset.role));
+      });
+    }
+
+    function renderTopFromCeo() {
+      const ceo = getRole("ceo");
+      briefPoints.innerHTML = ceo.recommendation.map((item) => `<li>${item}</li>`).join("");
+      boardScoreValue.textContent = "92";
+      boardScoreWord.textContent = "Strong";
+      boardScoreLines.innerHTML = `
+        <div>Revenue <span>94</span></div>
+        <div>Operations <span>91</span></div>
+        <div>Finance <span>89</span></div>
+      `;
+    }
+
+    function renderSurface() {
+      const role = getCurrentRole();
+      surfaceKicker.textContent = role.surfaceKicker;
+      surfaceTitle.textContent = role.surfaceTitle;
+      surfaceSubtitle.textContent = role.surfaceSubtitle;
+      renderTabs(role);
+      renderMetrics(role);
+      analysisHealth.textContent = role.analysisHealth;
+      renderTrend(role.trend);
+      analysisBullets.innerHTML = role.recommendation.map((item) => `<li>${item}</li>`).join("");
+    }
+
+    function renderTabs(role) {
+      surfaceTabs.innerHTML = role.tabs
+        .map((tab, index) => {
+          const active = index === selectedTab ? "active" : "";
+          return `<button class="surface-tab ${active}" data-index="${index}" type="button">${tab}</button>`;
+        })
+        .join("");
+
+      surfaceTabs.querySelectorAll(".surface-tab").forEach((node) => {
+        node.addEventListener("click", () => {
+          selectedTab = Number(node.dataset.index);
+          renderTabs(role);
+        });
+      });
+    }
+
+    function renderMetrics(role) {
+      metricGrid.innerHTML = role.metrics
+        .map(
+          (metric) => `
+            <article class="metric-card">
+              <h4 class="metric-label">${metric.label}</h4>
+              <p class="metric-value">${metric.value}</p>
+              <p class="metric-note">${metric.note}</p>
+            </article>
+          `
+        )
+        .join("");
+    }
+
+    function renderTrend(values) {
+      trendBars.innerHTML = values
+        .map((value) => `<div class="bar" style="height:${value}%"></div>`)
+        .join("");
+    }
+
+    function renderAsk() {
+      const role = getCurrentRole();
+      const promptName = role.code || role.short;
+      askKicker.textContent = `Ask ${promptName}`;
+      askIcon.textContent = promptName.charAt(0);
+      askName.textContent = role.name;
+      askRole.textContent = role.name;
+      askQuestionKicker.textContent = `Ask ${promptName}`;
+      askQuestion.textContent = role.askPrompt;
+      askResponseKicker.textContent = `${promptName} Response`;
+      askResponseList.innerHTML = role.askBullets.map((item) => `<li>${item}</li>`).join("");
+    }
+
+    function renderSelectedState() {
+      const role = getCurrentRole();
+      const labelBase = role.type === "executive" ? role.code : role.name;
+      selectedPill.textContent = `${labelBase} Selected`;
+    }
+
+    function selectExecutive(id) {
+      selectedExecutiveId = id;
+      selectedRoleId = id;
+      selectedTab = 0;
+      rerender();
+    }
+
+    function selectDirector(id) {
+      selectedRoleId = id;
+      selectedExecutiveId = getParentExecutiveId(id);
+      selectedTab = 0;
+      rerender();
+    }
+
+    function rerender() {
+      renderExecutives();
+      renderDirectors();
+      renderSelectedState();
+      renderSurface();
+      renderAsk();
+    }
+
+    renderDecisions();
+    renderTopFromCeo();
+    rerender();
+  </script>
+</body>
+</html>

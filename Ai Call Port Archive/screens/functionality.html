@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Call Port | Functionality</title>
+  <meta
+    name="description"
+    content="AI Call Port functionality walkthrough with guided modal sections explaining call handling, scheduling, notifications, dashboard workflows, reporting, and activation."
+  />
+  <style>
+    :root{
+      --text-primary:#f7fbff;
+      --text-secondary:#c9d7e6;
+      --text-muted:#8d9db1;
+      --blue:#3b82f6;
+      --blue-soft:#7bd7ff;
+      --orange:#f97316;
+      --orange-soft:#ff9d4d;
+      --border-soft:rgba(255,255,255,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      color:var(--text-primary);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(59,130,246,.08), transparent 26%),
+        radial-gradient(circle at 82% 22%, rgba(249,115,22,.07), transparent 28%),
+        linear-gradient(180deg,#05070b 0%, #04060a 100%);
+      overflow-x:hidden;
+    }
+    .grid-bg{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background:
+        linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(circle at center, black 40%, transparent 92%);
+      z-index:0;
+    }
+    .page{
+      position:relative;
+      z-index:1;
+      min-height:100vh;
+      padding:22px;
+      display:flex;
+      justify-content:center;
+    }
+    .shell{
+      width:min(1280px, calc(100vw - 44px));
+      min-height:calc(100vh - 44px);
+      border-radius:32px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));
+      box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+    .shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(420px circle at 50% 0%, rgba(249,115,22,.05), transparent 56%),
+        radial-gradient(520px circle at 10% 8%, rgba(59,130,246,.04), transparent 52%);
+      z-index:0;
+    }
+    .inner{
+      position:relative;
+      z-index:1;
+      padding:22px 24px 100px;
+      min-height:calc(100vh - 44px);
+      display:grid;
+      grid-template-rows:auto auto 1fr auto;
+      gap:18px;
+    }
+    .topbar{
+      position:relative;
+      min-height:72px;
+      padding:12px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .topbar::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:20px;
+      background:linear-gradient(90deg, rgba(59,130,246,.04), rgba(0,0,0,.92) 22%, rgba(0,0,0,.92) 78%, rgba(249,115,22,.04));
+      pointer-events:none;
+    }
+    .topbar > *{position:relative;z-index:1}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .logo-wrap{width:64px;height:64px;min-width:64px;display:flex;align-items:center;justify-content:center;flex:0 0 64px}
+    .logo{width:56px;height:56px;object-fit:contain;display:block;filter:drop-shadow(0 0 10px rgba(249,115,22,.20))}
+    .brand-stack{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .brand-wordmark{display:flex;align-items:flex-end;gap:6px;line-height:1}
+    .brand-ai,.brand-callport{font-size:14px;font-weight:900;text-transform:uppercase;color:transparent;-webkit-background-clip:text;background-clip:text}
+    .brand-ai{letter-spacing:.04em;background-image:linear-gradient(180deg, var(--blue-soft), var(--blue))}
+    .brand-callport{letter-spacing:.02em;background-image:linear-gradient(180deg, #ffc14d, var(--orange))}
+    .beta-badge,.topbar-note,.progress-chip,.helper-chip,.helper-badge{
+      display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap
+    }
+    .beta-badge{min-height:22px;padding:0 9px;border:1px solid rgba(249,115,22,.24);background:rgba(249,115,22,.10);color:#fff}
+    .topbar-note{min-height:32px;padding:0 14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--text-secondary)}
+    .topbar-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+    .topbar-links{display:flex;align-items:center;gap:18px;color:var(--text-muted);font-size:13px;font-weight:700}
+    .topbar-links a{color:inherit;text-decoration:none}
+    .hero{max-width:860px;margin:0 auto;text-align:center}
+    .hero h1{margin:0;font-size:clamp(30px,4.8vw,54px);line-height:1.02;letter-spacing:-.06em;color:#fff}
+    .hero p{margin:12px auto 0;max-width:760px;color:var(--blue-soft);font-size:15px;line-height:1.6;font-weight:700;text-wrap:balance}
+    .wizard-wrap{display:grid;place-items:center;min-height:0}
+    .wizard-card{
+      width:min(920px, 100%);
+      min-height:620px;
+      border-radius:30px;
+      border:1px solid var(--border-soft);
+      background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03), 0 22px 60px rgba(0,0,0,.32);
+      padding:28px 24px 22px;
+      position:relative;
+      overflow:hidden;
+    }
+    .wizard-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(260px circle at 80% 0%, rgba(249,115,22,.05), transparent 48%),
+        radial-gradient(260px circle at 10% 0%, rgba(59,130,246,.05), transparent 48%);
+    }
+    .wizard-card > *{position:relative;z-index:1}
+    .wizard-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .eyebrow{display:inline-flex;align-items:center;min-height:30px;padding:0 12px;border-radius:999px;background:rgba(123,215,255,.08);border:1px solid rgba(123,215,255,.18);color:var(--blue-soft);font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    .progress-chip{min-height:30px;padding:0 12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--blue-soft)}
+    .progress-line{margin-top:16px;height:10px;border-radius:999px;background:rgba(255,255,255,.05);overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+    .progress-fill{height:100%;width:12.5%;border-radius:999px;background:linear-gradient(90deg, var(--blue), var(--blue-soft));box-shadow:0 0 18px rgba(123,215,255,.22);transition:width .25s ease}
+    .slide{display:none;padding-top:24px;animation:fadeSlide .24s ease}
+    .slide.active{display:block}
+    .question-title{margin:18px 0 0;font-size:clamp(32px,4.4vw,46px);line-height:1.03;letter-spacing:-.06em;color:#fff}
+    .question-copy{margin:12px 0 0;max-width:760px;color:var(--text-secondary);font-size:15px;line-height:1.6;font-weight:600}
+    .feature-grid{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .feature-card,.helper-box{border-radius:20px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);padding:16px}
+    .feature-card h3{margin:0;color:#fff;font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    .feature-card p,.helper-box p{margin:10px 0 0;color:var(--text-secondary);font-size:14px;line-height:1.55;font-weight:600}
+    .point-list{margin-top:18px;display:grid;gap:10px}
+    .point{border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:14px}
+    .point strong{display:block;color:#fff;font-size:15px;line-height:1.45;font-weight:800}
+    .point span{display:block;margin-top:6px;color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}
+    .helper-box{margin-top:18px;border-color:rgba(249,115,22,.18);background:rgba(249,115,22,.08)}
+    .helper-badge{min-height:26px;padding:0 10px;border:1px solid rgba(249,115,22,.22);background:rgba(249,115,22,.14);color:#fff}
+    .helper-box p{color:#ffd7b5}
+    .feature-grid .feature-card:first-child{background:linear-gradient(180deg, rgba(103,212,255,.12), rgba(255,255,255,.03));border-color:rgba(103,212,255,.18)}
+    .feature-grid .feature-card:last-child{background:linear-gradient(180deg, rgba(249,115,22,.12), rgba(255,255,255,.03));border-color:rgba(249,115,22,.18)}
+    .point-list .point:nth-child(3n+1){background:linear-gradient(180deg, rgba(27,150,154,.12), rgba(255,255,255,.02));border-color:rgba(57,181,186,.16)}
+    .point-list .point:nth-child(3n+2){background:linear-gradient(180deg, rgba(255,191,47,.12), rgba(255,255,255,.02));border-color:rgba(255,191,47,.18)}
+    .point-list .point:nth-child(3n+3){background:linear-gradient(180deg, rgba(109,84,216,.12), rgba(255,255,255,.02));border-color:rgba(167,139,250,.18)}
+    .helper-chip-row{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+    .helper-chip{min-height:32px;padding:0 12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#eef6ff;font-size:10px;font-weight:900;letter-spacing:.10em;text-transform:uppercase;cursor:pointer}
+    .wizard-actions{display:grid;grid-template-columns:210px 140px 1fr 220px;align-items:center;gap:14px;padding-top:6px}
+    .landing-btn,.back-btn,.next-btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;border-radius:16px;text-decoration:none;cursor:pointer;transition:.18s ease;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:0 16px}
+    .landing-btn,.back-btn{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#eef6ff}
+    .back-btn{min-width:140px;background:transparent}
+    .status-copy{text-align:center;color:var(--text-muted);font-size:13px;line-height:1.5;font-weight:600}
+    .next-btn{border:none;background:linear-gradient(135deg, var(--orange), var(--orange-soft));color:#fff;box-shadow:0 10px 30px rgba(249,115,22,.28);justify-self:end;min-width:220px}
+    .ai-bubble{
+      position:fixed;right:24px;bottom:24px;z-index:12;width:min(360px, calc(100vw - 28px));
+      border-radius:22px;border:1px solid rgba(255,255,255,.08);background:rgba(9,12,19,.92);backdrop-filter:blur(16px);box-shadow:0 24px 60px rgba(0,0,0,.36);overflow:hidden
+    }
+    .ai-top{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .ai-top strong{display:block;color:#fff;font-size:13px;line-height:1.35;font-weight:800;letter-spacing:.02em}
+    .ai-top span{display:block;margin-top:4px;color:var(--blue-soft);font-size:11px;line-height:1.4;font-weight:700}
+    .ai-body{padding:14px 16px 16px}
+    .ai-copy{color:var(--text-secondary);font-size:13px;line-height:1.55;font-weight:600}
+    .ai-prompts{margin-top:12px;display:grid;gap:8px}
+    .ai-prompt{width:100%;text-align:left;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#eef6ff;padding:12px;font:inherit;cursor:pointer}
+    @keyframes fadeSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @media (max-width:960px){.wizard-actions{grid-template-columns:1fr 1fr;gap:10px}.status-copy{grid-column:1 / -1;text-align:left}.next-btn{justify-self:stretch}}
+    @media (max-width:760px){
+      .page{padding:10px}.shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}.inner{padding:12px 12px 100px;min-height:calc(100vh - 20px)}
+      .topbar{padding:12px;flex-wrap:wrap}.topbar::before{border-radius:16px}.logo-wrap{width:50px;height:50px;min-width:50px;min-height:50px;flex:0 0 50px}.logo{width:42px;height:42px}
+      .brand-ai,.brand-callport{font-size:12px}.beta-badge,.topbar-note,.progress-chip,.helper-chip,.helper-badge{font-size:8px}.wizard-card{min-height:660px;border-radius:22px;padding:22px 16px 18px}
+      .question-title{font-size:30px}.feature-grid{grid-template-columns:1fr}.wizard-actions{grid-template-columns:1fr}.ai-bubble{right:10px;bottom:10px;width:calc(100vw - 20px)}
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="page">
+    <div class="shell">
+      <div class="inner">
+        <header class="topbar">
+          <div class="brand">
+            <div class="logo-wrap"><img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo" /></div>
+            <div class="brand-stack">
+              <div class="brand-wordmark"><span class="brand-ai">AI</span><span class="brand-callport">CALL PORT</span></div>
+              <div class="beta-badge">Beta</div>
+            </div>
+          </div>
+          <div class="topbar-right">
+            <nav class="topbar-links">
+              <a href="index.html#how-it-works">How it works</a>
+              <a href="index.html#system">System</a>
+              <a href="index.html#pricing">Pricing</a>
+              <a href="guides.html">Guides</a>
+            </nav>
+            <div class="topbar-note">Guided functionality walkthrough</div>
+          </div>
+        </header>
+
+        <section class="hero">
+          <h1>AI Call Port Functionality</h1>
+          <p>See exactly what the system does, one capability at a time, in the same guided format as the activation flow.</p>
+        </section>
+
+        <div class="wizard-wrap">
+          <div class="wizard-card">
+            <div class="wizard-top">
+              <div class="eyebrow" id="eyebrow">AI Call Handling</div>
+              <div class="progress-chip" id="progressChip">Section 1 of 8</div>
+            </div>
+            <div class="progress-line"><div class="progress-fill" id="progressFill"></div></div>
+
+            <div class="slide active" data-step="0">
+              <h2 class="question-title">AI Call Handling</h2>
+              <p class="question-copy">The system answers inbound calls automatically, understands the caller’s intent, and converts the conversation into something operationally useful for the business.</p>
+              <div class="feature-grid">
+                <div class="feature-card"><h3>Intent Detection</h3><p>Understands whether the caller is a new lead, quote request, booking request, support question, or urgent service need.</p></div>
+                <div class="feature-card"><h3>Call Records</h3><p>Creates summaries, transcripts, and recordings so the owner can review exactly what happened after the call ends.</p></div>
+              </div>
+              <div class="point-list">
+                <div class="point"><strong>Lead and quote capture</strong><span>The AI gathers the customer details and operational context the business needs to follow up properly.</span></div>
+                <div class="point"><strong>Urgent routing logic</strong><span>Critical calls can be identified early and pushed toward urgent workflows instead of ordinary handling.</span></div>
+              </div>
+            </div>
+
+            <div class="slide" data-step="1">
+              <h2 class="question-title">Scheduling and Reservations</h2>
+              <p class="question-copy">When scheduling is enabled, the same system can support service appointments, sales bookings, and reservation-style workflows with reminders and confirmation tracking.</p>
+              <div class="feature-grid">
+                <div class="feature-card"><h3>Booking Workflows</h3><p>Supports service appointments, sales appointments, and reservation-type flows depending on the business model.</p></div>
+                <div class="feature-card"><h3>Scheduling Add-On</h3><p>Scheduling is added as a clear monthly upgrade, not hidden inside unclear package language.</p></div>
+              </div>
+              <div class="point-list">
+                <div class="point"><strong>Reminders and confirmations</strong><span>Clients can receive reminders and confirm from email or text messages before the appointment or reservation.</span></div>
+                <div class="point"><strong>Availability support</strong><span>Reservation or booking availability can be supported, but inventory tracking is not part of the standard system.</span></div>
+              </div>
+            </div>
+
+            <div class="slide" data-step="2">
+              <h2 class="question-title">Client Notifications</h2>
+              <p class="question-copy">The system keeps clients informed by email and SMS, then brings those responses back into the dashboard so the owner and staff are not guessing.</p>
+              <div class="feature-grid">
+                <div class="feature-card"><h3>Email and SMS</h3><p>Clients receive appointment notices, reminders, and confirmation requests through familiar communication channels.</p></div>
+                <div class="feature-card"><h3>Confirmation Tracking</h3><p>The dashboard updates when clients confirm, decline, or fail to respond so follow-up becomes operationally clear.</p></div>
+              </div>
+              <div class="point-list">
+                <div class="point"><strong>Less manual chasing</strong><span>The business does not have to manually confirm every booking when automated reminders and confirmations are already in place.</span></div>
+                <div class="point"><strong>Visible delivery issues</strong><span>Email or SMS failures are surfaced so the owner can fix contact records instead of silently losing communication.</span></div>
+              </div>
+            </div>
+
+            <div class="slide" data-step="3">
+              <h2 class="question-title">Dashboard and Built-In CRM</h2>
+              <p class="question-copy">AI Call Port includes its own dashboard and built-in CRM so businesses can operate from one place without needing external software from day one.</p>
+              <div class="feature-grid">
+                <div class="feature-card"><h3>Operational Dashboard</h3><p>Owners can see calls, appointments, confirmations, urgent alerts, booked value, billing, and business activity in one system.</p></div>
+                <div class="feature-card"><h3>Built-In CRM</h3><p>Client records, notes, communication history, and call outcomes live inside the platform automatically.</p></div>
+              </div>
+              <div class="point-list">
+                <div class="point"><strong>Searchable client records</strong><span>Every call, booking, and follow-up action can connect back to the same client profile.</span></div>
+                <div class="point"><strong>Optional external CRM sync</strong><span>If the business already uses a supported CRM, that becomes an add-on rather than a requirement.</span></div>
+              </div>
+            </div>
+
+            <div class="slide" data-step="4">
+              <h2 class="question-title">Staff and Provider Workflows</h2>
+              <p class="question-copy">The system supports assigned staff or providers, personal availability, acceptance tracking, and completion tracking without forcing all setup into the pre-activation funnel.</p>
+              <div class="feature-grid">
+                <div class="feature-card"><h3>Assigned Work</h3><p>Appointments and operational tasks can be routed to specific team members instead of staying only at the owner level.</p></div>
+                <div class="feature-card"><h3>Availability Management</h3><p>Each staff user can manage their own availability after activation inside the dashboard.</p></div>
+              </div>
+              <div class="point-list">
+                <div class="point"><strong>Acceptance and completion</strong><span>Staff can confirm receipt of assigned work and later confirm that it was completed.</span></div>
+                <div class="point"><strong>Post-activation setup</strong><span>Names, availability, services, and internal pricing are added after activation, not forced into the early signup flow.</span></div>
+              </div>
+            </div>
+
+            <div class="slide" data-step="5">
+              <h2 class="question-title">Alerts and Sound Notifications</h2>
+              <p class="question-copy">The dashboard includes notification logic so urgent events, confirmations, cancellations, delivery failures, and unfinished work stay visible.</p>
+              <div class="feature-grid">
+                <div class="feature-card"><h3>Urgent Visibility</h3><p>Important events can trigger stronger alerts for the owner or assigned staff instead of blending into routine updates.</p></div>
+                <div class="feature-card"><h3>Sound Priority</h3><p>High-priority events can use sound alerts so the dashboard behaves like a real operational tool, not just a passive report screen.</p></div>
+              </div>
+              <div class="point-list">
+                <div class="point"><strong>Owner and staff notifications</strong><span>Each side of the business can be alerted to what needs their attention right now.</span></div>
+                <div class="point"><strong>Delivery and response tracking</strong><span>The system can show whether client reminders were delivered, confirmed, ignored, or failed.</span></div>
+              </div>
+            </div>
+
+            <div class="slide" data-step="6">
+              <h2 class="question-title">Reports and Business Visibility</h2>
+              <p class="question-copy">AI Call Port is not only a voice system. It also gives the owner reporting on how calls become bookings, confirmations, completed work, and booked value.</p>
+              <div class="feature-grid">
+                <div class="feature-card"><h3>Operational Metrics</h3><p>Track call volume, booking conversion, confirmation rate, completion rate, and urgent call activity.</p></div>
+                <div class="feature-card"><h3>Commercial Visibility</h3><p>Owners can also track booked value, completed value, and where operational leakage is happening.</p></div>
+              </div>
+              <div class="point-list">
+                <div class="point"><strong>Performance review</strong><span>Staff follow-through and business response patterns become visible instead of hidden across phones, texts, and memory.</span></div>
+                <div class="point"><strong>Clear owner pulse</strong><span>The dashboard homepage and reports page are designed to show what matters now and how the system is performing over time.</span></div>
+              </div>
+            </div>
+
+            <div class="slide" data-step="7">
+              <h2 class="question-title">Activation and Post-Activation Setup</h2>
+              <p class="question-copy">The flow is designed to make the customer confident before payment, then let the business finish deeper setup inside the dashboard after activation.</p>
+              <div class="feature-grid">
+                <div class="feature-card"><h3>Before Activation</h3><p>The business completes intake, reviews the configured system and pricing, verifies contact details, signs documents, and runs a 3-minute live test.</p></div>
+                <div class="feature-card"><h3>After Activation</h3><p>The business adds staff names, availability, services, internal prices, and other deeper workflow settings in the dashboard.</p></div>
+              </div>
+              <div class="point-list">
+                <div class="point"><strong>Simple commercial model</strong><span>Both Standard and Luxury include the same advanced AI Call Port system. The voice tier changes the included voice minutes and overage rate, then only the upgrades the business actually needs are added.</span></div>
+                <div class="point"><strong>Country logic</strong><span>Active markets can proceed to activation, while coming soon or projected markets move through a waitlist-ready path without breaking the experience.</span></div>
+                <div class="point"><strong>Upcoming outbound beta</strong><span>Outbound Follow-Up is planned to begin on May 18, 2026 as a limited beta for 10 selected clients. The system uses the business's existing database, sorts the contact list, and decides whether follow-up should happen by call, SMS, or the next best action, with final confirmation notices going out on May 11, 2026.</span></div>
+              </div>
+              <div class="helper-box">
+                <div class="helper-badge">Ask AI Assistant</div>
+                <p>The AI assistant can explain any part of this page in more detail, including the upcoming outbound beta and how the system uses a business's own client or lead database for structured follow-up instead of selling lead generation.</p>
+                <div class="helper-chip-row">
+                  <button class="helper-chip" type="button">Explain pricing</button>
+                  <button class="helper-chip" type="button">Explain activation</button>
+                  <button class="helper-chip" type="button">Explain staff setup</button>
+                  <button class="helper-chip" type="button">Explain outbound follow-up</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="wizard-actions">
+              <a class="landing-btn" href="index.html">Back to Landing Page</a>
+              <button class="back-btn" id="backBtn" type="button">Back</button>
+              <div class="status-copy" id="statusCopy">This page explains one capability at a time so the product stays clear.</div>
+              <button class="next-btn" id="nextBtn" type="button">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="ai-bubble">
+    <div class="ai-top">
+      <div>
+        <strong>Ask AI Assistant</strong>
+        <span id="assistantLabel">Need help with this section?</span>
+      </div>
+      <div class="helper-badge">Ready</div>
+    </div>
+    <div class="ai-body">
+      <div class="ai-copy" id="assistantCopy">I can explain what this section means, how it affects the customer, and what happens later in the setup process.</div>
+      <div class="ai-prompts" id="assistantPrompts"></div>
+    </div>
+  </aside>
+
+  <script>
+    const stepMeta = [
+      { eyebrow: "AI Call Handling", status: "This section explains how inbound calls become structured business outcomes.", assistantLabel: "Ask about call handling", assistantCopy: "I can explain how the system understands callers, captures leads, and turns conversations into summaries, recordings, and next actions.", prompts: ["How does intent detection work?", "How are urgent calls handled?", "What gets saved after each call?"] },
+      { eyebrow: "Scheduling and Reservations", status: "This section explains booking workflows and why scheduling is a separate upgrade.", assistantLabel: "Ask about scheduling", assistantCopy: "I can explain what the scheduling add-on does, what kinds of bookings it supports, and what it does not include.", prompts: ["Why is scheduling extra?", "Can it support reservations?", "Does it track inventory too?"] },
+      { eyebrow: "Client Notifications", status: "This section explains reminders, confirmations, and message-based client responses.", assistantLabel: "Ask about notifications", assistantCopy: "I can explain how email and SMS reminders work, how confirmations update the dashboard, and what happens if delivery fails.", prompts: ["How do clients confirm?", "What if an email fails?", "Do reminders update the dashboard?"] },
+      { eyebrow: "Dashboard and CRM", status: "This section explains the operational dashboard and built-in CRM.", assistantLabel: "Ask about the dashboard", assistantCopy: "I can explain what the owner sees, what is included in the built-in CRM, and when external CRM integration becomes useful.", prompts: ["What is in the built-in CRM?", "Can I use my current CRM?", "What does the owner see every day?"] },
+      { eyebrow: "Staff and Providers", status: "This section explains provider assignment, personal availability, and completion workflows.", assistantLabel: "Ask about staff workflows", assistantCopy: "I can explain when staff names and availability are added, what staff can update themselves, and how completion tracking works.", prompts: ["When do I add staff names?", "Can each user manage availability?", "How does completion tracking work?"] },
+      { eyebrow: "Alerts and Sound", status: "This section explains dashboard alerts, urgency, and sound-priority behavior.", assistantLabel: "Ask about alerts", assistantCopy: "I can explain which events should trigger sound alerts, what owners see, and how urgent issues stay visible in the dashboard.", prompts: ["Which alerts use sound?", "How are urgent items shown?", "Do staff get alerts too?"] },
+      { eyebrow: "Reports and Visibility", status: "This section explains the business reporting layer behind the system.", assistantLabel: "Ask about reporting", assistantCopy: "I can explain how the dashboard tracks conversion, confirmations, completion, and value instead of only storing call history.", prompts: ["What is booked value?", "How is completion rate tracked?", "What do the reports show?"] },
+      { eyebrow: "Activation and Setup", status: "This section explains what happens before payment and what gets configured after activation.", assistantLabel: "Ask about activation", assistantCopy: "I can explain the 3-minute test, how pricing is structured, what happens after checkout, and why deeper setup is done later inside the dashboard.", prompts: ["How does the live test work?", "What happens after activation?", "What is included in the base price?"] }
+    ];
+
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const progressChip = document.getElementById("progressChip");
+    const progressFill = document.getElementById("progressFill");
+    const eyebrow = document.getElementById("eyebrow");
+    const statusCopy = document.getElementById("statusCopy");
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const assistantLabel = document.getElementById("assistantLabel");
+    const assistantCopy = document.getElementById("assistantCopy");
+    const assistantPrompts = document.getElementById("assistantPrompts");
+    let current = 0;
+
+    function updateUI() {
+      slides.forEach((slide, index) => slide.classList.toggle("active", index === current));
+      progressChip.textContent = `Section ${current + 1} of ${slides.length}`;
+      progressFill.style.width = `${((current + 1) / slides.length) * 100}%`;
+      eyebrow.textContent = stepMeta[current].eyebrow;
+      statusCopy.textContent = stepMeta[current].status;
+      assistantLabel.textContent = stepMeta[current].assistantLabel;
+      assistantCopy.textContent = stepMeta[current].assistantCopy;
+      backBtn.style.visibility = current === 0 ? "hidden" : "visible";
+      nextBtn.textContent = current === slides.length - 1 ? "Go to Step 1" : "Next";
+      assistantPrompts.innerHTML = "";
+      stepMeta[current].prompts.forEach(prompt => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "ai-prompt";
+        button.textContent = prompt;
+        assistantPrompts.appendChild(button);
+      });
+    }
+
+    backBtn.addEventListener("click", () => {
+      if (current > 0) {
+        current -= 1;
+        updateUI();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (current < slides.length - 1) {
+        current += 1;
+        updateUI();
+      } else {
+        window.location.href = "step1.html";
+      }
+    });
+
+    updateUI();
+  </script>
+</body>
+</html>

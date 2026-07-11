@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX | Job Records</title>
+  <meta
+    name="description"
+    content="AI-ABCX job record screen showing the shared Stage A and Stage B scheduling record, workflow status, outcome tracking, and President oversight."
+  />
+  <style>
+    :root{
+      --bg:#04070c;
+      --shell:#09111c;
+      --panel:#0d1724;
+      --panel-2:#111d2c;
+      --line:rgba(255,255,255,.08);
+      --text:#f4f7fb;
+      --muted:#95a5bb;
+      --blue:#49a7ff;
+      --blue-soft:#86d7ff;
+      --gold:#e7b64b;
+      --green:#62d992;
+      --orange:#ff9854;
+      --red:#ff6d7c;
+      --purple:#aa77ff;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%}
+    body{
+      color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(73,167,255,.14), transparent 30%),
+        radial-gradient(circle at top right, rgba(231,182,75,.10), transparent 28%),
+        linear-gradient(180deg,#07111c 0%, #04070c 100%);
+      overflow:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+      background-size:40px 40px;
+      opacity:.32;
+      mask-image:radial-gradient(circle at center, black 40%, transparent 95%);
+    }
+    .page{
+      min-height:100vh;
+      padding:18px;
+      display:flex;
+      justify-content:center;
+      position:relative;
+      z-index:1;
+    }
+    .shell{
+      width:min(1520px, calc(100vw - 36px));
+      height:calc(100vh - 36px);
+      min-height:calc(100vh - 36px);
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.1);
+      background:linear-gradient(180deg, rgba(9,17,28,.98), rgba(5,9,14,.99));
+      box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+    .shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(420px circle at 50% 0%, rgba(231,182,75,.05), transparent 54%),
+        radial-gradient(520px circle at 10% 8%, rgba(73,167,255,.05), transparent 52%);
+    }
+    .layout{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:260px 380px 1fr;
+      height:100%;
+      min-height:calc(100vh - 36px);
+    }
+    .sidebar,.record-rail,.main{
+      min-height:0;
+    }
+    .sidebar{
+      border-right:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      padding:22px 16px 20px;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+      overflow:auto;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:6px 8px 18px;
+      border-bottom:1px solid var(--line);
+    }
+    .logo-wrap{
+      width:72px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 auto;
+    }
+    .logo-image{
+      width:72px;
+      height:auto;
+      display:block;
+    }
+    .brand-wordmark{
+      display:flex;
+      gap:6px;
+      align-items:flex-end;
+      line-height:1;
+      flex-wrap:wrap;
+    }
+    .brand-ai{
+      font-size:14px;
+      font-weight:900;
+      text-transform:uppercase;
+      color:transparent;
+      -webkit-background-clip:text;
+      background-clip:text;
+      background-image:linear-gradient(180deg,var(--blue-soft),var(--blue));
+    }
+    .card{
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      padding:18px;
+    }
+    .card strong{
+      display:block;
+      font-size:18px;
+      line-height:1.2;
+    }
+    .card p{
+      margin:8px 0 0;
+      color:var(--blue-soft);
+      font-size:13px;
+      line-height:1.55;
+      font-weight:700;
+    }
+    .nav-title{
+      color:#7f91a8;
+      font-size:11px;
+      letter-spacing:.34em;
+      text-transform:uppercase;
+      margin-bottom:10px;
+      padding:0 8px;
+    }
+    .nav{
+      display:grid;
+      gap:8px;
+    }
+    .nav-link{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.05);
+      background:rgba(255,255,255,.02);
+      padding:13px 14px;
+      color:#dbe6f1;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:700;
+    }
+    .nav-link.active{
+      border-color:rgba(231,182,75,.34);
+      background:rgba(231,182,75,.10);
+      color:#fff;
+    }
+    .nav-count,.pill,.stage-btn,.chip,.tag,.mini-stat span,.save-btn,.inline-btn,.select-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .nav-count{
+      min-width:28px;
+      height:22px;
+      padding:0 8px;
+      background:rgba(255,255,255,.06);
+      color:#fff;
+    }
+    .sidebar-foot{
+      margin-top:auto;
+      border-radius:20px;
+      border:1px solid rgba(231,182,75,.25);
+      background:rgba(231,182,75,.06);
+      padding:16px;
+    }
+    .sidebar-foot h4{
+      margin:0 0 10px;
+      color:var(--gold);
+      font-size:12px;
+      letter-spacing:.28em;
+      text-transform:uppercase;
+    }
+    .sidebar-foot p{
+      margin:0;
+      color:#dde6f2;
+      font-size:13px;
+      line-height:1.55;
+      font-weight:600;
+    }
+    .record-rail{
+      border-right:1px solid var(--line);
+      padding:20px 16px;
+      overflow:auto;
+      display:grid;
+      align-content:start;
+      gap:16px;
+      padding-bottom:120px;
+      scroll-padding-bottom:120px;
+      overscroll-behavior:contain;
+    }
+    .rail-head h2{
+      margin:0;
+      font-size:26px;
+      letter-spacing:-.04em;
+    }
+    .rail-head p{
+      margin:10px 0 0;
+      color:var(--blue-soft);
+      font-size:13px;
+      line-height:1.5;
+      font-weight:700;
+    }
+    .stage-bar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .stage-label{
+      color:#8fa1b8;
+      font-size:11px;
+      letter-spacing:.28em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+    .stage-switcher{
+      display:inline-flex;
+      gap:6px;
+      padding:5px;
+      border:1px solid rgba(231,182,75,.18);
+      border-radius:14px;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+    }
+    .stage-btn{
+      min-width:68px;
+      height:34px;
+      padding:0 14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#d2dceb;
+      cursor:pointer;
+    }
+    .stage-btn.active{
+      border-color:rgba(231,182,75,.42);
+      background:linear-gradient(180deg, rgba(231,182,75,.26), rgba(231,182,75,.08));
+      color:#fff6df;
+    }
+    .stage-note{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+    .list{
+      display:grid;
+      gap:10px;
+    }
+    .record-item{
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+      color:inherit;
+      text-align:left;
+      font:inherit;
+      cursor:pointer;
+      transition:border-color .18s ease, transform .18s ease, background .18s ease;
+    }
+    .record-item:hover{
+      border-color:rgba(73,167,255,.22);
+      transform:translateY(-1px);
+    }
+    .record-item.active{
+      border-color:rgba(231,182,75,.34);
+      background:linear-gradient(180deg, rgba(231,182,75,.10), rgba(255,255,255,.03));
+    }
+    .record-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .record-id{
+      color:var(--gold);
+      font-size:11px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      font-weight:900;
+    }
+    .record-item strong{
+      display:block;
+      margin-top:6px;
+      font-size:16px;
+      line-height:1.3;
+      color:#c7d0e0;
+    }
+    .record-item p{
+      margin:8px 0 0;
+      color:#c4d0df;
+      font-size:13px;
+      line-height:1.5;
+      font-weight:600;
+    }
+    .tag-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .tag{
+      min-height:24px;
+      padding:0 9px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      color:#eef6ff;
+    }
+    .tag.green{border-color:rgba(98,217,146,.24);background:rgba(98,217,146,.12);color:#bdf1d0}
+    .tag.orange{border-color:rgba(255,152,84,.24);background:rgba(255,152,84,.12);color:#ffcdad}
+    .tag.red{border-color:rgba(255,109,124,.24);background:rgba(255,109,124,.12);color:#ffd0d7}
+    .tag.blue{border-color:rgba(73,167,255,.24);background:rgba(73,167,255,.10);color:#a8dcff}
+    .tag.purple{border-color:rgba(170,119,255,.24);background:rgba(170,119,255,.12);color:#d0b3ff}
+    .main{
+      padding:16px 20px 24px;
+      display:grid;
+      grid-template-rows:auto auto minmax(0, 1fr);
+      gap:10px;
+      align-content:start;
+      min-height:0;
+      overflow:hidden;
+    }
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:4;
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:rgba(8,12,19,.92);
+      backdrop-filter:blur(14px);
+      display:grid;
+      gap:10px;
+      padding:14px 16px;
+      align-items:start;
+    }
+    .topbar-chips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-start;
+      align-items:center;
+    }
+    .topbar-main{
+      display:grid;
+      grid-template-columns:minmax(0, 1.18fr);
+      grid-template-areas:
+        "copy"
+        "chips"
+        "actions";
+      gap:10px;
+      align-items:start;
+    }
+    .topbar-copy{
+      grid-area:copy;
+      min-width:0;
+    }
+    .topbar-copy-head{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:2px;
+    }
+    .kicker{
+      color:var(--gold);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.26em;
+      text-transform:uppercase;
+    }
+    .topbar h1{
+      margin:0 0 4px;
+      font-size:20px;
+      line-height:1.02;
+      font-weight:850;
+      letter-spacing:-.04em;
+      max-width:none;
+    }
+    .topbar p{
+      margin:0;
+      color:#c6d2e1;
+      font-size:13px;
+      line-height:1.45;
+      font-weight:600;
+      max-width:78ch;
+    }
+    .topbar-controls{
+      display:contents;
+      min-width:0;
+    }
+    .topbar-chips{
+      grid-area:chips;
+      justify-content:flex-start;
+      align-self:start;
+    }
+    .topbar-actions{
+      grid-area:actions;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-start;
+      align-items:flex-start;
+      align-self:start;
+      min-width:0;
+    }
+    .chip,.save-btn,.inline-btn,.select-btn{
+      min-height:34px;
+      padding:0 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#eef6ff;
+      cursor:pointer;
+      white-space:nowrap;
+      font-size:10px;
+    }
+    .inline-btn.hidden{display:none}
+    .save-btn{
+      border:none;
+      background:linear-gradient(135deg, var(--gold), #f2cb73);
+      color:#121212;
+    }
+    .main-grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:14px;
+      min-height:0;
+      align-items:start;
+    }
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:6px;
+    }
+    .stat{
+      border-radius:20px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      padding:8px 10px;
+    }
+    .stat label{
+      display:block;
+      color:#8898ad;
+      font-size:8px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-weight:900;
+    }
+    .stat strong{
+      display:block;
+      margin-top:4px;
+      font-size:20px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.05em;
+    }
+    .stat span{
+      display:block;
+      margin-top:3px;
+      color:#c6d2e1;
+      font-size:10px;
+      line-height:1.22;
+      font-weight:600;
+    }
+    .panel{
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(15,24,37,.96), rgba(9,14,21,.96));
+      padding:18px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    .main-grid > .panel,
+    .main-grid > .panel-stack{
+      max-height:min(69vh, calc(100vh - 245px));
+      overflow-x:hidden;
+      overflow-y:auto;
+      padding-bottom:120px;
+      scroll-padding-bottom:120px;
+      overscroll-behavior:contain;
+      min-height:0;
+    }
+    .panel-stack{
+      display:grid;
+      gap:14px;
+      align-content:start;
+    }
+    .panel-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:16px;
+    }
+    .panel-head h2,.panel-head h3{
+      margin:0;
+      font-size:21px;
+      letter-spacing:-.04em;
+    }
+    .panel-head p{
+      margin:8px 0 0;
+      color:#9fb0c5;
+      font-size:13px;
+      line-height:1.5;
+      font-weight:600;
+      max-width:680px;
+    }
+    .pill{
+      min-height:28px;
+      padding:0 10px;
+      border:1px solid rgba(231,182,75,.24);
+      background:rgba(231,182,75,.10);
+      color:#ffe3a7;
+    }
+    .mini-stat{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .mini-stat span{
+      min-height:24px;
+      padding:0 8px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      color:#d7e2ef;
+    }
+    .workflow-guide{
+      margin:0 0 16px;
+      border-radius:20px;
+      border:1px solid rgba(231,182,75,.18);
+      background:linear-gradient(180deg, rgba(231,182,75,.08), rgba(255,255,255,.02));
+      padding:16px;
+      display:grid;
+      gap:14px;
+    }
+    .workflow-guide.hidden{display:none}
+    .workflow-guide-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+    }
+    .workflow-guide-kicker{
+      color:var(--gold);
+      font-size:11px;
+      letter-spacing:.28em;
+      text-transform:uppercase;
+      font-weight:900;
+    }
+    .workflow-guide h3{
+      margin:8px 0 0;
+      font-size:20px;
+      letter-spacing:-.04em;
+    }
+    .workflow-guide p{
+      margin:8px 0 0;
+      color:#d8e2ee;
+      font-size:13px;
+      line-height:1.55;
+      font-weight:600;
+      max-width:720px;
+    }
+    .workflow-requirements{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .workflow-requirements span{
+      min-height:26px;
+      padding:0 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      color:#e6edf7;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .workflow-requirements span.highlight{
+      border-color:rgba(73,167,255,.28);
+      background:rgba(73,167,255,.12);
+      color:#a8dcff;
+    }
+    .workflow-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .workflow-btn{
+      min-height:38px;
+      padding:0 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#eef6ff;
+      cursor:pointer;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .workflow-btn.primary{
+      border-color:rgba(231,182,75,.34);
+      background:linear-gradient(135deg, rgba(231,182,75,.26), rgba(231,182,75,.1));
+      color:#fff4d2;
+    }
+    .workflow-btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+    .field.disabled{
+      opacity:.58;
+    }
+    .fields{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+    }
+    .field{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+    }
+    .field label{
+      display:block;
+      color:#8da0b8;
+      font-size:10px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      font-weight:900;
+      margin-bottom:10px;
+    }
+    .field input,.field textarea,.field select{
+      width:100%;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#f4f7fb;
+      border-radius:14px;
+      min-height:44px;
+      padding:0 12px;
+      font:700 14px/1.3 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;
+    }
+    .field textarea{
+      min-height:92px;
+      padding:12px;
+      resize:vertical;
+      line-height:1.45;
+    }
+    .field.full{
+      grid-column:1 / -1;
+    }
+    .timeline{
+      display:grid;
+      gap:10px;
+    }
+    .step{
+      display:grid;
+      grid-template-columns:30px 1fr;
+      gap:12px;
+      align-items:start;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+    }
+    .step-dot{
+      width:18px;
+      height:18px;
+      margin-top:2px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.22);
+      background:transparent;
+      box-shadow:0 0 0 4px rgba(255,255,255,.02);
+    }
+    .step.complete .step-dot{
+      border-color:rgba(98,217,146,.42);
+      background:rgba(98,217,146,.22);
+    }
+    .step.active .step-dot{
+      border-color:rgba(255,152,84,.44);
+      background:rgba(255,152,84,.24);
+    }
+    .step.pending .step-dot{
+      border-color:rgba(73,167,255,.34);
+      background:rgba(73,167,255,.12);
+    }
+    .step strong{
+      display:block;
+      font-size:14px;
+      line-height:1.35;
+    }
+    .step p{
+      margin:6px 0 0;
+      color:#a9b8cb;
+      font-size:13px;
+      line-height:1.5;
+      font-weight:600;
+    }
+    .flow-footer{
+      margin-top:12px;
+      color:#90a3ba;
+      font-size:12px;
+      line-height:1.5;
+      font-weight:700;
+    }
+    .activity-list{
+      display:grid;
+      gap:10px;
+    }
+    .activity{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+    }
+    .activity-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .activity strong{
+      font-size:14px;
+      line-height:1.4;
+    }
+    .activity time{
+      color:#86d7ff;
+      font-size:11px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .activity p{
+      margin:6px 0 0;
+      color:#a9b8cb;
+      font-size:13px;
+      line-height:1.5;
+      font-weight:600;
+    }
+    .mode-bar{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .select-btn.active{
+      border-color:rgba(73,167,255,.3);
+      background:rgba(73,167,255,.10);
+      color:#a8dcff;
+    }
+    .save-status{
+      min-height:18px;
+      color:#86d7ff;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.03em;
+    }
+    .save-status.success{color:#bdf1d0}
+    .save-status.error{color:#ffd0d7}
+    @media (max-width:1420px){
+      .layout{grid-template-columns:240px 340px 1fr}
+      .summary-grid{grid-template-columns:repeat(2, minmax(0, 1fr))}
+    }
+    @media (max-width:1180px){
+      .layout{grid-template-columns:1fr}
+      .sidebar,.record-rail{border-right:none;border-bottom:1px solid var(--line)}
+      .topbar,.main-grid,.fields{grid-template-columns:1fr}
+      .topbar-chips,.topbar-actions{justify-content:flex-start}
+      .main{grid-template-rows:auto auto auto;overflow:auto}
+      .main-grid > .panel,
+      .main-grid > .panel-stack{
+        max-height:none;
+        overflow:visible;
+        padding-bottom:0;
+      }
+    }
+    @media (max-width:760px){
+      body{overflow:auto}
+      .page{padding:10px}
+      .shell{width:calc(100vw - 20px);height:auto;min-height:calc(100vh - 20px);border-radius:24px}
+      .layout{height:auto;min-height:calc(100vh - 20px)}
+      .summary-grid{grid-template-columns:1fr 1fr}
+      .topbar h1{font-size:28px}
+      .fields{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="shell">
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="logo-wrap">
+              <img src="public/assets/images/ai-abcx-logo-icon-tight-transparent.png" class="logo-image" alt="AI-ABCX logo" />
+            </div>
+            <div>
+              <div class="brand-wordmark"><span class="brand-ai">AI-ABCX</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <strong>You lead as President.</strong>
+            <p>The same job record exists in Stage A and Stage B. What changes is who moves it and how much the engine does automatically.</p>
+          </div>
+
+          <div>
+            <div class="nav-title">Headquarters</div>
+            <nav class="nav">
+              <a class="nav-link" id="presidentNavLink" href="#"><span>President Dashboard</span><span class="nav-count">Live</span></a>
+              <a class="nav-link active" id="jobRecordsNavLink" href="#"><span>Job Records</span><span class="nav-count" id="jobRecordsNavCount">12</span></a>
+              <a class="nav-link" id="dispatcherNavLink" href="#"><span>Dispatcher</span><span class="nav-count">Flow</span></a>
+              <a class="nav-link" id="salesWorkerNavLink" href="#"><span>Sales Worker</span><span class="nav-count">B</span></a>
+              <a class="nav-link" id="serviceWorkerNavLink" href="#"><span>Service Worker</span><span class="nav-count">B</span></a>
+            </nav>
+          </div>
+
+          <div class="sidebar-foot">
+            <h4>Shared Record Rule</h4>
+            <p>Stage A uses President-driven updates. Stage B uses engine-driven assignment, worker confirmation, customer confirmation, and structured closeout on the same record.</p>
+          </div>
+        </aside>
+
+        <section class="record-rail">
+          <div class="rail-head">
+            <h2>Job Queue</h2>
+            <p>Switch stages to see the same record model in manual and automated scheduling modes.</p>
+          </div>
+
+          <div class="stage-bar">
+            <span class="stage-label">Stage View</span>
+            <div class="stage-switcher">
+              <button class="stage-btn active" data-stage="A" type="button">Stage A</button>
+              <button class="stage-btn" data-stage="B" type="button">Stage B</button>
+            </div>
+          </div>
+          <div class="stage-note" id="stageNote">Stage A keeps the President as the manual source of scheduling truth.</div>
+
+          <div class="list" id="recordList"></div>
+        </section>
+
+        <main class="main">
+          <section class="topbar">
+            <div class="topbar-main">
+              <div class="topbar-copy">
+                <div class="topbar-copy-head">
+                  <div class="kicker">Shared Job Record</div>
+                </div>
+                <h1 id="recordTitle">Job Record</h1>
+                <p id="recordSubtitle">The AI-ABCX scheduling record survives across stages. Stage A updates it manually. Stage B advances it through the engine plus worker and customer actions.</p>
+              </div>
+              <div class="topbar-controls">
+                <div class="topbar-chips">
+                  <div class="chip" id="stageChip">Stage A</div>
+                  <div class="chip" id="statusChip">Awaiting Manual Confirmation</div>
+                </div>
+                <div class="topbar-actions">
+                  <button class="inline-btn" type="button" id="presidentLink">President Dashboard</button>
+                  <button class="inline-btn" type="button" id="followUpHubLink">President Follow-Up</button>
+                  <button class="inline-btn hidden" type="button" id="salesWorkerLink">Sales Worker</button>
+                  <button class="inline-btn hidden" type="button" id="serviceWorkerLink">Service Worker</button>
+                  <button class="inline-btn" type="button" id="resetRecord">Reset Record</button>
+                  <button class="save-btn" type="button" id="saveRecord">Save Record</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="summary-grid" id="summaryGrid"></section>
+
+          <section class="main-grid">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Record Detail</h2>
+                  <p id="detailIntro">Core job data, money data, and communication references stay with the same record even as automation changes by stage.</p>
+                </div>
+                <span class="pill" id="jobPill">Job #</span>
+              </div>
+
+              <div class="workflow-guide hidden" id="stageAWorkflow">
+                <div class="workflow-guide-top">
+                  <div>
+                    <div class="workflow-guide-kicker">Stage A President Workflow</div>
+                    <h3 id="stageAWorkflowTitle">Manual scheduling control</h3>
+                    <p id="stageAWorkflowText">Stage A is President-driven. Confirm the appointment manually, then record final outcome truth after the visit.</p>
+                  </div>
+                </div>
+                <div class="workflow-requirements" id="stageARequirements"></div>
+                <div class="workflow-actions" id="stageAActionButtons"></div>
+              </div>
+
+              <div class="fields">
+                <div class="field">
+                  <label>Job Number</label>
+                  <input id="jobNumber" type="text" readonly />
+                </div>
+                <div class="field">
+                  <label>Customer Name</label>
+                  <input id="customerName" type="text" />
+                </div>
+                <div class="field">
+                  <label>Phone</label>
+                  <input id="customerPhone" type="text" />
+                </div>
+                <div class="field">
+                  <label>Appointment Type</label>
+                  <select id="appointmentType"></select>
+                </div>
+                <div class="field">
+                  <label>Requested / Provisional Time</label>
+                  <input id="requestedTime" type="text" />
+                </div>
+                <div class="field">
+                  <label>Final Confirmed Time</label>
+                  <input id="confirmedTime" type="text" />
+                </div>
+                <div class="field">
+                  <label>Assigned Representative</label>
+                  <input id="assignedRep" type="text" />
+                </div>
+                <div class="field">
+                  <label>Status</label>
+                  <select id="statusSelect"></select>
+                </div>
+                <div class="field">
+                  <label>Outcome</label>
+                  <select id="outcomeSelect"></select>
+                </div>
+                <div class="field">
+                  <label>Amount Paid</label>
+                  <input id="amountPaid" type="number" min="0" step="1" />
+                </div>
+                <div class="field full">
+                  <label>President / System Notes</label>
+                  <textarea id="notesField"></textarea>
+                </div>
+                <div class="field full">
+                  <label>Call Transcript</label>
+                  <textarea id="transcriptField"></textarea>
+                </div>
+                <div class="field full">
+                  <label>Call Recording Reference</label>
+                  <input id="recordingField" type="text" />
+                </div>
+              </div>
+
+              <div class="mini-stat" id="modeTokens"></div>
+              <div class="save-status" id="saveStatus">Local changes are stored per stage view in this browser.</div>
+            </div>
+
+            <div class="panel-stack">
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>Workflow Movement</h3>
+                    <p id="flowIntro">This panel explains what moves the record in the selected stage.</p>
+                  </div>
+                  <div class="mode-bar" id="modeBar"></div>
+                </div>
+                <div class="timeline" id="timeline"></div>
+                <div class="flow-footer" id="flowFooter"></div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>Activity Log</h3>
+                    <p id="activityIntro">The log stays attached to the same record and changes tone depending on whether the President or the engine is moving the workflow.</p>
+                  </div>
+                </div>
+                <div class="activity-list" id="activityList"></div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <script src="ai-abc-stage-config.js"></script>
+  <script src="ai-abcx-job-records-config.js?v=20260615a"></script>
+  <script src="ai-abcx-job-records.js?v=20260615f"></script>
+  <script src="ai-abcx-workflow-helpers.js?v=20260615b"></script>
+  <script src="ai-abcx-job-records-app.js?v=20260615b"></script>
+</body>
+</html>

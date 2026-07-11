@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Call Port | Clients</title>
+  <meta name="description" content="Owner dashboard clients page with CRM records, contact history, bookings, confirmations, and relationship timeline." />
+  <style>
+    :root{--text-primary:#f7fbff;--text-secondary:#c9d7e6;--text-muted:#8d9db1;--blue:#3b82f6;--blue-soft:#67d4ff;--orange:#f97316;--orange-soft:#fb923c;--green:#69d39c;--border-soft:rgba(255,255,255,.06)}
+    *{box-sizing:border-box} html,body{margin:0;height:100%} body{color:var(--text-primary);font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;background:radial-gradient(circle at top left, rgba(78,165,255,.18), transparent 30%),radial-gradient(circle at top right, rgba(255,138,61,.10), transparent 26%),linear-gradient(180deg,#09131f 0%,#07111a 100%);overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 22%, rgba(59,130,246,.06), transparent 28%),radial-gradient(circle at 82% 78%, rgba(249,115,22,.06), transparent 32%);z-index:0}
+    .grid-bg{position:fixed;inset:0;pointer-events:none;opacity:.08;background:linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at center, black 42%, transparent 96%);z-index:0}
+    .page{position:relative;z-index:1;min-height:100vh;padding:18px;display:flex;justify-content:center}.shell{width:min(1480px, calc(100vw - 36px));min-height:calc(100vh - 36px);border-radius:30px;border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);overflow:hidden;position:relative}.shell::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px circle at 50% 0%, rgba(249,115,22,.05), transparent 56%),radial-gradient(520px circle at 10% 8%, rgba(59,130,246,.04), transparent 52%);z-index:0}
+    .layout{position:relative;z-index:1;display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 36px)} .sidebar{border-right:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));padding:20px 16px 18px;display:flex;flex-direction:column;gap:20px}
+    .brand{display:flex;align-items:center;gap:12px;padding:6px 8px}.logo-wrap{width:56px;height:56px;min-width:56px;display:flex;align-items:center;justify-content:center}.logo{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(249,115,22,.20))}.brand-wordmark{display:flex;gap:6px;align-items:flex-end;line-height:1;flex-wrap:wrap}.brand-ai,.brand-callport{font-size:14px;font-weight:900;text-transform:uppercase;color:transparent;-webkit-background-clip:text;background-clip:text}.brand-ai{letter-spacing:.04em;background-image:linear-gradient(180deg, var(--blue-soft), var(--blue))}.brand-callport{letter-spacing:.02em;background-image:linear-gradient(180deg, #ffbf2f, var(--orange))}
+    .beta-badge,.nav-count,.chip,.tag{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.beta-badge{min-height:22px;padding:0 9px;border:1px solid rgba(249,115,22,.24);background:rgba(249,115,22,.10);color:#fff}
+    .company-card,.card{border-radius:24px;border:1px solid var(--border-soft);background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.03);padding:18px;position:relative;overflow:hidden}.company-card strong{display:block;font-size:18px;line-height:1.2}.company-card span{display:block;margin-top:8px;color:var(--blue-soft);font-size:13px;line-height:1.5;font-weight:700}
+    .nav{display:grid;gap:8px}.nav-link{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:16px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);padding:13px 14px;color:#dbe6f1;text-decoration:none;font-size:13px;font-weight:700}.nav-link.active{border-color:rgba(103,212,255,.24);background:rgba(103,212,255,.10);color:#fff}.nav-count{min-width:26px;height:22px;padding:0 7px;background:rgba(255,255,255,.06);color:#fff}
+    .sidebar-foot{margin-top:auto;border-radius:20px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:16px}.sidebar-foot strong{display:block;font-size:13px;line-height:1.3;text-transform:uppercase}.sidebar-foot p{margin:8px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.55;font-weight:600}
+    .main{padding:18px;display:grid;gap:16px}.topbar{position:sticky;top:0;z-index:4;border-radius:24px;border:1px solid var(--border-soft);background:rgba(8,11,18,.90);backdrop-filter:blur(14px);display:grid;grid-template-columns:1fr auto;gap:18px;padding:16px 18px}.topbar-left h1{margin:0;font-size:34px;font-weight:850;letter-spacing:-.05em}.topbar-left p{margin:10px 0 0;color:var(--blue-soft);font-size:14px;font-weight:700;line-height:1.5}.topbar-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.chip,.action-btn{min-height:40px;padding:0 14px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#eef6ff;font-size:11px;font-weight:900;letter-spacing:.10em;text-transform:uppercase;text-decoration:none;white-space:nowrap}.action-btn.primary{border:none;background:linear-gradient(135deg,var(--orange),var(--orange-soft));color:#fff}
+    .summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.label{color:var(--text-muted);font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.value{margin-top:10px;font-size:32px;line-height:1;font-weight:900;letter-spacing:-.05em}.meta{margin-top:8px;color:var(--text-secondary);font-size:13px;line-height:1.45;font-weight:600}
+    .split{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.section-title h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}.section-title span{color:var(--text-muted);font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    .client-list,.timeline{display:grid;gap:10px}.client-card,.timeline-item{border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);padding:14px}.client-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.client-head strong{display:block;font-size:15px;font-weight:800}.client-head span{display:block;margin-top:4px;color:var(--text-secondary);font-size:13px;font-weight:600}
+    .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.tag{min-height:24px;padding:0 8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#eef6ff}.tag.green{border-color:rgba(105,211,156,.24);background:rgba(105,211,156,.12);color:#bdf1d1}.tag.orange{border-color:rgba(249,115,22,.24);background:rgba(249,115,22,.12);color:#ffc48e}.tag.blue{border-color:rgba(103,212,255,.24);background:rgba(103,212,255,.10);color:#9bdcff}
+    .detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.detail-box{border-radius:16px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:12px}.detail-box h3{margin:0;color:var(--text-muted);font-size:10px;letter-spacing:.14em;text-transform:uppercase}.detail-box p{margin:8px 0 0;font-size:13px;line-height:1.45;font-weight:700}
+    .timeline-item strong{display:block;font-size:14px;font-weight:800}.timeline-item p{margin:6px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}
+    @media (max-width:1280px){.summary-grid,.split,.detail-grid{grid-template-columns:1fr}} @media (max-width:980px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid rgba(255,255,255,.06)}} @media (max-width:760px){.page{padding:10px}.shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}.layout{min-height:calc(100vh - 20px)}.topbar{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="page"><div class="shell"><div class="layout">
+    <aside class="sidebar">
+      <div class="brand"><div class="logo-wrap"><img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo" /></div><div><div class="brand-wordmark"><span class="brand-ai">AI</span><span class="brand-callport">CALL PORT</span></div><div class="beta-badge">Beta</div></div></div>
+      <div class="company-card"><strong>Acme Plumbing & Drain</strong><span>Client records, call history, booking history, confirmations, and relationship context in one built-in CRM view.</span></div>
+      <nav class="nav">
+        <a class="nav-link" href="new-president-dashboard.html"><span>Overview</span><span class="nav-count">6</span></a>
+        <a class="nav-link" href="calls.html"><span>Calls</span><span class="nav-count">18</span></a>
+        <a class="nav-link" href="appointments.html"><span>Appointments</span><span class="nav-count">12</span></a>
+        <a class="nav-link" href="closeout.html"><span>Closeout</span><span class="nav-count">9</span></a>
+        <a class="nav-link active" href="clients.html"><span>Clients</span><span class="nav-count">244</span></a>
+        <a class="nav-link" href="staff.html"><span>Staff</span><span class="nav-count">5</span></a>
+        <a class="nav-link" href="reports.html"><span>Reports</span><span class="nav-count">4</span></a>
+        <a class="nav-link" href="notifications.html"><span>Notifications</span><span class="nav-count">11</span></a>
+        <a class="nav-link" href="billing.html"><span>Billing</span><span class="nav-count">2</span></a>
+        <a class="nav-link" href="referrals.html"><span>Referrals</span><span class="nav-count">4</span></a>
+        <a class="nav-link" href="requests.html"><span>Requests</span><span class="nav-count">1</span></a>
+        <a class="nav-link" href="settings.html"><span>Settings</span><span class="nav-count">•</span></a>
+      </nav>
+      <div class="sidebar-foot"><strong>Built-In CRM</strong><p>Every client record should hold calls, bookings, confirmations, notes, and value history even if no external CRM is connected.</p></div>
+    </aside>
+    <main class="main">
+      <section class="topbar"><div class="topbar-left"><h1>Clients</h1><p>Track client relationships, communication history, booked work, confirmation outcomes, and operational context in the built-in CRM.</p></div><div class="topbar-right"><div class="chip">244 Clients</div><div class="chip">32 New This Month</div><a class="action-btn" href="#">Search</a><a class="action-btn" href="#">Filter</a><a class="action-btn primary" href="#">Add Client</a></div></section>
+      <section class="summary-grid">
+        <div class="card"><div class="label">Total Clients</div><div class="value">244</div><div class="meta">32 added this month</div></div>
+        <div class="card"><div class="label">Active Clients</div><div class="value">198</div><div class="meta">46 inactive or dormant</div></div>
+        <div class="card"><div class="label">Pending Confirmations</div><div class="value">6</div><div class="meta">Across upcoming bookings</div></div>
+        <div class="card"><div class="label">Upcoming Value</div><div class="value">$3.4k</div><div class="meta">From scheduled work</div></div>
+      </section>
+      <section class="split">
+        <div class="card">
+          <div class="section-title"><h2>Client Records</h2><span>CRM view</span></div>
+          <div class="client-list">
+            <div class="client-card">
+              <div class="client-head"><div><strong>Sarah Jones</strong><span>sarah.jones@email.com • (555) 557-8821</span></div><div class="tag green">Active</div></div>
+              <div class="tag-row"><span class="tag blue">Leak Inspection</span><span class="tag green">Confirmed</span><span class="tag">Repeat Client</span></div>
+              <div class="detail-grid">
+                <div class="detail-box"><h3>Last Call</h3><p>Apr 15, 9:15 AM</p></div>
+                <div class="detail-box"><h3>Next Booking</h3><p>Today, 3:00 PM</p></div>
+                <div class="detail-box"><h3>Booked Value</h3><p>$95</p></div>
+              </div>
+            </div>
+            <div class="client-card">
+              <div class="client-head"><div><strong>Maria Lopez</strong><span>maria@email.com • (555) 240-1182</span></div><div class="tag orange">Urgent Case</div></div>
+              <div class="tag-row"><span class="tag red">Urgent</span><span class="tag blue">Dispatch</span><span class="tag">Completion Pending</span></div>
+              <div class="detail-grid">
+                <div class="detail-box"><h3>Last Call</h3><p>Apr 15, 10:47 AM</p></div>
+                <div class="detail-box"><h3>Assigned Staff</h3><p>Mike Daniels</p></div>
+                <div class="detail-box"><h3>Booked Value</h3><p>$180</p></div>
+              </div>
+            </div>
+            <div class="client-card">
+              <div class="client-head"><div><strong>John Smith</strong><span>johnsmith@email.com • (555) 827-4410</span></div><div class="tag blue">New Lead</div></div>
+              <div class="tag-row"><span class="tag">Quote Request</span><span class="tag blue">Needs Follow-Up</span></div>
+              <div class="detail-grid">
+                <div class="detail-box"><h3>Last Call</h3><p>Apr 15, 11:02 AM</p></div>
+                <div class="detail-box"><h3>Next Action</h3><p>Sales callback</p></div>
+                <div class="detail-box"><h3>Expected Value</h3><p>$140</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title"><h2>Recent Timeline</h2><span>Client history</span></div>
+          <div class="timeline">
+            <div class="timeline-item"><strong>Sarah Jones confirmed today’s appointment by SMS</strong><p>The reminder text was delivered successfully and the client confirmed directly from the message link.</p></div>
+            <div class="timeline-item"><strong>Maria Lopez urgent service routed into dispatch</strong><p>The client record was updated with the call summary, urgent tag, assigned staff member, and completion pending status.</p></div>
+            <div class="timeline-item"><strong>John Smith created from AI quote request</strong><p>A new client record was created automatically from the call, including summary, contact details, and quote follow-up task.</p></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div></div></div>
+  <script src="ai-assistant.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Call Port | Staff</title>
+  <meta name="description" content="Owner dashboard staff page with user availability, appointments, task confirmations, completions, and role visibility." />
+  <style>
+    :root{--text-primary:#f7fbff;--text-secondary:#c9d7e6;--text-muted:#8d9db1;--blue:#3b82f6;--blue-soft:#67d4ff;--orange:#f97316;--orange-soft:#fb923c;--green:#69d39c;--border-soft:rgba(255,255,255,.06)}
+    *{box-sizing:border-box} html,body{margin:0;height:100%} body{color:var(--text-primary);font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;background:radial-gradient(circle at top left, rgba(78,165,255,.18), transparent 30%),radial-gradient(circle at top right, rgba(255,138,61,.10), transparent 26%),linear-gradient(180deg,#09131f 0%,#07111a 100%);overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 22%, rgba(59,130,246,.06), transparent 28%),radial-gradient(circle at 82% 78%, rgba(249,115,22,.06), transparent 32%);z-index:0}
+    .grid-bg{position:fixed;inset:0;pointer-events:none;opacity:.08;background:linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at center, black 42%, transparent 96%);z-index:0}
+    .page{position:relative;z-index:1;min-height:100vh;padding:18px;display:flex;justify-content:center}.shell{width:min(1480px, calc(100vw - 36px));min-height:calc(100vh - 36px);border-radius:30px;border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);overflow:hidden;position:relative}.shell::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px circle at 50% 0%, rgba(249,115,22,.05), transparent 56%),radial-gradient(520px circle at 10% 8%, rgba(59,130,246,.04), transparent 52%);z-index:0}
+    .layout{position:relative;z-index:1;display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 36px)} .sidebar{border-right:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));padding:20px 16px 18px;display:flex;flex-direction:column;gap:20px}
+    .brand{display:flex;align-items:center;gap:12px;padding:6px 8px}.logo-wrap{width:56px;height:56px;min-width:56px;display:flex;align-items:center;justify-content:center}.logo{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(249,115,22,.20))}.brand-wordmark{display:flex;gap:6px;align-items:flex-end;line-height:1;flex-wrap:wrap}.brand-ai,.brand-callport{font-size:14px;font-weight:900;text-transform:uppercase;color:transparent;-webkit-background-clip:text;background-clip:text}.brand-ai{letter-spacing:.04em;background-image:linear-gradient(180deg, var(--blue-soft), var(--blue))}.brand-callport{letter-spacing:.02em;background-image:linear-gradient(180deg, #ffbf2f, var(--orange))}
+    .beta-badge,.nav-count,.chip,.tag{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.beta-badge{min-height:22px;padding:0 9px;border:1px solid rgba(249,115,22,.24);background:rgba(249,115,22,.10);color:#fff}
+    .company-card,.card{border-radius:24px;border:1px solid var(--border-soft);background:linear-gradient(180deg, rgba(103,212,255,.05), rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.03);padding:18px;position:relative;overflow:hidden}.company-card strong{display:block;font-size:18px;line-height:1.2}.company-card span{display:block;margin-top:8px;color:var(--blue-soft);font-size:13px;line-height:1.5;font-weight:700}
+    .nav{display:grid;gap:8px}.nav-link{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:16px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);padding:13px 14px;color:#dbe6f1;text-decoration:none;font-size:13px;font-weight:700}.nav-link.active{border-color:rgba(103,212,255,.24);background:rgba(103,212,255,.10);color:#fff}.nav-count{min-width:26px;height:22px;padding:0 7px;background:rgba(255,255,255,.06);color:#fff}
+    .sidebar-foot{margin-top:auto;border-radius:20px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:16px}.sidebar-foot strong{display:block;font-size:13px;line-height:1.3;text-transform:uppercase}.sidebar-foot p{margin:8px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.55;font-weight:600}
+    .main{padding:18px;display:grid;gap:16px}.topbar{position:sticky;top:0;z-index:4;border-radius:24px;border:1px solid var(--border-soft);background:rgba(8,11,18,.90);backdrop-filter:blur(14px);display:grid;grid-template-columns:1fr auto;gap:18px;padding:16px 18px}.topbar-left h1{margin:0;font-size:34px;font-weight:850;letter-spacing:-.05em}.topbar-left p{margin:10px 0 0;color:var(--blue-soft);font-size:14px;font-weight:700;line-height:1.5}.topbar-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.chip,.action-btn{min-height:40px;padding:0 14px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#eef6ff;font-size:11px;font-weight:900;letter-spacing:.10em;text-transform:uppercase;text-decoration:none;white-space:nowrap}.action-btn.primary{border:none;background:linear-gradient(135deg,var(--orange),var(--orange-soft));color:#fff}
+    .summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.label{color:var(--text-muted);font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.value{margin-top:10px;font-size:32px;line-height:1;font-weight:900;letter-spacing:-.05em}.meta{margin-top:8px;color:var(--text-secondary);font-size:13px;line-height:1.45;font-weight:600}
+    .split{display:grid;grid-template-columns:1.05fr .95fr;gap:12px}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.section-title h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}.section-title span{color:var(--text-muted);font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    .staff-list,.queue{display:grid;gap:10px}.staff-card,.queue-item{border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);padding:14px}.staff-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.staff-head strong{display:block;font-size:15px;font-weight:800}.staff-head span{display:block;margin-top:4px;color:var(--text-secondary);font-size:13px;font-weight:600}
+    .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.tag{min-height:24px;padding:0 8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#eef6ff}.tag.green{border-color:rgba(105,211,156,.24);background:rgba(105,211,156,.12);color:#bdf1d1}.tag.orange{border-color:rgba(249,115,22,.24);background:rgba(249,115,22,.12);color:#ffc48e}.tag.blue{border-color:rgba(103,212,255,.24);background:rgba(103,212,255,.10);color:#9bdcff}
+    .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.stat{border-radius:16px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:12px}.stat h3{margin:0;color:var(--text-muted);font-size:10px;letter-spacing:.14em;text-transform:uppercase}.stat p{margin:8px 0 0;font-size:13px;line-height:1.45;font-weight:700}
+    .queue-item strong{display:block;font-size:14px;font-weight:800}.queue-item p{margin:6px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}
+    @media (max-width:1280px){.summary-grid,.split,.stats{grid-template-columns:1fr}} @media (max-width:980px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid rgba(255,255,255,.06)}} @media (max-width:760px){.page{padding:10px}.shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}.layout{min-height:calc(100vh - 20px)}.topbar{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="page"><div class="shell"><div class="layout">
+    <aside class="sidebar">
+      <div class="brand"><div class="logo-wrap"><img src="public/assets/images/ai-call-port-logo.png" class="logo" alt="AI Call Port Logo" /></div><div><div class="brand-wordmark"><span class="brand-ai">AI</span><span class="brand-callport">CALL PORT</span></div><div class="beta-badge">Beta</div></div></div>
+      <div class="company-card"><strong>Acme Plumbing & Drain</strong><span>Staff access, availability, confirmations, completion tracking, and operational oversight from the owner side.</span></div>
+      <nav class="nav">
+        <a class="nav-link" href="new-president-dashboard.html"><span>Overview</span><span class="nav-count">6</span></a>
+        <a class="nav-link" href="calls.html"><span>Calls</span><span class="nav-count">18</span></a>
+        <a class="nav-link" href="appointments.html"><span>Appointments</span><span class="nav-count">12</span></a>
+        <a class="nav-link" href="closeout.html"><span>Closeout</span><span class="nav-count">9</span></a>
+        <a class="nav-link" href="clients.html"><span>Clients</span><span class="nav-count">244</span></a>
+        <a class="nav-link active" href="staff.html"><span>Staff</span><span class="nav-count">5</span></a>
+        <a class="nav-link" href="reports.html"><span>Reports</span><span class="nav-count">4</span></a>
+        <a class="nav-link" href="notifications.html"><span>Notifications</span><span class="nav-count">11</span></a>
+        <a class="nav-link" href="billing.html"><span>Billing</span><span class="nav-count">2</span></a>
+        <a class="nav-link" href="referrals.html"><span>Referrals</span><span class="nav-count">4</span></a>
+        <a class="nav-link" href="requests.html"><span>Requests</span><span class="nav-count">1</span></a>
+        <a class="nav-link" href="settings.html"><span>Settings</span><span class="nav-count">•</span></a>
+      </nav>
+      <div class="sidebar-foot"><strong>Staff Permissions</strong><p>Each user should manage their own availability by date and time, see their own appointments, accept assignments, and confirm completion without full admin control.</p></div>
+    </aside>
+    <main class="main">
+      <section class="topbar"><div class="topbar-left"><h1>Staff</h1><p>Monitor who is active, who has availability, which assignments were accepted, and which jobs still need completion confirmation.</p></div><div class="topbar-right"><div class="chip">5 Staff Users</div><div class="chip">4 Active Today</div><a class="action-btn" href="settings.html">Permissions</a><a class="action-btn" href="#staff-roster">User Calendars</a><a class="action-btn primary" href="requests.html">Add Staff User</a></div></section>
+      <section class="summary-grid">
+        <div class="card"><div class="label">Staff Users</div><div class="value">5</div><div class="meta">4 available today</div></div>
+        <div class="card"><div class="label">Assigned Today</div><div class="value">9</div><div class="meta">1 urgent task open</div></div>
+        <div class="card"><div class="label">Accepted</div><div class="value">7</div><div class="meta">2 still awaiting response</div></div>
+        <div class="card"><div class="label">Completed</div><div class="value">5</div><div class="meta">3 awaiting closeout</div></div>
+      </section>
+      <section class="split" id="staff-roster">
+        <div class="card">
+          <div class="section-title"><h2>Staff Roster</h2><span>Availability + workload</span></div>
+          <div class="staff-list">
+            <div class="staff-card">
+              <div class="staff-head"><div><strong>Sarah Kim</strong><span>Senior Technician</span></div><div class="tag green">Available</div></div>
+              <div class="tag-row"><span class="tag blue">3 Jobs Today</span><span class="tag green">2 Completed</span><span class="tag">Owner Visible</span></div>
+              <div class="stats">
+                <div class="stat"><h3>Availability</h3><p>8:00 AM - 5:00 PM</p></div>
+                <div class="stat"><h3>Accepted</h3><p>3 / 3</p></div>
+                <div class="stat"><h3>Completion</h3><p>2 / 3</p></div>
+              </div>
+              <div class="tag-row"><a class="action-btn" href="service-availability.html">Open Sarah Calendar</a><a class="action-btn" href="field-dashboard.html">Open Service Dashboard</a></div>
+            </div>
+            <div class="staff-card">
+              <div class="staff-head"><div><strong>Mike Daniels</strong><span>Field Technician</span></div><div class="tag orange">On Job</div></div>
+              <div class="tag-row"><span class="tag blue">2 Jobs Today</span><span class="tag orange">1 Pending</span><span class="tag">Urgent Capable</span></div>
+              <div class="stats">
+                <div class="stat"><h3>Availability</h3><p>9:00 AM - 6:00 PM</p></div>
+                <div class="stat"><h3>Accepted</h3><p>2 / 2</p></div>
+                <div class="stat"><h3>Completion</h3><p>0 / 2</p></div>
+              </div>
+              <div class="tag-row"><a class="action-btn" href="mike-availability.html">Open Mike Calendar</a><a class="action-btn" href="field-dashboard.html">Open Service Dashboard</a></div>
+            </div>
+            <div class="staff-card">
+              <div class="staff-head"><div><strong>Alex Carter</strong><span>Estimator</span></div><div class="tag green">Available</div></div>
+              <div class="tag-row"><span class="tag blue">Sales / Quote</span><span class="tag green">1 Accepted</span></div>
+              <div class="stats">
+                <div class="stat"><h3>Availability</h3><p>10:00 AM - 4:00 PM</p></div>
+                <div class="stat"><h3>Accepted</h3><p>1 / 1</p></div>
+                <div class="stat"><h3>Completion</h3><p>0 / 1</p></div>
+              </div>
+              <div class="tag-row"><a class="action-btn" href="sales-availability.html">Open Alex Calendar</a><a class="action-btn" href="sales-dashboard.html">Open Sales Dashboard</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title"><h2>Staff Action Queue</h2><span>Needs follow-up</span></div>
+          <div class="queue">
+            <div class="queue-item"><strong>Mike Daniels needs to confirm completion</strong><p>The 10:30 AM drain cleaning job is still marked open even though the visit appears finished.</p><div class="tag-row"><span class="tag orange">Awaiting Completion</span></div></div>
+            <div class="queue-item"><strong>One urgent assignment still unaccepted</strong><p>A same-day dispatch request is still waiting for technician acknowledgment.</p><div class="tag-row"><span class="tag orange">Awaiting Acceptance</span></div></div>
+            <div class="queue-item"><strong>Availability change submitted</strong><p>Sarah Kim updated tomorrow’s hours, and the owner can review the new availability pattern in settings.</p><div class="tag-row"><span class="tag blue">Availability Update</span></div></div>
+          </div>
+        </div>
+      </section>
+      <section class="card">
+        <div class="section-title"><h2>Role Dashboard Views</h2><span>Non-owner access</span></div>
+        <div class="queue">
+          <div class="queue-item"><strong>Service Worker / Provider Dashboard</strong><p>Personal calendar view with only assigned appointments, limited-time confirmation, past assignment history, and structured result entry for technicians, service workers, or medical providers.</p><div class="tag-row"><span class="tag blue">Service Role</span><a class="action-btn" href="field-dashboard.html">Open Service View</a></div></div>
+          <div class="queue-item"><strong>Sales Dashboard</strong><p>Personal calendar view with only assigned consultations, limited-time confirmation, past consultation history, and structured result entry in a sales-focused role view.</p><div class="tag-row"><span class="tag green">Sales Role</span><a class="action-btn" href="sales-dashboard.html">Open Sales View</a></div></div>
+          <div class="queue-item"><strong>Manager Access</strong><p>An owner-appointed manager can work from the same full dashboard view when they need owner-level operational visibility and control.</p><div class="tag-row"><span class="tag orange">Manager Role</span><a class="action-btn" href="new-president-dashboard.html">Open Manager View</a></div></div>
+        </div>
+      </section>
+    </main>
+  </div></div></div>
+  <script src="ai-assistant.js"></script>
+</body>
+</html>

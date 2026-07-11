@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX Automation Levels</title>
+  <style>
+    :root {
+      --text: #edf4fc;
+      --muted: #9db0c5;
+      --line: rgba(255,255,255,0.08);
+      --blue: #78c7ff;
+      --gold: #f0be62;
+      --green: #53de9f;
+      --violet: #c49dff;
+      --red: #ff7a7a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(196,157,255,0.10), transparent 24%),
+        radial-gradient(circle at top left, rgba(120,199,255,0.08), transparent 28%),
+        linear-gradient(180deg, #07111c 0%, #04080f 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: radial-gradient(circle at center, black 48%, transparent 94%);
+      opacity: 0.14;
+      pointer-events: none;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1420px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 26px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: grid;
+      gap: 12px;
+      padding: 8px 0 14px;
+      background:
+        linear-gradient(180deg, rgba(5, 11, 18, 0.98), rgba(5, 11, 18, 0.84) 78%, rgba(5, 11, 18, 0));
+      backdrop-filter: blur(12px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 15px;
+      border-radius: 999px;
+      border: 1px solid rgba(196,157,255,0.22);
+      background: rgba(196,157,255,0.08);
+      color: #d7c0ff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      gap: 8px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(196,157,255,0.08), transparent 22%),
+        linear-gradient(180deg, rgba(10, 19, 31, 0.98), rgba(6, 11, 18, 0.99));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2.5vw, 2.35rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 980px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .summary-bar {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .summary-card,
+    .legend-card,
+    .module-card,
+    .compare-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.025);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .summary-card {
+      padding: 16px 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .summary-kicker,
+    .legend-card strong,
+    .module-name,
+    .compare-card strong {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .summary-title {
+      font-size: 23px;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+
+    .summary-copy {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .legend-card {
+      padding: 16px 18px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .legend-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .level-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .modules {
+      display: grid;
+      gap: 10px;
+    }
+
+    .module-card {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .module-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .module-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .level-rail {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .level-cell {
+      min-height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #95aac0;
+      position: relative;
+    }
+
+    .level-cell.active-a { color: #b8f5d0; border-color: rgba(83,222,159,0.28); background: rgba(83,222,159,0.10); }
+    .level-cell.active-b { color: #f7dd9f; border-color: rgba(242,197,107,0.28); background: rgba(242,197,107,0.10); }
+    .level-cell.active-c { color: #d8c1ff; border-color: rgba(196,157,255,0.28); background: rgba(196,157,255,0.10); }
+    .level-cell.active-x { color: #ffc4c4; border-color: rgba(255,122,122,0.28); background: rgba(255,122,122,0.10); }
+
+    .active-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: #dce8f5;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .compare-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .compare-card {
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .compare-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .compare-pill {
+      min-height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      display: grid;
+      place-items: center;
+      color: #dce8f5;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .compare-pill.a { border-color: rgba(83,222,159,0.22); color: #b8f5d0; }
+    .compare-pill.b { border-color: rgba(242,197,107,0.22); color: #f7dd9f; }
+    .compare-pill.c { border-color: rgba(196,157,255,0.22); color: #dcc6ff; }
+    .compare-pill.x { border-color: rgba(255,122,122,0.22); color: #ffc4c4; }
+
+    @media (max-width: 980px) {
+      .summary-bar,
+      .level-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .wrap {
+        width: min(100%, calc(100% - 16px));
+        padding-top: 10px;
+      }
+
+      .hero {
+        padding: 16px;
+        border-radius: 22px;
+      }
+
+      .compare-row,
+      .level-rail {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <span class="badge">Compare Automation Levels</span>
+    </div>
+
+    <section class="hero">
+      <h1>Match each business function to the right automation level.</h1>
+      <p>
+        AI-ABCX is not a one-size-fits-all package. Each function can operate at a different level depending on workflow depth, staffing, coordination needs, and how much automation the company is ready to activate.
+      </p>
+
+      <div class="summary-bar">
+        <div class="summary-card">
+          <div class="summary-kicker">Current Company Configuration</div>
+          <div class="summary-title">Mixed-level automation with selective upgrades.</div>
+          <div class="summary-copy">Call handling can stay at A while Marketing moves to B and Scheduling moves to C. When higher coordination is needed, dependent modules can be upgraded together.</div>
+        </div>
+        <div class="legend-card">
+          <strong>Level Meaning</strong>
+          <div class="legend-list">
+            <div class="legend-item"><span>A • Foundational</span><span class="active-chip">Entry Level</span></div>
+            <div class="legend-item"><span>B • Coordinated</span><span class="active-chip">Upcharge</span></div>
+            <div class="legend-item"><span>C • Advanced</span><span class="active-chip">Higher Upcharge</span></div>
+            <div class="legend-item"><span>X • Projected</span><span class="active-chip">Future State</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-grid">
+        <div class="modules">
+          <div class="module-card">
+            <div class="module-head">
+              <div class="module-name">Call Handling</div>
+              <span class="active-chip">Current Level A</span>
+            </div>
+            <div class="module-copy">Basic intake, capture, and President visibility without deeper workflow automation.</div>
+            <div class="level-rail">
+              <div class="level-cell active-a">A</div>
+              <div class="level-cell">B</div>
+              <div class="level-cell">C</div>
+              <div class="level-cell">X</div>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-head">
+              <div class="module-name">Marketing</div>
+              <span class="active-chip">Current Level B</span>
+            </div>
+            <div class="module-copy">Campaign coordination, source visibility, and stronger lead feedback without full cross-company autonomy.</div>
+            <div class="level-rail">
+              <div class="level-cell">A</div>
+              <div class="level-cell active-b">B</div>
+              <div class="level-cell">C</div>
+              <div class="level-cell">X</div>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-head">
+              <div class="module-name">Scheduling</div>
+              <span class="active-chip">Current Level C</span>
+            </div>
+            <div class="module-copy">Advanced routing, confirmation, and operational timing visibility across connected workflow lanes.</div>
+            <div class="level-rail">
+              <div class="level-cell">A</div>
+              <div class="level-cell">B</div>
+              <div class="level-cell active-c">C</div>
+              <div class="level-cell">X</div>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-head">
+              <div class="module-name">Executive Reporting</div>
+              <span class="active-chip">Current Level B</span>
+            </div>
+            <div class="module-copy">Clear executive summaries, stronger cross-module visibility, and higher President control over next actions.</div>
+            <div class="level-rail">
+              <div class="level-cell">A</div>
+              <div class="level-cell active-b">B</div>
+              <div class="level-cell">C</div>
+              <div class="level-cell">X</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="compare-stack">
+          <div class="compare-card">
+            <strong>Automation Depth</strong>
+            <div class="compare-row">
+              <div class="compare-pill a">Basic</div>
+              <div class="compare-pill b">Coordinated</div>
+              <div class="compare-pill c">Deep</div>
+              <div class="compare-pill x">Projected</div>
+            </div>
+            <p>A starts with structure. B connects workflows. C adds deeper execution. X represents future-state full corporate automation.</p>
+          </div>
+
+          <div class="compare-card">
+            <strong>Upgrade Logic</strong>
+            <p>Some modules can move independently. Others require linked upgrades when more shared workflow truth is needed across the system.</p>
+          </div>
+
+          <div class="compare-card">
+            <strong>Pricing Logic</strong>
+            <p>Each higher level adds capability and increases cost. Mixed-level configurations make it possible to grow naturally instead of paying for more automation than the company is ready to use.</p>
+          </div>
+
+          <div class="compare-card">
+            <strong>Recommended Pattern</strong>
+            <p>Start with the level that matches real operational readiness, then upgrade specific functions as complexity, staffing, and coordination needs expand.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

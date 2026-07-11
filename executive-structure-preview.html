@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX Executive Structure</title>
+  <style>
+    :root {
+      --text: #edf4fc;
+      --muted: #9db0c5;
+      --line: rgba(255,255,255,0.08);
+      --blue: #78c7ff;
+      --gold: #f0be62;
+      --green: #53de9f;
+      --violet: #c49dff;
+      --pink: #ff8ad7;
+      --teal: #57d7d0;
+      --red: #ff7a7a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(120,199,255,0.08), transparent 24%),
+        radial-gradient(circle at top left, rgba(240,190,98,0.08), transparent 28%),
+        linear-gradient(180deg, #07111c 0%, #04080f 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: radial-gradient(circle at center, black 48%, transparent 94%);
+      opacity: 0.14;
+      pointer-events: none;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1460px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 26px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: grid;
+      gap: 12px;
+      padding: 8px 0 14px;
+      background:
+        linear-gradient(180deg, rgba(5,11,18,0.98), rgba(5,11,18,0.84) 78%, rgba(5,11,18,0));
+      backdrop-filter: blur(12px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 15px;
+      border-radius: 999px;
+      border: 1px solid rgba(120,199,255,0.22);
+      background: rgba(120,199,255,0.08);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      gap: 8px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(120,199,255,0.08), transparent 22%),
+        linear-gradient(180deg, rgba(10,19,31,0.98), rgba(6,11,18,0.99));
+      box-shadow: 0 24px 70px rgba(0,0,0,0.34);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2.5vw, 2.35rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 980px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .board {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255,255,255,0.025);
+      padding: 18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .president {
+      display: grid;
+      place-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .president-node {
+      min-width: 210px;
+      min-height: 72px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(240,190,98,0.28);
+      background: rgba(240,190,98,0.08);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(240,190,98,0.10);
+    }
+
+    .node-code {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .node-title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .node-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .connector-line {
+      width: 2px;
+      height: 34px;
+      background: linear-gradient(180deg, rgba(240,190,98,0.48), rgba(120,199,255,0.18));
+      margin: 0 auto;
+    }
+
+    .exec-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .exec-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      min-height: 188px;
+    }
+
+    .exec-card.featured {
+      border-color: rgba(120,199,255,0.24);
+      background:
+        radial-gradient(circle at top right, rgba(120,199,255,0.08), transparent 36%),
+        rgba(255,255,255,0.04);
+      box-shadow: 0 0 34px rgba(120,199,255,0.08);
+    }
+
+    .exec-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .exec-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #dce8f5;
+    }
+
+    .exec-name {
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .exec-role {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      min-height: 36px;
+    }
+
+    .director-list {
+      display: grid;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .director {
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 11px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.025);
+      display: flex;
+      align-items: center;
+      color: #dce8f5;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .lane-panel {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+    }
+
+    .panel-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.025);
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .panel-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .panel-card h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .lane-flow {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .flow-step {
+      min-height: 42px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      color: #dce8f5;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 1120px) {
+      .exec-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .lane-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .wrap {
+        width: min(100%, calc(100% - 16px));
+        padding-top: 10px;
+      }
+
+      .hero {
+        padding: 16px;
+        border-radius: 22px;
+      }
+
+      .exec-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <span class="badge">Explore Executive Structure</span>
+    </div>
+
+    <section class="hero">
+      <h1>One President, visible Executive Officers, and connected Managing Directors.</h1>
+      <p>
+        AI-ABCX organizes the business like a real corporate structure. The President stays in control while Executive Officers govern the main operating lanes and Managing Directors activate under them where more execution visibility is needed.
+      </p>
+
+      <div class="board">
+        <div class="president">
+          <div class="president-node">
+            <div class="node-code">President</div>
+            <div class="node-title">Corporate Control</div>
+            <div class="node-subtitle">Approves direction, reviews reports, and governs the company from one top-level command point.</div>
+          </div>
+          <div class="connector-line"></div>
+        </div>
+
+        <div class="exec-grid">
+          <div class="exec-card">
+            <div class="exec-head">
+              <span class="exec-pill">Executive Officer</span>
+              <span class="exec-pill">Strategy</span>
+            </div>
+            <div class="exec-name">CEO</div>
+            <div class="exec-role">Executive synthesis, strategic alignment, reporting discipline, and President summary.</div>
+            <div class="director-list">
+              <div class="director">Strategy Director</div>
+              <div class="director">Executive Reporting Director</div>
+              <div class="director">Accountability Director</div>
+            </div>
+          </div>
+
+          <div class="exec-card featured">
+            <div class="exec-head">
+              <span class="exec-pill">Executive Officer</span>
+              <span class="exec-pill">Operations</span>
+            </div>
+            <div class="exec-name">COO</div>
+            <div class="exec-role">Operations, scheduling, service movement, timing visibility, and daily execution truth.</div>
+            <div class="director-list">
+              <div class="director">Scheduling Director</div>
+              <div class="director">Service Director</div>
+              <div class="director">Dispatch Director</div>
+            </div>
+          </div>
+
+          <div class="exec-card">
+            <div class="exec-head">
+              <span class="exec-pill">Executive Officer</span>
+              <span class="exec-pill">Revenue</span>
+            </div>
+            <div class="exec-name">CRO</div>
+            <div class="exec-role">Revenue flow, qualification, sales control, follow-up movement, and commercial opportunity visibility.</div>
+            <div class="director-list">
+              <div class="director">Sales Director</div>
+              <div class="director">Follow-Up Director</div>
+              <div class="director">Reactivation Director</div>
+            </div>
+          </div>
+
+          <div class="exec-card">
+            <div class="exec-head">
+              <span class="exec-pill">Executive Officer</span>
+              <span class="exec-pill">Finance</span>
+            </div>
+            <div class="exec-name">CFO</div>
+            <div class="exec-role">Financial truth, cost visibility, collection awareness, and money accountability.</div>
+            <div class="director-list">
+              <div class="director">Billing Director</div>
+              <div class="director">Collections Director</div>
+              <div class="director">Revenue Truth Director</div>
+            </div>
+          </div>
+
+          <div class="exec-card">
+            <div class="exec-head">
+              <span class="exec-pill">Executive Officer</span>
+              <span class="exec-pill">Marketing</span>
+            </div>
+            <div class="exec-name">CMO</div>
+            <div class="exec-role">Marketing, advertising, lead generation, and growth communications across active channels.</div>
+            <div class="director-list">
+              <div class="director">Advertising Director</div>
+              <div class="director">Campaign Director</div>
+              <div class="director">Lead Source Director</div>
+            </div>
+          </div>
+
+          <div class="exec-card">
+            <div class="exec-head">
+              <span class="exec-pill">Executive Officer</span>
+              <span class="exec-pill">Service</span>
+            </div>
+            <div class="exec-name">CSO</div>
+            <div class="exec-role">Customer success, service continuity, and experience visibility when workflows require stronger client-facing structure.</div>
+            <div class="director-list">
+              <div class="director">Customer Service Director</div>
+              <div class="director">Retention Director</div>
+              <div class="director">Experience Director</div>
+            </div>
+          </div>
+
+          <div class="exec-card">
+            <div class="exec-head">
+              <span class="exec-pill">Executive Officer</span>
+              <span class="exec-pill">People</span>
+            </div>
+            <div class="exec-name">CHRO</div>
+            <div class="exec-role">People structure, team development, staffing visibility, and human accountability over time.</div>
+            <div class="director-list">
+              <div class="director">Recruiting Director</div>
+              <div class="director">Training Director</div>
+              <div class="director">Staff Accountability Director</div>
+            </div>
+          </div>
+
+          <div class="exec-card">
+            <div class="exec-head">
+              <span class="exec-pill">Executive Officer</span>
+              <span class="exec-pill">Governance</span>
+            </div>
+            <div class="exec-name">CAO</div>
+            <div class="exec-role">Governance, compliance, administrative order, and operational discipline across the structure.</div>
+            <div class="director-list">
+              <div class="director">Compliance Director</div>
+              <div class="director">Administrative Director</div>
+              <div class="director">Policy Director</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lane-panel">
+          <div class="panel-card">
+            <strong>Highlighted Lane</strong>
+            <h3>COO → Scheduling Director → Service Director</h3>
+            <p>This lane shows how one Executive Officer can activate related Managing Directors when the business needs more execution control, timing visibility, and service coordination.</p>
+            <div class="lane-flow">
+              <div class="flow-step">COO governs operational truth and service movement.</div>
+              <div class="flow-step">Scheduling Director controls timing, appointment flow, and route logic.</div>
+              <div class="flow-step">Service Director oversees field execution and completion quality.</div>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <strong>Growth Logic</strong>
+            <p>Not every company starts with every Director active. AI-ABCX can begin with the Executive Officers and only activate the Directors the company actually needs, then add more structure as complexity grows.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

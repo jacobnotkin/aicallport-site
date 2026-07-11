@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX | Service Dashboard</title>
+  <meta name="description" content="AI-ABCX Stage B service dashboard with personal availability, routed jobs, confirmation timing, history, and structured completion entry." />
+  <style>
+    :root{--text-primary:#f7fbff;--text-secondary:#c9d7e6;--text-muted:#8d9db1;--blue:#4ea5ff;--blue-soft:#7fd4ff;--orange:#ff8a3d;--orange-soft:#ffb36b;--green:#69d39c;--red:#ff6e7f;--border-soft:rgba(255,255,255,.06)}
+    *{box-sizing:border-box} html,body{margin:0;height:100%}
+    body{color:var(--text-primary);font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;background:radial-gradient(circle at top left, rgba(78,165,255,.18), transparent 30%),radial-gradient(circle at top right, rgba(255,138,61,.10), transparent 26%),linear-gradient(180deg,#09131f 0%,#07111a 100%);overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 22%, rgba(78,165,255,.06), transparent 28%),radial-gradient(circle at 82% 78%, rgba(255,138,61,.06), transparent 32%);z-index:0}
+    .grid-bg{position:fixed;inset:0;pointer-events:none;opacity:.08;background:linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at center, black 42%, transparent 96%);z-index:0}
+    .page{position:relative;z-index:1;min-height:100vh;padding:18px;display:flex;justify-content:center}
+    .shell{width:min(1480px, calc(100vw - 36px));min-height:calc(100vh - 36px);border-radius:30px;border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);overflow:hidden;position:relative}
+    .shell::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px circle at 50% 0%, rgba(255,138,61,.05), transparent 56%),radial-gradient(520px circle at 10% 8%, rgba(78,165,255,.05), transparent 52%);z-index:0}
+    .layout{position:relative;z-index:1;display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 36px);min-height:calc(100vh - 36px)}
+    .sidebar{border-right:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));padding:20px 16px 18px;display:flex;flex-direction:column;gap:20px;min-height:0;overflow:auto}
+    .brand{display:flex;align-items:center;gap:12px;padding:6px 8px}.logo-wrap{width:80px;height:80px;display:flex;align-items:center;justify-content:center}.logo{width:70px;height:70px;object-fit:contain}.brand-wordmark{display:flex;gap:6px;align-items:flex-end;line-height:1;flex-wrap:wrap}.brand-ai,.brand-callport{font-size:14px;font-weight:900;text-transform:uppercase;color:transparent;-webkit-background-clip:text;background-clip:text}.brand-ai{background-image:linear-gradient(180deg,var(--blue-soft),var(--blue))}.brand-callport{background-image:linear-gradient(180deg,#ffbf2f,var(--orange))}
+    .beta-badge,.nav-count,.chip,.tag,.view-btn,.result-btn{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .beta-badge{min-height:22px;padding:0 9px;border:1px solid rgba(255,138,61,.24);background:rgba(255,138,61,.10);color:#fff}
+    .profile-card,.card{border-radius:24px;border:1px solid var(--border-soft);background:linear-gradient(180deg, rgba(127,212,255,.05), rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.03);padding:18px}
+    .profile-card strong{display:block;font-size:18px;line-height:1.2}.profile-card span{display:block;margin-top:8px;color:var(--blue-soft);font-size:13px;line-height:1.5;font-weight:700}
+    .nav{display:grid;gap:8px}.nav-link{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:16px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);padding:13px 14px;color:#dbe6f1;text-decoration:none;font-size:13px;font-weight:700}.nav-link.active{border-color:rgba(127,212,255,.24);background:rgba(127,212,255,.10);color:#fff}.nav-count{min-width:26px;height:22px;padding:0 7px;background:rgba(255,255,255,.06);color:#fff}
+    .sidebar-foot{margin-top:auto;border-radius:20px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:16px}.sidebar-foot strong{display:block;font-size:13px;line-height:1.3;text-transform:uppercase}.sidebar-foot p{margin:8px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.55;font-weight:600}
+    .main{padding:18px;display:grid;gap:16px;align-content:start;min-height:0;overflow:auto}
+    .topbar{position:sticky;top:0;z-index:4;border-radius:24px;border:1px solid var(--border-soft);background:rgba(8,11,18,.90);backdrop-filter:blur(14px);display:grid;grid-template-columns:1fr auto;gap:18px;padding:16px 18px}
+    .topbar-left h1{margin:0;font-size:34px;font-weight:850;letter-spacing:-.05em}.topbar-left p{margin:10px 0 0;color:var(--blue-soft);font-size:14px;font-weight:700;line-height:1.5}.topbar-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .chip,.action-btn,.view-btn,.result-btn{min-height:40px;padding:0 14px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#eef6ff;font-size:11px;font-weight:900;letter-spacing:.10em;line-height:1;text-transform:uppercase;text-decoration:none;white-space:nowrap;cursor:pointer}
+    .action-btn.primary,.view-btn.active{border:none;background:linear-gradient(135deg,var(--orange),var(--orange-soft));color:#fff}
+    .summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .label{color:var(--text-muted);font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.value{margin-top:10px;font-size:32px;line-height:1;font-weight:900;letter-spacing:-.05em}.meta{margin-top:8px;color:var(--text-secondary);font-size:13px;line-height:1.45;font-weight:600}
+    .split{display:grid;grid-template-columns:1.15fr .85fr;gap:12px}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.section-title h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}.section-title span{color:var(--text-muted);font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    .view-switch,.result-row,.tag-row,.option-row{display:flex;gap:8px;flex-wrap:wrap}
+    .route-board{display:grid;gap:14px}
+    .route-group{display:grid;gap:10px}
+    .route-group-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .route-group-head strong{font-size:13px;letter-spacing:.18em;color:var(--text-secondary)}
+    .route-group-head span{font-size:12px;color:var(--text-secondary);text-transform:uppercase}
+    .route-list{display:grid;gap:10px}
+    .route-item{border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);padding:14px;cursor:pointer;color:inherit}
+    .route-item.active{border-color:rgba(127,212,255,.24);background:rgba(127,212,255,.08)}
+    .route-item strong{display:block;font-size:14px;font-weight:800;line-height:1.45;color:#c7d0e0}
+    .route-item p{margin:6px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}
+    .flow-panel{border-radius:24px;border:1px solid rgba(127,212,255,.16);background:linear-gradient(180deg, rgba(127,212,255,.06), rgba(255,255,255,.02));padding:18px}
+    .flow-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}.flow-head h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}.flow-head p{margin:8px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}
+    .flow-steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:16px}
+    .flow-step{border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);padding:14px}
+    .flow-step strong{display:block;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .flow-step span{display:block;margin-top:8px;color:var(--text-secondary);font-size:12px;line-height:1.45;font-weight:700}
+    .flow-step.complete{border-color:rgba(105,211,156,.24);background:rgba(105,211,156,.12)}
+    .flow-step.active{border-color:rgba(255,138,61,.24);background:rgba(255,138,61,.12)}
+    .flow-step.pending{border-color:rgba(127,212,255,.20);background:rgba(127,212,255,.08)}
+    .job-ref{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:0 10px;border-radius:999px;border:1px solid rgba(127,212,255,.24);background:rgba(127,212,255,.10);color:#9bdcff;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .result-status{min-height:20px;margin-top:10px;color:var(--blue-soft);font-size:12px;font-weight:800;letter-spacing:.04em}
+    .calendar-head{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-bottom:8px}.day-head{padding:10px 8px;border-radius:14px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);text-align:center}.day-head strong{display:block;font-size:13px;font-weight:800}.day-head span{display:block;margin-top:4px;color:var(--text-muted);font-size:11px;font-weight:700}
+    .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}.day-card{min-height:220px;border-radius:20px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);padding:12px;display:grid;align-content:start;gap:8px}.day-card.today{border-color:rgba(127,212,255,.24);background:rgba(127,212,255,.08)}.day-card.clickable{cursor:pointer;transition:border-color .18s ease, transform .18s ease}.day-card.clickable:hover{border-color:rgba(127,212,255,.24);transform:translateY(-1px)}
+    .slot{border-radius:14px;padding:10px;border:1px solid rgba(255,255,255,.06);font-size:12px;line-height:1.4;font-weight:700}.slot.booked{background:rgba(127,212,255,.12);border-color:rgba(127,212,255,.24);color:#bdeaff}.slot.available{background:rgba(105,211,156,.12);border-color:rgba(105,211,156,.24);color:#c9f5d9}.slot.blocked{background:rgba(255,138,61,.12);border-color:rgba(255,138,61,.24);color:#ffd2ab}.slot.unavailable{background:rgba(255,110,127,.12);border-color:rgba(255,110,127,.24);color:#ffd0d7}
+    .list{display:grid;gap:10px}.item{border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);padding:14px;color:inherit}.item strong{display:block;font-size:14px;font-weight:800;line-height:1.45;color:#c7d0e0}.item p{margin:6px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}
+    .tag{min-height:24px;padding:0 8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#eef6ff}.tag.green{border-color:rgba(105,211,156,.24);background:rgba(105,211,156,.12);color:#bdf1d1}.tag.orange{border-color:rgba(255,138,61,.24);background:rgba(255,138,61,.12);color:#ffc48e}.tag.blue{border-color:rgba(127,212,255,.24);background:rgba(127,212,255,.10);color:#9bdcff}.tag.red{border-color:rgba(255,110,127,.24);background:rgba(255,110,127,.12);color:#ffd0d7}
+    .result-btn.selected{background:rgba(127,212,255,.10);border-color:rgba(127,212,255,.24);color:#9bdcff}
+    .result-btn.disabled,.action-btn.disabled{opacity:.42;cursor:not-allowed}
+    .action-btn.disabled{pointer-events:none}
+    .modal-overlay{position:fixed;inset:0;background:rgba(4,8,14,.74);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:24px;z-index:20}.modal-overlay:target{display:flex}
+    .modal-card{width:min(820px, calc(100vw - 32px));border-radius:28px;border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg, rgba(13,18,28,.98), rgba(8,12,19,.98));box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);padding:22px;display:grid;gap:16px}
+    .modal-head{display:flex;align-items:start;justify-content:space-between;gap:16px}.modal-head h2{margin:0;font-size:28px;font-weight:850;letter-spacing:-.05em}.modal-head p{margin:8px 0 0;color:var(--blue-soft);font-size:14px;font-weight:700;line-height:1.5}
+    .modal-close{min-width:42px;height:42px;border-radius:14px;border:1px solid rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.03);color:#eef6ff;text-decoration:none;font-size:18px;font-weight:800}
+    .editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.editor-card{border-radius:20px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);padding:16px}.editor-card h3{margin:0;font-size:15px;font-weight:800}.editor-card p{margin:8px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}
+    .time-list{display:grid;gap:10px;margin-top:12px}.window-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+    .field-box{border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);padding:12px}.field-box strong{display:block;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--blue-soft)}.field-box span{display:block;margin-top:8px;font-size:14px;font-weight:800;color:#fff}
+    .form-input{width:100%;min-height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#eef6ff;padding:0 12px;font:700 14px/1 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
+    .option-pill{min-height:34px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+    .option-pill.active-blue{background:rgba(127,212,255,.10);border-color:rgba(127,212,255,.24);color:#9bdcff}.option-pill.active-green{background:rgba(105,211,156,.12);border-color:rgba(105,211,156,.24);color:#c9f5d9}.option-pill.active-red{background:rgba(255,110,127,.12);border-color:rgba(255,110,127,.24);color:#ffd0d7}
+    .window-remove{min-width:42px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,110,127,.12);color:#ffd0d7;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;cursor:pointer}
+    .helper-text,.modal-note{color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}.modal-actions{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .editor-status{min-height:20px;color:var(--blue-soft);font-size:12px;font-weight:800;letter-spacing:.04em}
+    .editor-status.error{color:#ffd0d7}
+    .editor-status.success{color:#c9f5d9}
+    @media (max-width:1280px){.summary-grid,.split,.editor-grid{grid-template-columns:1fr}.calendar-head,.calendar-grid,.flow-steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media (max-width:980px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid rgba(255,255,255,.06)}.flow-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:760px){.page{padding:10px}.shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}.layout{min-height:calc(100vh - 20px)}.topbar,.modal-actions,.window-row{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr 1fr}.calendar-head,.calendar-grid,.flow-steps{grid-template-columns:1fr 1fr}.day-card{min-height:180px}}
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="page"><div class="shell"><div class="layout">
+    <aside class="sidebar">
+      <div class="brand"><div class="logo-wrap"><img src="public/assets/images/ai-abcx-logo-icon-tight-transparent.png" class="logo" alt="AI-ABCX Logo" /></div><div><div class="brand-wordmark"><span class="brand-ai">AI-ABCX</span></div><div class="beta-badge" id="serviceStageBadge">Stage B Service</div></div></div>
+      <div class="profile-card"><strong>Sarah Kim</strong><span id="serviceProfileText">Personal service dashboard for assigned jobs, confirmation timing, calendar control, and structured completion entry.</span></div>
+      <nav class="nav">
+        <a class="nav-link active" href="#calendar"><span>My Calendar</span><span class="nav-count" id="serviceNavCalendarCount">7</span></a>
+        <a class="nav-link" href="#upcoming"><span>Upcoming</span><span class="nav-count" id="serviceNavUpcomingCount">3</span></a>
+        <a class="nav-link" href="#history"><span>Past Assignments</span><span class="nav-count" id="serviceNavHistoryCount">12</span></a>
+        <a class="nav-link" href="#results"><span>Result Entry</span><span class="nav-count" id="serviceNavResultCount">1</span></a>
+      </nav>
+      <div class="sidebar-foot"><strong>Personal Access Only</strong><p id="serviceSidebarFoot">This role sees only personal assignments, confirmation timing, appointment history, and structured completion choices for routed jobs.</p></div>
+    </aside>
+    <main class="main">
+      <section class="topbar"><div class="topbar-left"><h1 id="serviceDashboardTitle">Sarah Kim Service Dashboard</h1><p id="serviceDashboardSub">AI-ABCX Stage B routes service jobs to available workers, requires timed confirmation, and records structured completion under a system-issued job number.</p></div><div class="topbar-right"><div class="chip" id="serviceAssignedChip">3 Assigned</div><div class="chip" id="serviceJobChip">Job #240422-031</div><button class="action-btn" id="serviceConfirmAction" type="button">Confirm Assignment</button><button class="action-btn" id="serviceCustomerConfirmAction" type="button">Customer Confirmed</button><button class="action-btn" id="serviceRerouteAction" type="button">Mark Timed Out</button><a class="action-btn" id="serviceAvailabilityLink" href="#availability-editor">Edit Availability</a><a class="action-btn" id="servicePresidentLink" href="#">President View</a><a class="action-btn primary" id="serviceEnterResultLink" href="#results">Enter Result</a></div></section>
+      <section class="summary-grid">
+        <div class="card"><div class="label">Assigned Today</div><div class="value" id="serviceSummaryAssignedValue">3</div><div class="meta" id="serviceSummaryAssignedMeta">Only Sarah’s appointments are shown here</div></div>
+        <div class="card"><div class="label">Awaiting Confirm</div><div class="value" id="serviceSummaryAwaitingValue">1</div><div class="meta" id="serviceSummaryAwaitingMeta">If not confirmed, it routes to another worker</div></div>
+        <div class="card"><div class="label">Past Assignments</div><div class="value" id="serviceSummaryPastValue">12</div><div class="meta" id="serviceSummaryPastMeta">Full personal history remains visible</div></div>
+        <div class="card"><div class="label">Open Result Entry</div><div class="value" id="serviceSummaryResultValue">1</div><div class="meta" id="serviceSummaryResultMeta">Latest appointment still needs outcome</div></div>
+      </section>
+      <section class="flow-panel">
+        <div class="flow-head">
+          <div>
+            <h2 id="serviceFlowTitle">Stage B Job Flow</h2>
+            <p id="serviceFlowSub">Service uses the automated scheduling engine. The worker confirms, the customer confirms, the visit happens, and the completion outcome is tied to one job record.</p>
+          </div>
+          <span class="job-ref" id="serviceFlowJobRef">Job #240422-031</span>
+        </div>
+        <div class="flow-steps" id="serviceFlowSteps">
+          <div class="flow-step complete"><strong>Provisional</strong><span>Customer requested a time with the AI agent.</span></div>
+          <div class="flow-step complete"><strong>Assigned</strong><span>Routed to Sarah from availability.</span></div>
+          <div class="flow-step active"><strong>Worker Confirm</strong><span>Needs timed acceptance by 8:15 PM.</span></div>
+          <div class="flow-step pending"><strong>Customer Confirm</strong><span>SMS confirmation follows worker acceptance.</span></div>
+          <div class="flow-step pending"><strong>Visit</strong><span>Service is completed, rescheduled, or escalated.</span></div>
+          <div class="flow-step pending"><strong>President Review</strong><span>President records payment and sees next-step direction.</span></div>
+        </div>
+      </section>
+      <section class="split">
+        <div class="card">
+          <div class="section-title"><h2>Assigned Work Board</h2><span id="serviceRouteBoardLabel">Personal queue</span></div>
+          <div class="route-board" id="serviceRouteList"></div>
+        </div>
+        <div class="card">
+          <div class="section-title"><h2>Role Visibility Rule</h2><span>Personal visibility</span></div>
+          <div class="list" id="serviceRouteInsightList">
+            <div class="item"><strong>Only personal work stays visible</strong><p>This role should move between Sarah's own routed jobs without exposing everyone else's queue or availability.</p></div>
+            <div class="item"><strong>Selection should stay inside one surface</strong><p>Switching between assigned jobs should not depend on manually editing URLs. The personal board should carry the worker across the day.</p></div>
+          </div>
+        </div>
+      </section>
+      <section class="card" id="calendar">
+        <div class="section-title"><h2>Personal Calendar</h2><span>Day / week / month / year</span></div>
+        <div class="view-switch">
+          <span class="view-btn">Day</span>
+          <span class="view-btn active">Week</span>
+          <span class="view-btn">Month</span>
+          <span class="view-btn">Year</span>
+        </div>
+        <div class="section-title" style="margin-top:16px;"><h2>Week of Apr 19 - Apr 25</h2><span>Only assigned time</span></div>
+        <div class="calendar-grid" id="service-calendar-grid"></div>
+      </section>
+      <section class="split" id="upcoming">
+        <div class="card">
+          <div class="section-title"><h2>Upcoming Jobs</h2><span>Confirmation required</span></div>
+          <div class="list" id="serviceUpcomingList">
+            <div class="item">
+              <strong id="serviceUpcomingPrimaryTitle">Leak inspection for Sarah Jones</strong>
+              <p id="serviceUpcomingPrimaryText">Assigned for today at 3:00 PM. This appointment must be confirmed within <strong>18 minutes</strong> or it will route to another available service worker.</p>
+              <div class="tag-row"><span class="tag orange" id="serviceUpcomingPrimaryBadge">Confirm by 8:15 PM</span><span class="tag blue">Reroute if missed</span><span class="tag" id="serviceUpcomingPrimaryJob">Job #240422-031</span></div>
+            </div>
+            <div class="item">
+              <strong id="servicePendingTitle">Drain cleaning for Maria Lopez</strong>
+              <p id="servicePendingText">Urgent same-day visit completed, but the structured completion outcome still needs to be submitted before the job closes.</p>
+              <div class="tag-row"><span class="tag red">Urgent</span><span class="tag orange">Outcome Pending</span><span class="tag blue" id="servicePendingJob">Job #240422-024</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title"><h2>Confirmation Rules</h2><span>Automatic routing</span></div>
+          <div class="list">
+            <div class="item"><strong>Limited time to confirm</strong><p>New assignments should stay pending only for a short time window. If the worker does not confirm in time, the system should route the request to another available person.</p></div>
+            <div class="item"><strong>No shared queues</strong><p>The worker should not browse everyone else’s availability. The only visible assignments are the ones already routed to this personal calendar.</p></div>
+            <div class="item"><strong>Next open slot stays visible</strong><p>Even with booked work on the calendar, the next available window should remain visible for future routing decisions.</p></div>
+          </div>
+        </div>
+      </section>
+      <section class="split" id="history">
+        <div class="card">
+          <div class="section-title"><h2>Past Assignments</h2><span>Personal history</span></div>
+          <div class="list" id="serviceHistoryList"></div>
+        </div>
+        <div class="card" id="results">
+          <div class="section-title"><h2>Job Result Entry</h2><span>Multiple choice only</span></div>
+          <div class="list">
+            <div class="item">
+              <strong id="serviceResultTitle">Drain cleaning for Maria Lopez</strong>
+              <p id="serviceResultText">Select the visit outcome for <strong>Job #240422-024</strong> so the system can close or route the next step correctly.</p>
+              <div class="result-row" style="margin-top:10px;">
+                <span class="result-btn selected" data-result-value="service_completed">Service Completed</span>
+                <span class="result-btn" data-result-value="sold_and_completed">Sold And Completed</span>
+                <span class="result-btn" data-result-value="follow_up_needed">Follow-Up Needed</span>
+                <span class="result-btn" data-result-value="rescheduled">Rescheduled</span>
+                <span class="result-btn" data-result-value="canceled">Canceled</span>
+                <span class="result-btn" data-result-value="no_show">No Show</span>
+              </div>
+              <div class="result-status" id="service-result-status">Current outcome: Service Completed</div>
+            </div>
+            <div class="item"><strong>Structured results keep the record clean</strong><p>The worker should not need to write open-ended notes first. A multiple choice outcome decides whether the job closed, completed on site, needs follow-up, or returns to scheduling.</p></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div></div></div>
+  <section class="modal-overlay" id="availability-editor">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2>Edit Availability</h2>
+          <p>Select a date, choose available or unavailable status, and set exact time windows around booked appointments.</p>
+        </div>
+        <a class="modal-close" href="#">×</a>
+      </div>
+      <div class="editor-grid">
+        <div class="editor-card">
+          <h3>Selected Date</h3>
+          <p id="service-editor-summary">Apr 20 is open for editing. Existing appointments on other dates stay visible and protected from overlap.</p>
+          <div class="editor-grid">
+            <label class="field-box"><strong>Date</strong><input class="form-input" id="service-date-input" type="date" value="2026-04-20" /></label>
+            <div class="field-box"><strong>Current Status</strong><span id="service-current-status">Split Availability</span></div>
+          </div>
+          <div class="option-row" id="service-status-options">
+            <button class="option-pill" data-status="availableAllDay" type="button">Available All Day</button>
+            <button class="option-pill" data-status="splitAvailability" type="button">Split Availability</button>
+            <button class="option-pill" data-status="unavailableAllDay" type="button">Unavailable All Day</button>
+          </div>
+        </div>
+        <div class="editor-card">
+          <h3>Booked Appointment Protection</h3>
+          <p>Booked visits stay on the calendar, and the editor shows the next available slot after those appointments.</p>
+          <div class="editor-grid">
+            <div class="field-box"><strong>Booked Visits</strong><span id="service-booked-summary">1:00 PM - 2:00 PM</span></div>
+            <div class="field-box"><strong>Next Open Slot</strong><span id="service-next-open">2:30 PM - 5:00 PM</span></div>
+            <div class="field-box"><strong>Route Readiness</strong><span id="service-route-readiness">Route Ready</span></div>
+          </div>
+          <div class="option-row"><span class="tag blue">No overlap allowed</span><span class="tag orange">Travel / training block</span></div>
+        </div>
+      </div>
+      <div class="editor-grid">
+        <div class="editor-card">
+          <h3>Available Windows</h3>
+          <div class="time-list" id="service-available-list"></div>
+          <div class="helper-text">Use exact start and end times for each available window.</div>
+          <div class="option-row"><button class="action-btn" id="service-add-available" type="button">Add Time Window</button></div>
+        </div>
+        <div class="editor-card">
+          <h3>Blocked Windows</h3>
+          <div class="time-list" id="service-blocked-list"></div>
+          <div class="helper-text">Use blocked windows for travel, lunch, meetings, training, or time off.</div>
+          <div class="option-row"><button class="action-btn" id="service-add-blocked" type="button">Add Blocked Window</button></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <div>
+          <div class="modal-note">The worker opens a date, edits time windows, and saves personal availability without seeing anyone else’s calendar.</div>
+          <div class="editor-status" id="service-editor-status">Choose a date and save changes to update the calendar.</div>
+        </div>
+        <button class="action-btn primary" id="service-save-availability" type="button">Save Availability</button>
+      </div>
+    </div>
+  </section>
+  <script src="ai-abc-stage-config.js"></script>
+  <script src="ai-abc-config.js?v=20260618a"></script>
+  <script src="ai-abcx-job-records.js?v=20260615d"></script>
+  <script>
+    (function () {
+      const stageConfig = window.AIABCStageConfig || null;
+      const appConfig = window.AIABCConfig || null;
+      const jobRecords = window.AIABCXJobRecords;
+      const storageKey = "ai-call-port-service-calendar";
+      const resultStorageKey = "ai-abcx-service-result-selection";
+      const params = new URLSearchParams(window.location.search);
+      const companyConfig = appConfig && typeof appConfig.companyConfigFromSearchParams === "function"
+        ? appConfig.companyConfigFromSearchParams(params)
+        : null;
+      const requestedJob = params.get("job");
+      const requestedStage = params.get("stage");
+      const currentStage = stageConfig && typeof stageConfig.normalizeStage === "function"
+        ? stageConfig.normalizeStage(requestedStage, stageConfig.getCurrentStage ? stageConfig.getCurrentStage() : "A")
+        : (["A", "B", "C"].includes(requestedStage) ? requestedStage : "A");
+      const workerDashboardActive = currentStage !== "A";
+      const businessDescriptor = companyConfig && companyConfig.viewModel
+        ? (companyConfig.viewModel.serviceDescriptor || companyConfig.viewModel.industry || "Service")
+        : "Service";
+      const businessDescriptorLower = String(businessDescriptor).toLowerCase();
+      const serviceTerms = (() => {
+        const normalized = businessDescriptorLower;
+        const terms = {
+          stageLabel: `Stage ${currentStage} ${businessDescriptor}`,
+          visitWord: "visit",
+          visitsWord: "visits",
+          workerRole: "service worker",
+          workerRolePlural: "service workers",
+          outcomeLabel: `${businessDescriptorLower} outcome`
+        };
+        if (normalized.includes("plumb")) {
+          terms.visitWord = "plumbing visit";
+          terms.visitsWord = "plumbing visits";
+          terms.workerRole = "plumber";
+          terms.workerRolePlural = "plumbers";
+          terms.outcomeLabel = "work order outcome";
+        } else if (normalized.includes("hvac") || normalized.includes("heating") || normalized.includes("cooling")) {
+          terms.visitWord = "service call";
+          terms.visitsWord = "service calls";
+          terms.workerRole = "HVAC technician";
+          terms.workerRolePlural = "HVAC technicians";
+          terms.outcomeLabel = "service-call outcome";
+        } else if (normalized.includes("electric")) {
+          terms.visitWord = "electrical visit";
+          terms.visitsWord = "electrical visits";
+          terms.workerRole = "electrician";
+          terms.workerRolePlural = "electricians";
+          terms.outcomeLabel = "electrical job outcome";
+        }
+        return terms;
+      })();
+      const weekDates = ["2026-04-19","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-25"];
+      const dayLabels = {
+        "2026-04-19": { day: "Sun", short: "Apr 19", full: "Apr 19, 2026", today: true },
+        "2026-04-20": { day: "Mon", short: "Apr 20", full: "Apr 20, 2026" },
+        "2026-04-21": { day: "Tue", short: "Apr 21", full: "Apr 21, 2026" },
+        "2026-04-22": { day: "Wed", short: "Apr 22", full: "Apr 22, 2026" },
+        "2026-04-23": { day: "Thu", short: "Apr 23", full: "Apr 23, 2026" },
+        "2026-04-24": { day: "Fri", short: "Apr 24", full: "Apr 24, 2026" },
+        "2026-04-25": { day: "Sat", short: "Apr 25", full: "Apr 25, 2026" }
+      };
+      const defaults = {
+        "2026-04-19": { status: "splitAvailability", available: [{ start: "12:30", end: "14:00" }], blocked: [], booked: [{ start: "09:00", end: "10:00", label: "Water heater inspection" }, { start: "10:30", end: "11:30", label: "Drain cleaning" }, { start: "15:00", end: "16:00", label: "Leak inspection" }] },
+        "2026-04-20": { status: "splitAvailability", available: [{ start: "08:00", end: "11:30" }, { start: "14:00", end: "17:30" }], blocked: [{ start: "11:30", end: "14:00" }], booked: [] },
+        "2026-04-21": { status: "unavailableAllDay", available: [], blocked: [], booked: [] },
+        "2026-04-22": { status: "splitAvailability", available: [{ start: "14:30", end: "17:00" }], blocked: [], booked: [{ start: "13:00", end: "14:00", label: "Provider visit" }] },
+        "2026-04-23": { status: "availableAllDay", available: [{ start: "09:00", end: "16:00" }], blocked: [], booked: [] },
+        "2026-04-24": { status: "availableAllDay", available: [{ start: "08:00", end: "15:00" }], blocked: [], booked: [] },
+        "2026-04-25": { status: "unavailableAllDay", available: [], blocked: [], booked: [] }
+      };
+      const state = JSON.parse(localStorage.getItem(storageKey) || JSON.stringify(defaults));
+      let selectedDate = "2026-04-20";
+
+      const calendarGrid = document.getElementById("service-calendar-grid");
+      const dateInput = document.getElementById("service-date-input");
+      const statusText = document.getElementById("service-current-status");
+      const summaryText = document.getElementById("service-editor-summary");
+      const bookedSummary = document.getElementById("service-booked-summary");
+      const nextOpen = document.getElementById("service-next-open");
+      const routeReadiness = document.getElementById("service-route-readiness");
+      const availableList = document.getElementById("service-available-list");
+      const blockedList = document.getElementById("service-blocked-list");
+      const statusOptions = document.getElementById("service-status-options");
+      const editorStatus = document.getElementById("service-editor-status");
+      const resultButtons = Array.from(document.querySelectorAll(".result-btn[data-result-value]"));
+      const resultStatus = document.getElementById("service-result-status");
+      const serviceDashboardTitle = document.getElementById("serviceDashboardTitle");
+      const serviceDashboardSub = document.getElementById("serviceDashboardSub");
+      const serviceProfileText = document.getElementById("serviceProfileText");
+      const serviceSidebarFoot = document.getElementById("serviceSidebarFoot");
+      const serviceAssignedChip = document.getElementById("serviceAssignedChip");
+      const serviceJobChip = document.getElementById("serviceJobChip");
+      const serviceSummaryAssignedValue = document.getElementById("serviceSummaryAssignedValue");
+      const serviceSummaryAssignedMeta = document.getElementById("serviceSummaryAssignedMeta");
+      const serviceSummaryAwaitingValue = document.getElementById("serviceSummaryAwaitingValue");
+      const serviceSummaryAwaitingMeta = document.getElementById("serviceSummaryAwaitingMeta");
+      const serviceSummaryPastValue = document.getElementById("serviceSummaryPastValue");
+      const serviceSummaryPastMeta = document.getElementById("serviceSummaryPastMeta");
+      const serviceSummaryResultValue = document.getElementById("serviceSummaryResultValue");
+      const serviceSummaryResultMeta = document.getElementById("serviceSummaryResultMeta");
+      const serviceNavCalendarCount = document.getElementById("serviceNavCalendarCount");
+      const serviceNavUpcomingCount = document.getElementById("serviceNavUpcomingCount");
+      const serviceNavHistoryCount = document.getElementById("serviceNavHistoryCount");
+      const serviceNavResultCount = document.getElementById("serviceNavResultCount");
+      const serviceFlowTitle = document.getElementById("serviceFlowTitle");
+      const serviceFlowSub = document.getElementById("serviceFlowSub");
+      const serviceFlowJobRef = document.getElementById("serviceFlowJobRef");
+      const serviceFlowSteps = document.getElementById("serviceFlowSteps");
+      const serviceUpcomingPrimaryTitle = document.getElementById("serviceUpcomingPrimaryTitle");
+      const serviceUpcomingPrimaryText = document.getElementById("serviceUpcomingPrimaryText");
+      const serviceUpcomingPrimaryBadge = document.getElementById("serviceUpcomingPrimaryBadge");
+      const serviceUpcomingPrimaryJob = document.getElementById("serviceUpcomingPrimaryJob");
+      const serviceUpcomingList = document.getElementById("serviceUpcomingList");
+      const servicePendingTitle = document.getElementById("servicePendingTitle");
+      const servicePendingText = document.getElementById("servicePendingText");
+      const servicePendingJob = document.getElementById("servicePendingJob");
+      const serviceHistoryList = document.getElementById("serviceHistoryList");
+      const serviceResultTitle = document.getElementById("serviceResultTitle");
+      const serviceResultText = document.getElementById("serviceResultText");
+      const serviceConfirmAction = document.getElementById("serviceConfirmAction");
+      const serviceCustomerConfirmAction = document.getElementById("serviceCustomerConfirmAction");
+      const serviceRerouteAction = document.getElementById("serviceRerouteAction");
+      const serviceStageBadge = document.getElementById("serviceStageBadge");
+      const serviceAvailabilityLink = document.getElementById("serviceAvailabilityLink");
+      const servicePresidentLink = document.getElementById("servicePresidentLink");
+      const serviceEnterResultLink = document.getElementById("serviceEnterResultLink");
+      const serviceRouteList = document.getElementById("serviceRouteList");
+      const serviceRouteBoardLabel = document.getElementById("serviceRouteBoardLabel");
+      let selectedWorkerJobId = requestedJob || "";
+      let selectedResult = requestedJob ? "" : (localStorage.getItem(resultStorageKey) || "service_completed");
+      let resultEntryLockedMessage = "";
+      let workerConfirmLockedMessage = "";
+      let customerConfirmLockedMessage = "";
+      let rerouteLockedMessage = "";
+
+      function applyServiceBusinessCopy() {
+        serviceStageBadge.textContent = serviceTerms.stageLabel;
+        if (serviceProfileText) {
+          serviceProfileText.textContent = `Personal ${businessDescriptorLower} dashboard for assigned jobs, confirmation timing, calendar control, and structured completion entry.`;
+        }
+        if (serviceSidebarFoot) {
+          serviceSidebarFoot.textContent = `This role sees only personal ${businessDescriptorLower} assignments, confirmation timing, appointment history, and structured completion choices for routed jobs.`;
+        }
+      }
+
+      function readJobRecordsState() {
+        return jobRecords.readState().records || [];
+      }
+
+      function getServiceRecords() {
+        return readJobRecordsState().filter(isServiceRecord);
+      }
+
+      function getSelectedRecord() {
+        const serviceRecords = getServiceRecords();
+        if (!serviceRecords.length) return null;
+        return serviceRecords.find((record) => record.id === selectedWorkerJobId) || serviceRecords[0] || null;
+      }
+
+      function getSelectedJobId() {
+        const selectedRecord = getSelectedRecord();
+        return selectedRecord ? selectedRecord.id : null;
+      }
+
+      function getSelectedRouteDate() {
+        const record = getSelectedRecord();
+        return record && record.routeDate ? record.routeDate : null;
+      }
+
+      function buildFollowUpParam(record) {
+        if (!record) return "";
+        const stageRecord = jobRecords.ensureStageRecord(record, currentStage);
+        return stageRecord.status === "follow_up_needed" && stageRecord.followUpReason
+          ? stageRecord.followUpReason
+          : "";
+      }
+
+      function syncSelectedJobUrl(jobId) {
+        if (!jobId || !window.history || !window.history.replaceState) return;
+        const nextParams = new URLSearchParams(window.location.search);
+        nextParams.set("job", jobId);
+        nextParams.set("stage", currentStage);
+        const record = getServiceRecords().find((item) => item.id === jobId) || null;
+        const followUpReason = buildFollowUpParam(record);
+        if (followUpReason) {
+          nextParams.set("followup", followUpReason);
+        } else {
+          nextParams.delete("followup");
+        }
+        const nextUrl = `${window.location.pathname}?${nextParams.toString()}`;
+        window.history.replaceState({}, "", nextUrl);
+      }
+
+      function writeJobRecordsState(records) {
+        const selectedJobId = getSelectedJobId();
+        try {
+          jobRecords.writeState(records, selectedJobId || (records[0] && records[0].id) || null);
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function titleWords(value) {
+        return jobRecords.titleWords(value);
+      }
+
+      function formatJobRef(record) {
+        return jobRecords.formatJobRef(record);
+      }
+
+      function buildPresidentRoute(extraParams) {
+        const nextParams = new URLSearchParams(window.location.search);
+        nextParams.set("stage", currentStage);
+        nextParams.set("source", "field-dashboard");
+        Object.entries(extraParams || {}).forEach(([key, value]) => {
+          if (value === null || value === undefined || value === "") {
+            nextParams.delete(key);
+            return;
+          }
+          nextParams.set(key, value);
+        });
+        const search = nextParams.toString();
+        return search ? `new-president-dashboard.html?${search}` : "new-president-dashboard.html";
+      }
+
+      function buildPresidentHref(record) {
+        if (!record) {
+          return buildPresidentRoute({ job: null, followup: null });
+        }
+        const followUpReason = buildFollowUpParam(record);
+        return buildPresidentRoute({
+          job: record.id,
+          followup: followUpReason || null
+        });
+      }
+
+      function isServiceRecord(record) {
+        return Boolean(record && ["service", "sales_and_service"].includes(record.appointmentType) && record.assignedRep === "Sarah Kim");
+      }
+
+      function summarizeServiceRecords() {
+        const summary = {
+          assigned: 0,
+          awaitingConfirm: 0,
+          past: 0,
+          openResult: 0
+        };
+        if (!workerDashboardActive) return summary;
+        getServiceRecords().forEach((record) => {
+          if (!isServiceRecord(record)) return;
+          summary.assigned += 1;
+          const stageRecord = jobRecords.ensureStageRecord(record, currentStage);
+          if (stageRecord.status === "awaiting_worker_confirmation") {
+            summary.awaitingConfirm += 1;
+          }
+          if (["completed", "follow_up_needed", "canceled", "no_show"].includes(stageRecord.status)) {
+            summary.past += 1;
+          }
+          if (jobRecords.canWorkerEnterOutcome(stageRecord)) {
+            summary.openResult += 1;
+          }
+        });
+        return summary;
+      }
+
+      function applyServiceSummary() {
+        const summary = summarizeServiceRecords();
+        serviceStageBadge.textContent = serviceTerms.stageLabel;
+        serviceAssignedChip.textContent = workerDashboardActive ? `${summary.assigned} Assigned` : "Stage A Locked";
+        serviceSummaryAssignedValue.textContent = String(summary.assigned);
+        serviceSummaryAssignedMeta.textContent = workerDashboardActive
+          ? `Only Sarah's shared-record ${serviceTerms.visitsWord} are shown here`
+          : `${serviceTerms.workerRole.charAt(0).toUpperCase()}${serviceTerms.workerRole.slice(1)} routing is not active in Stage A`;
+        serviceSummaryAwaitingValue.textContent = String(summary.awaitingConfirm);
+        serviceSummaryAwaitingMeta.textContent = workerDashboardActive
+          ? "Awaiting worker confirmation on Sarah's route"
+          : "Manual president scheduling stays outside this dashboard";
+        serviceSummaryPastValue.textContent = String(summary.past);
+        serviceSummaryPastMeta.textContent = workerDashboardActive
+          ? `Closed or follow-up ${businessDescriptorLower} records remain visible`
+          : `Past ${businessDescriptorLower} outcomes remain recorded by the President`;
+        serviceSummaryResultValue.textContent = String(summary.openResult);
+        serviceSummaryResultMeta.textContent = workerDashboardActive
+          ? `Shared records currently unlocked for ${serviceTerms.outcomeLabel} entry`
+          : `${businessDescriptor} result entry opens only after Stage B activation`;
+        serviceNavCalendarCount.textContent = String(weekDates.length);
+        serviceNavUpcomingCount.textContent = String(workerDashboardActive ? Math.max(summary.assigned - summary.past, 0) : 0);
+        serviceNavHistoryCount.textContent = String(summary.past);
+        serviceNavResultCount.textContent = String(summary.openResult);
+      }
+
+      function renderRouteBoard() {
+        const records = getServiceRecords();
+        if (!records.length) {
+          serviceRouteBoardLabel.textContent = "No assignments";
+          serviceRouteList.innerHTML = `<div class="item"><strong>No shared ${businessDescriptorLower} records found</strong><p>This personal dashboard will show Sarah's routed work once records are assigned into the shared queue.</p></div>`;
+          return;
+        }
+        const groups = [
+          {
+            key: "confirmation",
+            label: workerDashboardActive ? "Needs Confirmation" : "Stage A Structure",
+            filter: (stageRecord) => ["awaiting_worker_confirmation", "awaiting_customer_confirmation", "rerouted", "awaiting_manual_confirmation", "provisional"].includes(stageRecord.status)
+          },
+          {
+            key: "today",
+            label: "Ready / Today",
+            filter: (stageRecord) => ["confirmed", "in_progress"].includes(stageRecord.status)
+          },
+          {
+            key: "followup",
+            label: "Follow-Up Queue",
+            filter: (stageRecord) => stageRecord.status === "follow_up_needed"
+          },
+          {
+            key: "closed",
+            label: "Closed History",
+            filter: (stageRecord) => ["completed", "canceled", "no_show"].includes(stageRecord.status)
+          }
+        ];
+        serviceRouteBoardLabel.textContent = workerDashboardActive ? `${records.length} routed ${serviceTerms.visitsWord} grouped by status` : "Stage A structure";
+        const sections = groups.map((group) => {
+          const groupRecords = records.filter((record) => group.filter(jobRecords.ensureStageRecord(record, currentStage)));
+          if (!groupRecords.length) return "";
+          return `
+            <div class="route-group">
+              <div class="route-group-head"><strong>${group.label}</strong><span>${groupRecords.length} job${groupRecords.length === 1 ? "" : "s"}</span></div>
+              <div class="route-list">
+                ${groupRecords.map((record) => {
+                  const stageRecord = jobRecords.ensureStageRecord(record, currentStage);
+                  return `
+                    <button type="button" class="route-item${record.id === getSelectedJobId() ? " active" : ""}" data-route-job="${record.id}">
+                      <strong>${record.customerName}</strong>
+                      <p>${formatJobRef(record)} • ${record.confirmedTime || record.requestedTime || "Time pending"} • ${jobRecords.titleWords(stageRecord.status)}</p>
+                      <div class="tag-row"><span class="tag ${stageRecord.status === "confirmed" ? "green" : stageRecord.status === "awaiting_customer_confirmation" || stageRecord.status === "awaiting_worker_confirmation" ? "orange" : "blue"}">${jobRecords.titleWords(stageRecord.status)}</span><span class="tag blue">${jobRecords.getOutcomeLabel(stageRecord.outcome)}</span></div>
+                    </button>`;
+                }).join("")}
+              </div>
+            </div>`;
+        }).filter(Boolean);
+        serviceRouteList.innerHTML = sections.join("");
+        serviceRouteList.querySelectorAll("[data-route-job]").forEach((button) => {
+          button.addEventListener("click", () => {
+            selectedWorkerJobId = button.dataset.routeJob;
+            selectedDate = getSelectedRouteDate() || selectedDate;
+            selectedResult = "";
+            syncSelectedJobUrl(selectedWorkerJobId);
+            applyJobContext();
+            renderCalendar();
+            renderEditor();
+          });
+        });
+      }
+
+      function renderServiceSupplementalLists() {
+        if (!workerDashboardActive) {
+          serviceHistoryList.innerHTML = `<div class="item"><strong>Stage A keeps service dashboards inactive</strong><p>The President still sees the shared job number and outcome path, but service workers are not confirming appointments or entering completion results inside AI-ABCX until Stage B goes live.</p></div>`;
+          serviceUpcomingList.innerHTML = `
+            <div class="item">
+              <strong>Manual dispatch stays outside the worker screen</strong>
+              <p>The AI agent can collect the preferred appointment time in Stage A, but the President and representative complete confirmation manually before the outcome is recorded back on the shared job record.</p>
+              <div class="tag-row"><span class="tag orange">Stage A Manual</span><span class="tag blue">Stage B Activates Worker Routing</span></div>
+            </div>`;
+          return;
+        }
+        const selectedJobId = getSelectedJobId();
+        const records = getServiceRecords().filter((record) => record.id !== selectedJobId);
+        const upcoming = [];
+        const history = [];
+        records.forEach((record) => {
+          const stageRecord = jobRecords.ensureStageRecord(record, currentStage);
+          const itemHtml = `
+            <div class="item">
+              <strong>${jobRecords.titleWords(record.appointmentType).replace("And", "&")} visit for ${record.customerName}</strong>
+              <p>${record.confirmedTime || record.requestedTime || "Time pending"}. ${stageRecord.activity && stageRecord.activity.length ? stageRecord.activity[stageRecord.activity.length - 1].text : "Shared record remains visible on this personal route."}</p>
+              <div class="tag-row"><span class="tag ${stageRecord.status === "confirmed" ? "green" : stageRecord.status === "awaiting_customer_confirmation" || stageRecord.status === "awaiting_worker_confirmation" ? "orange" : "red"}">${jobRecords.titleWords(stageRecord.status)}</span><span class="tag blue">${formatJobRef(record)}</span></div>
+            </div>`;
+          if (["completed", "follow_up_needed", "canceled", "no_show"].includes(stageRecord.status)) {
+            history.push(itemHtml);
+          } else {
+            upcoming.push(itemHtml);
+          }
+        });
+        serviceHistoryList.innerHTML = history.length ? history.join("") : `<div class="item"><strong>No past shared service records yet</strong><p>Closed and follow-up service outcomes will appear here as the worker history grows.</p></div>`;
+        const pendingItem = servicePendingTitle.closest(".item").outerHTML;
+        const primaryItem = serviceUpcomingPrimaryTitle.closest(".item").outerHTML;
+        serviceUpcomingList.innerHTML = primaryItem + (upcoming.length ? upcoming.join("") : "") + pendingItem;
+      }
+
+      function buildServiceFlowState(shared) {
+        if (!workerDashboardActive) {
+          return {
+            title: "Stage A Manual Service Flow",
+            sub: `${shared.jobRef} is visible for President oversight, but ${businessDescriptorLower} routing, worker confirmation, customer confirmation, and worker completion entry stay inactive until Stage B.`,
+            steps: [
+              { label: "Intake", note: "The AI agent captures the customer request and creates one job number.", state: "complete" },
+              { label: "President Review", note: "The President reviews the request and chooses the next manual step.", state: "active" },
+              { label: "Worker Contact", note: "The field worker is contacted outside the system in Stage A.", state: "pending" },
+              { label: "Manual Confirm", note: "Appointment time is confirmed manually, then recorded by the President.", state: "pending" },
+              { label: "Outcome Entry", note: `The President records the ${serviceTerms.outcomeLabel} against the same job number.`, state: "pending" },
+              { label: "Stage B Upgrade", note: "Worker routing and automated confirmations activate in Stage B.", state: "pending" }
+            ]
+          };
+        }
+        const status = shared.statusValue;
+        const steps = [
+          { label: "Provisional", note: "Customer requested a time with the AI agent.", state: "complete" },
+          { label: "Assigned", note: `Routed to Sarah from availability for ${shared.jobRef}.`, state: "complete" },
+          { label: "Worker Confirm", note: "Assigned worker must confirm inside the timing window.", state: "pending" },
+          { label: "Customer Confirm", note: "SMS confirmation follows worker acceptance.", state: "pending" },
+          { label: "Visit", note: `${businessDescriptor} work is completed, rescheduled, or escalated.`, state: "pending" },
+          { label: "President Review", note: "President records payment and sees next-step direction.", state: "pending" }
+        ];
+        if (status === "awaiting_worker_assignment") {
+          steps[1].state = "active";
+          steps[1].note = "The engine is still matching the service-capable worker.";
+        } else if (status === "awaiting_worker_confirmation") {
+          steps[2].state = "active";
+        } else if (status === "awaiting_customer_confirmation") {
+          steps[2].state = "complete";
+          steps[3].state = "active";
+        } else if (status === "confirmed" || status === "in_progress") {
+          steps[2].state = "complete";
+          steps[3].state = "complete";
+          steps[4].state = "active";
+        } else if (["completed", "follow_up_needed", "canceled", "no_show"].includes(status)) {
+          steps[2].state = "complete";
+          steps[3].state = "complete";
+          steps[4].state = "complete";
+          steps[5].state = "active";
+        } else if (status === "rerouted") {
+          steps[2].state = "active";
+          steps[2].note = "Confirmation window expired and the job moved into reroute handling.";
+          steps[3].note = "Customer confirmation cannot start until the next worker accepts.";
+        }
+        return {
+          title: "Stage B Job Flow",
+          sub: status === "rerouted"
+            ? `Service automation is rerouting ${shared.jobRef}. The original worker missed confirmation, so the job is waiting for the next available service-capable person.`
+            : `${shared.jobRef} is moving through worker confirmation, customer confirmation, visit execution, and one structured service outcome.`,
+          steps
+        };
+      }
+
+      function writeSharedServiceOutcome(outcomeValue) {
+        const selectedJobId = getSelectedJobId();
+        if (!selectedJobId) return false;
+        const records = readJobRecordsState();
+        const updated = jobRecords.writeWorkerOutcome({
+          records,
+          jobId: selectedJobId,
+          stage: currentStage,
+          outcomeValue,
+          workerLabel: "Sarah Kim",
+          workerRole: "service"
+        });
+        if (!updated) return false;
+        return writeJobRecordsState(records);
+      }
+
+      function writeSharedServiceConfirmation() {
+        const selectedJobId = getSelectedJobId();
+        if (!selectedJobId) return false;
+        const records = readJobRecordsState();
+        const updated = jobRecords.writeWorkerConfirmation({
+          records,
+          jobId: selectedJobId,
+          stage: currentStage,
+          workerLabel: "Sarah Kim",
+          workerRole: "service"
+        });
+        if (!updated) return false;
+        return writeJobRecordsState(records);
+      }
+
+      function writeSharedServiceCustomerConfirmation() {
+        const selectedJobId = getSelectedJobId();
+        if (!selectedJobId) return false;
+        const records = readJobRecordsState();
+        const updated = jobRecords.writeCustomerConfirmation({
+          records,
+          jobId: selectedJobId,
+          stage: currentStage
+        });
+        if (!updated) return false;
+        return writeJobRecordsState(records);
+      }
+
+      function writeSharedServiceReroute() {
+        const selectedJobId = getSelectedJobId();
+        if (!selectedJobId) return false;
+        const records = readJobRecordsState();
+        const updated = jobRecords.writeWorkerReroute({
+          records,
+          jobId: selectedJobId,
+          stage: currentStage,
+          workerLabel: "Sarah Kim",
+          workerRole: "service"
+        });
+        if (!updated) return false;
+        return writeJobRecordsState(records);
+      }
+
+      function buildServiceJobContext(record) {
+        const shared = jobRecords.buildWorkerJobContext({
+          record,
+          stage: currentStage,
+          role: "service",
+          dashboardTitle: "Sarah Kim Service Dashboard",
+          ownerLabel: "service"
+        });
+        if (!shared) return null;
+        if (!workerDashboardActive) {
+          return {
+            title: "Sarah Kim Service Dashboard",
+            sub: `AI-ABCX Stage A keeps the ${businessDescriptorLower} worker surface visible for future structure, but the President still owns confirmation timing, scheduling changes, and completion entry for ${shared.jobRef}.`,
+            assignedChip: "Stage A Locked",
+            jobChip: shared.jobRef,
+            flowJob: shared.jobRef,
+            upcomingTitle: `${shared.appointmentDisplay} request for ${shared.customer}`,
+            upcomingText: `${shared.timeLabel}. The AI agent can capture the preferred time, but Sarah does not confirm or work this appointment inside the system until Stage B.`,
+            upcomingBadge: "Stage A Manual",
+            upcomingJob: shared.jobRef,
+            pendingTitle: `President-owned outcome path for ${shared.customer}`,
+            pendingText: `${shared.jobRef} stays on one shared record, but the President records manual confirmation, completion outcome, and revenue in Stage A.`,
+            pendingJob: shared.jobRef,
+            resultTitle: `${shared.customer} ${serviceTerms.outcomeLabel}`,
+            resultHtml: `Outcome entry is locked for <strong>${shared.jobRef}</strong>. Stage A keeps worker ${businessDescriptorLower} dashboards visible for structure only while the President records the actual result.`,
+            result: shared.outcomeValue,
+            canEnterOutcome: false,
+            outcomeGateMessage: "Stage A keeps worker service result entry inactive. The President records the outcome on the shared job record.",
+            canConfirmAssignment: false,
+            confirmLabel: "Stage A Manual",
+            canConfirmCustomer: false,
+            customerConfirmLabel: "President Confirms",
+            canRerouteAssignment: false,
+            rerouteLabel: "Reroute Inactive"
+          };
+        }
+        const confirmLabel = shared.statusValue === "rerouted"
+          ? "Assignment Closed"
+          : (jobRecords.canWorkerConfirm(record && record.stages && record.stages[currentStage]) ? "Confirm Assignment" : "Assignment Confirmed");
+        const customerConfirmLabel = jobRecords.canCustomerConfirm(record && record.stages && record.stages[currentStage])
+          ? "Customer Confirmed"
+          : (shared.statusValue === "confirmed" ? "Customer Confirmed" : "Customer Locked");
+        const rerouteLabel = shared.statusValue === "rerouted"
+          ? "Rerouted"
+          : (jobRecords.canWorkerReroute(record && record.stages && record.stages[currentStage]) ? "Mark Timed Out" : "Reroute Locked");
+        return {
+          title: shared.title,
+          sub: shared.sub,
+          assignedChip: `${summarizeServiceRecords().assigned} Assigned`,
+          jobChip: shared.jobRef,
+          flowJob: shared.jobRef,
+          upcomingTitle: `${shared.appointmentDisplay} ${serviceTerms.visitWord} for ${shared.customer}`,
+          upcomingText: `${shared.timeLabel}. ${shared.latestActivity ? shared.latestActivity.text : "This service appointment stays attached to one shared job record from assignment through closeout."}`,
+          upcomingBadge: shared.primaryBadge,
+          upcomingJob: shared.jobRef,
+          pendingTitle: `${shared.outcomeLabel} path for ${shared.customer}`,
+          pendingText: shared.latestActivity ? `${shared.latestActivity.title}. ${shared.latestActivity.text}` : `Keep ${shared.jobRef} attached to one completion path so follow-up, payment truth, and President review stay on the same record.`,
+          pendingJob: shared.jobRef,
+          resultTitle: `${shared.customer} ${serviceTerms.outcomeLabel}`,
+          resultHtml: shared.canEnterOutcome
+            ? `Select the visit outcome for <strong>${shared.jobRef}</strong> so the system can preserve ${shared.statusLabel.toLowerCase()} and ${shared.outcomeLabel.toLowerCase()} truth on the shared record.`
+            : `Outcome entry is locked for <strong>${shared.jobRef}</strong>. ${shared.outcomeGateMessage}`,
+          result: shared.outcomeValue,
+          canEnterOutcome: shared.canEnterOutcome,
+          outcomeGateMessage: shared.outcomeGateMessage,
+          canConfirmAssignment: jobRecords.canWorkerConfirm(record && record.stages && record.stages[currentStage]),
+          confirmLabel,
+          canConfirmCustomer: jobRecords.canCustomerConfirm(record && record.stages && record.stages[currentStage]),
+          customerConfirmLabel,
+          canRerouteAssignment: jobRecords.canWorkerReroute(record && record.stages && record.stages[currentStage]),
+          rerouteLabel
+        };
+      }
+
+      function applyJobContext() {
+        applyServiceSummary();
+        const selectedRecord = getSelectedRecord();
+        const context = buildServiceJobContext(selectedRecord);
+        if (!context) return;
+        if (selectedRecord && selectedRecord.id) {
+          syncSelectedJobUrl(selectedRecord.id);
+        }
+        const assignmentFit = evaluateAssignmentFit(selectedRecord);
+        serviceDashboardTitle.textContent = context.title;
+        serviceDashboardSub.textContent = `${context.sub} ${assignmentFit.detail}`;
+        serviceAssignedChip.textContent = context.assignedChip;
+        serviceJobChip.textContent = context.jobChip;
+        serviceFlowJobRef.textContent = context.flowJob;
+        serviceUpcomingPrimaryTitle.textContent = context.upcomingTitle;
+        serviceUpcomingPrimaryText.innerHTML = context.upcomingText;
+        serviceUpcomingPrimaryBadge.textContent = context.upcomingBadge;
+        serviceUpcomingPrimaryJob.textContent = context.upcomingJob;
+        servicePendingTitle.textContent = context.pendingTitle;
+        servicePendingText.textContent = context.pendingText;
+        servicePendingJob.textContent = context.pendingJob;
+        serviceResultTitle.textContent = context.resultTitle;
+        serviceResultText.innerHTML = context.resultHtml;
+        renderServiceSupplementalLists();
+        const flow = buildServiceFlowState(jobRecords.buildWorkerJobContext({
+          record: selectedRecord,
+          stage: currentStage,
+          role: "service",
+          dashboardTitle: "Sarah Kim Service Dashboard",
+          ownerLabel: "service"
+        }));
+        serviceFlowTitle.textContent = flow.title;
+        serviceFlowSub.textContent = flow.sub;
+        serviceFlowSteps.innerHTML = flow.steps.map((step) => `<div class="flow-step ${step.state}"><strong>${step.label}</strong><span>${step.note}</span></div>`).join("");
+        if (getSelectedJobId()) localStorage.removeItem(resultStorageKey);
+        selectedResult = context.result;
+        resultEntryLockedMessage = context.canEnterOutcome ? "" : context.outcomeGateMessage;
+        workerConfirmLockedMessage = !workerDashboardActive
+          ? "Stage A keeps service worker confirmation inactive."
+          : (!assignmentFit.canConfirm && context.canConfirmAssignment
+          ? assignmentFit.detail
+          : (context.canConfirmAssignment ? "" : "Worker confirmation is already complete for this shared record."));
+        customerConfirmLockedMessage = !workerDashboardActive
+          ? "Stage A keeps customer confirmation inside President workflow."
+          : (context.canConfirmCustomer ? "" : "Customer confirmation is not waiting on this shared record.");
+        rerouteLockedMessage = !workerDashboardActive
+          ? "Stage A has no worker reroute flow."
+          : (context.canRerouteAssignment ? "" : "Reroute is only available while worker confirmation is still pending.");
+        serviceConfirmAction.textContent = !assignmentFit.canConfirm && context.canConfirmAssignment ? "Availability Mismatch" : context.confirmLabel;
+        serviceConfirmAction.disabled = !context.canConfirmAssignment || !assignmentFit.canConfirm;
+        serviceCustomerConfirmAction.textContent = context.customerConfirmLabel;
+        serviceCustomerConfirmAction.disabled = !context.canConfirmCustomer;
+        serviceRerouteAction.textContent = context.rerouteLabel;
+        serviceRerouteAction.disabled = !context.canRerouteAssignment;
+        serviceAvailabilityLink.classList.toggle("disabled", !workerDashboardActive);
+        serviceAvailabilityLink.href = workerDashboardActive ? "#availability-editor" : "#";
+        servicePresidentLink.href = buildPresidentHref(selectedRecord);
+        serviceEnterResultLink.classList.toggle("disabled", !workerDashboardActive);
+        serviceEnterResultLink.href = workerDashboardActive ? "#results" : "#";
+        renderRouteBoard();
+        renderResultSelection();
+      }
+
+      function formatResultLabel(value) {
+        return jobRecords.getOutcomeLabel(value);
+      }
+      function renderResultSelection() {
+        const supported = resultButtons.some((button) => button.dataset.resultValue === selectedResult);
+        resultButtons.forEach((button) => {
+          button.classList.toggle("selected", button.dataset.resultValue === selectedResult);
+          button.classList.toggle("disabled", Boolean(resultEntryLockedMessage));
+        });
+        if (resultEntryLockedMessage) {
+          resultStatus.textContent = resultEntryLockedMessage;
+          return;
+        }
+        resultStatus.textContent = supported
+          ? `Current outcome: ${formatResultLabel(selectedResult)}`
+          : `Current shared record outcome: ${formatResultLabel(selectedResult)}`;
+      }
+
+      function ensureDay(date) {
+        if (!state[date]) state[date] = { status: "splitAvailability", available: [], blocked: [], booked: [] };
+        return state[date];
+      }
+      function formatTime(value) {
+        if (!value) return "--";
+        const [hourString, minute] = value.split(":");
+        let hour = Number(hourString);
+        const suffix = hour >= 12 ? "PM" : "AM";
+        hour = hour % 12 || 12;
+        return `${hour}:${minute} ${suffix}`;
+      }
+      function formatRange(start, end) { return `${formatTime(start)} - ${formatTime(end)}`; }
+      function parseMeridiemTime(value) {
+        const match = String(value || "").match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+        if (!match) return null;
+        let hour = Number(match[1]);
+        const minute = Number(match[2]);
+        const suffix = match[3].toUpperCase();
+        if (suffix === "PM" && hour !== 12) hour += 12;
+        if (suffix === "AM" && hour === 12) hour = 0;
+        return (hour * 60) + minute;
+      }
+      function statusLabel(status) {
+        if (status === "availableAllDay") return "Available All Day";
+        if (status === "unavailableAllDay") return "Unavailable All Day";
+        return "Split Availability";
+      }
+      function setEditorMessage(message, type) {
+        editorStatus.textContent = message;
+        editorStatus.className = `editor-status${type ? ` ${type}` : ""}`;
+      }
+      function toMinutes(value) {
+        const [hourString, minuteString] = value.split(":");
+        return Number(hourString) * 60 + Number(minuteString);
+      }
+      function overlaps(a, b) {
+        return toMinutes(a.start) < toMinutes(b.end) && toMinutes(b.start) < toMinutes(a.end);
+      }
+      function collectValidation(day) {
+        const problems = [];
+        ["available", "blocked", "booked"].forEach((type) => {
+          day[type].forEach((slot, index) => {
+            if (!slot.start || !slot.end || toMinutes(slot.start) >= toMinutes(slot.end)) {
+              problems.push(`${type} window ${index + 1} needs a valid start and end time.`);
+            }
+          });
+        });
+        day.available.forEach((slot, index) => {
+          day.booked.forEach((booked) => {
+            if (overlaps(slot, booked)) problems.push(`available window ${index + 1} overlaps a booked visit.`);
+          });
+        });
+        day.blocked.forEach((slot, index) => {
+          day.booked.forEach((booked) => {
+            if (overlaps(slot, booked)) problems.push(`blocked window ${index + 1} overlaps a booked visit.`);
+          });
+        });
+        day.available.forEach((slot, index) => {
+          day.blocked.forEach((blocked) => {
+            if (overlaps(slot, blocked)) problems.push(`available window ${index + 1} overlaps a blocked window.`);
+          });
+        });
+        return problems;
+      }
+      function nextOpenLabel(day) {
+        if (day.status === "unavailableAllDay") return "Unavailable";
+        if (!day.available.length) return "No open slot";
+        const first = day.available[0];
+        return formatRange(first.start, first.end);
+      }
+      function getRouteReadiness(day) {
+        if (day.status === "unavailableAllDay") {
+          return { label: "Route Blocked", detail: "No service appointments should be routed into this day." };
+        }
+        if (!day.available.length) {
+          return { label: "No Open Capacity", detail: "There are no available service windows left for routing." };
+        }
+        if (day.booked.length >= 2 && day.available.length === 1) {
+          return { label: "Tight Capacity", detail: "Only one usable service window remains after booked visits." };
+        }
+        if (day.available.length >= 2) {
+          return { label: "Route Ready", detail: "Multiple service windows remain available on this day." };
+        }
+        return { label: "Open Capacity", detail: "This day can still accept routed service work." };
+      }
+      function evaluateAssignmentFit(record) {
+        if (!workerDashboardActive) return { label: "Stage A Manual", detail: "Stage A does not use worker availability routing.", fits: true, canConfirm: false };
+        if (!record) return { label: "No Route", detail: "No shared job is selected for route validation.", fits: true, canConfirm: true };
+        const routeDate = record.routeDate;
+        if (!routeDate) return { label: "Route Date Unmapped", detail: "This shared job is outside the current calendar mock week.", fits: true, canConfirm: true };
+        const routeStart = parseMeridiemTime(record.confirmedTime || record.requestedTime);
+        if (routeStart === null) return { label: "Manual Time Needed", detail: "The assignment has no exact confirmed time yet, so availability fit cannot be validated.", fits: false, canConfirm: false };
+        const routeEnd = routeStart + 60;
+        const day = ensureDay(routeDate);
+        if (day.status === "unavailableAllDay") {
+          return { label: "Route Blocked", detail: `Saved availability blocks ${record.customerName}'s route on ${routeDate}. Reroute should happen before worker confirmation.`, fits: false, canConfirm: false };
+        }
+        const fits = day.available.some((slot) => toMinutes(slot.start) <= routeStart && toMinutes(slot.end) >= routeEnd);
+        if (!fits) {
+          return { label: "Availability Mismatch", detail: `Saved availability does not cover ${record.customerName}'s confirmed route window. Reroute should happen before worker confirmation.`, fits: false, canConfirm: false };
+        }
+        return { label: "Route Fits Calendar", detail: `Saved availability covers the current routed visit on ${routeDate}.`, fits: true, canConfirm: true };
+      }
+      function persist() { localStorage.setItem(storageKey, JSON.stringify(state)); }
+      function renderWindowList(container, windows, type) {
+        container.innerHTML = "";
+        windows.forEach((windowItem, index) => {
+          const row = document.createElement("div");
+          row.className = "window-row";
+          row.innerHTML = `
+            <label class="field-box"><strong>Start</strong><input class="form-input" type="time" value="${windowItem.start}" data-type="${type}" data-index="${index}" data-field="start" /></label>
+            <label class="field-box"><strong>End</strong><input class="form-input" type="time" value="${windowItem.end}" data-type="${type}" data-index="${index}" data-field="end" /></label>
+            <button class="window-remove" type="button" data-remove="${type}" data-index="${index}">×</button>`;
+          container.appendChild(row);
+        });
+        if (!windows.length) {
+          const empty = document.createElement("div");
+          empty.className = "helper-text";
+          empty.textContent = type === "available" ? "No available windows added yet." : "No blocked windows added yet.";
+          container.appendChild(empty);
+        }
+      }
+      function renderEditor(preserveMessage) {
+        const day = ensureDay(selectedDate);
+        const labels = dayLabels[selectedDate] || { full: selectedDate };
+        dateInput.value = selectedDate;
+        statusText.textContent = statusLabel(day.status);
+        const readiness = getRouteReadiness(day);
+        const routeFit = getSelectedJobId() && getSelectedRouteDate() === selectedDate
+          ? evaluateAssignmentFit(getSelectedRecord())
+          : null;
+        summaryText.textContent = `${labels.full} is open for editing. ${(routeFit || readiness).detail}`;
+        bookedSummary.textContent = day.booked.length ? day.booked.map((slot) => formatRange(slot.start, slot.end)).join(", ") : "No booked visits";
+        nextOpen.textContent = nextOpenLabel(day);
+        routeReadiness.textContent = (routeFit || readiness).label;
+        renderWindowList(availableList, day.available, "available");
+        renderWindowList(blockedList, day.blocked, "blocked");
+        Array.from(statusOptions.querySelectorAll("[data-status]")).forEach((button) => {
+          button.className = "option-pill";
+          if (button.dataset.status === day.status) {
+            if (day.status === "availableAllDay") button.classList.add("active-green");
+            else if (day.status === "unavailableAllDay") button.classList.add("active-red");
+            else button.classList.add("active-blue");
+          }
+        });
+        if (!preserveMessage) setEditorMessage(`Choose a date and save changes to update the calendar. ${(routeFit || readiness).detail}`);
+      }
+      function renderCalendar() {
+        calendarGrid.innerHTML = "";
+        weekDates.forEach((date) => {
+          const day = ensureDay(date);
+          const labels = dayLabels[date];
+          const card = document.createElement("div");
+          card.className = `day-card clickable${labels.today ? " today" : ""}`;
+          card.innerHTML = `<div class="day-head"><strong>${labels.day}</strong><span>${labels.short}</span></div>`;
+          day.booked.forEach((slot) => {
+            const el = document.createElement("div");
+            el.className = "slot booked";
+            el.textContent = `${formatTime(slot.start)} ${slot.label}`;
+            card.appendChild(el);
+          });
+          if (day.status === "unavailableAllDay") {
+            const el = document.createElement("div");
+            el.className = "slot unavailable";
+            el.textContent = "Unavailable all day";
+            card.appendChild(el);
+          } else {
+            day.available.forEach((slot, index) => {
+              const el = document.createElement("div");
+              el.className = "slot available";
+              el.textContent = `${formatRange(slot.start, slot.end)}${index === 0 && day.booked.length ? " Next available" : " Available"}`;
+              card.appendChild(el);
+            });
+            day.blocked.forEach((slot) => {
+              const el = document.createElement("div");
+              el.className = "slot blocked";
+              el.textContent = `${formatRange(slot.start, slot.end)} Blocked`;
+              card.appendChild(el);
+            });
+          }
+          card.addEventListener("click", () => {
+            selectedDate = date;
+            renderEditor();
+            window.location.hash = "availability-editor";
+          });
+          calendarGrid.appendChild(card);
+        });
+      }
+      dateInput.addEventListener("change", (event) => { selectedDate = event.target.value; ensureDay(selectedDate); renderEditor(); });
+      statusOptions.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-status]");
+        if (!button) return;
+        const day = ensureDay(selectedDate);
+        day.status = button.dataset.status;
+        if (day.status === "availableAllDay" && !day.available.length) {
+          day.available = [{ start: "08:00", end: "17:00" }];
+          day.blocked = [];
+        }
+        if (day.status === "unavailableAllDay") {
+          day.available = [];
+          day.blocked = [];
+        }
+        if (day.status === "splitAvailability" && !day.available.length) {
+          day.available = [{ start: "08:00", end: "12:00" }, { start: "13:00", end: "17:00" }];
+        }
+        renderEditor(true);
+      });
+      function bindWindowEvents(container, type) {
+        container.addEventListener("input", (event) => {
+          const input = event.target.closest("input[data-type]");
+          if (!input) return;
+          ensureDay(selectedDate)[type][Number(input.dataset.index)][input.dataset.field] = input.value;
+          setEditorMessage("Unsaved changes in progress.");
+        });
+        container.addEventListener("click", (event) => {
+          const button = event.target.closest(`[data-remove="${type}"]`);
+          if (!button) return;
+          ensureDay(selectedDate)[type].splice(Number(button.dataset.index), 1);
+          setEditorMessage("Unsaved changes in progress.");
+          renderEditor(true);
+        });
+      }
+      bindWindowEvents(availableList, "available");
+      bindWindowEvents(blockedList, "blocked");
+      document.getElementById("service-add-available").addEventListener("click", () => {
+        ensureDay(selectedDate).available.push({ start: "09:00", end: "12:00" });
+        setEditorMessage("Unsaved changes in progress.");
+        renderEditor(true);
+      });
+      document.getElementById("service-add-blocked").addEventListener("click", () => {
+        ensureDay(selectedDate).blocked.push({ start: "12:00", end: "13:00" });
+        setEditorMessage("Unsaved changes in progress.");
+        renderEditor(true);
+      });
+      document.getElementById("service-save-availability").addEventListener("click", () => {
+        const day = ensureDay(selectedDate);
+        const previous = JSON.parse(JSON.stringify(day));
+        if (day.status === "availableAllDay") {
+          day.available = [{ start: "08:00", end: "17:00" }];
+          day.blocked = [];
+        }
+        if (day.status === "unavailableAllDay") {
+          day.available = [];
+          day.blocked = [];
+        }
+        const problems = collectValidation(day);
+        if (problems.length) {
+          state[selectedDate] = previous;
+          renderEditor(true);
+          setEditorMessage(`Cannot save: ${problems[0]}`, "error");
+          return;
+        }
+        persist();
+        renderCalendar();
+        renderEditor(true);
+        setEditorMessage(`Availability saved successfully. ${(getSelectedJobId() && getSelectedRouteDate() === selectedDate ? evaluateAssignmentFit(getSelectedRecord()).label : getRouteReadiness(day).label)} now applies to ${selectedDate}.`, "success");
+        window.setTimeout(() => { window.location.hash = "calendar"; }, 450);
+      });
+      resultButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          if (resultEntryLockedMessage) {
+            renderResultSelection();
+            return;
+          }
+          selectedResult = button.dataset.resultValue;
+          localStorage.setItem(resultStorageKey, selectedResult);
+          const savedToSharedRecord = writeSharedServiceOutcome(selectedResult);
+          if (savedToSharedRecord) applyJobContext();
+          renderResultSelection();
+          if (!savedToSharedRecord && getSelectedJobId()) {
+            resultStatus.textContent = `Current outcome: ${formatResultLabel(selectedResult)} • Shared record update failed`;
+          }
+        });
+      });
+      serviceConfirmAction.addEventListener("click", () => {
+        if (workerConfirmLockedMessage) return;
+        const savedToSharedRecord = writeSharedServiceConfirmation();
+        if (savedToSharedRecord) {
+          applyJobContext();
+          resultStatus.textContent = "Assignment confirmed. The system can now request customer confirmation.";
+          return;
+        }
+        resultStatus.textContent = "Worker confirmation did not save to the shared record.";
+      });
+      serviceCustomerConfirmAction.addEventListener("click", () => {
+        if (customerConfirmLockedMessage) return;
+        const savedToSharedRecord = writeSharedServiceCustomerConfirmation();
+        if (savedToSharedRecord) {
+          applyJobContext();
+          resultStatus.textContent = "Customer confirmed. The appointment is now fully locked for outcome entry.";
+          return;
+        }
+        resultStatus.textContent = "Customer confirmation did not save to the shared record.";
+      });
+      serviceRerouteAction.addEventListener("click", () => {
+        if (rerouteLockedMessage) return;
+        const savedToSharedRecord = writeSharedServiceReroute();
+        if (savedToSharedRecord) {
+          applyJobContext();
+          resultStatus.textContent = "Confirmation window missed. The shared record moved into reroute handling.";
+          return;
+        }
+        resultStatus.textContent = "Reroute did not save to the shared record.";
+      });
+      selectedDate = getSelectedRouteDate() || selectedDate;
+      applyServiceBusinessCopy();
+      applyJobContext();
+      renderCalendar();
+      renderEditor();
+      renderResultSelection();
+    }());
+  </script>
+  <script src="ai-assistant.js"></script>
+</body>
+</html>

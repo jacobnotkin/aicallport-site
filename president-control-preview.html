@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX President Control Preview</title>
+  <style>
+    :root {
+      --bg: #06101a;
+      --panel: rgba(255, 255, 255, 0.04);
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #eef4fb;
+      --muted: #9db0c5;
+      --blue: #79c8ff;
+      --gold: #f0be62;
+      --green: #42d392;
+      --violet: #b68dff;
+      --pink: #ff8cd9;
+      --red: #ff7f7f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(121, 200, 255, 0.12), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(240, 190, 98, 0.08), transparent 28%),
+        linear-gradient(180deg, #07111b 0%, #040911 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 34px 34px;
+      opacity: 0.16;
+      pointer-events: none;
+      mask-image: radial-gradient(circle at center, black 44%, transparent 90%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1420px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 24px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 10px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(121, 200, 255, 0.08), transparent 22%),
+        linear-gradient(180deg, rgba(10, 19, 30, 0.98), rgba(6, 10, 16, 0.99));
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.36);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      width: fit-content;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(121, 200, 255, 0.24);
+      background: rgba(121, 200, 255, 0.08);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 2.8vw, 2.7rem);
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 920px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.18fr 0.82fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--panel);
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .summary {
+      display: grid;
+      gap: 14px;
+    }
+
+    .summary-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .summary h2 {
+      margin: 0 0 6px;
+      font-size: 1.7rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .summary-copy {
+      color: #dce7f3;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .timestamp {
+      min-width: 156px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(240, 190, 98, 0.16);
+      background: rgba(240, 190, 98, 0.06);
+      color: #f6d89a;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.45;
+      text-align: right;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.025);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      font-size: 1.6rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .metric-note {
+      margin-top: 6px;
+      color: #dce7f3;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .list-item {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.024);
+      display: grid;
+      gap: 6px;
+    }
+
+    .list-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: #e4edf8;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pill.gold {
+      color: var(--gold);
+      border-color: rgba(240, 190, 98, 0.18);
+      background: rgba(240, 190, 98, 0.08);
+    }
+
+    .pill.green {
+      color: var(--green);
+      border-color: rgba(66, 211, 146, 0.18);
+      background: rgba(66, 211, 146, 0.08);
+    }
+
+    .pill.red {
+      color: var(--red);
+      border-color: rgba(255, 127, 127, 0.18);
+      background: rgba(255, 127, 127, 0.08);
+    }
+
+    .item-title {
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      color: var(--text);
+    }
+
+    .item-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .goals {
+      display: grid;
+      gap: 12px;
+    }
+
+    .goal-card {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.026);
+      display: grid;
+      gap: 8px;
+    }
+
+    .goal-title {
+      font-size: 14px;
+      font-weight: 850;
+      line-height: 1.4;
+    }
+
+    .goal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #f0be62 0%, #ffb24a 100%);
+      color: #08111b;
+    }
+
+    .btn.secondary {
+      border-color: rgba(121, 200, 255, 0.22);
+      background: rgba(121, 200, 255, 0.08);
+      color: var(--blue);
+    }
+
+    .accountability {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .score {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.025);
+      display: grid;
+      gap: 8px;
+    }
+
+    .score-name {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .score-value {
+      font-size: 1.5rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .score-trend {
+      font-size: 12px;
+      line-height: 1.45;
+      color: #dce7f3;
+    }
+
+    @media (max-width: 1080px) {
+      .grid,
+      .action-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics,
+      .accountability {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <span class="eyebrow">President Control Preview</span>
+      <h1>Good Morning, President.</h1>
+      <p>
+        Here is today&apos;s company briefing, recommended actions, monthly goals awaiting approval, and accountability across the system. This view is designed to show how AI-ABCX reports upward to the President without making the owner chase information across disconnected tools.
+      </p>
+    </section>
+
+    <div class="grid">
+      <section class="summary">
+        <div class="card">
+          <strong>CEO Morning Brief</strong>
+          <div class="summary-top">
+            <div>
+              <h2>Today the company is stable, but three decisions need your attention.</h2>
+              <div class="summary-copy">
+                Revenue opportunities are active, service load is healthy, and the executive team remains aligned. The strongest priorities today are one manual scheduling confirmation, one sales follow-up decision, and approval of this month&apos;s operating goals.
+              </div>
+            </div>
+            <div class="timestamp">
+              June 24, 2026<br />
+              7:00 AM<br />
+              Morning Brief
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">Recommended Actions</div>
+            <div class="metric-value">3</div>
+            <div class="metric-note">One high priority and two medium priority decisions are waiting.</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Goals Awaiting Approval</div>
+            <div class="metric-value">4</div>
+            <div class="metric-note">Prepared by the system for President review before release.</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Accountability Rating</div>
+            <div class="metric-value">91</div>
+            <div class="metric-note">Executive structure is stable, with visible improvement opportunities.</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Sales Target Pace</div>
+            <div class="metric-value">84%</div>
+            <div class="metric-note">Sales team is on track, but follow-up discipline needs attention.</div>
+          </div>
+        </div>
+
+        <div class="action-grid">
+          <div class="card">
+            <strong>Recommended Next Actions</strong>
+            <div class="list">
+              <div class="list-item">
+                <div class="list-item-top">
+                  <div class="item-title">Approve manual scheduling follow-up for today&apos;s pending service window.</div>
+                  <span class="pill red">High</span>
+                </div>
+                <div class="item-copy">COO is requesting confirmation so the system can lock the service record and preserve clean scheduling truth.</div>
+              </div>
+              <div class="list-item">
+                <div class="list-item-top">
+                  <div class="item-title">Review CRO recommendation on two open estimate revisions.</div>
+                  <span class="pill gold">Medium</span>
+                </div>
+                <div class="item-copy">Revenue lane is healthy, but closing speed can improve if follow-up timing is approved now.</div>
+              </div>
+              <div class="list-item">
+                <div class="list-item-top">
+                  <div class="item-title">Approve this month&apos;s service accountability goals before broader release.</div>
+                  <span class="pill gold">Medium</span>
+                </div>
+                <div class="item-copy">CPIO and COO are aligned on targets. System is waiting for President approval to release final scorecards.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <strong>Monthly Goals Awaiting Approval</strong>
+            <div class="goals">
+              <div class="goal-card">
+                <div class="goal-title">Raise manual confirmation discipline to 96% across current service records.</div>
+                <div class="goal-actions">
+                  <span class="btn primary">Approve Goal</span>
+                  <span class="btn secondary">Request Edit</span>
+                </div>
+              </div>
+              <div class="goal-card">
+                <div class="goal-title">Reduce estimate-revision delay by one full business day in the CRO lane.</div>
+                <div class="goal-actions">
+                  <span class="btn primary">Approve Goal</span>
+                  <span class="btn secondary">Review Notes</span>
+                </div>
+              </div>
+              <div class="goal-card">
+                <div class="goal-title">Increase accountability visibility for service reps and sales reps in one shared monthly report.</div>
+                <div class="goal-actions">
+                  <span class="btn primary">Approve Goal</span>
+                  <span class="btn secondary">Adjust Scope</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <strong>Accountability Overview</strong>
+        <div class="accountability">
+          <div class="score">
+            <div class="score-name">CEO</div>
+            <div class="score-value">94</div>
+            <div class="score-trend">Strong visibility and aligned next actions.</div>
+          </div>
+          <div class="score">
+            <div class="score-name">COO</div>
+            <div class="score-value">89</div>
+            <div class="score-trend">Healthy execution, but manual scheduling still needs review.</div>
+          </div>
+          <div class="score">
+            <div class="score-name">CRO</div>
+            <div class="score-value">87</div>
+            <div class="score-trend">Follow-up discipline can close faster with President approval.</div>
+          </div>
+          <div class="score">
+            <div class="score-name">CPIO</div>
+            <div class="score-value">92</div>
+            <div class="score-trend">Reporting quality is strong and monthly scorecards are ready.</div>
+          </div>
+          <div class="score">
+            <div class="score-name">Sales Team</div>
+            <div class="score-value">83</div>
+            <div class="score-trend">Target pace is healthy, but one lane needs tighter follow-up timing.</div>
+          </div>
+          <div class="score">
+            <div class="score-name">Service Team</div>
+            <div class="score-value">88</div>
+            <div class="score-trend">Capacity is balanced and service quality is holding well.</div>
+          </div>
+          <div class="score">
+            <div class="score-name">Customer Visibility</div>
+            <div class="score-value">90</div>
+            <div class="score-trend">CRM truth is clean and reporting context is stable.</div>
+          </div>
+          <div class="score">
+            <div class="score-name">President Control</div>
+            <div class="score-value">3</div>
+            <div class="score-trend">Three decisions waiting for review this morning.</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</body>
+</html>

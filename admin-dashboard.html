@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Call Port | Internal Dashboard</title>
+  <meta
+    name="description"
+    content="AI Call Port internal dashboard for beta users, campaigns, referrals, SEO, publishing, feedback, analytics, and roadmap control."
+  />
+  <style>
+    :root{
+      --text-primary:#f7fbff;
+      --text-secondary:#c9d7e6;
+      --text-muted:#8d9db1;
+      --blue:#3b82f6;
+      --blue-soft:#67d4ff;
+      --orange:#f97316;
+      --orange-soft:#fb923c;
+      --gold:#ffbf2f;
+      --green:#69d39c;
+      --red:#ff6e7f;
+      --purple:#a78bfa;
+      --border:rgba(255,255,255,.08);
+      --border-soft:rgba(255,255,255,.06);
+      --shadow:0 36px 100px rgba(0,0,0,.58);
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%}
+
+    body{
+      color:var(--text-primary);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(78,165,255,.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(255,138,61,.10), transparent 26%),
+        linear-gradient(180deg,#09131f 0%, #07111a 100%);
+      overflow-x:hidden;
+      position:relative;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(circle at center, black 42%, transparent 96%);
+      opacity:.08;
+      z-index:0;
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      min-height:100vh;
+      padding:18px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .shell{
+      width:min(1560px, calc(100vw - 36px));
+      min-height:calc(100vh - 36px);
+      border-radius:30px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));
+      box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(420px circle at 50% 0%, rgba(249,115,22,.05), transparent 56%),
+        radial-gradient(520px circle at 10% 8%, rgba(59,130,246,.04), transparent 52%);
+      z-index:0;
+    }
+
+    .layout{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:290px 1fr;
+      min-height:calc(100vh - 36px);
+    }
+
+    .sidebar{
+      border-right:1px solid rgba(255,255,255,.06);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      padding:20px 16px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:14px 14px;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),
+        radial-gradient(circle at top right, rgba(249,115,22,.08), transparent 44%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .logo-wrap{
+      width:60px;
+      height:60px;
+      min-width:60px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 60px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.02);
+    }
+
+    .logo{
+      width:50px;
+      height:50px;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 0 10px rgba(249,115,22,.20));
+    }
+
+    .brand-wordmark{
+      display:flex;
+      gap:6px;
+      align-items:flex-end;
+      line-height:1;
+      flex-wrap:wrap;
+    }
+
+    .brand-ai,
+    .brand-callport{
+      font-size:14px;
+      font-weight:900;
+      text-transform:uppercase;
+      color:transparent;
+      -webkit-background-clip:text;
+      background-clip:text;
+    }
+
+    .brand-ai{
+      letter-spacing:.04em;
+      background-image:linear-gradient(180deg, var(--blue-soft), var(--blue));
+    }
+
+    .brand-callport{
+      letter-spacing:.02em;
+      background-image:linear-gradient(180deg, var(--gold), var(--orange));
+    }
+
+    .beta-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:22px;
+      padding:0 9px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.24);
+      background:rgba(249,115,22,.10);
+      color:#fff;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .company-card{
+      border-radius:22px;
+      border:1px solid var(--border-soft);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.025));
+      padding:16px 16px 18px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .company-card strong{
+      display:block;
+      font-size:18px;
+      line-height:1.2;
+      color:#fff;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+
+    .company-card span{
+      display:block;
+      margin-top:8px;
+      color:var(--blue-soft);
+      font-size:13px;
+      line-height:1.5;
+      font-weight:700;
+    }
+
+    .module-label,
+    .module-group-label{
+      padding:0 8px;
+      color:var(--text-muted);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .module-nav,
+    .module-group{
+      display:grid;
+      gap:10px;
+    }
+
+    .module-group{gap:8px}
+
+    .module-link{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.05);
+      background:rgba(255,255,255,.02);
+      padding:13px 14px;
+      color:#dbe6f1;
+      text-decoration:none;
+      font-size:13px;
+      line-height:1.4;
+      font-weight:700;
+      transition:.18s ease;
+      cursor:pointer;
+    }
+
+    .module-main{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+      flex:1 1 auto;
+    }
+
+    .module-icon{
+      width:28px;
+      height:28px;
+      min-width:28px;
+      border-radius:10px;
+      display:grid;
+      place-items:center;
+      font-size:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+    }
+
+    .module-name{
+      flex:1 1 auto;
+      min-width:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-size:12px;
+      line-height:1.2;
+    }
+
+    .module-link:hover{
+      transform:translateX(2px);
+      background:rgba(255,255,255,.04);
+    }
+
+    .module-link.active{
+      border-color:rgba(103,212,255,.24);
+      background:linear-gradient(180deg, rgba(103,212,255,.12), rgba(103,212,255,.08));
+      color:#fff;
+      box-shadow:0 10px 26px rgba(59,130,246,.12);
+    }
+
+    .module-state{
+      min-width:52px;
+      min-height:22px;
+      padding:0 8px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      color:#ced9e7;
+    }
+
+    .state-active{
+      border-color:rgba(103,212,255,.22);
+      background:rgba(103,212,255,.12);
+      color:#aee5ff;
+    }
+
+    .sidebar-foot{
+      margin-top:auto;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.02);
+      padding:16px;
+    }
+
+    .sidebar-foot strong{
+      display:block;
+      color:#fff;
+      font-size:13px;
+      line-height:1.3;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .sidebar-foot p{
+      margin:8px 0 0;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.55;
+      font-weight:600;
+    }
+
+    .main{
+      padding:18px;
+      display:grid;
+      gap:16px;
+      align-content:start;
+    }
+
+    .workspace-header{
+      border-radius:24px;
+      border:1px solid var(--border-soft);
+      background:
+        linear-gradient(180deg, rgba(8,11,18,.94), rgba(8,11,18,.88)),
+        radial-gradient(circle at top right, rgba(249,115,22,.06), transparent 34%);
+      backdrop-filter:blur(14px);
+      padding:18px 20px 16px;
+      display:grid;
+      gap:16px;
+    }
+
+    .workspace-top{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:18px;
+      align-items:start;
+    }
+
+    .workspace-title{
+      margin:0;
+      color:#fff;
+      font-size:34px;
+      line-height:1;
+      font-weight:850;
+      letter-spacing:-.05em;
+    }
+
+    .workspace-copy{
+      margin:10px 0 0;
+      color:var(--blue-soft);
+      font-size:14px;
+      line-height:1.5;
+      font-weight:700;
+      max-width:760px;
+    }
+
+    .header-actions{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .chip,
+    .action-btn,
+    .submenu-btn{
+      min-height:40px;
+      padding:0 14px;
+      border-radius:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#eef6ff;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      white-space:nowrap;
+      text-decoration:none;
+      cursor:pointer;
+    }
+
+    .chip.blue{color:var(--blue-soft)}
+    .chip.orange{color:#ffc48e}
+    .chip.green{color:#a6f0c8}
+
+    .action-btn.primary{
+      border:none;
+      background:linear-gradient(135deg, var(--orange), var(--orange-soft));
+      color:#fff;
+      box-shadow:0 10px 30px rgba(249,115,22,.24);
+    }
+
+    .submenu-bar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      padding-top:2px;
+      border-top:1px solid rgba(255,255,255,.05);
+    }
+
+    .submenu-btn{background:rgba(255,255,255,.025)}
+
+    .submenu-btn.active{
+      border-color:rgba(103,212,255,.22);
+      background:linear-gradient(180deg, rgba(103,212,255,.12), rgba(103,212,255,.08));
+      color:#fff;
+    }
+
+    .workspace{
+      border-radius:24px;
+      border:1px solid var(--border-soft);
+      background:
+        linear-gradient(180deg, rgba(103,212,255,.055), rgba(255,255,255,.02)),
+        radial-gradient(circle at top right, rgba(249,115,22,.05), transparent 30%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      padding:20px;
+      min-height:780px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .workspace::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(200px circle at 100% 0%, rgba(249,115,22,.04), transparent 42%),
+        radial-gradient(180px circle at 0% 0%, rgba(59,130,246,.04), transparent 44%);
+    }
+
+    .workspace > *{position:relative;z-index:1}
+
+    .panel-grid{
+      display:grid;
+      gap:14px;
+    }
+
+    .panel-grid.cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
+    .panel-grid.cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
+    .panel-grid.cols-4{grid-template-columns:repeat(4, minmax(0,1fr))}
+
+    .card{
+      border-radius:22px;
+      border:1px solid var(--border-soft);
+      background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.028));
+      padding:18px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .card.teal{
+      background:linear-gradient(180deg, rgba(27,150,154,.12), rgba(255,255,255,.03));
+      border-color:rgba(57,181,186,.16);
+    }
+
+    .card.orange{
+      background:linear-gradient(180deg, rgba(249,115,22,.12), rgba(255,255,255,.03));
+      border-color:rgba(249,115,22,.16);
+    }
+
+    .card.green{
+      background:linear-gradient(180deg, rgba(105,211,156,.12), rgba(255,255,255,.03));
+      border-color:rgba(105,211,156,.16);
+    }
+
+    .card.blue{
+      background:linear-gradient(180deg, rgba(103,212,255,.12), rgba(255,255,255,.03));
+      border-color:rgba(103,212,255,.16);
+    }
+
+    .card.purple{
+      background:linear-gradient(180deg, rgba(167,139,250,.12), rgba(255,255,255,.03));
+      border-color:rgba(167,139,250,.16);
+    }
+
+    .card.amber{
+      background:linear-gradient(180deg, rgba(255,191,47,.12), rgba(255,255,255,.03));
+      border-color:rgba(255,191,47,.18);
+    }
+
+    .card h2,
+    .card h3{
+      margin:0;
+      color:#fff;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+
+    .card h2{font-size:24px; line-height:1.1}
+    .card h3{font-size:18px; line-height:1.15}
+
+    .card p{
+      margin:10px 0 0;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.55;
+      font-weight:600;
+    }
+
+    .kpi-row{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .kpi-card .label{
+      color:var(--text-muted);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .kpi-card .value{
+      margin-top:10px;
+      color:#fff;
+      font-size:30px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.05em;
+    }
+
+    .kpi-card .meta{
+      margin-top:8px;
+      color:var(--text-secondary);
+      font-size:13px;
+      line-height:1.45;
+      font-weight:600;
+    }
+
+    .metric-list{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .metric-row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 0;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      color:var(--text-secondary);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .metric-row:last-child{border-bottom:0;padding-bottom:0}
+    .metric-row strong{color:#fff}
+
+    .list{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .item{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+    }
+
+    .item-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+
+    .item strong{display:block;color:#fff;font-size:14px;line-height:1.35}
+    .item p{margin:8px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.55;font-weight:600}
+
+    .tag-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .tag{
+      min-height:24px;
+      padding:0 10px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      color:#eef6ff;
+    }
+
+    .tag.blue{color:var(--blue-soft);border-color:rgba(103,212,255,.18);background:rgba(103,212,255,.10)}
+    .tag.orange{color:#ffc48e;border-color:rgba(249,115,22,.18);background:rgba(249,115,22,.10)}
+    .tag.green{color:#b9f5d4;border-color:rgba(105,211,156,.18);background:rgba(105,211,156,.10)}
+    .tag.purple{color:#d4c7ff;border-color:rgba(167,139,250,.18);background:rgba(167,139,250,.10)}
+    .tag.red{color:#ffc5cd;border-color:rgba(255,110,127,.18);background:rgba(255,110,127,.10)}
+
+    .stamp{
+      color:var(--text-muted);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .mini-stat-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .mini-stat{
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.025);
+      padding:14px;
+    }
+
+    .mini-stat .label{
+      color:var(--text-muted);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .mini-stat .value{
+      margin-top:8px;
+      font-size:24px;
+      font-weight:900;
+      letter-spacing:-.04em;
+      color:#fff;
+    }
+
+    .empty-state{
+      border-radius:22px;
+      border:1px dashed rgba(255,255,255,.10);
+      padding:24px;
+      background:rgba(255,255,255,.02);
+    }
+
+    .empty-state h2{margin:0;color:#fff;font-size:24px;letter-spacing:-.03em}
+    .empty-state p{margin:10px 0 0;color:var(--text-secondary);font-size:14px;line-height:1.6;font-weight:600}
+
+    @media (max-width: 1180px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{border-right:0;border-bottom:1px solid rgba(255,255,255,.06)}
+      .panel-grid.cols-4,.kpi-row{grid-template-columns:repeat(2, minmax(0,1fr))}
+      .panel-grid.cols-3{grid-template-columns:1fr}
+      .panel-grid.cols-2{grid-template-columns:1fr}
+      .workspace-top{grid-template-columns:1fr}
+      .header-actions{justify-content:flex-start}
+    }
+
+    @media (max-width: 760px){
+      .page{padding:10px}
+      .shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}
+      .main{padding:14px}
+      .workspace-header,.workspace{padding:16px}
+      .panel-grid.cols-4,.kpi-row{grid-template-columns:1fr}
+      .workspace-title{font-size:28px}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="shell">
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="logo-wrap">
+              <img src="public/assets/images/ai-call-port-logo.png" alt="AI Call Port Logo" class="logo" />
+            </div>
+            <div>
+              <div class="brand-wordmark">
+                <span class="brand-ai">AI</span>
+                <span class="brand-callport">CALL PORT</span>
+              </div>
+              <span class="beta-badge">Internal Dashboard</span>
+            </div>
+          </div>
+
+          <div class="company-card">
+            <strong>AI Call Port Internal</strong>
+            <span>Run beta users, campaigns, referrals, publishing, feedback, analytics, and roadmap decisions from one internal operating system.</span>
+          </div>
+
+          <div class="module-label">Internal Modules</div>
+          <nav class="module-nav" id="moduleNav"></nav>
+
+          <div class="sidebar-foot">
+            <strong>Current focus</strong>
+            <p>Finish the launch system first: beta users, referrals, campaigns, SEO, publishing, and feedback. Expand visual polish only after internal workflows are real.</p>
+          </div>
+        </aside>
+
+        <main class="main">
+          <section class="workspace-header">
+            <div class="workspace-top">
+              <div>
+                <h1 class="workspace-title" id="workspaceTitle">Overview</h1>
+                <p class="workspace-copy" id="workspaceCopy">Internal control center for AI Call Port launch, growth, and product decision-making.</p>
+              </div>
+              <div class="header-actions" id="headerActions"></div>
+            </div>
+            <div class="submenu-bar" id="submenuBar"></div>
+          </section>
+
+          <section class="workspace" id="workspace"></section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modules = [
+      { id: "overview", name: "Overview", submenus: ["Summary", "Alerts", "Today"] },
+      { id: "beta-users", name: "Beta Users", submenus: ["Signups", "Trials", "Activations", "Retention"] },
+      { id: "campaigns", name: "Campaigns", submenus: ["Active", "Calendar", "Tasks", "Results"] },
+      { id: "referrals", name: "Referrals", submenus: ["Partners", "Links", "Leads", "Rewards"] },
+      { id: "seo", name: "SEO Engine", submenus: ["Keywords", "Topics", "Articles", "Performance"] },
+      { id: "publishing", name: "Publishing", submenus: ["Queue", "Scheduled", "Published", "Repurposing"] },
+      { id: "feedback", name: "Feedback", submenus: ["New", "Priorities", "Repeated Issues", "Requests"] },
+      { id: "analytics", name: "Analytics", submenus: ["Launch", "Growth", "Conversion", "Retention"] },
+      { id: "roadmap", name: "Roadmap", submenus: ["Current Build", "Coming Soon", "Internal Testing", "Release Plan"] },
+      { id: "settings", name: "Settings", submenus: ["Team Access", "Offers", "Rules", "Automations"] }
+    ];
+
+    const moduleIcons = {
+      overview: "◫",
+      "beta-users": "◎",
+      campaigns: "✦",
+      referrals: "↗",
+      seo: "⌕",
+      publishing: "▣",
+      feedback: "✉",
+      analytics: "◔",
+      roadmap: "◇",
+      settings: "☰"
+    };
+
+    const dashboardData = {
+      overview: {
+        title: "Overview",
+        copy: "Main control center for launch health, activations, campaign motion, publishing readiness, and the internal issues that need attention now.",
+        actions: [
+          { label: "Today", kind: "chip blue" },
+          { label: "Launch Active", kind: "chip orange" },
+          { label: "11 Alerts", kind: "chip" },
+          { label: "Open Beta Users", kind: "action primary" }
+        ],
+        views: {
+          Summary: `
+            <div class="kpi-row">
+              <div class="card kpi-card blue"><div class="label">Active Beta Users</div><div class="value">38</div><div class="meta">12 using more than 3 upgrades</div></div>
+              <div class="card kpi-card green"><div class="label">Activations This Week</div><div class="value">9</div><div class="meta">3 came from partner links</div></div>
+              <div class="card kpi-card orange"><div class="label">Trials Ending Soon</div><div class="value">7</div><div class="meta">Need feedback and keep/drop decisions</div></div>
+              <div class="card kpi-card purple"><div class="label">Publish Queue</div><div class="value">18</div><div class="meta">6 multilingual assets ready</div></div>
+            </div>
+            <div class="panel-grid cols-3">
+              <div class="card blue">
+                <h2>Launch Snapshot</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>New signups today</span><strong>6</strong></div>
+                  <div class="metric-row"><span>Trial accounts live</span><strong>21</strong></div>
+                  <div class="metric-row"><span>Qualified feedback collected</span><strong>14</strong></div>
+                  <div class="metric-row"><span>Discount-qualified accounts</span><strong>11</strong></div>
+                </div>
+              </div>
+              <div class="card orange">
+                <h2>Growth Snapshot</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Top traffic source</span><strong>Partner articles</strong></div>
+                  <div class="metric-row"><span>Best campaign</span><strong>Launch Beta Push</strong></div>
+                  <div class="metric-row"><span>Top article language</span><strong>English</strong></div>
+                  <div class="metric-row"><span>Top converting channel</span><strong>LinkedIn</strong></div>
+                </div>
+              </div>
+              <div class="card teal">
+                <h2>Next Actions</h2>
+                <div class="list">
+                  <div class="item"><strong>Review 7 trial accounts ending this week</strong><p>Make sure feedback is captured before trial-end upgrade decisions are triggered.</p><div class="tag-row"><span class="tag orange">Trials</span></div></div>
+                  <div class="item"><strong>Publish 3 beta-offer articles today</strong><p>Two partner placements and one multilingual version are still waiting in queue.</p><div class="tag-row"><span class="tag blue">Publishing</span></div></div>
+                  <div class="item"><strong>Follow up with top partner</strong><p>Partner source produced 2 activations but still has one unpaid reward status to confirm.</p><div class="tag-row"><span class="tag purple">Referrals</span></div></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Alerts: `
+            <div class="panel-grid cols-2">
+              <div class="card orange">
+                <h2>Urgent Alerts</h2>
+                <div class="list">
+                  <div class="item"><div class="item-top"><strong>7 trials ending in 7 days</strong><span class="stamp">Action needed</span></div><p>Feedback is missing on 3 of them and may block discount qualification.</p><div class="tag-row"><span class="tag orange">Trials</span><span class="tag red">Urgent</span></div></div>
+                  <div class="item"><div class="item-top"><strong>Publishing queue delayed</strong><span class="stamp">2 overdue</span></div><p>Two approved launch assets missed their scheduled publishing window.</p><div class="tag-row"><span class="tag purple">Publishing</span></div></div>
+                  <div class="item"><div class="item-top"><strong>CRM integration issue reported</strong><span class="stamp">Critical</span></div><p>One beta client flagged a sync mismatch after trial activation.</p><div class="tag-row"><span class="tag red">Critical</span><span class="tag blue">Feedback</span></div></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Internal Alert Totals</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Trials ending soon</span><strong>7</strong></div>
+                  <div class="metric-row"><span>Feedback unresolved</span><strong>11</strong></div>
+                  <div class="metric-row"><span>Campaign tasks overdue</span><strong>4</strong></div>
+                  <div class="metric-row"><span>Published items needing review</span><strong>3</strong></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Today: `
+            <div class="panel-grid cols-2">
+              <div class="card green">
+                <h2>Today</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Signups today</span><strong>6</strong></div>
+                  <div class="metric-row"><span>Activated today</span><strong>2</strong></div>
+                  <div class="metric-row"><span>Partner clicks today</span><strong>148</strong></div>
+                  <div class="metric-row"><span>Articles published today</span><strong>4</strong></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Today’s focus</h2>
+                <p>Keep Overview light. Use it to spot what matters now, then move into Beta Users, Referrals, Campaigns, or Publishing one area at a time instead of mixing everything on one screen.</p>
+              </div>
+            </div>
+          `
+        }
+      },
+      "beta-users": {
+        title: "Beta Users",
+        copy: "Track every launch customer from signup to trial, activation, feedback, and upgrade retention. This is the main control layer for the Beta Partner Offer.",
+        actions: [
+          { label: "38 Active", kind: "chip blue" },
+          { label: "7 Ending Soon", kind: "chip orange" },
+          { label: "Export", kind: "action" },
+          { label: "Open Trial List", kind: "action primary" }
+        ],
+        views: {
+          Signups: `
+            <div class="kpi-row">
+              <div class="card kpi-card blue"><div class="label">New Signups</div><div class="value">24</div><div class="meta">This week</div></div>
+              <div class="card kpi-card"><div class="label">Top Source</div><div class="value">9</div><div class="meta">Partner articles</div></div>
+              <div class="card kpi-card orange"><div class="label">Need Review</div><div class="value">4</div><div class="meta">Missing verification details</div></div>
+              <div class="card kpi-card green"><div class="label">Luxury Selected</div><div class="value">11</div><div class="meta">Strong premium-interest signal</div></div>
+            </div>
+            <div class="card">
+              <h2>Recent Signups</h2>
+              <div class="list">
+                <div class="item"><div class="item-top"><strong>Summit Drain & Pipe</strong><span class="stamp">Today</span></div><p>Signed up through partner article campaign. Selected Standard with all launch upgrades active in month one.</p><div class="tag-row"><span class="tag blue">Partner Source</span><span class="tag green">Verified</span></div></div>
+                <div class="item"><div class="item-top"><strong>Metro Home Service</strong><span class="stamp">Today</span></div><p>Direct launch landing page signup. Trial account created but contact verification is still incomplete.</p><div class="tag-row"><span class="tag orange">Verification Pending</span></div></div>
+                <div class="item"><div class="item-top"><strong>Westside Waterworks</strong><span class="stamp">Yesterday</span></div><p>Signed up after organic content article and immediately opened Step 1.</p><div class="tag-row"><span class="tag purple">Organic Content</span></div></div>
+              </div>
+            </div>
+          `,
+          Trials: `
+            <div class="kpi-row">
+              <div class="card kpi-card blue"><div class="label">Trial Accounts Live</div><div class="value">21</div><div class="meta">Current launch month</div></div>
+              <div class="card kpi-card orange"><div class="label">Ending In 7 Days</div><div class="value">7</div><div class="meta">Needs keep/drop review</div></div>
+              <div class="card kpi-card purple"><div class="label">Using 3+ Upgrades</div><div class="value">12</div><div class="meta">Strong management-layer interest</div></div>
+              <div class="card kpi-card"><div class="label">Feedback Missing</div><div class="value">3</div><div class="meta">May affect 50% discount</div></div>
+            </div>
+            <div class="panel-grid cols-2">
+              <div class="card blue">
+                <h2>Trials Ending Soon</h2>
+                <div class="list">
+                  <div class="item"><div class="item-top"><strong>Summit Drain & Pipe</strong><span class="stamp">3 days left</span></div><p>Used Scheduling, Advanced Management, and Outbound Follow-Up. Feedback submitted.</p><div class="tag-row"><span class="tag green">Discount Eligible</span><span class="tag blue">Luxury</span></div></div>
+                  <div class="item"><div class="item-top"><strong>Rapid Rooter West</strong><span class="stamp">5 days left</span></div><p>Used Scheduling heavily but has not yet submitted launch feedback.</p><div class="tag-row"><span class="tag orange">Feedback Missing</span></div></div>
+                  <div class="item"><div class="item-top"><strong>ClearFlow Services</strong><span class="stamp">7 days left</span></div><p>Used multilingual handling and CRM integration. Waiting on keep/drop selections.</p><div class="tag-row"><span class="tag purple">Languages</span><span class="tag blue">CRM Sync</span></div></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Trial Usage Snapshot</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Scheduling used</span><strong>18</strong></div>
+                  <div class="metric-row"><span>Advanced Management used</span><strong>11</strong></div>
+                  <div class="metric-row"><span>Outbound Follow-Up used</span><strong>9</strong></div>
+                  <div class="metric-row"><span>CRM Integration used</span><strong>4</strong></div>
+                  <div class="metric-row"><span>Languages used</span><strong>6</strong></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Activations: `
+            <div class="panel-grid cols-2">
+              <div class="card green">
+                <h2>Recent Activations</h2>
+                <div class="list">
+                  <div class="item"><div class="item-top"><strong>BrightLine Plumbing</strong><span class="stamp">Activated yesterday</span></div><p>Moved from trial to active after successful live test. Kept Scheduling and Advanced Management.</p><div class="tag-row"><span class="tag green">Activated</span><span class="tag orange">Advanced Management</span></div></div>
+                  <div class="item"><div class="item-top"><strong>Urban Leak Experts</strong><span class="stamp">Activated 2 days ago</span></div><p>Kept Outbound Follow-Up and one additional language after launch month.</p><div class="tag-row"><span class="tag purple">Languages</span><span class="tag blue">Outbound</span></div></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Activation Metrics</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Activations this week</span><strong>9</strong></div>
+                  <div class="metric-row"><span>Partner-sourced activations</span><strong>3</strong></div>
+                  <div class="metric-row"><span>Organic-content activations</span><strong>2</strong></div>
+                  <div class="metric-row"><span>Direct activations</span><strong>4</strong></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Retention: `
+            <div class="panel-grid cols-2">
+              <div class="card purple">
+                <h2>Retention by Upgrade</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Scheduling kept</span><strong>8</strong></div>
+                  <div class="metric-row"><span>Advanced Management kept</span><strong>5</strong></div>
+                  <div class="metric-row"><span>Outbound Follow-Up kept</span><strong>4</strong></div>
+                  <div class="metric-row"><span>Languages kept</span><strong>3</strong></div>
+                  <div class="metric-row"><span>CRM Integration kept</span><strong>2</strong></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Discount Qualification</h2>
+                <p>Launch customers who complete onboarding and provide feedback keep selected upgrades at 50% off. Use this page to track which accounts qualify and which still need feedback or review before retention decisions are finalized.</p>
+              </div>
+            </div>
+          `
+        }
+      },
+      campaigns: {
+        title: "Campaigns",
+        copy: "Run AI Call Port launch, organic, partner, and multilingual growth campaigns from one place. The system should organize campaign work before it becomes visual noise.",
+        actions: [
+          { label: "5 Active", kind: "chip orange" },
+          { label: "14 Tasks Due", kind: "chip" },
+          { label: "Create Campaign", kind: "action primary" }
+        ],
+        views: {
+          Active: `
+            <div class="kpi-row">
+              <div class="card kpi-card orange"><div class="label">Active Campaigns</div><div class="value">5</div><div class="meta">2 partner-led, 3 internal</div></div>
+              <div class="card kpi-card blue"><div class="label">Top Campaign</div><div class="value">42</div><div class="meta">Leads from Launch Beta Push</div></div>
+              <div class="card kpi-card purple"><div class="label">Content Pieces Live</div><div class="value">18</div><div class="meta">Across 6 languages</div></div>
+              <div class="card kpi-card green"><div class="label">Activations Influenced</div><div class="value">7</div><div class="meta">This month</div></div>
+            </div>
+            <div class="panel-grid cols-2">
+              <div class="card orange">
+                <h2>Campaigns In Motion</h2>
+                <div class="list">
+                  <div class="item"><div class="item-top"><strong>Launch Beta Push</strong><span class="stamp">Active</span></div><p>Main launch campaign tied to articles, partners, and direct landing-page signups.</p><div class="tag-row"><span class="tag orange">Launch</span><span class="tag blue">LinkedIn</span><span class="tag purple">Articles</span></div></div>
+                  <div class="item"><div class="item-top"><strong>Partner Media Expansion</strong><span class="stamp">Active</span></div><p>Article placements and referral links rolling out to partner channels.</p><div class="tag-row"><span class="tag purple">Partners</span></div></div>
+                  <div class="item"><div class="item-top"><strong>Spanish Rollout Test</strong><span class="stamp">Active</span></div><p>First multilingual content and landing-page experiment for Spanish-speaking audiences.</p><div class="tag-row"><span class="tag blue">Spanish</span></div></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Campaign Status</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Draft</span><strong>2</strong></div>
+                  <div class="metric-row"><span>Active</span><strong>5</strong></div>
+                  <div class="metric-row"><span>Paused</span><strong>1</strong></div>
+                  <div class="metric-row"><span>Completed</span><strong>3</strong></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Calendar: `
+            <div class="card blue">
+              <h2>Campaign Calendar</h2>
+              <div class="list">
+                <div class="item"><div class="item-top"><strong>Apr 23</strong><span class="stamp">Publishing deadline</span></div><p>Three launch assets and one partner article need approval before noon.</p></div>
+                <div class="item"><div class="item-top"><strong>Apr 24</strong><span class="stamp">Language rollout</span></div><p>Spanish campaign variant scheduled to go live with tracked landing page.</p></div>
+                <div class="item"><div class="item-top"><strong>Apr 26</strong><span class="stamp">Partner follow-up</span></div><p>Review top partner leads and confirm referral reward status.</p></div>
+              </div>
+            </div>
+          `,
+          Tasks: `
+            <div class="panel-grid cols-2">
+              <div class="card">
+                <h2>Tasks Due</h2>
+                <div class="list">
+                  <div class="item"><div class="item-top"><strong>Approve multilingual article set</strong><span class="stamp">Due today</span></div><p>Assigned to publishing manager. Blocking two campaign launches.</p><div class="tag-row"><span class="tag orange">High</span><span class="tag purple">Publishing</span></div></div>
+                  <div class="item"><div class="item-top"><strong>Check partner tracking links</strong><span class="stamp">Due tomorrow</span></div><p>Confirm all referral paths are attributing correctly before next article drop.</p><div class="tag-row"><span class="tag blue">Referrals</span></div></div>
+                  <div class="item"><div class="item-top"><strong>Review launch FAQ draft</strong><span class="stamp">Blocked</span></div><p>Waiting on final Beta Partner Offer wording update.</p><div class="tag-row"><span class="tag red">Blocked</span></div></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Task Metrics</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Open tasks</span><strong>14</strong></div>
+                  <div class="metric-row"><span>In progress</span><strong>6</strong></div>
+                  <div class="metric-row"><span>Blocked</span><strong>2</strong></div>
+                  <div class="metric-row"><span>Completed this week</span><strong>19</strong></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Results: `
+            <div class="panel-grid cols-2">
+              <div class="card green">
+                <h2>Campaign Results</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Leads generated</span><strong>84</strong></div>
+                  <div class="metric-row"><span>Step 1 starts</span><strong>31</strong></div>
+                  <div class="metric-row"><span>Activated</span><strong>7</strong></div>
+                  <div class="metric-row"><span>Best converting campaign</span><strong>Launch Beta Push</strong></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Interpretation</h2>
+                <p>The internal dashboard should not only report campaigns. It should show which campaigns are producing real activations, which need more follow-up, and where publishing or partner work is blocking better results.</p>
+              </div>
+            </div>
+          `
+        }
+      },
+      referrals: {
+        title: "Referrals",
+        copy: "Partners, links, clicks, leads, activations, and reward qualification belong in one internal workspace. This is where referral growth becomes operational.",
+        actions: [
+          { label: "12 Partners", kind: "chip blue" },
+          { label: "148 Clicks", kind: "chip" },
+          { label: "Create Partner Link", kind: "action primary" }
+        ],
+        views: {
+          Partners: `
+            <div class="kpi-row">
+              <div class="card kpi-card blue"><div class="label">Active Partners</div><div class="value">12</div><div class="meta">4 top-performing sources</div></div>
+              <div class="card kpi-card green"><div class="label">Referral Activations</div><div class="value">3</div><div class="meta">This week</div></div>
+              <div class="card kpi-card orange"><div class="label">Pending Rewards</div><div class="value">2</div><div class="meta">Need review</div></div>
+              <div class="card kpi-card purple"><div class="label">Top Partner</div><div class="value">17</div><div class="meta">Clicks from GrowthWave Media</div></div>
+            </div>
+            <div class="panel-grid cols-2">
+              <div class="card purple">
+                <h2>Top Partners</h2>
+                <div class="list">
+                  <div class="item"><div class="item-top"><strong>GrowthWave Media</strong><span class="stamp">Top source</span></div><p>17 clicks, 6 leads, 2 activations. Strong article-to-signup performance.</p><div class="tag-row"><span class="tag purple">Media Partner</span><span class="tag green">2 Activations</span></div></div>
+                  <div class="item"><div class="item-top"><strong>Founder Signals</strong><span class="stamp">Rising</span></div><p>11 clicks, 3 leads, 1 activation. Best conversion quality this week.</p><div class="tag-row"><span class="tag blue">Content Partner</span></div></div>
+                  <div class="item"><div class="item-top"><strong>Startup Local Español</strong><span class="stamp">Testing</span></div><p>Spanish-language partner with first campaign now active.</p><div class="tag-row"><span class="tag blue">Spanish</span></div></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Partner Health</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Links live</span><strong>19</strong></div>
+                  <div class="metric-row"><span>Partners with leads</span><strong>7</strong></div>
+                  <div class="metric-row"><span>Partners with activations</span><strong>3</strong></div>
+                  <div class="metric-row"><span>Pending reward review</span><strong>2</strong></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Links: `
+            <div class="card blue">
+              <h2>Referral Links</h2>
+              <div class="list">
+                <div class="item"><div class="item-top"><strong>/beta?ref=growthwave</strong><span class="stamp">English</span></div><p>Main partner article link used in launch campaign.</p></div>
+                <div class="item"><div class="item-top"><strong>/beta?ref=foundersignals</strong><span class="stamp">English</span></div><p>Founder audience landing link tied to article placements.</p></div>
+                <div class="item"><div class="item-top"><strong>/beta?ref=startuplocales</strong><span class="stamp">Spanish</span></div><p>Localized partner link for Spanish rollout testing.</p></div>
+              </div>
+            </div>
+          `,
+          Leads: `
+            <div class="panel-grid cols-2">
+              <div class="card green">
+                <h2>Referral Leads</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Clicks</span><strong>148</strong></div>
+                  <div class="metric-row"><span>Leads</span><strong>31</strong></div>
+                  <div class="metric-row"><span>Signups</span><strong>12</strong></div>
+                  <div class="metric-row"><span>Activations</span><strong>3</strong></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Recent Referral Leads</h2>
+                <div class="list">
+                  <div class="item"><strong>Metro Home Service</strong><p>Came from GrowthWave Media article. Started Step 1 but still pending verification.</p></div>
+                  <div class="item"><strong>Peak Service Group</strong><p>Came from Founder Signals article. Activated this week after live test.</p></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Rewards: `
+            <div class="panel-grid cols-2">
+              <div class="card orange">
+                <h2>Reward Status</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Reward-qualified partners</span><strong>2</strong></div>
+                  <div class="metric-row"><span>Pending review</span><strong>2</strong></div>
+                  <div class="metric-row"><span>Paid / granted</span><strong>1</strong></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Logic</h2>
+                <p>Use this screen to track partner reward logic, activation-linked eligibility, and launch discount qualification without mixing partner operations into normal client dashboards.</p>
+              </div>
+            </div>
+          `
+        }
+      },
+      seo: {
+        title: "SEO Engine",
+        copy: "Control keyword strategy, article production, multilingual content, and search-driven conversion from one internal engine.",
+        actions: [
+          { label: "24 Topics", kind: "chip blue" },
+          { label: "11 Drafts", kind: "chip purple" },
+          { label: "Open Article Queue", kind: "action primary" }
+        ],
+        views: {
+          Keywords: `
+            <div class="panel-grid cols-2">
+              <div class="card blue">
+                <h2>Priority Keywords</h2>
+                <div class="list">
+                  <div class="item"><strong>AI call system for small business</strong><p>Primary category term for launch education content.</p></div>
+                  <div class="item"><strong>business operations system with AI call handling</strong><p>Supports product positioning and differentiation.</p></div>
+                  <div class="item"><strong>AI call handling with CRM and scheduling</strong><p>Connects search intent to core product workflow.</p></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Keyword Metrics</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Tracked keywords</span><strong>42</strong></div>
+                  <div class="metric-row"><span>High priority</span><strong>12</strong></div>
+                  <div class="metric-row"><span>English</span><strong>26</strong></div>
+                  <div class="metric-row"><span>Spanish</span><strong>9</strong></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Topics: `
+            <div class="card">
+              <h2>Topic Clusters</h2>
+              <div class="list">
+                <div class="item"><strong>Category creation</strong><p>What AI Call Port is and why it is more than answering calls.</p></div>
+                <div class="item"><strong>Beta Partner Offer</strong><p>Why early users should join, test, and give feedback.</p></div>
+                <div class="item"><strong>Operational value</strong><p>CRM, scheduling, confirmations, outbound follow-up, and management upgrade topics.</p></div>
+              </div>
+            </div>
+          `,
+          Articles: `
+            <div class="panel-grid cols-2">
+              <div class="card purple">
+                <h2>Article Queue</h2>
+                <div class="list">
+                  <div class="item"><strong>Long-form launch article</strong><p>Status: review</p><div class="tag-row"><span class="tag purple">Long</span><span class="tag orange">Review</span></div></div>
+                  <div class="item"><strong>Beta offer explainer</strong><p>Status: approved</p><div class="tag-row"><span class="tag blue">Approved</span></div></div>
+                  <div class="item"><strong>Spanish partner article</strong><p>Status: draft</p><div class="tag-row"><span class="tag blue">Spanish</span><span class="tag orange">Draft</span></div></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Article Metrics</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Drafts</span><strong>11</strong></div>
+                  <div class="metric-row"><span>Ready for review</span><strong>5</strong></div>
+                  <div class="metric-row"><span>Approved</span><strong>4</strong></div>
+                  <div class="metric-row"><span>Published</span><strong>8</strong></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Performance: `
+            <div class="card green">
+              <h2>SEO Performance</h2>
+              <div class="metric-list">
+                <div class="metric-row"><span>Top article</span><strong>Why SMBs need more than AI answering</strong></div>
+                <div class="metric-row"><span>Top converting language</span><strong>English</strong></div>
+                <div class="metric-row"><span>Signups from content</span><strong>9</strong></div>
+                <div class="metric-row"><span>Activations from content</span><strong>2</strong></div>
+              </div>
+            </div>
+          `
+        }
+      },
+      publishing: {
+        title: "Publishing",
+        copy: "Manage publishing queue, schedules, published content, and repurposing from one internal workspace before this module becomes a customer-facing upgrade later.",
+        actions: [
+          { label: "18 In Queue", kind: "chip purple" },
+          { label: "6 Languages", kind: "chip blue" },
+          { label: "Create Content", kind: "action primary" }
+        ],
+        views: {
+          Queue: `
+            <div class="card purple">
+              <h2>Publishing Queue</h2>
+              <div class="list">
+                <div class="item"><strong>Launch Beta Offer article</strong><p>Approved and waiting for partner distribution.</p></div>
+                <div class="item"><strong>Spanish rollout post set</strong><p>Needs final language review before scheduling.</p></div>
+                <div class="item"><strong>Advanced Management feature article</strong><p>Waiting on product wording approval.</p></div>
+              </div>
+            </div>
+          `,
+          Scheduled: `
+            <div class="card blue">
+              <h2>Scheduled</h2>
+              <div class="list">
+                <div class="item"><strong>Apr 23 • LinkedIn</strong><p>Launch Beta Offer short post</p></div>
+                <div class="item"><strong>Apr 24 • Medium</strong><p>Category creation long-form article</p></div>
+                <div class="item"><strong>Apr 24 • Partner article</strong><p>GrowthWave Media placement</p></div>
+              </div>
+            </div>
+          `,
+          Published: `
+            <div class="card green">
+              <h2>Published</h2>
+              <div class="metric-list">
+                <div class="metric-row"><span>Published this week</span><strong>9</strong></div>
+                <div class="metric-row"><span>Top platform</span><strong>LinkedIn</strong></div>
+                <div class="metric-row"><span>Top language</span><strong>English</strong></div>
+              </div>
+            </div>
+          `,
+          Repurposing: `
+            <div class="card">
+              <h2>Repurposing</h2>
+              <p>Track which long articles still need short versions, partner versions, translations, or social variants so the content engine stays organized.</p>
+            </div>
+          `
+        }
+      },
+      feedback: {
+        title: "Feedback",
+        copy: "Collect launch feedback, cluster repeated issues, and turn requests into roadmap decisions without losing product-learning visibility.",
+        actions: [
+          { label: "11 Unresolved", kind: "chip orange" },
+          { label: "3 Critical", kind: "chip" },
+          { label: "Open Feedback Queue", kind: "action primary" }
+        ],
+        views: {
+          New: `
+            <div class="card orange">
+              <h2>New Feedback</h2>
+              <div class="list">
+                <div class="item"><strong>Client wants clearer upgrade pricing after month 1</strong><p>Reported by Summit Drain & Pipe during trial feedback.</p></div>
+                <div class="item"><strong>CRM sync confusion during onboarding</strong><p>Two launch users reported uncertainty around import and sync logic.</p></div>
+                <div class="item"><strong>Requested stronger task view</strong><p>Advanced Management trial users want clearer task ownership.</p></div>
+              </div>
+            </div>
+          `,
+          Priorities: `
+            <div class="card red">
+              <h2>Priorities</h2>
+              <div class="metric-list">
+                <div class="metric-row"><span>Critical issues</span><strong>3</strong></div>
+                <div class="metric-row"><span>High priority requests</span><strong>7</strong></div>
+                <div class="metric-row"><span>Resolved this week</span><strong>4</strong></div>
+              </div>
+            </div>
+          `,
+          "Repeated Issues": `
+            <div class="card">
+              <h2>Repeated Issues</h2>
+              <div class="list">
+                <div class="item"><strong>Upgrade confusion after month 1</strong><p>Repeated 4 times</p></div>
+                <div class="item"><strong>Need stronger management module explanation</strong><p>Repeated 3 times</p></div>
+                <div class="item"><strong>Publishing status visibility needs work</strong><p>Repeated 2 times</p></div>
+              </div>
+            </div>
+          `,
+          Requests: `
+            <div class="card">
+              <h2>Feature Requests</h2>
+              <p>Use this area to track structured customer requests and connect them to roadmap priorities instead of handling them in scattered notes.</p>
+            </div>
+          `
+        }
+      },
+      analytics: {
+        title: "Analytics",
+        copy: "See launch, growth, conversion, and retention performance from one internal reporting layer without mixing the company’s own metrics with customer dashboards.",
+        actions: [
+          { label: "Launch Live", kind: "chip green" },
+          { label: "Open Reports", kind: "action primary" }
+        ],
+        views: {
+          Launch: `
+            <div class="panel-grid cols-2">
+              <div class="card green">
+                <h2>Launch Metrics</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Signups</span><strong>42</strong></div>
+                  <div class="metric-row"><span>Trials</span><strong>21</strong></div>
+                  <div class="metric-row"><span>Activations</span><strong>9</strong></div>
+                  <div class="metric-row"><span>Feedback completed</span><strong>14</strong></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Launch interpretation</h2>
+                <p>The launch dashboard should answer which sources bring better accounts, which users are most engaged, and which parts of the trial turn into retained upgrades.</p>
+              </div>
+            </div>
+          `,
+          Growth: `
+            <div class="card blue">
+              <h2>Growth Metrics</h2>
+              <div class="metric-list">
+                <div class="metric-row"><span>Best source</span><strong>Partner articles</strong></div>
+                <div class="metric-row"><span>Best content type</span><strong>Long-form launch explainer</strong></div>
+                <div class="metric-row"><span>Top language</span><strong>English</strong></div>
+              </div>
+            </div>
+          `,
+          Conversion: `
+            <div class="card purple">
+              <h2>Conversion Metrics</h2>
+              <div class="metric-list">
+                <div class="metric-row"><span>Clicks to leads</span><strong>21%</strong></div>
+                <div class="metric-row"><span>Leads to signups</span><strong>39%</strong></div>
+                <div class="metric-row"><span>Signups to activations</span><strong>21%</strong></div>
+              </div>
+            </div>
+          `,
+          Retention: `
+            <div class="card orange">
+              <h2>Retention Metrics</h2>
+              <div class="metric-list">
+                <div class="metric-row"><span>Scheduling retained</span><strong>8</strong></div>
+                <div class="metric-row"><span>Advanced Management retained</span><strong>5</strong></div>
+                <div class="metric-row"><span>Outbound retained</span><strong>4</strong></div>
+              </div>
+            </div>
+          `
+        }
+      },
+      roadmap: {
+        title: "Roadmap",
+        copy: "Track current build status, what is coming next, what is under internal testing, and which release priorities should move first.",
+        actions: [
+          { label: "6 Active Builds", kind: "chip purple" },
+          { label: "Open Roadmap", kind: "action primary" }
+        ],
+        views: {
+          "Current Build": `
+            <div class="panel-grid cols-2">
+              <div class="card purple">
+                <h2>Current Build</h2>
+                <div class="list">
+                  <div class="item"><strong>Advanced Management Upgrade</strong><p>Task Management, Staff Management, Sales Pipeline, and Approvals.</p></div>
+                  <div class="item"><strong>Internal Campaigns Module</strong><p>Needed for launch content, task flow, and source tracking.</p></div>
+                  <div class="item"><strong>Referral Engine</strong><p>Partner links, rewards, and attribution.</p></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Build Priorities</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Highest priority</span><strong>Internal Dashboard V1</strong></div>
+                  <div class="metric-row"><span>Next client-facing build</span><strong>Advanced Management</strong></div>
+                  <div class="metric-row"><span>Growth engine</span><strong>SEO + Publishing</strong></div>
+                </div>
+              </div>
+            </div>
+          `,
+          "Coming Soon": `
+            <div class="card">
+              <h2>Coming Soon</h2>
+              <p>Use this area to track which modules should become visible to customers next once they are tested internally and connected to real workflows.</p>
+            </div>
+          `,
+          "Internal Testing": `
+            <div class="card blue">
+              <h2>Internal Testing</h2>
+              <div class="list">
+                <div class="item"><strong>Publishing module</strong><p>Testing queue, calendar, and multilingual workflow internally first.</p></div>
+                <div class="item"><strong>Campaigns module</strong><p>Testing launch campaign logic before selling it as an upgrade later.</p></div>
+              </div>
+            </div>
+          `,
+          "Release Plan": `
+            <div class="card">
+              <h2>Release Plan</h2>
+              <p>Keep release timing, launch phases, and public rollout logic visible here so product expansion stays structured.</p>
+            </div>
+          `
+        }
+      },
+      settings: {
+        title: "Settings",
+        copy: "Internal rules, launch-offer logic, permissions, and automation controls for AI Call Port itself.",
+        actions: [
+          { label: "Beta Offer Active", kind: "chip orange" },
+          { label: "Save Rules", kind: "action primary" }
+        ],
+        views: {
+          "Team Access": `
+            <div class="card">
+              <h2>Team Access</h2>
+              <div class="metric-list">
+                <div class="metric-row"><span>Admins</span><strong>2</strong></div>
+                <div class="metric-row"><span>Growth managers</span><strong>3</strong></div>
+                <div class="metric-row"><span>Publishing operators</span><strong>2</strong></div>
+              </div>
+            </div>
+          `,
+          Offers: `
+            <div class="panel-grid cols-2">
+              <div class="card orange">
+                <h2>Beta Partner Offer</h2>
+                <p>Base system price only for month 1, all upgrades included, and 50% off selected upgrades after month 1 for launch participants who provide feedback.</p>
+              </div>
+              <div class="card">
+                <h2>Offer Rules</h2>
+                <div class="metric-list">
+                  <div class="metric-row"><span>Trial length</span><strong>30 days</strong></div>
+                  <div class="metric-row"><span>Discount</span><strong>50%</strong></div>
+                  <div class="metric-row"><span>Requires feedback</span><strong>Yes</strong></div>
+                </div>
+              </div>
+            </div>
+          `,
+          Rules: `
+            <div class="card">
+              <h2>Rules</h2>
+              <p>Use this area for launch rules, partner reward logic, upgrade-retention rules, and workflow conditions that should not live inside scattered documents.</p>
+            </div>
+          `,
+          Automations: `
+            <div class="card blue">
+              <h2>Automations</h2>
+              <p>Future automation rules should control reminder timing, campaign task creation, referral reward checks, publish scheduling, and trial-end alerts from one internal area.</p>
+            </div>
+          `
+        }
+      }
+    };
+
+    const moduleNav = document.getElementById("moduleNav");
+    const submenuBar = document.getElementById("submenuBar");
+    const workspace = document.getElementById("workspace");
+    const workspaceTitle = document.getElementById("workspaceTitle");
+    const workspaceCopy = document.getElementById("workspaceCopy");
+    const headerActions = document.getElementById("headerActions");
+
+    let activeModule = "overview";
+    let activeSubmenu = "Summary";
+
+    function renderModuleNav() {
+      moduleNav.innerHTML = modules.map((mod) => `
+        <button class="module-link ${mod.id === activeModule ? "active" : ""}" data-module="${mod.id}">
+          <span class="module-main">
+            <span class="module-icon">${moduleIcons[mod.id]}</span>
+            <span class="module-name">${mod.name}</span>
+          </span>
+          <span class="module-state state-active">Live</span>
+        </button>
+      `).join("");
+
+      moduleNav.querySelectorAll("[data-module]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          activeModule = btn.dataset.module;
+          activeSubmenu = modules.find((m) => m.id === activeModule).submenus[0];
+          renderAll();
+        });
+      });
+    }
+
+    function renderHeader() {
+      const data = dashboardData[activeModule];
+      workspaceTitle.textContent = data.title;
+      workspaceCopy.textContent = data.copy;
+      headerActions.innerHTML = data.actions.map((action) => `<span class="${action.kind.startsWith("action") ? "action-btn" : "chip"} ${action.kind.includes("primary") ? "primary" : ""} ${action.kind.includes("blue") ? "blue" : ""} ${action.kind.includes("orange") ? "orange" : ""} ${action.kind.includes("green") ? "green" : ""}">${action.label}</span>`).join("");
+    }
+
+    function renderSubmenu() {
+      const mod = modules.find((m) => m.id === activeModule);
+      submenuBar.innerHTML = mod.submenus.map((name) => `
+        <button class="submenu-btn ${name === activeSubmenu ? "active" : ""}" data-submenu="${name}">
+          ${name}
+        </button>
+      `).join("");
+
+      submenuBar.querySelectorAll("[data-submenu]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          activeSubmenu = btn.dataset.submenu;
+          renderWorkspace();
+          renderSubmenu();
+        });
+      });
+    }
+
+    function renderWorkspace() {
+      const view = dashboardData[activeModule].views[activeSubmenu];
+      workspace.innerHTML = view || `
+        <div class="empty-state">
+          <h2>${activeSubmenu}</h2>
+          <p>This page is defined in the internal dashboard structure, but the first focused view has not been filled yet.</p>
+        </div>
+      `;
+    }
+
+    function renderAll() {
+      renderModuleNav();
+      renderHeader();
+      renderSubmenu();
+      renderWorkspace();
+    }
+
+    renderAll();
+  </script>
+  <script src="ai-assistant.js"></script>
+</body>
+</html>

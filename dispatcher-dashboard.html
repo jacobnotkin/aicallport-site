@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX | Dispatcher Dashboard</title>
+  <meta name="description" content="AI-ABCX Dispatcher Dashboard for President-side Stage A manual scheduling visibility and Stage B automated assignment, confirmation, reroute, and closeout control." />
+  <style>
+    :root{--text-primary:#f7fbff;--text-secondary:#c9d7e6;--text-muted:#8d9db1;--blue:#4ea5ff;--blue-soft:#7fd4ff;--orange:#ff8a3d;--orange-soft:#ffb36b;--green:#69d39c;--red:#ff6e7f;--border-soft:rgba(255,255,255,.06)}
+    *{box-sizing:border-box} html,body{margin:0;height:100%}
+    body{color:var(--text-primary);font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;background:radial-gradient(circle at top left, rgba(78,165,255,.18), transparent 30%),radial-gradient(circle at top right, rgba(255,138,61,.10), transparent 26%),linear-gradient(180deg,#09131f 0%,#07111a 100%);overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 22%, rgba(78,165,255,.06), transparent 28%),radial-gradient(circle at 82% 78%, rgba(255,138,61,.06), transparent 32%);z-index:0}
+    .page{position:relative;z-index:1;min-height:100vh;padding:18px;display:flex;justify-content:center}
+    .shell{width:min(1500px, calc(100vw - 36px));height:calc(100vh - 36px);min-height:calc(100vh - 36px);border-radius:30px;border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg, rgba(9,11,17,.97), rgba(6,8,13,.99));box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);overflow:hidden;position:relative}
+    .shell::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px circle at 50% 0%, rgba(255,138,61,.05), transparent 56%),radial-gradient(520px circle at 10% 8%, rgba(78,165,255,.05), transparent 52%);z-index:0}
+    .layout{position:relative;z-index:1;display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 36px)}
+    .sidebar{border-right:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));padding:20px 16px 18px;display:flex;flex-direction:column;gap:20px;min-height:0;overflow:auto}
+    .brand{display:flex;align-items:center;gap:12px;padding:6px 8px}.logo-wrap{width:72px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}.logo-image{width:72px;height:auto;display:block}.brand-wordmark{display:flex;gap:6px;align-items:flex-end;line-height:1;flex-wrap:wrap}.brand-ai{font-size:14px;font-weight:900;text-transform:uppercase;color:transparent;-webkit-background-clip:text;background-clip:text;background-image:linear-gradient(180deg,var(--blue-soft),var(--blue))}
+    .beta-badge,.nav-count,.chip,.tag,.stage-toggle{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .beta-badge{min-height:22px;padding:0 9px;border:1px solid rgba(255,138,61,.24);background:rgba(255,138,61,.10);color:#fff}
+    .profile-card,.card{border-radius:24px;border:1px solid var(--border-soft);background:linear-gradient(180deg, rgba(127,212,255,.05), rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.03);padding:18px}
+    .profile-card strong{display:block;font-size:18px;line-height:1.2}.profile-card span{display:block;margin-top:8px;color:var(--blue-soft);font-size:13px;line-height:1.5;font-weight:700}
+    .nav{display:grid;gap:8px}.nav-link{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:16px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);padding:13px 14px;color:#dbe6f1;text-decoration:none;font-size:13px;font-weight:700}.nav-link.active{border-color:rgba(127,212,255,.24);background:rgba(127,212,255,.10);color:#fff}.nav-count{min-width:26px;height:22px;padding:0 7px;background:rgba(255,255,255,.06);color:#fff}
+    .sidebar-foot{margin-top:auto;border-radius:20px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:16px}.sidebar-foot strong{display:block;font-size:13px;line-height:1.3;text-transform:uppercase}.sidebar-foot p{margin:8px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.55;font-weight:600}
+    .main{padding:18px;display:grid;gap:16px;align-content:start;min-height:0;overflow:auto}
+    .topbar{position:sticky;top:0;z-index:4;border-radius:24px;border:1px solid var(--border-soft);background:rgba(8,11,18,.90);backdrop-filter:blur(14px);display:grid;grid-template-columns:1fr auto;gap:16px;padding:14px 18px}
+    .topbar-left{max-width:640px}
+    .topbar-left h1{margin:0;font-size:28px;font-weight:850;letter-spacing:-.05em;line-height:1.04}.topbar-left p{margin:8px 0 0;color:var(--blue-soft);font-size:13px;font-weight:700;line-height:1.42}.topbar-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:flex-start;align-content:flex-start}
+    .chip,.action-btn,.stage-toggle{min-height:36px;padding:0 13px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#eef6ff;font-size:10px;font-weight:900;letter-spacing:.10em;line-height:1;text-transform:uppercase;text-decoration:none;white-space:nowrap;cursor:pointer}
+    .action-btn.primary,.stage-toggle.active{border:none;background:linear-gradient(135deg,var(--orange),var(--orange-soft));color:#fff}
+    .action-btn.disabled{opacity:.42;pointer-events:none;cursor:not-allowed}
+    .summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.label{color:var(--text-muted);font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.value{margin-top:10px;font-size:32px;line-height:1;font-weight:900;letter-spacing:-.05em}.meta{margin-top:8px;color:var(--text-secondary);font-size:13px;line-height:1.45;font-weight:600}
+    .split{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;align-items:start}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.section-title h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}.section-title span{color:var(--text-muted);font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    .dispatch-list,.mini-list,.flow-steps,.candidate-list{display:grid;gap:10px}.dispatch-item,.mini-item,.flow-step,.candidate-item{border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);padding:14px}
+    .dispatch-item.active{border-color:rgba(127,212,255,.24);background:rgba(127,212,255,.08)}
+    .dispatch-item{cursor:pointer;color:inherit;text-align:left;font:inherit}
+    .dispatch-top{display:grid;grid-template-columns:1.2fr .8fr auto;gap:12px;align-items:start}
+    .dispatch-item strong,.mini-item strong,.flow-step strong{display:block;font-size:14px;font-weight:800;line-height:1.45}.dispatch-item strong{color:#c7d0e0}.dispatch-item p,.mini-item p,.flow-step span{margin:6px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}
+    .tag-row,.action-row,.stage-switch,.candidate-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .tag{min-height:24px;padding:0 8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#eef6ff}.tag.green{border-color:rgba(105,211,156,.24);background:rgba(105,211,156,.12);color:#bdf1d1}.tag.orange{border-color:rgba(255,138,61,.24);background:rgba(255,138,61,.12);color:#ffc48e}.tag.blue{border-color:rgba(127,212,255,.24);background:rgba(127,212,255,.10);color:#9bdcff}.tag.red{border-color:rgba(255,110,127,.24);background:rgba(255,110,127,.12);color:#ffd0d7}
+    .focus-card{border-radius:24px;border:1px solid rgba(127,212,255,.16);background:linear-gradient(180deg, rgba(127,212,255,.06), rgba(255,255,255,.02));padding:18px;display:grid;gap:16px}
+    .split > .card,.split > .focus-card{max-height:min(58vh, calc(100vh - 330px));overflow-x:hidden;overflow-y:auto;padding-bottom:120px;scroll-padding-bottom:120px;overscroll-behavior:contain}
+    .focus-head h2{margin:0;font-size:28px;font-weight:850;letter-spacing:-.05em}.focus-head p{margin:10px 0 0;color:var(--blue-soft);font-size:14px;font-weight:700;line-height:1.5}
+    .focus-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .mini-stat{border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);padding:14px}.mini-stat strong{display:block;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted)}.mini-stat span{display:block;margin-top:8px;font-size:16px;font-weight:800;color:#fff;line-height:1.4}
+    .candidate-item{color:inherit;text-align:left;font:inherit}
+    .candidate-item.active{border-color:rgba(255,138,61,.24);background:rgba(255,138,61,.10)}
+    .candidate-item strong{display:block;font-size:14px;font-weight:800;line-height:1.45;color:#c7d0e0}.candidate-item p{margin:6px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.5;font-weight:600}
+    .panel-status{min-height:20px;color:var(--blue-soft);font-size:12px;font-weight:800;letter-spacing:.04em}
+    .panel-status.success{color:#bdf1d1}.panel-status.error{color:#ffd0d7}
+    .flow-step.complete{border-color:rgba(105,211,156,.24);background:rgba(105,211,156,.12)}.flow-step.active{border-color:rgba(255,138,61,.24);background:rgba(255,138,61,.12)}.flow-step.blocked{border-color:rgba(255,110,127,.24);background:rgba(255,110,127,.12)}
+    @media (max-width:1280px){.summary-grid,.split,.focus-meta{grid-template-columns:1fr}.split > .card,.split > .focus-card{max-height:none}}
+    @media (max-width:980px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid rgba(255,255,255,.06)}}
+    @media (max-width:760px){.page{padding:10px}.shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}.layout{min-height:calc(100vh - 20px)}.topbar,.dispatch-top{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr 1fr}.focus-meta{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="page"><div class="shell"><div class="layout">
+    <aside class="sidebar">
+      <div class="brand"><div class="logo-wrap"><img class="logo-image" src="public/assets/images/ai-abcx-logo-icon-tight-transparent.png" alt="AI-ABCX logo" /></div><div><div class="brand-wordmark"><span class="brand-ai">AI-ABCX</span></div><div class="beta-badge" id="dispatchStageBadge">Dispatcher</div></div></div>
+      <div class="profile-card"><strong>Dispatcher Dashboard</strong><span id="dispatchProfileText">Manage assignment flow, confirmation timing, routing decisions, and closeout pressure across the day.</span></div>
+      <nav class="nav">
+        <a class="nav-link active" id="dispatchBoardLink" href="#"><span>Dispatcher</span><span class="nav-count" id="dispatchBoardCount">0</span></a>
+        <a class="nav-link" id="dispatchJobRecordsLink" href="#"><span>Job Records</span><span class="nav-count">Shared</span></a>
+        <a class="nav-link" id="dispatchPresidentLink" href="#"><span>President View</span><span class="nav-count">Top</span></a>
+        <a class="nav-link" id="dispatchCrmLink" href="#"><span>CRM</span><span class="nav-count">Core</span></a>
+        <a class="nav-link" id="dispatchFollowUpLink" href="#"><span>President Follow-Up</span><span class="nav-count">Action</span></a>
+        <a class="nav-link" id="dispatchSettingsLink" href="#"><span>Settings</span><span class="nav-count">System</span></a>
+      </nav>
+      <div class="sidebar-foot"><strong>Operational Access</strong><p id="dispatchSidebarFoot">This role bridges scheduling truth, assignment movement, confirmation gates, and escalation visibility without replacing President control.</p></div>
+    </aside>
+    <main class="main">
+      <section class="topbar">
+        <div class="topbar-left">
+          <h1 id="dispatchTitle">Dispatcher Dashboard</h1>
+          <p id="dispatchSub">See what needs assignment, who is available, what is urgent, and what still needs confirmation or closeout.</p>
+          <div class="stage-switch">
+            <button class="stage-toggle active" type="button" data-stage="A">Stage A</button>
+            <button class="stage-toggle" type="button" data-stage="B">Stage B</button>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="chip" id="dispatchOpenChip">0 Open</div>
+          <div class="chip" id="dispatchPressureChip">0 Waiting</div>
+          <a class="action-btn" id="dispatchOpenRecordBtn" href="#">Open Job Record</a>
+          <a class="action-btn" id="dispatchWorkerBtn" href="#">Open Field Dashboard</a>
+          <a class="action-btn primary" id="dispatchPresidentBtn" href="#">Open President Dashboard</a>
+        </div>
+      </section>
+      <section class="summary-grid" id="dispatchSummaryGrid"></section>
+      <section class="split">
+        <div class="card">
+          <div class="section-title"><h2>Assignment Queue</h2><span id="dispatchQueueLabel">Priority first</span></div>
+          <div class="dispatch-list" id="dispatchQueueList"></div>
+        </div>
+        <div class="focus-card">
+          <div class="focus-head">
+            <h2 id="focusTitle">Job Record Focus</h2>
+            <p id="focusSub">Select a record to inspect the current movement rule.</p>
+          </div>
+          <div class="focus-meta">
+            <div class="mini-stat"><strong>Job</strong><span id="focusJob">-</span></div>
+            <div class="mini-stat"><strong>Priority</strong><span id="focusPriority">-</span></div>
+            <div class="mini-stat"><strong>Status</strong><span id="focusStatus">-</span></div>
+            <div class="mini-stat"><strong>Owner</strong><span id="focusOwner">-</span></div>
+          </div>
+          <div class="mini-item"><strong id="focusActionLabel">Next action</strong><p id="focusActionText">Movement detail appears here.</p></div>
+          <div class="mini-item">
+            <strong id="assignmentPanelTitle">Assignment Decision Surface</strong>
+            <p id="assignmentPanelIntro">Choose a worker or review the manual control note for this stage.</p>
+            <div class="candidate-list" id="assignmentCandidateList"></div>
+            <div class="candidate-actions">
+              <button class="action-btn" id="assignSelectedBtn" type="button">Assign Selected</button>
+              <button class="action-btn" id="returnToQueueBtn" type="button">Return To Queue</button>
+              <button class="action-btn" id="rerouteSelectedBtn" type="button">Send To Reroute</button>
+              <button class="action-btn primary" id="markInProgressBtn" type="button">Mark In Progress</button>
+            </div>
+            <div class="panel-status" id="assignmentPanelStatus">Select a queue item to review assignment movement.</div>
+          </div>
+          <div class="flow-steps" id="dispatchFlowSteps"></div>
+          <div class="mini-list" id="dispatchActivityList"></div>
+          <div class="action-row">
+            <a class="action-btn" id="focusJobRecordLink" href="#">Job Record</a>
+            <a class="action-btn" id="focusWorkerLink" href="#">Worker View</a>
+            <a class="action-btn primary" id="focusPresidentLink" href="#">President View</a>
+          </div>
+        </div>
+      </section>
+      <section class="card">
+        <div class="section-title"><h2>Routing Lanes</h2><span>Live board</span></div>
+        <div class="mini-list" id="dispatchLaneList"></div>
+      </section>
+    </main>
+  </div></div></div>
+  <script src="ai-abc-stage-config.js"></script>
+  <script src="ai-abc-config.js?v=20260618a"></script>
+  <script src="ai-abcx-job-records.js?v=20260615d"></script>
+  <script src="ai-abcx-workflow-helpers.js"></script>
+  <script src="ai-abcx-dispatcher-dashboard-app.js"></script>
+  <script src="ai-assistant.js"></script>
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX Country Explorer</title>
+  <style>
+    :root {
+      --text: #edf4fc;
+      --muted: #9db0c5;
+      --line: rgba(255,255,255,0.08);
+      --blue: #78c7ff;
+      --gold: #f0be62;
+      --green: #53de9f;
+      --amber: #f2c56b;
+      --violet: #c49dff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(240,190,98,0.08), transparent 26%),
+        radial-gradient(circle at top left, rgba(120,199,255,0.08), transparent 28%),
+        linear-gradient(180deg, #07111c 0%, #04080f 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: radial-gradient(circle at center, black 48%, transparent 94%);
+      opacity: 0.14;
+      pointer-events: none;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1460px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 26px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: grid;
+      gap: 12px;
+      padding: 8px 0 14px;
+      background:
+        linear-gradient(180deg, rgba(5, 11, 18, 0.98), rgba(5, 11, 18, 0.84) 78%, rgba(5, 11, 18, 0));
+      backdrop-filter: blur(12px);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 15px;
+      border-radius: 999px;
+      border: 1px solid rgba(120, 199, 255, 0.22);
+      background: rgba(120, 199, 255, 0.08);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      gap: 8px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(240,190,98,0.08), transparent 22%),
+        linear-gradient(180deg, rgba(10, 19, 31, 0.98), rgba(6, 11, 18, 0.99));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2.6vw, 2.45rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 980px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .search-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .search-field input {
+      width: 100%;
+      height: 52px;
+      padding: 0 18px;
+      border: 1px solid rgba(120, 199, 255, 0.16);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+    }
+
+    .search-field input::placeholder { color: #8ea3ba; }
+
+    .summary-stack {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .summary-pill,
+    .legend-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 13px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .summary-pill {
+      border-color: rgba(240,190,98,0.2);
+      background: rgba(240,190,98,0.08);
+      color: #f3d28e;
+    }
+
+    .legend-pill.active { color: #b6f3cf; border-color: rgba(83,222,159,0.22); background: rgba(83,222,159,0.08); }
+    .legend-pill.soon { color: #f7dd9f; border-color: rgba(242,197,107,0.22); background: rgba(242,197,107,0.08); }
+    .legend-pill.projected { color: #dcc6ff; border-color: rgba(196,157,255,0.22); background: rgba(196,157,255,0.08); }
+
+    .continent-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .continent-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.025);
+      padding: 18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .continent-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .continent-head strong {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .continent-count {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: #b9c9db;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .country-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .country-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 40px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      color: #dde8f5;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .country-item span:first-child { min-width: 0; }
+
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .status-tag.active { color: #b6f3cf; border: 1px solid rgba(83,222,159,0.22); background: rgba(83,222,159,0.08); }
+    .status-tag.soon { color: #f7dd9f; border: 1px solid rgba(242,197,107,0.22); background: rgba(242,197,107,0.08); }
+    .status-tag.projected { color: #dcc6ff; border: 1px solid rgba(196,157,255,0.22); background: rgba(196,157,255,0.08); }
+
+    .empty-state {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.02);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .continent-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .wrap {
+        width: min(100%, calc(100% - 16px));
+        padding-top: 10px;
+      }
+
+      .search-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-stack {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        padding: 16px;
+        border-radius: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <span class="badge">Search Your Country</span>
+    </div>
+
+    <section class="hero">
+      <h1>Search the market where your company operates.</h1>
+      <p>
+        AI-ABCX is structured for global expansion. This rollout map shows countries currently prioritized as `Active`, markets planned as `Coming Soon`, and longer-range `Projected` markets.
+      </p>
+      <div class="search-shell">
+        <label class="search-field">
+          <input id="countrySearch" type="text" placeholder="Search United States, Germany, Brazil, UAE, South Africa, India..." />
+        </label>
+        <div class="summary-stack">
+          <div class="summary-pill" id="resultSummary">0 continents • 0 countries</div>
+          <div class="legend-pill active" id="activeCount">Active 0</div>
+          <div class="legend-pill soon" id="soonCount">Coming Soon 0</div>
+          <div class="legend-pill projected" id="projectedCount">Projected 0</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="empty-state" id="emptyState">
+      No country match was found. Try searching by country name only, such as `Canada`, `Japan`, `Mexico`, `India`, or `Kenya`.
+    </div>
+
+    <section class="continent-grid" id="continentGrid"></section>
+
+    <p class="footer-note">
+      `Active` markets are prioritized first based on buying ability and practical launch readiness. `Coming Soon` and `Projected` markets remain visible so companies can see the intended expansion path.
+    </p>
+  </div>
+
+  <script>
+    const countryCatalog = [
+      {
+        continent: "North America",
+        countries: [
+          ["United States","active"],["Canada","active"],["Mexico","active"],["Panama","active"],["Costa Rica","active"],
+          ["Dominican Republic","active"],["Trinidad and Tobago","active"],["Bahamas","active"],["Barbados","active"],
+          ["Antigua and Barbuda","active"],["Saint Kitts and Nevis","active"],["Jamaica","active"],
+          ["Guatemala","soon"],["El Salvador","soon"],["Honduras","soon"],["Nicaragua","soon"]
+        ]
+      },
+      {
+        continent: "South America",
+        countries: [
+          ["Chile","active"],["Uruguay","active"],["Brazil","active"],["Guyana","active"],
+          ["Colombia","soon"],["Peru","soon"],["Ecuador","soon"],["Paraguay","soon"],["Bolivia","soon"]
+        ]
+      },
+      {
+        continent: "Europe",
+        countries: [
+          ["United Kingdom","active"],["Ireland","active"],["Iceland","active"],["Norway","active"],["Sweden","active"],
+          ["Finland","active"],["Denmark","active"],["Netherlands","active"],["Belgium","active"],["Luxembourg","active"],
+          ["France","active"],["Germany","active"],["Switzerland","active"],["Austria","active"],["Spain","active"],
+          ["Portugal","active"],["Italy","active"],["Malta","active"],["Cyprus","active"],["Greece","active"],
+          ["Czech Republic","active"],["Estonia","active"],["Latvia","active"],["Lithuania","active"],["Poland","active"],
+          ["Slovakia","active"],["Slovenia","active"],["Croatia","active"],["Hungary","active"],["Romania","active"],
+          ["Bulgaria","active"],["Serbia","active"],["Montenegro","active"],
+          ["Albania","soon"],["North Macedonia","soon"],["Bosnia and Herzegovina","soon"],["Moldova","soon"],["Ukraine","soon"],["Kosovo","soon"]
+        ]
+      },
+      {
+        continent: "Asia",
+        countries: [
+          ["Japan","active"],["South Korea","active"],["Singapore","active"],["Taiwan","active"],["Hong Kong","active"],["Macau","active"],
+          ["Israel","active"],["Saudi Arabia","active"],["United Arab Emirates","active"],["Qatar","active"],["Kuwait","active"],["Bahrain","active"],
+          ["Oman","active"],["Brunei","active"],["Malaysia","active"],["Thailand","active"],["Turkey","active"],["Kazakhstan","active"],
+          ["China","active"],["Georgia","active"],["Armenia","active"],
+          ["India","soon"],["Indonesia","soon"],["Vietnam","soon"],["Philippines","soon"],["Sri Lanka","soon"],["Jordan","soon"],["Lebanon","soon"],
+          ["Pakistan","projected"],["Bangladesh","projected"],["Nepal","projected"],["Cambodia","projected"],["Laos","projected"],["Mongolia","projected"],["Uzbekistan","projected"],["Azerbaijan","projected"]
+        ]
+      },
+      {
+        continent: "Africa",
+        countries: [
+          ["Mauritius","active"],["Seychelles","active"],["South Africa","active"],
+          ["Egypt","soon"],["Morocco","soon"],["Tunisia","soon"],
+          ["Nigeria","projected"],["Kenya","projected"],["Ghana","projected"],["Tanzania","projected"],["Uganda","projected"],["Rwanda","projected"],["Botswana","projected"],["Namibia","projected"],["Zambia","projected"],["Senegal","projected"],["Côte d’Ivoire","projected"],["Angola","projected"]
+        ]
+      },
+      {
+        continent: "Oceania",
+        countries: [
+          ["Australia","active"],["New Zealand","active"]
+        ]
+      }
+    ];
+
+    const countrySearch = document.getElementById('countrySearch');
+    const continentGrid = document.getElementById('continentGrid');
+    const resultSummary = document.getElementById('resultSummary');
+    const activeCount = document.getElementById('activeCount');
+    const soonCount = document.getElementById('soonCount');
+    const projectedCount = document.getElementById('projectedCount');
+    const emptyState = document.getElementById('emptyState');
+
+    function titleCaseStatus(status) {
+      if (status === 'active') return 'Active';
+      if (status === 'soon') return 'Coming Soon';
+      return 'Projected';
+    }
+
+    function renderCountries(filter = '') {
+      const q = filter.trim().toLowerCase();
+      const matches = countryCatalog
+        .map((group) => {
+          const countries = group.countries.filter(([name, status]) =>
+            !q || name.toLowerCase().includes(q) || titleCaseStatus(status).toLowerCase().includes(q) || group.continent.toLowerCase().includes(q)
+          );
+          return { ...group, countries };
+        })
+        .filter((group) => group.countries.length);
+
+      const continentCount = matches.length;
+      const allCountries = matches.flatMap((group) => group.countries);
+      const totalCount = allCountries.length;
+      const totalActive = allCountries.filter(([, status]) => status === 'active').length;
+      const totalSoon = allCountries.filter(([, status]) => status === 'soon').length;
+      const totalProjected = allCountries.filter(([, status]) => status === 'projected').length;
+
+      resultSummary.textContent = `${continentCount} continents • ${totalCount} countries`;
+      activeCount.textContent = `Active ${totalActive}`;
+      soonCount.textContent = `Coming Soon ${totalSoon}`;
+      projectedCount.textContent = `Projected ${totalProjected}`;
+      emptyState.style.display = totalCount ? 'none' : 'block';
+
+      continentGrid.innerHTML = matches.map((group) => `
+        <article class="continent-card">
+          <div class="continent-head">
+            <strong>${group.continent}</strong>
+            <span class="continent-count">${group.countries.length}</span>
+          </div>
+          <div class="country-list">
+            ${group.countries.map(([name, status]) => `
+              <div class="country-item">
+                <span>${name}</span>
+                <span class="status-tag ${status}">${titleCaseStatus(status)}</span>
+              </div>
+            `).join('')}
+          </div>
+        </article>
+      `).join('');
+    }
+
+    countrySearch.addEventListener('input', (event) => {
+      renderCountries(event.target.value);
+    });
+
+    renderCountries();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX | CRM Core</title>
+  <meta
+    name="description"
+    content="AI-ABCX CRM Core showing the shared operating truth layer for calls, records, scheduling state, follow-up pressure, and President-readable business reality."
+  />
+  <style>
+    :root{
+      --bg:#050912;
+      --shell:#09111c;
+      --panel:#0e1725;
+      --panel-2:#121d2d;
+      --line:rgba(255,255,255,.08);
+      --text:#f5f8fd;
+      --muted:#96a7bc;
+      --blue:#4ea5ff;
+      --blue-soft:#8fdbff;
+      --gold:#e7b64b;
+      --green:#68d59b;
+      --orange:#ff9c5c;
+      --red:#ff6f7e;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%}
+    body{
+      color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(78,165,255,.16), transparent 30%),
+        radial-gradient(circle at top right, rgba(231,182,75,.09), transparent 28%),
+        linear-gradient(180deg,#07111a 0%,#04070c 100%);
+      overflow:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+      background-size:40px 40px;
+      opacity:.3;
+      mask-image:radial-gradient(circle at center, black 42%, transparent 95%);
+    }
+    .page{
+      min-height:100vh;
+      padding:18px;
+      display:flex;
+      justify-content:center;
+      position:relative;
+      z-index:1;
+    }
+    .shell{
+      width:min(1540px, calc(100vw - 36px));
+      min-height:calc(100vh - 36px);
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.1);
+      background:linear-gradient(180deg, rgba(9,17,28,.98), rgba(5,9,14,.99));
+      box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+    .shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(420px circle at 50% 0%, rgba(231,182,75,.05), transparent 54%),
+        radial-gradient(520px circle at 10% 8%, rgba(78,165,255,.05), transparent 52%);
+    }
+    .layout{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:260px 360px 1fr;
+      min-height:calc(100vh - 36px);
+    }
+    .sidebar,.rail,.main{min-height:0}
+    .sidebar{
+      border-right:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      padding:22px 16px 20px;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:6px 8px 18px;
+      border-bottom:1px solid var(--line);
+    }
+    .logo-wrap{
+      width:74px;
+      height:74px;
+      display:grid;
+      place-items:center;
+    }
+    .logo{
+      width:70px;
+      height:70px;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 0 18px rgba(255,255,255,.08));
+    }
+    .brand-name{
+      font-size:20px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .brand-sub{
+      margin-top:5px;
+      color:var(--muted);
+      font-size:11px;
+      letter-spacing:.34em;
+      text-transform:uppercase;
+    }
+    .card,.focus-card,.topbar,.mini-panel{
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    .card,.mini-panel{padding:18px}
+    .card strong,.mini-panel strong{display:block;font-size:18px;line-height:1.2}
+    .card p,.mini-panel p{margin:8px 0 0;color:var(--blue-soft);font-size:13px;line-height:1.55;font-weight:700}
+    .nav{display:grid;gap:8px}
+    .nav-link{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.05);
+      background:rgba(255,255,255,.02);
+      padding:13px 14px;
+      color:#dbe6f1;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:700;
+    }
+    .nav-link.active{
+      border-color:rgba(78,165,255,.28);
+      background:rgba(78,165,255,.10);
+      color:#fff;
+    }
+    .nav-count,.chip,.stage-pill,.tag,.action-btn,.stage-toggle{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .nav-count{
+      min-width:28px;
+      height:22px;
+      padding:0 8px;
+      background:rgba(255,255,255,.06);
+      color:#fff;
+    }
+    .sidebar-foot{
+      margin-top:auto;
+      border-radius:20px;
+      border:1px solid rgba(231,182,75,.24);
+      background:rgba(231,182,75,.06);
+      padding:16px;
+    }
+    .sidebar-foot h4{
+      margin:0 0 10px;
+      color:var(--gold);
+      font-size:12px;
+      letter-spacing:.28em;
+      text-transform:uppercase;
+    }
+    .sidebar-foot p{
+      margin:0;
+      color:#dfe8f4;
+      font-size:13px;
+      line-height:1.55;
+      font-weight:600;
+    }
+    .rail{
+      border-right:1px solid var(--line);
+      padding:20px 16px;
+      overflow:auto;
+      display:grid;
+      align-content:start;
+      gap:16px;
+    }
+    .rail-head h2{
+      margin:0;
+      font-size:26px;
+      letter-spacing:-.04em;
+    }
+    .rail-head p{
+      margin:10px 0 0;
+      color:var(--blue-soft);
+      font-size:13px;
+      line-height:1.5;
+      font-weight:700;
+    }
+    .stage-bar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .stage-label{
+      color:#8fa1b8;
+      font-size:11px;
+      letter-spacing:.28em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+    .stage-switcher{
+      display:inline-flex;
+      gap:6px;
+      padding:5px;
+      border:1px solid rgba(231,182,75,.18);
+      border-radius:14px;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+    }
+    .stage-toggle{
+      min-height:34px;
+      padding:0 12px;
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      cursor:pointer;
+    }
+    .stage-toggle.active{
+      background:linear-gradient(135deg, var(--gold), #f2c96f);
+      color:#1a1509;
+    }
+    .queue{
+      display:grid;
+      gap:10px;
+    }
+    .queue-item{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+      cursor:pointer;
+    }
+    .queue-item.active{
+      border-color:rgba(78,165,255,.28);
+      background:rgba(78,165,255,.10);
+    }
+    .queue-item strong{
+      display:block;
+      font-size:14px;
+      font-weight:800;
+      line-height:1.45;
+    }
+    .queue-item p{
+      margin:6px 0 0;
+      color:var(--text);
+      font-size:13px;
+      line-height:1.45;
+      font-weight:600;
+      opacity:.92;
+    }
+    .queue-meta,.tag-row,.action-row,.timeline,.metric-list,.source-list,.lane-list,.job-list{
+      display:grid;
+      gap:8px;
+    }
+    .tag-row{
+      grid-template-columns:repeat(auto-fit, minmax(0, max-content));
+      align-items:center;
+    }
+    .tag{
+      min-height:24px;
+      padding:0 8px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      color:#eef6ff;
+    }
+    .tag.blue{border-color:rgba(78,165,255,.24);background:rgba(78,165,255,.1);color:#a9dbff}
+    .tag.green{border-color:rgba(104,213,155,.22);background:rgba(104,213,155,.11);color:#c5f2d6}
+    .tag.orange{border-color:rgba(255,156,92,.22);background:rgba(255,156,92,.11);color:#ffd1aa}
+    .tag.red{border-color:rgba(255,111,126,.22);background:rgba(255,111,126,.11);color:#ffd2d8}
+    .main{
+      padding:18px;
+      display:grid;
+      gap:14px;
+      align-content:start;
+      overflow:auto;
+    }
+    .topbar{
+      padding:18px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:16px;
+      position:sticky;
+      top:0;
+      z-index:4;
+      backdrop-filter:blur(14px);
+      background:rgba(8,12,18,.9);
+    }
+    .topbar h1{
+      margin:0;
+      font-size:34px;
+      font-weight:850;
+      letter-spacing:-.05em;
+    }
+    .topbar p{
+      margin:10px 0 0;
+      color:var(--blue-soft);
+      font-size:14px;
+      font-weight:700;
+      line-height:1.5;
+      max-width:800px;
+    }
+    .topbar-right{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-content:flex-start;
+    }
+    .chip,.action-btn,.stage-pill{
+      min-height:40px;
+      padding:0 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      color:#eef6ff;
+      text-decoration:none;
+      font-size:11px;
+      line-height:1;
+    }
+    .action-btn{cursor:pointer}
+    .action-btn.primary{
+      border:none;
+      background:linear-gradient(135deg, var(--blue), var(--blue-soft));
+      color:#08101b;
+    }
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:12px;
+    }
+    .summary-card{
+      padding:18px;
+    }
+    .label{
+      color:var(--muted);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+    .value{
+      margin-top:10px;
+      font-size:32px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.05em;
+    }
+    .meta{
+      margin-top:8px;
+      color:var(--text);
+      opacity:.88;
+      font-size:13px;
+      line-height:1.45;
+      font-weight:600;
+    }
+    .content-grid{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:12px;
+    }
+    .focus-card{
+      padding:18px;
+      display:grid;
+      gap:16px;
+      border-color:rgba(78,165,255,.18);
+      background:linear-gradient(180deg, rgba(78,165,255,.06), rgba(255,255,255,.02));
+    }
+    .section-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .section-head h2{
+      margin:0;
+      font-size:22px;
+      font-weight:820;
+      letter-spacing:-.04em;
+    }
+    .section-head span{
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:10px;
+    }
+    .mini-panel span,.metric-row span,.timeline-item span,.source-item span,.lane-item span,.job-item span{
+      display:block;
+      color:var(--muted);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .mini-panel strong,.metric-row strong,.timeline-item strong,.source-item strong,.lane-item strong,.job-item strong{
+      margin-top:8px;
+      font-size:15px;
+      line-height:1.4;
+    }
+    .metric-row,.timeline-item,.source-item,.lane-item,.job-item{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+    }
+    .source-item p,.timeline-item p,.lane-item p,.job-item p{
+      margin:8px 0 0;
+      color:var(--text);
+      opacity:.88;
+      font-size:13px;
+      line-height:1.5;
+      font-weight:600;
+    }
+    .job-item.active{
+      border-color:rgba(231,182,75,.24);
+      background:rgba(231,182,75,.09);
+    }
+    .empty{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+    }
+    @media (max-width:1320px){
+      .layout{grid-template-columns:250px 320px 1fr}
+      .summary-grid,.content-grid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:1120px){
+      .layout{grid-template-columns:1fr}
+      .sidebar,.rail{border-right:none}
+      .sidebar{border-bottom:1px solid var(--line)}
+      .rail{border-bottom:1px solid var(--line)}
+      body{overflow:auto}
+      .shell,.layout,.main{min-height:auto}
+    }
+    @media (max-width:760px){
+      .page{padding:10px}
+      .shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}
+      .summary-grid,.content-grid,.mini-grid,.topbar{grid-template-columns:1fr}
+      .topbar-right{justify-content:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="shell">
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="logo-wrap">
+              <img src="public/assets/images/ai-abcx-logo-icon-tight-transparent.png" class="logo" alt="AI-ABCX Logo" />
+            </div>
+            <div>
+              <div class="brand-name">AI-ABCX</div>
+              <div class="brand-sub">CRM Core</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <strong>Shared operating truth</strong>
+            <p id="sidebarIntro">Calls, records, scheduling state, outcomes, and follow-up remain connected here so the President sees one business reality.</p>
+          </div>
+
+          <nav class="nav">
+            <a class="nav-link active" id="crmNavLink" href="#"><span>CRM Core</span><span class="nav-count">Live</span></a>
+            <a class="nav-link" id="presidentNavLink" href="#"><span>President View</span><span class="nav-count">Top</span></a>
+            <a class="nav-link" id="dispatcherNavLink" href="#"><span>Dispatcher</span><span class="nav-count" id="dispatcherSeatCount">0</span></a>
+            <a class="nav-link" id="jobRecordsNavLink" href="#"><span>Job Records</span><span class="nav-count">Shared</span></a>
+            <a class="nav-link" id="followUpNavLink" href="#"><span>Follow-Up</span><span class="nav-count">Action</span></a>
+            <a class="nav-link" id="settingsNavLink" href="#"><span>Settings</span><span class="nav-count">System</span></a>
+          </nav>
+
+          <div class="sidebar-foot">
+            <h4>CRM Rule</h4>
+            <p>This is not a contact list. It is the connected record memory that lets call handling, scheduling, closeout, and President oversight behave like one company system.</p>
+          </div>
+        </aside>
+
+        <section class="rail">
+          <div class="rail-head">
+            <h2>Record Queue</h2>
+            <p id="queueSub">Every live customer record should stay attached to source, next action, and accountable owner.</p>
+          </div>
+
+          <div class="stage-bar">
+            <span class="stage-label">Automation Level</span>
+            <div class="stage-switcher">
+              <button class="stage-toggle active" type="button" data-stage="A">A</button>
+              <button class="stage-toggle" type="button" data-stage="B">B</button>
+              <button class="stage-toggle" type="button" data-stage="C">C</button>
+            </div>
+          </div>
+
+          <div class="queue" id="crmQueue"></div>
+        </section>
+
+        <main class="main">
+          <section class="topbar">
+            <div>
+              <div class="stage-pill" id="stagePill">Stage A</div>
+              <h1 id="pageTitle">CRM Core</h1>
+              <p id="pageSub">The shared operating truth layer that keeps call intake, qualification, scheduling, outcomes, payment, and follow-up visible to the President on one connected record spine.</p>
+            </div>
+            <div class="topbar-right">
+              <div class="chip" id="recordsChip">0 Records</div>
+              <div class="chip" id="openChip">0 Open</div>
+              <div class="chip" id="revenueChip">$0 Linked</div>
+              <a class="action-btn" id="topJobRecordLink" href="#">Open Job Record</a>
+              <a class="action-btn" id="topDispatcherLink" href="#">Open Dispatcher</a>
+              <a class="action-btn primary" id="topPresidentLink" href="#">Open President Dashboard</a>
+            </div>
+          </section>
+
+          <section class="summary-grid" id="summaryGrid"></section>
+
+          <section class="content-grid">
+            <div class="focus-card">
+              <div class="section-head">
+                <h2 id="focusTitle">Record Focus</h2>
+                <span id="focusEyebrow">Shared truth</span>
+              </div>
+              <div class="mini-grid">
+                <div class="mini-panel"><span>Customer ID</span><strong id="focusId">-</strong></div>
+                <div class="mini-panel"><span>Owner</span><strong id="focusOwner">-</strong></div>
+                <div class="mini-panel"><span>Current Status</span><strong id="focusStatus">-</strong></div>
+                <div class="mini-panel"><span>Next Step</span><strong id="focusStepAt">-</strong></div>
+              </div>
+              <div class="mini-panel">
+                <span>Lifecycle</span>
+                <strong id="focusLifecycle">-</strong>
+                <p id="focusAction">-</p>
+              </div>
+              <div class="mini-panel">
+                <span>Transcript Memory</span>
+                <strong id="focusTranscriptLabel">Stored call context</strong>
+                <p id="focusTranscript">-</p>
+              </div>
+              <div class="mini-panel">
+                <span>Cross-module value</span>
+                <strong id="focusCrossLabel">Why this record matters</strong>
+                <p id="focusCross">-</p>
+              </div>
+              <div class="action-row">
+                <a class="action-btn" id="focusJobRecordLink" href="#">Job Record</a>
+                <a class="action-btn" id="focusFollowUpLink" href="#">Follow-Up</a>
+                <a class="action-btn primary" id="focusPresidentLink" href="#">President View</a>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-head">
+                <h2>Connected Job Truth</h2>
+                <span id="jobsLabel">Shared records</span>
+              </div>
+              <div class="job-list" id="jobList"></div>
+            </div>
+          </section>
+
+          <section class="content-grid">
+            <div class="card">
+              <div class="section-head">
+                <h2>Source And Attribution</h2>
+                <span>Demand visibility</span>
+              </div>
+              <div class="source-list" id="sourceList"></div>
+            </div>
+
+            <div class="card">
+              <div class="section-head">
+                <h2>Shared Operating Chain</h2>
+                <span>Backbone</span>
+              </div>
+              <div class="lane-list" id="laneList"></div>
+            </div>
+          </section>
+
+          <section class="content-grid">
+            <div class="card">
+              <div class="section-head">
+                <h2>Recent Timeline</h2>
+                <span>Activity memory</span>
+              </div>
+              <div class="timeline" id="timelineList"></div>
+            </div>
+
+            <div class="card">
+              <div class="section-head">
+                <h2>Cross-Module Pressure</h2>
+                <span>President-readable</span>
+              </div>
+              <div class="metric-list" id="pressureList"></div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <script src="ai-abc-stage-config.js"></script>
+  <script src="ai-abc-config.js"></script>
+  <script src="ai-abc-modules.js"></script>
+  <script src="ai-abc-role-registry.js"></script>
+  <script src="ai-abc-reporting.js"></script>
+  <script src="ai-abc-accountability.js"></script>
+  <script src="ai-abc-data.js"></script>
+  <script src="ai-abcx-job-records.js?v=20260615d"></script>
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const stageConfig = window.AIABCStageConfig;
+      const configApi = window.AIABCConfig;
+      const modulesApi = window.AIABCModules;
+      const dataApi = window.AIABCData;
+      const jobApi = window.AIABCXJobRecords;
+
+      const companyConfig = configApi && typeof configApi.companyConfigFromSearchParams === "function"
+        ? configApi.companyConfigFromSearchParams(params)
+        : null;
+      const moduleContext = modulesApi && companyConfig
+        ? modulesApi.buildModuleContext(companyConfig)
+        : null;
+      const liveData = dataApi && companyConfig && moduleContext
+        ? dataApi.generateLiveDashboardData(companyConfig, moduleContext)
+        : null;
+
+      const requestedStage = params.get("stage") || (companyConfig && companyConfig.moduleConfiguration ? companyConfig.moduleConfiguration.liveStage : "A");
+      let currentStage = stageConfig && typeof stageConfig.normalizeStage === "function"
+        ? stageConfig.normalizeStage(requestedStage, "A")
+        : (requestedStage || "A");
+      if (currentStage === "C") currentStage = "B";
+
+      const vm = companyConfig ? companyConfig.viewModel : {
+        companyName: "Activated Service Company",
+        ownerName: "Owner",
+        serviceDescriptor: "Service Operations",
+        serviceDescriptorLower: "service operations",
+        crmLabel: "Built-in CRM",
+        pathLabel: "Regular Access"
+      };
+
+      const crmClients = liveData && Array.isArray(liveData.crmClients) ? liveData.crmClients.slice() : [];
+      const baseRecords = jobApi && typeof jobApi.getBaseRecords === "function" ? jobApi.getBaseRecords() : [];
+      const state = jobApi && typeof jobApi.readState === "function" ? jobApi.readState(baseRecords) : { records: baseRecords };
+      const jobRecords = Array.isArray(state.records) ? state.records : baseRecords;
+      const requestedJobId = params.get("job") || "";
+      let selectedCustomerId = null;
+
+      const recordStatusLabels = {
+        awaiting_manual_confirmation: "Awaiting Manual Confirmation",
+        awaiting_worker_assignment: "Awaiting Worker Assignment",
+        awaiting_worker_confirmation: "Awaiting Worker Confirmation",
+        awaiting_customer_confirmation: "Awaiting Customer Confirmation",
+        in_progress: "In Progress",
+        follow_up_needed: "Follow-Up Needed",
+        confirmed: "Confirmed",
+        completed: "Completed",
+        canceled: "Canceled",
+        rerouted: "Rerouted",
+        no_show: "No Show",
+        pending: "Pending",
+        open: "Open"
+      };
+
+      function esc(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function stageLabel(stage) {
+        return stage === "A" ? "Stage A" : "Stage B";
+      }
+
+      function formatMoney(value) {
+        return `$${Number(value || 0).toLocaleString("en-US")}`;
+      }
+
+      function titleWords(value) {
+        return String(value || "")
+          .split(/[_\s]+/)
+          .filter(Boolean)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(" ");
+      }
+
+      function getStageRecord(jobRecord) {
+        if (!jobRecord || !jobRecord.stages) return null;
+        return jobRecord.stages[currentStage] || jobRecord.stages.A || null;
+      }
+
+      function getStatusLabel(value) {
+        return recordStatusLabels[value] || titleWords(value || "Open");
+      }
+
+      function getStatusClass(value) {
+        if (["completed"].includes(value)) return "green";
+        if (["awaiting_worker_confirmation", "awaiting_customer_confirmation", "confirmed", "in_progress"].includes(value)) return "blue";
+        if (["follow_up_needed", "rerouted", "pending", "awaiting_manual_confirmation", "awaiting_worker_assignment"].includes(value)) return "orange";
+        if (["canceled", "no_show"].includes(value)) return "red";
+        return "blue";
+      }
+
+      function pickJobRecord(client, index) {
+        if (!jobRecords.length) return null;
+        const priorityMatch = jobRecords.find((record) => {
+          const customer = String(record.customerName || "").toLowerCase();
+          return customer.includes(String(client.name || "").split(" ")[0].toLowerCase());
+        });
+        return priorityMatch || jobRecords[index % jobRecords.length] || null;
+      }
+
+      const linkedClients = crmClients.map((client, index) => {
+        const linkedJob = pickJobRecord(client, index);
+        const stageRecord = linkedJob ? getStageRecord(linkedJob) : null;
+        return {
+          ...client,
+          linkedJob,
+          stageRecord
+        };
+      });
+
+      selectedCustomerId = (
+        linkedClients.find((client) => client.linkedJob && client.linkedJob.id === requestedJobId) ||
+        linkedClients[0] ||
+        null
+      )?.customerId || null;
+
+      function getSelectedClient() {
+        return linkedClients.find((client) => client.customerId === selectedCustomerId) || linkedClients[0] || null;
+      }
+
+      function getLinkedJobFollowUpReason(record) {
+        const stageRecord = getStageRecord(record);
+        return stageRecord && stageRecord.status === "follow_up_needed" && stageRecord.followUpReason
+          ? stageRecord.followUpReason
+          : "";
+      }
+
+      function buildQuery(extra) {
+        const next = new URLSearchParams(params.toString());
+        next.set("stage", currentStage);
+        Object.entries(extra || {}).forEach(([key, value]) => {
+          if (value === null || value === undefined || value === "") {
+            next.delete(key);
+          } else {
+            next.set(key, value);
+          }
+        });
+        return next.toString();
+      }
+
+      function relatedJobHref(record, source) {
+        if (!record) return `job-records.html?${buildQuery({ source: source || "crm", followup: "" })}`;
+        return `job-records.html?${buildQuery({ job: record.id, source: source || "crm", followup: getLinkedJobFollowUpReason(record) || "" })}`;
+      }
+
+      function syncSelectionUrl() {
+        const client = getSelectedClient();
+        const linkedJob = client ? client.linkedJob : null;
+        const nextUrl = new URL(window.location.href);
+        nextUrl.search = buildQuery({
+          job: linkedJob ? linkedJob.id : null,
+          source: "crm",
+          followup: getLinkedJobFollowUpReason(linkedJob) || ""
+        });
+        window.history.replaceState({}, "", nextUrl.toString());
+      }
+
+      function renderSummary() {
+        const openCount = linkedClients.filter((client) => ["open", "pending", "active"].includes(String(client.currentStatus || "").toLowerCase())).length;
+        const followUpCount = linkedClients.filter((client) => {
+          const status = client.stageRecord ? client.stageRecord.status : client.currentStatus;
+          return ["follow_up_needed", "rerouted", "awaiting_manual_confirmation", "awaiting_worker_confirmation", "awaiting_customer_confirmation"].includes(status);
+        }).length;
+        const linkedRevenue = linkedClients.reduce((sum, client) => sum + Number(client.linkedJob && client.linkedJob.amountPaid ? client.linkedJob.amountPaid : 0), 0);
+        const sourceCount = new Set(linkedClients.map((client) => client.source)).size;
+
+        document.getElementById("summaryGrid").innerHTML = [
+          ["Live Records", String(linkedClients.length), `${vm.companyName} records are visible inside one CRM memory.`],
+          ["Open Pressure", String(openCount), `These records still need movement, confirmation, or closure.`],
+          ["Revenue Linked", formatMoney(linkedRevenue), `Closeout truth remains attached to CRM records instead of sitting outside them.`],
+          ["Source Lanes", String(sourceCount), `Demand sources stay attributable across call handling, follow-up, and future marketing.`]
+        ].map(([label, value, meta]) => `
+          <div class="card summary-card">
+            <div class="label">${esc(label)}</div>
+            <div class="value">${esc(value)}</div>
+            <div class="meta">${esc(meta)}</div>
+          </div>
+        `).join("");
+
+        document.getElementById("recordsChip").textContent = `${linkedClients.length} Records`;
+        document.getElementById("openChip").textContent = `${followUpCount} Need Review`;
+        document.getElementById("revenueChip").textContent = `${formatMoney(linkedRevenue)} Linked`;
+      }
+
+      function renderQueue() {
+        const queue = document.getElementById("crmQueue");
+        queue.innerHTML = linkedClients.map((client) => {
+          const status = client.stageRecord ? client.stageRecord.status : client.currentStatus;
+          const jobRef = client.linkedJob ? client.linkedJob.jobNumber : "No job linked";
+          return `
+            <article class="queue-item ${client.customerId === selectedCustomerId ? "active" : ""}" data-customer-id="${esc(client.customerId)}">
+              <strong>${esc(client.name)}</strong>
+              <p>${esc(client.source)} • ${esc(getStatusLabel(status))}</p>
+              <div class="tag-row">
+                <span class="tag ${getStatusClass(status)}">${esc(getStatusLabel(status))}</span>
+                <span class="tag blue">${esc(client.originPrefix)} Record</span>
+                <span class="tag">${esc(jobRef)}</span>
+              </div>
+              <div class="queue-meta">
+                <p>${esc(client.nextStepAction)}</p>
+              </div>
+            </article>
+          `;
+        }).join("");
+
+        queue.querySelectorAll(".queue-item").forEach((node) => {
+          node.addEventListener("click", () => {
+            selectedCustomerId = node.dataset.customerId;
+            syncSelectionUrl();
+            render();
+          });
+        });
+      }
+
+      function renderFocus() {
+        const client = getSelectedClient();
+        if (!client) return;
+        const status = client.stageRecord ? client.stageRecord.status : client.currentStatus;
+        const linkedJob = client.linkedJob;
+        const nextOwner = client.nextStepBy || (linkedJob ? linkedJob.assignedRep : vm.ownerName);
+        const lifecycle = linkedJob
+          ? `Demand -> Call -> Qualification -> Record -> ${currentStage === "A" ? "Manual scheduling" : "Automated scheduling"} -> Outcome -> President oversight`
+          : "Demand -> Call -> Qualification -> Record -> Next action";
+
+        document.getElementById("focusTitle").textContent = client.name;
+        document.getElementById("focusEyebrow").textContent = `${client.customerId} • ${client.source}`;
+        document.getElementById("focusId").textContent = client.customerId;
+        document.getElementById("focusOwner").textContent = nextOwner;
+        document.getElementById("focusStatus").textContent = getStatusLabel(status);
+        document.getElementById("focusStepAt").textContent = client.nextStepAt || "Today";
+        document.getElementById("focusLifecycle").textContent = lifecycle;
+        document.getElementById("focusAction").textContent = client.nextStepAction;
+        document.getElementById("focusTranscript").textContent = client.transcript;
+        document.getElementById("focusCross").textContent = linkedJob
+          ? `${linkedJob.jobNumber} keeps this CRM record tied to ${getStatusLabel(status)}, ${linkedJob.assignedRep}, and ${formatMoney(linkedJob.amountPaid || 0)} in captured payment truth.`
+          : "This record is prepared to connect directly into job truth once an appointment or outcome path opens.";
+
+        document.getElementById("focusJobRecordLink").href = relatedJobHref(linkedJob, "crm-focus");
+        document.getElementById("focusFollowUpLink").href = `president-follow-up.html?${buildQuery({ job: linkedJob ? linkedJob.id : null, source: "crm-focus", followup: getLinkedJobFollowUpReason(linkedJob) || "" })}`;
+        document.getElementById("focusPresidentLink").href = `new-president-dashboard.html?${buildQuery({ job: linkedJob ? linkedJob.id : null, source: "crm-focus", followup: getLinkedJobFollowUpReason(linkedJob) || "" })}`;
+        document.getElementById("topJobRecordLink").href = relatedJobHref(linkedJob, "crm-top");
+      }
+
+      function renderJobs() {
+        const client = getSelectedClient();
+        const jobList = document.getElementById("jobList");
+        const records = client && client.linkedJob ? [client.linkedJob] : [];
+        if (!records.length) {
+          jobList.innerHTML = `<div class="empty">No linked job record is attached yet for this CRM entry.</div>`;
+          return;
+        }
+        jobList.innerHTML = records.map((record) => {
+          const stageRecord = getStageRecord(record);
+          return `
+            <a class="job-item active" href="${esc(relatedJobHref(record, "crm-jobs"))}">
+              <span>${esc(record.jobNumber)} • ${esc(getStatusLabel(stageRecord ? stageRecord.status : "pending"))}</span>
+              <strong>${esc(record.customerName)}</strong>
+              <p>${esc(record.requestedTime)}<br>${esc(record.confirmedTime)}<br>${esc(record.notes)}</p>
+            </a>
+          `;
+        }).join("");
+      }
+
+      function renderSourceList() {
+        const grouped = linkedClients.reduce((acc, client) => {
+          const key = client.source;
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(client);
+          return acc;
+        }, {});
+        document.getElementById("sourceList").innerHTML = Object.entries(grouped).map(([source, items]) => `
+          <div class="source-item">
+            <span>${esc(source)}</span>
+            <strong>${items.length} ${items.length === 1 ? "record" : "records"} in this lane</strong>
+            <p>${esc(items[0].nextStepAction)}</p>
+          </div>
+        `).join("");
+      }
+
+      function renderLanes() {
+        const client = getSelectedClient();
+        const linkedJob = client ? client.linkedJob : null;
+        const stageMode = currentStage === "A"
+          ? "Manual confirmation and President-controlled movement."
+          : "Automated routing, confirmation gates, reroute discipline, and closeout visibility.";
+        const items = [
+          ["Call Handling", "AI intake, urgency, qualification, and transcript memory stay attached to the same operating record."],
+          ["CRM Core", "Customer identity, source attribution, next action, and history remain readable to the President."],
+          ["Scheduling", stageMode],
+          ["Closeout", linkedJob ? `Payment truth is currently ${linkedJob.amountPaid ? "captured" : "still open"} on ${linkedJob.jobNumber}.` : "Closeout will attach once the business path reaches an outcome."],
+          ["Follow-Up", "Unresolved business outcomes stay alive instead of disappearing after the appointment or quote moment."]
+        ];
+        document.getElementById("laneList").innerHTML = items.map(([title, body]) => `
+          <div class="lane-item">
+            <span>${esc(title)}</span>
+            <strong>${esc(title)} remains connected</strong>
+            <p>${esc(body)}</p>
+          </div>
+        `).join("");
+      }
+
+      function renderTimeline() {
+        const client = getSelectedClient();
+        const timeline = client && Array.isArray(client.timeline) ? client.timeline : [];
+        document.getElementById("timelineList").innerHTML = timeline.map((item) => `
+          <div class="timeline-item">
+            <span>${esc(item.when)} • ${esc(item.channel)}</span>
+            <strong>${esc(item.type)}</strong>
+            <p>${esc(item.summary)}<br><br>${esc(item.direction)}</p>
+          </div>
+        `).join("");
+      }
+
+      function renderPressure() {
+        const client = getSelectedClient();
+        const linkedJob = client ? client.linkedJob : null;
+        const stageRecord = client ? client.stageRecord : null;
+        const items = [
+          ["Source Integrity", `${client ? client.source : "Unknown"} still remains attached to the live record and future marketing measurement.`],
+          ["Scheduling Truth", linkedJob ? `${currentStage === "A" ? "President-controlled" : "Engine-controlled"} movement is visible on ${linkedJob.jobNumber}.` : "This record is ready for scheduling linkage once an appointment path opens."],
+          ["Outcome Pressure", stageRecord ? `${getStatusLabel(stageRecord.status)} is still visible to the President and cannot disappear behind the workflow.` : "Outcome truth is waiting on the next operational step."],
+          ["Revenue Accountability", linkedJob ? `${formatMoney(linkedJob.amountPaid || 0)} is currently linked to this record.` : "No payment truth has been captured yet."],
+          ["Follow-Up Discipline", "If the business path does not close cleanly, the same record should remain alive for President follow-up." ]
+        ];
+        document.getElementById("pressureList").innerHTML = items.map(([title, body]) => `
+          <div class="metric-row">
+            <span>${esc(title)}</span>
+            <strong>${esc(body)}</strong>
+          </div>
+        `).join("");
+      }
+
+      function updateRoutes() {
+        const selected = getSelectedClient();
+        const linkedJob = selected ? selected.linkedJob : null;
+        const stageQuery = buildQuery({ job: linkedJob ? linkedJob.id : null, source: "crm", followup: getLinkedJobFollowUpReason(linkedJob) || "" });
+        document.getElementById("crmNavLink").href = `crm.html?${stageQuery}`;
+        document.getElementById("presidentNavLink").href = `new-president-dashboard.html?${stageQuery}`;
+        document.getElementById("dispatcherNavLink").href = `dispatcher-dashboard.html?${stageQuery}`;
+        document.getElementById("jobRecordsNavLink").href = relatedJobHref(linkedJob, "crm-nav");
+        document.getElementById("followUpNavLink").href = `president-follow-up.html?${stageQuery}`;
+        document.getElementById("settingsNavLink").href = `settings.html?${stageQuery}`;
+        document.getElementById("topDispatcherLink").href = `dispatcher-dashboard.html?${stageQuery}`;
+        document.getElementById("topPresidentLink").href = `new-president-dashboard.html?${stageQuery}`;
+        syncSelectionUrl();
+      }
+
+      function renderHeader() {
+        document.getElementById("stagePill").textContent = `${stageLabel(currentStage)} CRM`;
+        document.getElementById("pageTitle").textContent = `${vm.companyName} CRM Core`;
+        document.getElementById("pageSub").textContent = `${vm.crmLabel} is acting as the shared operating truth layer for ${vm.companyName}. It keeps ${vm.serviceDescriptorLower} demand, record movement, and President-readable next action inside one connected system memory.`;
+        document.getElementById("sidebarIntro").textContent = `${vm.companyName} uses CRM Core to keep call handling, job truth, and follow-up pressure connected instead of scattered.`;
+        document.getElementById("dispatcherSeatCount").textContent = String(companyConfig && companyConfig.roleConfiguration ? (companyConfig.roleConfiguration.dispatcherRoles.count || 0) : 0);
+      }
+
+      function renderStageButtons() {
+        document.querySelectorAll(".stage-toggle").forEach((button) => {
+          const buttonStage = button.dataset.stage;
+          const normalizedStage = buttonStage === "C" ? "B" : buttonStage;
+          button.classList.toggle("active", normalizedStage === currentStage && !(buttonStage === "C" && currentStage !== "B"));
+        });
+      }
+
+      function attachStageSwitching() {
+        document.querySelectorAll(".stage-toggle").forEach((button) => {
+          button.addEventListener("click", () => {
+            const next = button.dataset.stage === "C" ? "B" : button.dataset.stage;
+            currentStage = next;
+            render();
+          });
+        });
+      }
+
+      function render() {
+        renderHeader();
+        renderStageButtons();
+        renderSummary();
+        renderQueue();
+        renderFocus();
+        renderJobs();
+        renderSourceList();
+        renderLanes();
+        renderTimeline();
+        renderPressure();
+        updateRoutes();
+      }
+
+      attachStageSwitching();
+      render();
+    })();
+  </script>
+  <script src="ai-assistant.js"></script>
+</body>
+</html>

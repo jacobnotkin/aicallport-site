@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-ABCX President Follow-Up</title>
+  <style>
+    :root{
+      --bg:#08101d;
+      --panel:#0f1b2e;
+      --panel-2:#122238;
+      --line:rgba(255,255,255,.08);
+      --text:#f3f6ff;
+      --muted:#94a4c5;
+      --gold:#f1c75b;
+      --blue:#59a8ff;
+      --green:#68d78a;
+      --orange:#ffb35c;
+      --red:#ff7b7b;
+      --shadow:0 22px 60px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top,#10203a 0%,#08101d 52%,#050a12 100%);color:var(--text)}
+    button,input,textarea,select{font:inherit}
+    .app{height:100vh;min-height:100vh;display:grid;grid-template-columns:280px minmax(0,1fr)}
+    .sidebar{padding:24px;border-right:1px solid var(--line);background:rgba(6,12,22,.78);display:grid;gap:22px;min-height:0;overflow:auto}
+    .brand{display:grid;gap:10px}
+    .brand-mark{display:flex;align-items:center;gap:12px}
+    .logo-wrap{width:72px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+    .logo-image{width:72px;height:auto;display:block}
+    .brand-wordmark{display:flex;gap:6px;align-items:flex-end;line-height:1;flex-wrap:wrap}
+.brand-ai{font-size:14px;font-weight:900;text-transform:uppercase;color:var(--text)}
+    .side-card,.queue-panel,.panel,.stat{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+    .side-card{padding:18px;display:grid;gap:10px}
+    .side-card strong,.group-head strong,.panel h2,.panel h3{letter-spacing:.08em}
+    .side-card p,.muted{color:var(--muted)}
+    .nav{display:grid;gap:10px}
+    .nav a{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:16px;border:1px solid var(--line);text-decoration:none;color:var(--text);background:rgba(255,255,255,.03)}
+    .nav a.active{border-color:rgba(241,199,91,.45);background:rgba(241,199,91,.12)}
+    .nav span:last-child{font-size:12px;color:var(--muted)}
+    .main{padding:24px;display:grid;gap:20px;min-height:0;overflow:auto}
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+    .kicker{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:800}
+    h1{margin:8px 0 8px;font-size:40px;line-height:1.05}
+    .topbar p{margin:0;color:var(--muted);max-width:760px}
+    .top-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px}
+    .chip,.inline-btn,.save-btn,.action-btn,.stage-btn{border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);padding:12px 14px}
+    .chip{font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+    .inline-btn,.action-btn,.save-btn,.stage-btn{cursor:pointer;font-weight:700}
+    .save-btn{background:var(--gold);color:#1d1b12;border-color:rgba(241,199,91,.5)}
+    .layout{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start;min-height:0}
+    .queue-panel{padding:18px;display:grid;gap:16px;min-height:0;overflow:auto}
+    .stage-bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .stage-switcher{display:flex;gap:8px}
+    .stage-btn.active{background:rgba(89,168,255,.18);border-color:rgba(89,168,255,.45)}
+    .group{display:grid;gap:10px}
+    .group-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .group-head strong{font-size:13px;text-transform:uppercase;color:var(--muted)}
+    .group-head span{font-size:12px;color:var(--muted)}
+    .queue-list{display:grid;gap:10px}
+    .queue-item{width:100%;text-align:left;padding:14px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--text);cursor:pointer}
+    .queue-item.active{border-color:rgba(89,168,255,.45);background:rgba(89,168,255,.12)}
+    .queue-item strong{display:block;font-size:14px;color:#ffffff}
+    .queue-item p,.queue-item span{display:block;margin-top:6px;color:var(--muted);font-size:13px;line-height:1.45}
+    .pill-row,.tag-row,.action-row{display:flex;flex-wrap:wrap;gap:10px}
+    .tag{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:700}
+    .tag.blue{background:rgba(89,168,255,.14);border-color:rgba(89,168,255,.28)}
+    .tag.green{background:rgba(104,215,138,.14);border-color:rgba(104,215,138,.28)}
+    .tag.orange{background:rgba(255,179,92,.14);border-color:rgba(255,179,92,.28)}
+    .tag.red{background:rgba(255,123,123,.14);border-color:rgba(255,123,123,.28)}
+    .content{display:grid;gap:20px;min-height:0;max-height:min(68vh, calc(100vh - 220px));overflow-x:hidden;overflow-y:auto;padding-right:2px;padding-bottom:120px;scroll-padding-bottom:120px;overscroll-behavior:contain}
+    .stat-grid,.detail-grid,.timeline{display:grid;gap:14px}
+    .stat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .stat{padding:18px}
+    .stat label,.field label,.timeline-item label{display:block;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+    .stat strong{display:block;margin-top:10px;font-size:28px}
+    .stat span,.panel p,.field-note{display:block;margin-top:8px;color:var(--muted);line-height:1.5}
+    .panel{padding:20px;display:grid;gap:18px}
+    .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+    .detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .field{display:grid;gap:8px}
+    .field input,.field textarea,.field select{width:100%;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--text)}
+    .field textarea{min-height:120px;resize:vertical}
+    .field.full{grid-column:1/-1}
+    .action-row{align-items:center}
+    .action-btn.primary{background:rgba(241,199,91,.18);border-color:rgba(241,199,91,.42)}
+    .action-btn:disabled{opacity:.45;cursor:not-allowed}
+    .timeline-item{padding:14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .timeline-item strong{display:block;margin-top:8px;color:#c7d0e0}
+    .queue-panel{max-height:min(68vh, calc(100vh - 220px));padding-bottom:120px;scroll-padding-bottom:120px;overscroll-behavior:contain}
+    .recommendation-card{padding:18px;border-radius:18px;border:1px solid rgba(241,199,91,.26);background:linear-gradient(180deg,rgba(241,199,91,.08),rgba(255,255,255,.02));display:grid;gap:12px}
+    .recommendation-card label{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+    .recommendation-card strong{font-size:24px;line-height:1.15}
+    .recommendation-card p{margin:0;color:var(--text)}
+    .recommendation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .recommendation-metric{padding:14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+    .recommendation-metric span{display:block;margin-top:6px;color:var(--muted);font-size:13px;line-height:1.45}
+    .save-status{padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted)}
+    .save-status.success{border-color:rgba(104,215,138,.42);color:#c8f7d5}
+    .save-status.error{border-color:rgba(255,123,123,.42);color:#ffd0d0}
+    @media (max-width: 1220px){
+      .app{grid-template-columns:1fr}
+      .sidebar{border-right:0;border-bottom:1px solid var(--line)}
+      .layout{grid-template-columns:1fr}
+      .queue-panel{position:static}
+      .queue-panel,.content{max-height:none;padding-bottom:0}
+      .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (max-width: 760px){
+      h1{font-size:30px}
+      .stat-grid,.detail-grid,.recommendation-grid{grid-template-columns:1fr}
+      .topbar{flex-direction:column}
+      .top-actions{justify-content:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <div class="logo-wrap"><img class="logo-image" src="public/assets/images/ai-abcx-logo-icon-tight-transparent.png" alt="AI-ABCX logo" /></div>
+          <div><div class="brand-wordmark"><span class="brand-ai">AI-ABCX</span></div></div>
+        </div>
+        <div class="side-card">
+          <strong>You lead as President.</strong>
+          <p>This screen is for appointment truth, follow-up pressure, and revenue truth after the initial dashboard view.</p>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a id="presidentNavLink" href="#"><span>President Dashboard</span><span>Live</span></a>
+        <a id="jobRecordsNavLink" href="#"><span>Job Records</span><span>Shared</span></a>
+        <a id="dispatcherNavLink" href="#"><span>Dispatcher</span><span>Flow</span></a>
+        <a id="crmNavLink" href="#"><span>CRM Core</span><span>Memory</span></a>
+        <a id="followUpNavLink" href="#" class="active"><span>President Follow-Up</span><span>Now</span></a>
+        <a id="settingsNavLink" href="#"><span>Settings</span><span>System</span></a>
+      </nav>
+
+      <div class="side-card">
+        <strong>Follow-Up Rule</strong>
+        <p>Stage A keeps the President as the manual source of scheduling and revenue truth. Stage B still needs President follow-through after automation clears the front-end gates.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="topbar">
+        <div>
+          <div class="kicker">President Follow-Up Lane</div>
+          <h1 id="pageTitle">Appointment and Revenue Follow-Up</h1>
+          <p id="pageIntro">Use this screen after the chamber view to keep manual confirmation, post-appointment follow-up, and revenue truth visible on the shared record.</p>
+        </div>
+        <div class="top-actions">
+          <div class="chip" id="stageChip">Stage A</div>
+          <div class="chip" id="statusChip">Awaiting Manual Confirmation</div>
+          <button class="inline-btn" id="openDashboardBtn" type="button">Open Dashboard</button>
+          <button class="inline-btn" id="openRecordBtn" type="button">Open Job Record</button>
+          <button class="save-btn" id="saveBtn" type="button">Save Follow-Up</button>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="queue-panel">
+          <div class="stage-bar">
+            <strong>Queue View</strong>
+            <div class="stage-switcher">
+              <button class="stage-btn active" data-stage="A" type="button">Stage A</button>
+              <button class="stage-btn" data-stage="B" type="button">Stage B</button>
+            </div>
+          </div>
+          <div class="muted" id="stageNote">Stage A follow-up stays centered on manual scheduling and President-entered outcome truth.</div>
+          <div id="queueGroups"></div>
+        </aside>
+
+        <div class="content">
+          <section class="stat-grid" id="summaryGrid"></section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h2 id="recordHeading">Selected Record</h2>
+                <p id="recordSub">The selected shared record drives follow-up action, revenue review, and next-step pressure.</p>
+              </div>
+              <div class="pill-row" id="recordTags"></div>
+            </div>
+            <div class="detail-grid">
+              <div class="field">
+                <label>Job Number</label>
+                <input id="jobNumber" type="text" readonly />
+              </div>
+              <div class="field">
+                <label>Assigned Representative</label>
+                <input id="assignedRep" type="text" />
+              </div>
+              <div class="field">
+                <label>Customer Name</label>
+                <input id="customerName" type="text" />
+              </div>
+              <div class="field">
+                <label>Customer Phone</label>
+                <input id="customerPhone" type="text" />
+              </div>
+              <div class="field">
+                <label>Requested / Provisional Time</label>
+                <input id="requestedTime" type="text" />
+              </div>
+              <div class="field">
+                <label>Final Confirmed Time</label>
+                <input id="confirmedTime" type="text" />
+              </div>
+              <div class="field">
+                <label>Status</label>
+                <select id="statusSelect"></select>
+              </div>
+              <div class="field">
+                <label>Outcome</label>
+                <select id="outcomeSelect"></select>
+              </div>
+              <div class="field" id="followUpReasonField">
+                <label>Follow-Up Next Step</label>
+                <select id="followUpReasonSelect"></select>
+              </div>
+              <div class="field">
+                <label>Amount Paid</label>
+                <input id="amountPaid" type="number" min="0" step="1" />
+              </div>
+              <div class="field">
+                <label>Appointment Type</label>
+                <input id="appointmentType" type="text" readonly />
+              </div>
+              <div class="field full">
+                <label>President Follow-Up Notes</label>
+                <textarea id="notesField"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>President Action Lane</h3>
+                <p id="actionIntro">Quick actions stay aligned to the current stage gate and the real follow-up obligation on this record.</p>
+              </div>
+            </div>
+            <div class="action-row" id="actionRow"></div>
+            <div class="save-status" id="saveStatus">Changes stay on the shared record in this browser.</div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>President Recommendation</h3>
+                <p id="recommendationIntro">This is the system recommendation for what the President should govern next on the selected record.</p>
+              </div>
+            </div>
+            <div class="recommendation-card">
+              <label id="recommendationLabel">President Priority</label>
+              <strong id="recommendationTitle">Clear the current gate.</strong>
+              <p id="recommendationText">The current record state determines what the President should protect next.</p>
+              <div class="recommendation-grid" id="recommendationGrid"></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Activity and Revenue Timeline</h3>
+                <p id="timelineIntro">The latest scheduling, outcome, and revenue truth stays attached to the same record for President review.</p>
+              </div>
+            </div>
+            <div class="timeline" id="timeline"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./ai-abc-stage-config.js"></script>
+  <script src="./ai-abcx-job-records.js?v=20260615f"></script>
+  <script src="./ai-abcx-workflow-helpers.js?v=20260615b"></script>
+  <script src="./ai-abcx-president-follow-up-app.js?v=20260615a"></script>
+</body>
+</html>
