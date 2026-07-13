@@ -1,5 +1,7 @@
 window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
   const storageKey = "ai-abcx-job-records-v1";
+  const JOB_RECORDS_SCHEMA_VERSION = 2;
+  const ESTIMATOR_SCHEMA_VERSION = 2;
   const baseRecords = [
         {
           id: "job-240614-001",
@@ -336,13 +338,32 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     return "new_request";
   }
 
+  function migrateEstimatorData(value) {
+    const existing = value && typeof value === "object" ? cloneRecord(value) : {};
+    const sourceVersion = Math.max(1, Number(existing.schemaVersion || 1));
+    if (sourceVersion < 2) {
+      const scheduling = existing.handoff && existing.handoff.scheduling;
+      existing.followUp = existing.followUp && typeof existing.followUp === "object" ? existing.followUp : {};
+      existing.followUp.attempts = Array.isArray(existing.followUp.attempts) ? existing.followUp.attempts : [];
+      existing.followUp.completedAt = existing.followUp.completedAt || "";
+      existing.followUp.resolution = existing.followUp.resolution || "";
+      existing.handoff = existing.handoff && typeof existing.handoff === "object" ? existing.handoff : {};
+      existing.handoff.scheduling = scheduling && typeof scheduling === "object"
+        ? scheduling
+        : { status: scheduling && scheduling !== "not_requested" ? scheduling : "not_requested", scheduledDate: "", scheduledTime: "", assignedTo: "", notes: "", requestedAt: "" };
+    }
+    existing.schemaVersion = ESTIMATOR_SCHEMA_VERSION;
+    return existing;
+  }
+
   function ensureEstimatorRecord(record) {
     if (!record) return null;
-    const existing = record.estimator && typeof record.estimator === "object" ? record.estimator : {};
+    const existing = migrateEstimatorData(record.estimator);
     const initialStatus = ESTIMATOR_STATUSES.includes(existing.status)
       ? existing.status
       : deriveLegacyEstimatorStatus(record);
     record.estimator = {
+      schemaVersion: ESTIMATOR_SCHEMA_VERSION,
       level: normalizeEstimatorLevel(existing.level),
       status: initialStatus,
       source: ESTIMATE_SOURCES.includes(existing.source) ? existing.source : inferEstimatorSource(record),
@@ -752,10 +773,13 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
       const parsed = JSON.parse(localStorage.getItem(storageKey) || "{}");
       if (!parsed || !Array.isArray(parsed.records)) {
         return {
+          schemaVersion: JOB_RECORDS_SCHEMA_VERSION,
           records: fallbackRecords.map(normalizeRecord),
           selectedRecordId: fallbackRecords[0] ? fallbackRecords[0].id : null
         };
       }
+      const needsMigration = Number(parsed.schemaVersion || 1) < JOB_RECORDS_SCHEMA_VERSION
+        || parsed.records.some((record) => Number(record && record.estimator && record.estimator.schemaVersion || 1) < ESTIMATOR_SCHEMA_VERSION);
       const normalizedParsedRecords = parsed.records.map(normalizeRecord);
       const mergedRecords = normalizedParsedRecords.slice();
       let merged = false;
@@ -765,15 +789,17 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
           merged = true;
         }
       });
-      if (merged) {
+      if (merged || needsMigration) {
         writeState(mergedRecords, parsed.selectedRecordId || (fallbackRecords[0] ? fallbackRecords[0].id : null));
       }
       return {
+        schemaVersion: JOB_RECORDS_SCHEMA_VERSION,
         records: mergedRecords,
         selectedRecordId: parsed.selectedRecordId || (fallbackRecords[0] ? fallbackRecords[0].id : null)
       };
     } catch (error) {
       return {
+        schemaVersion: JOB_RECORDS_SCHEMA_VERSION,
         records: fallbackRecords.map(normalizeRecord),
         selectedRecordId: fallbackRecords[0] ? fallbackRecords[0].id : null
       };
@@ -782,6 +808,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
 
   function writeState(records, selectedRecordId) {
     localStorage.setItem(storageKey, JSON.stringify({
+      schemaVersion: JOB_RECORDS_SCHEMA_VERSION,
       records,
       selectedRecordId: selectedRecordId || (records[0] ? records[0].id : null)
     }));
@@ -1116,6 +1143,8 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
 
   return {
     storageKey,
+    JOB_RECORDS_SCHEMA_VERSION,
+    ESTIMATOR_SCHEMA_VERSION,
     ESTIMATOR_LEVELS,
     ESTIMATOR_STATUSES,
     ESTIMATE_TYPES,
@@ -1129,6 +1158,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     normalizeEstimatorLevel,
     inferEstimatorSource,
     inferEstimateType,
+    migrateEstimatorData,
     ensureEstimatorRecord,
     canTransitionEstimator,
     transitionEstimator,
