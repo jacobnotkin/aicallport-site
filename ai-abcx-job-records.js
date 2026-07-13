@@ -258,8 +258,480 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     "job-240614-007": "2026-04-25"
   };
 
+  const ESTIMATOR_LEVELS = ["A", "B", "C"];
+  const ESTIMATOR_STATUSES = [
+    "new_request",
+    "estimate_preparing",
+    "estimate_ready_to_preview",
+    "estimate_previewed",
+    "estimate_ready_to_send",
+    "estimate_sent",
+    "waiting_on_customer",
+    "revision_requested",
+    "accepted",
+    "declined",
+    "follow_up_needed",
+    "scheduled_after_acceptance",
+    "lost"
+  ];
+  const ESTIMATE_TYPES = ["standard", "options", "package", "quick"];
+  const ESTIMATE_SOURCES = ["website", "call_agent", "advertising", "manual", "repeat_customer", "service", "unknown"];
+  const ESTIMATOR_TRANSITIONS = {
+    new_request: ["estimate_preparing", "follow_up_needed", "lost"],
+    estimate_preparing: ["estimate_ready_to_preview", "follow_up_needed", "lost"],
+    estimate_ready_to_preview: ["estimate_previewed", "estimate_preparing", "follow_up_needed", "lost"],
+    estimate_previewed: ["estimate_ready_to_send", "estimate_preparing", "follow_up_needed", "lost"],
+    estimate_ready_to_send: ["estimate_sent", "estimate_preparing", "lost"],
+    estimate_sent: ["waiting_on_customer", "accepted", "declined", "revision_requested", "follow_up_needed"],
+    waiting_on_customer: ["accepted", "declined", "revision_requested", "follow_up_needed", "lost"],
+    revision_requested: ["estimate_preparing", "estimate_ready_to_send", "follow_up_needed", "lost"],
+    accepted: ["scheduled_after_acceptance", "follow_up_needed"],
+    declined: ["follow_up_needed", "lost", "estimate_preparing"],
+    follow_up_needed: ["estimate_preparing", "estimate_ready_to_send", "accepted", "declined", "lost"],
+    scheduled_after_acceptance: ["follow_up_needed"],
+    lost: ["estimate_preparing", "follow_up_needed"]
+  };
+
   function cloneRecord(record) {
     return JSON.parse(JSON.stringify(record));
+  }
+
+  function normalizeEstimatorLevel(value) {
+    const normalized = String(value || "A").toUpperCase();
+    return ESTIMATOR_LEVELS.includes(normalized) ? normalized : "A";
+  }
+
+  function inferEstimatorSource(record) {
+    const text = `${record && record.notes ? record.notes : ""} ${record && record.transcript ? record.transcript : ""}`.toLowerCase();
+    if (/repeat|returning customer|existing customer/.test(text)) return "repeat_customer";
+    if (/website|web form|online request/.test(text)) return "website";
+    if (/advert|campaign|google|facebook|instagram/.test(text)) return "advertising";
+    if (/call|phone|missed-call|ai agent/.test(text)) return "call_agent";
+    if (record && record.appointmentType === "service") return "service";
+    if (record) return "manual";
+    return "unknown";
+  }
+
+  function inferEstimateType(record) {
+    const text = `${record && record.notes ? record.notes : ""} ${record && record.transcript ? record.transcript : ""}`.toLowerCase();
+    if (/package|tier|gold|silver|bronze/.test(text)) return "package";
+    if (/option|choose|select|add-on|menu/.test(text)) return "options";
+    if (/quick|fast|same call|rough number/.test(text)) return "quick";
+    return "standard";
+  }
+
+  function deriveLegacyEstimatorStatus(record) {
+    const stages = record && record.stages ? record.stages : {};
+    const stageRecord = stages.C || stages.B || stages.A || {};
+    const status = stageRecord.status || "";
+    const outcome = stageRecord.outcome || "";
+    if (["sold_and_completed", "sold_not_completed"].includes(outcome)) return "accepted";
+    if (["not_sold", "canceled"].includes(outcome)) return "declined";
+    if (status === "follow_up_needed" && stageRecord.followUpReason === "estimate_revision") return "revision_requested";
+    if (status === "follow_up_needed") return "follow_up_needed";
+    if (["completed", "confirmed", "in_progress"].includes(status)) return "estimate_preparing";
+    if (["awaiting_customer_confirmation"].includes(status)) return "waiting_on_customer";
+    if (["awaiting_worker_confirmation", "awaiting_manual_confirmation", "awaiting_worker_assignment", "rerouted", "rescheduled"].includes(status)) return "new_request";
+    if (["canceled", "no_show"].includes(status)) return "lost";
+    return "new_request";
+  }
+
+  function ensureEstimatorRecord(record) {
+    if (!record) return null;
+    const existing = record.estimator && typeof record.estimator === "object" ? record.estimator : {};
+    const initialStatus = ESTIMATOR_STATUSES.includes(existing.status)
+      ? existing.status
+      : deriveLegacyEstimatorStatus(record);
+    record.estimator = {
+      level: normalizeEstimatorLevel(existing.level),
+      status: initialStatus,
+      source: ESTIMATE_SOURCES.includes(existing.source) ? existing.source : inferEstimatorSource(record),
+      estimateType: ESTIMATE_TYPES.includes(existing.estimateType) ? existing.estimateType : inferEstimateType(record),
+      owner: {
+        userId: existing.owner && existing.owner.userId ? existing.owner.userId : "",
+        label: existing.owner && existing.owner.label ? existing.owner.label : (record.assignedRep || "President"),
+        assignedBy: existing.owner && existing.owner.assignedBy ? existing.owner.assignedBy : "President"
+      },
+      quote: {
+        version: Math.max(1, Number(existing.quote && existing.quote.version || 1)),
+        currency: existing.quote && existing.quote.currency ? existing.quote.currency : "USD",
+        customerScope: existing.quote && existing.quote.customerScope ? existing.quote.customerScope : "",
+        internalNotes: existing.quote && existing.quote.internalNotes ? existing.quote.internalNotes : "",
+        lineItems: existing.quote && Array.isArray(existing.quote.lineItems) ? existing.quote.lineItems : [],
+        subtotal: Number(existing.quote && existing.quote.subtotal || 0),
+        discountAmount: Number(existing.quote && existing.quote.discountAmount || 0),
+        taxRate: Number(existing.quote && existing.quote.taxRate || 0),
+        taxAmount: Number(existing.quote && existing.quote.taxAmount || 0),
+        total: Number(existing.quote && existing.quote.total || 0),
+        attachments: existing.quote && Array.isArray(existing.quote.attachments) ? existing.quote.attachments : []
+      },
+      preview: {
+        quoteVersion: Number(existing.preview && existing.preview.quoteVersion || 0),
+        previewedAt: existing.preview && existing.preview.previewedAt ? existing.preview.previewedAt : "",
+        previewedBy: existing.preview && existing.preview.previewedBy ? existing.preview.previewedBy : "",
+        snapshot: existing.preview && existing.preview.snapshot ? existing.preview.snapshot : null
+      },
+      delivery: {
+        method: existing.delivery && existing.delivery.method ? existing.delivery.method : "",
+        sentAt: existing.delivery && existing.delivery.sentAt ? existing.delivery.sentAt : "",
+        openedAt: existing.delivery && existing.delivery.openedAt ? existing.delivery.openedAt : ""
+      },
+      decision: {
+        value: existing.decision && existing.decision.value ? existing.decision.value : "pending",
+        decidedAt: existing.decision && existing.decision.decidedAt ? existing.decision.decidedAt : "",
+        selectedOptionId: existing.decision && existing.decision.selectedOptionId ? existing.decision.selectedOptionId : ""
+      },
+      revisions: Array.isArray(existing.revisions) ? existing.revisions : [],
+      followUp: {
+        reason: existing.followUp && existing.followUp.reason ? existing.followUp.reason : "",
+        owner: existing.followUp && existing.followUp.owner ? existing.followUp.owner : "",
+        nextAction: existing.followUp && existing.followUp.nextAction ? existing.followUp.nextAction : "",
+        dueAt: existing.followUp && existing.followUp.dueAt ? existing.followUp.dueAt : "",
+        attempts: existing.followUp && Array.isArray(existing.followUp.attempts) ? existing.followUp.attempts : [],
+        completedAt: existing.followUp && existing.followUp.completedAt ? existing.followUp.completedAt : "",
+        resolution: existing.followUp && existing.followUp.resolution ? existing.followUp.resolution : ""
+      },
+      handoff: {
+        sales: existing.handoff && existing.handoff.sales ? existing.handoff.sales : "not_requested",
+        service: existing.handoff && existing.handoff.service ? existing.handoff.service : "not_requested",
+        scheduling: existing.handoff && existing.handoff.scheduling && typeof existing.handoff.scheduling === "object"
+          ? existing.handoff.scheduling
+          : {
+              status: existing.handoff && existing.handoff.scheduling && existing.handoff.scheduling !== "not_requested" ? existing.handoff.scheduling : "not_requested",
+              scheduledDate: "",
+              scheduledTime: "",
+              assignedTo: "",
+              notes: "",
+              requestedAt: ""
+            }
+      },
+      activity: Array.isArray(existing.activity) ? existing.activity : []
+    };
+    return record.estimator;
+  }
+
+  function canTransitionEstimator(record, nextStatus) {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator || !ESTIMATOR_STATUSES.includes(nextStatus)) return false;
+    if (estimator.status === nextStatus) return true;
+    return (ESTIMATOR_TRANSITIONS[estimator.status] || []).includes(nextStatus);
+  }
+
+  function transitionEstimator(record, nextStatus, activity = {}) {
+    if (!canTransitionEstimator(record, nextStatus)) return false;
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator) return false;
+    const previousStatus = estimator.status;
+    estimator.status = nextStatus;
+    estimator.activity.push({
+      time: activity.time || new Date().toISOString(),
+      title: activity.title || `Estimate moved to ${titleWords(nextStatus)}`,
+      text: activity.text || `${formatJobRef(record)} moved from ${titleWords(previousStatus)} to ${titleWords(nextStatus)}.`,
+      actor: activity.actor || "President"
+    });
+    return true;
+  }
+
+  function getEstimatorCapabilities(level) {
+    const normalizedLevel = normalizeEstimatorLevel(level);
+    return {
+      level: normalizedLevel,
+      estimateTypes: normalizedLevel === "A"
+        ? ["standard"]
+        : normalizedLevel === "B"
+          ? ["standard", "options"]
+          : ESTIMATE_TYPES.slice(),
+      automatedDelivery: normalizedLevel !== "A",
+      revisionWorkflow: true,
+      automatedFollowUp: normalizedLevel === "C",
+      performanceIntelligence: normalizedLevel === "C"
+    };
+  }
+
+  function assignEstimatorOwner(record, owner = {}, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator || !owner.label) return false;
+    estimator.owner = {
+      userId: owner.userId || "",
+      label: owner.label,
+      assignedBy: actor
+    };
+    estimator.activity.push({
+      time: new Date().toISOString(),
+      title: `Estimate assigned to ${owner.label}`,
+      text: `${formatJobRef(record)} estimator ownership was assigned by ${actor}.`,
+      actor
+    });
+    return true;
+  }
+
+  function updateEstimatorQuote(record, quote = {}, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator) return false;
+    const estimateType = ESTIMATE_TYPES.includes(quote.estimateType) ? quote.estimateType : estimator.estimateType;
+    const capabilities = getEstimatorCapabilities(estimator.level);
+    if (!capabilities.estimateTypes.includes(estimateType)) return false;
+    const lineItems = Array.isArray(quote.lineItems)
+      ? quote.lineItems.map((item, index) => ({
+          id: item.id || `line-${index + 1}`,
+          label: String(item.label || `Line item ${index + 1}`),
+          description: String(item.description || ""),
+          quantity: Math.max(0, Number(item.quantity === undefined ? 1 : item.quantity)),
+          unitPrice: Math.max(0, Number(item.unitPrice === undefined ? item.amount || 0 : item.unitPrice)),
+          optionId: String(item.optionId || "")
+        }))
+      : estimator.quote.lineItems;
+    const subtotal = lineItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    const discountAmount = Math.min(subtotal, Math.max(0, Number(quote.discountAmount === undefined ? estimator.quote.discountAmount : quote.discountAmount)));
+    const taxRate = Math.min(100, Math.max(0, Number(quote.taxRate === undefined ? estimator.quote.taxRate : quote.taxRate)));
+    const taxableAmount = Math.max(0, subtotal - discountAmount);
+    const taxAmount = taxableAmount * (taxRate / 100);
+    estimator.estimateType = estimateType;
+    estimator.quote = {
+      version: Math.max(1, Number(estimator.quote.version || 1) + 1),
+      currency: quote.currency || estimator.quote.currency || "USD",
+      customerScope: quote.customerScope === undefined ? estimator.quote.customerScope : String(quote.customerScope || ""),
+      internalNotes: quote.internalNotes === undefined ? estimator.quote.internalNotes : String(quote.internalNotes || ""),
+      lineItems,
+      subtotal,
+      discountAmount,
+      taxRate,
+      taxAmount,
+      total: taxableAmount + taxAmount,
+      attachments: Array.isArray(quote.attachments)
+        ? quote.attachments.map((attachment, index) => ({
+            id: attachment.id || `attachment-${index + 1}`,
+            label: String(attachment.label || attachment.name || `Attachment ${index + 1}`),
+            url: String(attachment.url || "")
+          }))
+        : estimator.quote.attachments
+    };
+    if (["new_request", "revision_requested", "declined", "follow_up_needed", "lost"].includes(estimator.status)) {
+      transitionEstimator(record, "estimate_preparing", {
+        actor,
+        title: "Estimate preparation started",
+        text: `${actor} opened ${formatJobRef(record)} as a ${titleWords(estimateType)} estimate.`
+      });
+    }
+    const current = ensureEstimatorRecord(record);
+    current.activity.push({
+      time: new Date().toISOString(),
+      title: `${titleWords(estimateType)} estimate updated`,
+      text: `${actor} saved ${lineItems.length} line item${lineItems.length === 1 ? "" : "s"} totaling ${current.quote.currency} ${current.quote.total.toFixed(2)}.`,
+      actor
+    });
+    return true;
+  }
+
+  function validateEstimatorQuote(record) {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator) return ["Estimate record is unavailable."];
+    const errors = [];
+    if (!estimator.quote.customerScope.trim()) errors.push("Customer scope is required.");
+    if (!estimator.quote.lineItems.length) errors.push("Add at least one line item.");
+    estimator.quote.lineItems.forEach((item, index) => {
+      if (!String(item.label || "").trim()) errors.push(`Line item ${index + 1} needs a description.`);
+      if (!(Number(item.quantity) > 0)) errors.push(`Line item ${index + 1} quantity must be greater than zero.`);
+      if (Number(item.unitPrice) < 0 || !Number.isFinite(Number(item.unitPrice))) errors.push(`Line item ${index + 1} needs a valid unit price.`);
+    });
+    if (estimator.quote.total <= 0) errors.push("Final total must be greater than zero.");
+    estimator.quote.attachments.forEach((attachment, index) => {
+      if (!String(attachment.label || "").trim()) errors.push(`Attachment ${index + 1} needs a name.`);
+    });
+    return errors;
+  }
+
+  function markEstimatorReadyToPreview(record, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator || validateEstimatorQuote(record).length) return false;
+    return transitionEstimator(record, "estimate_ready_to_preview", {
+      actor,
+      title: "Estimate ready to preview",
+      text: `${formatJobRef(record)} passed validation and requires customer-view preview before sending.`
+    });
+  }
+
+  function recordEstimatorPreview(record, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator || estimator.status !== "estimate_ready_to_preview") return false;
+    estimator.preview = {
+      quoteVersion: estimator.quote.version,
+      previewedAt: new Date().toISOString(),
+      previewedBy: actor,
+      snapshot: cloneRecord({
+        customerName: record.customerName || "Customer",
+        jobRef: formatJobRef(record),
+        estimateType: estimator.estimateType,
+        quote: estimator.quote
+      })
+    };
+    return transitionEstimator(record, "estimate_previewed", {
+      actor,
+      title: "Customer quote preview confirmed",
+      text: `${actor} previewed quote version ${estimator.quote.version} for ${formatJobRef(record)}.`
+    });
+  }
+
+  function markEstimatorReadyToSend(record, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator || estimator.status !== "estimate_previewed") return false;
+    if (!estimator.preview.previewedAt || estimator.preview.quoteVersion !== estimator.quote.version) return false;
+    return transitionEstimator(record, "estimate_ready_to_send", {
+      actor,
+      title: "Previewed estimate ready to send",
+      text: `${formatJobRef(record)} quote version ${estimator.quote.version} is approved for customer delivery.`
+    });
+  }
+
+  function returnEstimatorToDraft(record, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator || !["estimate_ready_to_preview", "estimate_previewed", "estimate_ready_to_send"].includes(estimator.status)) return false;
+    estimator.preview = { quoteVersion: 0, previewedAt: "", previewedBy: "", snapshot: null };
+    return transitionEstimator(record, "estimate_preparing", {
+      actor,
+      title: "Estimate returned to draft",
+      text: `${actor} reopened ${formatJobRef(record)}. A new preview will be required before sending.`
+    });
+  }
+
+  function sendEstimatorQuote(record, delivery = {}, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator || estimator.status !== "estimate_ready_to_send") return false;
+    if (!estimator.preview.previewedAt || estimator.preview.quoteVersion !== estimator.quote.version) return false;
+    estimator.delivery = {
+      method: delivery.method || "manual_link",
+      sentAt: delivery.sentAt || new Date().toISOString(),
+      openedAt: ""
+    };
+    if (!transitionEstimator(record, "estimate_sent", {
+      actor,
+      title: "Estimate sent",
+      text: `${formatJobRef(record)} was sent by ${delivery.method || "manual link"}.`
+    })) return false;
+    return transitionEstimator(record, "waiting_on_customer", {
+      actor,
+      title: "Waiting on customer decision",
+      text: `${formatJobRef(record)} is awaiting acceptance, decline, or a revision request.`
+    });
+  }
+
+  function recordEstimatorDecision(record, decision, actor = "Customer") {
+    const decisionMap = {
+      accepted: "accepted",
+      declined: "declined",
+      revision_requested: "revision_requested"
+    };
+    const nextStatus = decisionMap[decision && decision.value];
+    if (!nextStatus || !canTransitionEstimator(record, nextStatus)) return false;
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator) return false;
+    estimator.decision = {
+      value: decision.value,
+      decidedAt: decision.decidedAt || new Date().toISOString(),
+      selectedOptionId: decision.selectedOptionId || ""
+    };
+    if (nextStatus === "revision_requested") {
+      estimator.revisions.push({
+        id: `revision-${estimator.revisions.length + 1}`,
+        requestedAt: estimator.decision.decidedAt,
+        requestedBy: actor,
+        reason: decision.reason || "Customer requested an estimate revision.",
+        status: "requested"
+      });
+    }
+    return transitionEstimator(record, nextStatus, {
+      actor,
+      title: nextStatus === "revision_requested" ? "Customer requested revision" : `Estimate ${nextStatus}`,
+      text: decision.reason || `${actor} marked ${formatJobRef(record)} as ${titleWords(nextStatus)}.`
+    });
+  }
+
+  function setEstimatorFollowUp(record, followUp = {}, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator || !followUp.reason || !followUp.nextAction) return false;
+    if (estimator.status !== "follow_up_needed" && !transitionEstimator(record, "follow_up_needed", {
+      actor,
+      title: "Estimator follow-up required",
+      text: `${formatJobRef(record)} requires another action before the estimate can close.`
+    })) return false;
+    const current = ensureEstimatorRecord(record);
+    current.followUp = {
+      reason: followUp.reason,
+      owner: followUp.owner || current.owner.label || "President",
+      nextAction: followUp.nextAction,
+      dueAt: followUp.dueAt || "",
+      attempts: current.followUp.attempts || [],
+      completedAt: "",
+      resolution: ""
+    };
+    return true;
+  }
+
+  function addEstimatorFollowUpAttempt(record, attempt = {}, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator || estimator.status !== "follow_up_needed" || !String(attempt.note || "").trim()) return false;
+    const entry = {
+      id: `follow-up-${estimator.followUp.attempts.length + 1}`,
+      time: attempt.time || new Date().toISOString(),
+      channel: attempt.channel || "phone",
+      note: String(attempt.note).trim(),
+      outcome: attempt.outcome || "pending",
+      actor
+    };
+    estimator.followUp.attempts.push(entry);
+    estimator.activity.push({
+      time: entry.time,
+      title: `Follow-up contact logged by ${actor}`,
+      text: `${titleWords(entry.channel)} contact: ${entry.note}`,
+      actor
+    });
+    return true;
+  }
+
+  function resolveEstimatorFollowUp(record, resolution, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    const resolutionMap = {
+      return_to_draft: "estimate_preparing",
+      accepted: "accepted",
+      declined: "declined",
+      lost: "lost"
+    };
+    const nextStatus = resolutionMap[resolution];
+    if (!estimator || estimator.status !== "follow_up_needed" || !nextStatus) return false;
+    if (!transitionEstimator(record, nextStatus, {
+      actor,
+      title: `Follow-up resolved: ${titleWords(resolution)}`,
+      text: `${formatJobRef(record)} follow-up resolved as ${titleWords(resolution)}.`
+    })) return false;
+    const current = ensureEstimatorRecord(record);
+    current.followUp.completedAt = new Date().toISOString();
+    current.followUp.resolution = resolution;
+    if (["accepted", "declined"].includes(resolution)) {
+      current.decision = {
+        value: resolution,
+        decidedAt: current.followUp.completedAt,
+        selectedOptionId: ""
+      };
+    }
+    return true;
+  }
+
+  function scheduleAcceptedEstimate(record, schedule = {}, actor = "President") {
+    const estimator = ensureEstimatorRecord(record);
+    if (!estimator || estimator.status !== "accepted" || !schedule.scheduledDate || !schedule.scheduledTime || !schedule.assignedTo) return false;
+    estimator.handoff.scheduling = {
+      status: "scheduled",
+      scheduledDate: schedule.scheduledDate,
+      scheduledTime: schedule.scheduledTime,
+      assignedTo: schedule.assignedTo,
+      notes: String(schedule.notes || ""),
+      requestedAt: new Date().toISOString()
+    };
+    return transitionEstimator(record, "scheduled_after_acceptance", {
+      actor,
+      title: "Accepted estimate scheduled",
+      text: `${formatJobRef(record)} was handed to ${schedule.assignedTo} for ${schedule.scheduledDate} at ${schedule.scheduledTime}.`
+    });
   }
 
   function normalizeRecord(record) {
@@ -267,6 +739,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     if (next && !next.routeDate && next.id && routeDateDefaults[next.id]) {
       next.routeDate = routeDateDefaults[next.id];
     }
+    ensureEstimatorRecord(next);
     return next;
   }
 
@@ -643,11 +1116,36 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
 
   return {
     storageKey,
+    ESTIMATOR_LEVELS,
+    ESTIMATOR_STATUSES,
+    ESTIMATE_TYPES,
+    ESTIMATE_SOURCES,
+    ESTIMATOR_TRANSITIONS,
     cloneRecord,
     getBaseRecords,
     readState,
     writeState,
     findRecordById,
+    normalizeEstimatorLevel,
+    inferEstimatorSource,
+    inferEstimateType,
+    ensureEstimatorRecord,
+    canTransitionEstimator,
+    transitionEstimator,
+    getEstimatorCapabilities,
+    assignEstimatorOwner,
+    updateEstimatorQuote,
+    validateEstimatorQuote,
+    markEstimatorReadyToPreview,
+    recordEstimatorPreview,
+    markEstimatorReadyToSend,
+    returnEstimatorToDraft,
+    sendEstimatorQuote,
+    recordEstimatorDecision,
+    setEstimatorFollowUp,
+    addEstimatorFollowUpAttempt,
+    resolveEstimatorFollowUp,
+    scheduleAcceptedEstimate,
     ensureStageRecord,
     titleWords,
     getOutcomeLabel,
