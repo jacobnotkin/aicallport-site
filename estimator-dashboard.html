@@ -383,8 +383,10 @@
   <script src="ai-abc-config.js?v=20260618a"></script>
   <script src="ai-abcx-account-assignments.js"></script>
   <script src="ai-abcx-job-records.js?v=20260712a"></script>
+  <script src="ai-abcx-auth-client.js?v=20260712a"></script>
+  <script src="ai-abcx-server-repositories.js?v=20260712a"></script>
   <script>
-    (function () {
+    (async function () {
       const stageConfig = window.AIABCStageConfig || null;
       const appConfig = window.AIABCConfig || null;
       const accountAssignments = window.AIABCXAccountAssignments || null;
@@ -396,7 +398,7 @@
         : null;
       const requestedJob = params.get("job");
       const requestedStage = params.get("stage");
-      const accountAssignment = accountAssignments && typeof accountAssignments.getDashboardAssignment === "function"
+      let accountAssignment = accountAssignments && typeof accountAssignments.getDashboardAssignment === "function"
         ? accountAssignments.getDashboardAssignment("estimator", params.get("user") || "")
         : { userId: "", name: "Assigned Estimator", director: "estimator", level: requestedStage || "A" };
       const estimatorViews = ["overview", "estimates", "create", "preview", "decisions", "followup", "calendar", "history", "performance"];
@@ -406,14 +408,14 @@
         : (estimatorViews.includes(requestedViewFromHash) ? requestedViewFromHash : (requestedJob ? "create" : "overview"));
       let activeEstimatorView = requestedView;
       const assignedLevel = accountAssignment && accountAssignment.level ? accountAssignment.level : requestedStage;
-      const currentStage = stageConfig && typeof stageConfig.normalizeStage === "function"
+      let currentStage = stageConfig && typeof stageConfig.normalizeStage === "function"
         ? stageConfig.normalizeStage(assignedLevel, "A")
         : (["A", "B", "C"].includes(assignedLevel) ? assignedLevel : "A");
       const businessDescriptor = companyConfig && companyConfig.viewModel
         ? (companyConfig.viewModel.serviceDescriptor || companyConfig.viewModel.industry || "Service")
         : "Service";
       const businessDescriptorLower = String(businessDescriptor).toLowerCase();
-      const estimatorTerms = (() => {
+      let estimatorTerms = (() => {
         const normalized = businessDescriptorLower;
         const terms = {
           stageLabel: `Estimator Director ${currentStage}`,
@@ -504,7 +506,39 @@
         "2026-04-24": { status: "availableAllDay", available: [{ start: "09:00", end: "15:00" }], blocked: [], booked: [] },
         "2026-04-25": { status: "splitAvailability", available: [], blocked: [{ start: "10:00", end: "14:00" }], booked: [] }
       };
-      const state = JSON.parse(localStorage.getItem(storageKey) || JSON.stringify(defaults));
+      const localCalendarState = JSON.parse(localStorage.getItem(storageKey) || JSON.stringify(defaults));
+      const persistenceRepository = window.AIABCXServerRepositories || null;
+      let persistenceMode = "local";
+      let persistenceBootstrap = { mode: "local", records: [], calendarState: localCalendarState, calendarEntries: [] };
+      try {
+        const localRecords = jobRecords.readState(jobRecords.getBaseRecords()).records || [];
+        if (persistenceRepository) persistenceBootstrap = await persistenceRepository.bootstrap(localRecords, localCalendarState);
+        persistenceMode = persistenceBootstrap.mode;
+        if (persistenceBootstrap.records && persistenceBootstrap.records.length) {
+          jobRecords.writeState(persistenceBootstrap.records, requestedJob || persistenceBootstrap.records[0].id);
+        }
+        if (persistenceBootstrap.assignment) {
+          accountAssignment = {
+            ...accountAssignment,
+            userId: persistenceBootstrap.assignment.user_id,
+            level: persistenceBootstrap.assignment.level
+          };
+          currentStage = persistenceBootstrap.assignment.level;
+          estimatorTerms.stageLabel = `Estimator Director ${currentStage}`;
+        }
+      } catch (error) {
+        persistenceMode = "error";
+        persistenceBootstrap.error = error;
+      }
+      let state = persistenceBootstrap.calendarState && Object.keys(persistenceBootstrap.calendarState).length
+        ? persistenceBootstrap.calendarState
+        : localCalendarState;
+      let calendarRevisions = (persistenceBootstrap.calendarEntries || []).reduce((result, entry) => {
+        result[entry.externalKey] = entry.serverRevision;
+        return result;
+      }, {});
+      let recordPersistenceQueue = Promise.resolve();
+      let calendarPersistenceQueue = Promise.resolve();
       let selectedDate = calendarAnchorDate;
 
       const calendarGrid = document.getElementById("sales-calendar-grid");
@@ -682,6 +716,24 @@
         const selectedJobId = getSelectedJobId();
         try {
           jobRecords.writeState(records, selectedJobId || (records[0] && records[0].id) || null);
+          if (persistenceMode === "server" && persistenceRepository && selectedJobId) {
+            recordPersistenceQueue = recordPersistenceQueue.then(async () => {
+              const latest = readJobRecordsState();
+              const latestRecord = latest.find((item) => item.id === selectedJobId);
+              if (!latestRecord) return;
+              const saved = await persistenceRepository.saveRecord(latestRecord);
+              const current = readJobRecordsState();
+              const index = current.findIndex((item) => item.id === saved.id);
+              if (index >= 0) {
+                current[index] = saved;
+                jobRecords.writeState(current, selectedJobId);
+              }
+            }).catch((error) => {
+              if (resultStatus) resultStatus.textContent = error.status === 409
+                ? "This estimate was updated in another session. Reload before making another change."
+                : `Server save failed: ${error.message}`;
+            });
+          }
           return true;
         } catch (error) {
           return false;
@@ -1677,7 +1729,19 @@
         }
         return { label: "Route Fits Calendar", detail: `Saved availability covers the current routed estimate on ${routeDate}.`, fits: true };
       }
-      function persist() { localStorage.setItem(storageKey, JSON.stringify(state)); }
+      function persist() {
+        localStorage.setItem(storageKey, JSON.stringify(state));
+        if (persistenceMode === "server" && persistenceRepository) {
+          calendarPersistenceQueue = calendarPersistenceQueue.then(async () => {
+            const saved = await persistenceRepository.saveCalendar(state, calendarRevisions);
+            calendarRevisions = saved.reduce((result, entry) => { result[entry.externalKey] = entry.serverRevision; return result; }, {});
+          }).catch((error) => {
+            if (editorStatus) editorStatus.textContent = error.status === 409
+              ? "Calendar changed in another session. Reload before saving again."
+              : `Server calendar save failed: ${error.message}`;
+          });
+        }
+      }
       function renderWindowList(container, windows, type) {
         container.innerHTML = "";
         windows.forEach((windowItem, index) => {
@@ -2149,6 +2213,7 @@
       setEstimatorView(activeEstimatorView, false);
       applyEstimatorBusinessCopy();
       applyJobContext();
+      if (persistenceMode === "error" && resultStatus) resultStatus.textContent = `Server connection unavailable: ${persistenceBootstrap.error.message}`;
       renderCalendar();
       renderEditor();
     }());
