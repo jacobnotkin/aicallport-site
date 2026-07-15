@@ -42,6 +42,19 @@ window.AIABCXAuthClient = window.AIABCXAuthClient || (() => {
     return data?.session || null;
   }
 
+  async function sendPasswordRecovery(email, redirectTo) {
+    const client = await getSupabaseClient();
+    const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw error;
+  }
+
+  async function updatePassword(password) {
+    const client = await getSupabaseClient();
+    const { data, error } = await client.auth.updateUser({ password });
+    if (error) throw error;
+    return data?.user || null;
+  }
+
   async function signOut() {
     const client = await getSupabaseClient();
     const { error } = await client.auth.signOut();
@@ -56,5 +69,5 @@ window.AIABCXAuthClient = window.AIABCXAuthClient || (() => {
     if (!response.ok) { const error = new Error(payload.error || `Request failed (${response.status}).`); error.status = response.status; error.code = payload.code; error.currentRevision = payload.currentRevision; throw error; }
     return payload;
   }
-  return { getSupabaseClient, getSession, getAccessToken, signInWithPassword, signOut, request };
+  return { getSupabaseClient, getSession, getAccessToken, signInWithPassword, sendPasswordRecovery, updatePassword, signOut, request };
 })();

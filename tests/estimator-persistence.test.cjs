@@ -33,6 +33,8 @@ test("browser auth client reads and creates Supabase sessions", async () => {
   const auth = {
     getSession: async () => ({ data: { session }, error: null }),
     signInWithPassword: async ({ email, password }) => ({ data: email && password ? { session } : {}, error: null }),
+    resetPasswordForEmail: async (email, options) => ({ error: email && options.redirectTo ? null : new Error("missing recovery data") }),
+    updateUser: async ({ password }) => ({ data: { user: password ? session.user : null }, error: null }),
     signOut: async () => ({ error: null })
   };
   const context = {
@@ -47,6 +49,8 @@ test("browser auth client reads and creates Supabase sessions", async () => {
   vm.runInContext(fs.readFileSync(path.join(root, "ai-abcx-auth-client.js"), "utf8"), context);
   assert.equal(await context.window.AIABCXAuthClient.getAccessToken(), "server-session-token");
   assert.deepEqual(JSON.parse(JSON.stringify(await context.window.AIABCXAuthClient.signInWithPassword("owner@example.com", "secret"))), session);
+  await context.window.AIABCXAuthClient.sendPasswordRecovery("owner@example.com", "https://preview.example/estimator-dashboard.html");
+  assert.deepEqual(JSON.parse(JSON.stringify(await context.window.AIABCXAuthClient.updatePassword("new-password"))), session.user);
 });
 
 test("browser auth client preserves local mode when server configuration is unavailable", async () => {

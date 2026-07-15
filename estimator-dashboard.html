@@ -131,7 +131,7 @@
     .editor-status.error{color:#ffd0d7}
     .editor-status.success{color:#c9f5d9}
     .auth-gate{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(4,8,14,.88);backdrop-filter:blur(18px)}
-    .auth-gate[hidden]{display:none}.auth-card{width:min(440px,100%);border-radius:28px;border:1px solid rgba(127,212,255,.18);background:linear-gradient(180deg,rgba(13,18,28,.99),rgba(8,12,19,.99));box-shadow:0 36px 100px rgba(0,0,0,.65);padding:24px;display:grid;gap:16px}.auth-brand{display:flex;align-items:center;gap:12px}.auth-brand img{width:54px;height:54px;object-fit:contain}.auth-card h1{margin:0;font-size:24px;letter-spacing:-.04em}.auth-card p{margin:0;color:var(--text-secondary);font-size:13px;line-height:1.55;font-weight:650}.auth-form{display:grid;gap:12px}.auth-field{display:grid;gap:7px}.auth-field span{color:var(--blue-soft);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.auth-submit{min-height:46px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--orange-soft));color:#fff;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}.auth-submit:disabled{opacity:.55;cursor:wait}.auth-status{min-height:20px;color:var(--blue-soft);font-size:12px;line-height:1.45;font-weight:750}.auth-status.error{color:#ffd0d7}
+    .auth-gate[hidden],.auth-form[hidden]{display:none!important}.auth-card{width:min(440px,100%);border-radius:28px;border:1px solid rgba(127,212,255,.18);background:linear-gradient(180deg,rgba(13,18,28,.99),rgba(8,12,19,.99));box-shadow:0 36px 100px rgba(0,0,0,.65);padding:24px;display:grid;gap:16px}.auth-brand{display:flex;align-items:center;gap:12px}.auth-brand img{width:54px;height:54px;object-fit:contain}.auth-card h1{margin:0;font-size:24px;letter-spacing:-.04em}.auth-card p{margin:0;color:var(--text-secondary);font-size:13px;line-height:1.55;font-weight:650}.auth-form{display:grid;gap:12px}.auth-field{display:grid;gap:7px}.auth-field span{color:var(--blue-soft);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.auth-submit{min-height:46px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--orange-soft));color:#fff;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}.auth-submit.secondary{border:1px solid rgba(127,212,255,.18);background:rgba(127,212,255,.06);color:var(--blue-soft)}.auth-submit:disabled{opacity:.55;cursor:wait}.auth-status{min-height:20px;color:var(--blue-soft);font-size:12px;line-height:1.45;font-weight:750}.auth-status.error{color:#ffd0d7}
     @media (max-width:1280px){.summary-grid,.split,.editor-grid,.estimator-workspace,.topbar-strip,.workspace-overview{grid-template-columns:1fr}.calendar-head,.calendar-grid,.flow-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.estimator-grid,.workspace-mini-grid,.view-intro-grid,.estimator-event-list{grid-template-columns:repeat(2,minmax(0,1fr))}#estimatorHandoffView .record-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media (max-width:980px){.layout{grid-template-columns:minmax(0,1fr);height:auto}.sidebar{min-width:0;max-width:100%;border-right:none;border-bottom:1px solid rgba(255,255,255,.06);overflow:hidden}.sidebar .profile-card,.sidebar-foot{display:none}.nav{min-width:0;width:100%;max-width:100%;grid-auto-flow:column;grid-auto-columns:155px;overflow-x:auto;padding-bottom:4px}.topbar-main{grid-template-columns:1fr}.topbar-right{justify-items:start}.flow-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.record-grid,#estimatorHandoffView .record-grid{grid-template-columns:1fr}.main{overflow:visible}}
     @media (max-width:760px){.page{padding:10px}.shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}.layout{min-height:calc(100vh - 20px)}.summary-grid,.estimator-grid,.record-grid,.workspace-mini-grid,.quote-editor-grid,.estimator-event-list{grid-template-columns:1fr}.quote-line-editor{grid-template-columns:1fr 1fr}.quote-line-editor .quote-editor-field:first-child{grid-column:1/-1}.calendar-head,.calendar-grid,.flow-steps{grid-template-columns:1fr 1fr}.day-card{min-height:180px}}
@@ -145,6 +145,12 @@
         <label class="auth-field"><span>Email</span><input class="form-input" id="estimatorAuthEmail" type="email" autocomplete="username" required /></label>
         <label class="auth-field"><span>Password</span><input class="form-input" id="estimatorAuthPassword" type="password" autocomplete="current-password" required /></label>
         <button class="auth-submit" id="estimatorAuthSubmit" type="submit">Sign In</button>
+        <button class="auth-submit secondary" id="estimatorAuthRecover" type="button">Create or Reset Password</button>
+      </form>
+      <form class="auth-form" id="estimatorPasswordForm" hidden>
+        <label class="auth-field"><span>New password</span><input class="form-input" id="estimatorNewPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <label class="auth-field"><span>Confirm new password</span><input class="form-input" id="estimatorConfirmPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <button class="auth-submit" id="estimatorPasswordSubmit" type="submit">Save New Password</button>
       </form>
       <div class="auth-status" id="estimatorAuthStatus">Use the existing Supabase Account credentials. Your password stays with Supabase.</div>
     </div>
@@ -397,7 +403,7 @@
   <script src="ai-abc-config.js?v=20260618a"></script>
   <script src="ai-abcx-account-assignments.js"></script>
   <script src="ai-abcx-job-records.js?v=20260712a"></script>
-  <script src="ai-abcx-auth-client.js?v=20260712a"></script>
+  <script src="ai-abcx-auth-client.js?v=20260714b"></script>
   <script src="ai-abcx-server-repositories.js?v=20260712a"></script>
   <script>
     (async function () {
@@ -407,8 +413,14 @@
       const authEmail = document.getElementById("estimatorAuthEmail");
       const authPassword = document.getElementById("estimatorAuthPassword");
       const authSubmit = document.getElementById("estimatorAuthSubmit");
+      const authRecover = document.getElementById("estimatorAuthRecover");
+      const passwordForm = document.getElementById("estimatorPasswordForm");
+      const newPassword = document.getElementById("estimatorNewPassword");
+      const confirmPassword = document.getElementById("estimatorConfirmPassword");
+      const passwordSubmit = document.getElementById("estimatorPasswordSubmit");
       const authStatus = document.getElementById("estimatorAuthStatus");
       const requiresAuthentication = window.location.protocol === "https:";
+      const isPasswordRecovery = new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery";
 
       async function requireEstimatorSession() {
         if (!requiresAuthentication) {
@@ -418,7 +430,7 @@
         if (!authClient) throw new Error("Estimator authentication client is unavailable.");
         try {
           const existingSession = await authClient.getSession();
-          if (existingSession) {
+          if (existingSession && !isPasswordRecovery) {
             authGate.hidden = true;
             return existingSession;
           }
@@ -428,6 +440,54 @@
         }
         authGate.hidden = false;
         return new Promise((resolve) => {
+          if (isPasswordRecovery) {
+            authForm.hidden = true;
+            passwordForm.hidden = false;
+            authStatus.textContent = "Choose a new password for this Account user.";
+            passwordForm.addEventListener("submit", async (event) => {
+              event.preventDefault();
+              passwordSubmit.disabled = true;
+              authStatus.classList.remove("error");
+              try {
+                if (newPassword.value.length < 8) throw new Error("Use at least 8 characters.");
+                if (newPassword.value !== confirmPassword.value) throw new Error("The passwords do not match.");
+                await authClient.updatePassword(newPassword.value);
+                const session = await authClient.getSession();
+                if (!session) throw new Error("Password saved, but no authenticated session was returned.");
+                history.replaceState(null, "", window.location.pathname + window.location.search);
+                authGate.hidden = true;
+                resolve(session);
+              } catch (error) {
+                authStatus.textContent = error.message || "Password update failed.";
+                authStatus.classList.add("error");
+              } finally {
+                passwordSubmit.disabled = false;
+              }
+            });
+            return;
+          }
+          authRecover.addEventListener("click", async () => {
+            const email = authEmail.value.trim();
+            authStatus.classList.remove("error");
+            if (!email) {
+              authStatus.textContent = "Enter your Account email first.";
+              authStatus.classList.add("error");
+              authEmail.focus();
+              return;
+            }
+            authRecover.disabled = true;
+            authStatus.textContent = "Sending a secure password link…";
+            try {
+              const redirectTo = window.location.origin + window.location.pathname;
+              await authClient.sendPasswordRecovery(email, redirectTo);
+              authStatus.textContent = "Password email sent. Open the link in that email to choose your password.";
+            } catch (error) {
+              authStatus.textContent = error.message || "Password email could not be sent.";
+              authStatus.classList.add("error");
+            } finally {
+              authRecover.disabled = false;
+            }
+          });
           authForm.addEventListener("submit", async (event) => {
             event.preventDefault();
             authSubmit.disabled = true;
