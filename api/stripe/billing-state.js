@@ -7,7 +7,7 @@ import {
   getUserFromBearer,
   json,
   readJsonBody
-} from "./_shared.js";
+} from "../../lib/stripe-api-shared.js";
 
 export const config = { api: { bodyParser: true } };
 export { runtime };

@@ -7,7 +7,7 @@ const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
 
 async function loadShared() {
-  const source = fs.readFileSync(path.join(root, "api/estimator/_shared.js"), "utf8")
+  const source = fs.readFileSync(path.join(root, "lib/estimator-api-shared.js"), "utf8")
     .replace('import { createClient } from "@supabase/supabase-js";\n', "const createClient = () => ({});\n");
   return import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
 }
