@@ -7,7 +7,7 @@ const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
 
 async function loadShared() {
-  const source = fs.readFileSync(path.join(root, "api/estimator/_shared.js"), "utf8")
+  const source = fs.readFileSync(path.join(root, "lib/estimator-api-shared.js"), "utf8")
     .replace('import { createClient } from "@supabase/supabase-js";\n', "const createClient = () => ({});\n");
   return import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
 }
@@ -25,6 +25,46 @@ test("authenticated user lookup rejects missing and invalid bearer sessions", as
   assert.equal(await getAuthenticatedUser({ headers: {} }, supabase), null);
   assert.equal(await getAuthenticatedUser({ headers: { authorization: "Bearer invalid" } }, supabase), null);
   assert.deepEqual(await getAuthenticatedUser({ headers: { authorization: "Bearer valid" } }, supabase), { id: "user-1" });
+});
+
+test("browser auth client reads and creates Supabase sessions", async () => {
+  const storage = new Map();
+  const session = { access_token: "server-session-token", user: { id: "user-1" } };
+  const auth = {
+    getSession: async () => ({ data: { session }, error: null }),
+    signInWithPassword: async ({ email, password }) => ({ data: email && password ? { session } : {}, error: null }),
+    resetPasswordForEmail: async (email, options) => ({ error: email && options.redirectTo ? null : new Error("missing recovery data") }),
+    updateUser: async ({ password }) => ({ data: { user: password ? session.user : null }, error: null }),
+    signOut: async () => ({ error: null })
+  };
+  const context = {
+    window: { supabase: { createClient: () => ({ auth }) } },
+    localStorage: { getItem: (key) => storage.get(key) || null, removeItem: (key) => storage.delete(key) },
+    fetch: async () => ({ ok: true, json: async () => ({ supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "anon" }) })
+  };
+  context.window.window = context.window;
+  context.window.localStorage = context.localStorage;
+  context.window.fetch = context.fetch;
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync(path.join(root, "ai-abcx-auth-client.js"), "utf8"), context);
+  assert.equal(await context.window.AIABCXAuthClient.getAccessToken(), "server-session-token");
+  assert.deepEqual(JSON.parse(JSON.stringify(await context.window.AIABCXAuthClient.signInWithPassword("owner@example.com", "secret"))), session);
+  await context.window.AIABCXAuthClient.sendPasswordRecovery("owner@example.com", "https://preview.example/estimator-dashboard.html");
+  assert.deepEqual(JSON.parse(JSON.stringify(await context.window.AIABCXAuthClient.updatePassword("new-password"))), session.user);
+});
+
+test("browser auth client preserves local mode when server configuration is unavailable", async () => {
+  const context = {
+    window: {},
+    localStorage: { getItem: () => null },
+    fetch: async () => ({ ok: false, json: async () => ({ error: "not deployed" }) })
+  };
+  context.window.window = context.window;
+  context.window.localStorage = context.localStorage;
+  context.window.fetch = context.fetch;
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync(path.join(root, "ai-abcx-auth-client.js"), "utf8"), context);
+  assert.equal(await context.window.AIABCXAuthClient.getAccessToken(), "");
 });
 
 function loadBrowserRepositories(fetchImpl, token = "token") {

@@ -10,7 +10,7 @@ import {
   json,
   readJsonBody,
   searchStripeCustomerByReferralCode
-} from "./_shared.js";
+} from "../../lib/stripe-api-shared.js";
 
 export const config = { api: { bodyParser: true } };
 export { runtime };
@@ -26,24 +26,6 @@ function buildUpgradeCodeMap(profile) {
   };
 }
 
-function getStageAPathPricing(path) {
-  if (path === "prelaunch") {
-    return {
-      key: "prelaunch",
-      name: "AI Call Port Stage A Prelaunch Access",
-      description: "Stage A prelaunch reservation path.",
-      amountCents: 34900
-    };
-  }
-
-  return {
-    key: "regular",
-    name: "AI Call Port Stage A Regular Path",
-    description: "Stage A regular reservation path.",
-    amountCents: 49900
-  };
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") return json(res, 405, { error: "Method not allowed" });
 
@@ -51,10 +33,7 @@ export default async function handler(req, res) {
     const stripe = getStripe();
     const supabaseAdmin = getSupabaseAdmin();
     const body = await readJsonBody(req);
-    const setup = body.setup || req.body || {};
-    const profile = billingConfig.parseSetupParams(setup);
-    const selectedPath = setup.path === "prelaunch" ? "prelaunch" : "regular";
-    const stagePricing = getStageAPathPricing(selectedPath);
+    const profile = billingConfig.parseSetupParams(body.setup || req.body || {});
     const authUser = await getUserFromBearer(req, supabaseAdmin);
     const profileRow = await getProfileByIdOrEmail(supabaseAdmin, {
       userId: authUser?.id || "",
@@ -62,7 +41,7 @@ export default async function handler(req, res) {
     });
 
     if (!profile.businessEmail) {
-      return json(res, 400, { error: "Business email is required for Stripe reservation." });
+      return json(res, 400, { error: "Business email is required for activation." });
     }
 
     const accountId = body.accountId || billingConfig.generateAccountId();
@@ -81,16 +60,15 @@ export default async function handler(req, res) {
         activeReferralCount: 0,
         usageMinutes: 0
       }),
-      selected_path: selectedPath,
-      intended_first_charge_date: "2026-06-01",
       user_id: authUser?.id || profileRow?.id || "",
       referred_by_account_id: referringCustomer?.metadata?.account_id || "",
       upgrade_codes: JSON.stringify(buildUpgradeCodeMap(profile)),
       carry_codes: JSON.stringify(buildUpgradeCodeMap({ upgrades: profile.carryOver }))
     });
 
+    const basePlan = billingConfig.getBasePlan(profile);
     const siteUrl = getSiteUrl();
-    const cancelParams = new URLSearchParams(setup);
+    const cancelParams = new URLSearchParams(body.setup || {});
     cancelParams.set("checkoutCanceled", "1");
     cancelParams.set("account_id", accountId);
 
@@ -101,11 +79,11 @@ export default async function handler(req, res) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: stagePricing.name,
-              description: stagePricing.description
+              name: basePlan.name,
+              description: `AI Call Port base system with ${basePlan.includedMinutes} included minutes.`
             },
             recurring: { interval: "month" },
-            unit_amount: stagePricing.amountCents
+            unit_amount: basePlan.amountCents
           },
           quantity: 1
         }

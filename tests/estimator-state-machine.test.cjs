@@ -61,6 +61,22 @@ test("unknown statuses are always rejected", () => {
   assert.equal(records.ensureEstimatorRecord(record).status, "new_request");
 });
 
+test("non-draft estimates cannot be edited or reopened through quote preparation", () => {
+  for (const status of [
+    "estimate_ready_to_preview", "estimate_previewed", "estimate_ready_to_send", "estimate_sent",
+    "waiting_on_customer", "accepted", "declined", "scheduled_after_acceptance", "lost"
+  ]) {
+    const record = recordAt(status);
+    const originalQuote = JSON.stringify(records.ensureEstimatorRecord(record).quote);
+    assert.equal(records.updateEstimatorQuote(record, {
+      estimateType: "standard",
+      lineItems: [{ id: "line-1", label: "Should not save", quantity: 1, unitPrice: 100 }]
+    }), false);
+    assert.equal(records.ensureEstimatorRecord(record).status, status);
+    assert.equal(JSON.stringify(records.ensureEstimatorRecord(record).quote), originalQuote);
+  }
+});
+
 test("version 1 estimator data migrates to the current estimator schema", () => {
   const migrated = records.migrateEstimatorData({
     status: "follow_up_needed",

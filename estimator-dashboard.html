@@ -130,12 +130,31 @@
     .editor-status{min-height:20px;color:var(--blue-soft);font-size:12px;font-weight:800;letter-spacing:.04em}
     .editor-status.error{color:#ffd0d7}
     .editor-status.success{color:#c9f5d9}
+    .auth-gate{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(4,8,14,.88);backdrop-filter:blur(18px)}
+    .auth-gate[hidden],.auth-form[hidden]{display:none!important}.auth-card{width:min(440px,100%);border-radius:28px;border:1px solid rgba(127,212,255,.18);background:linear-gradient(180deg,rgba(13,18,28,.99),rgba(8,12,19,.99));box-shadow:0 36px 100px rgba(0,0,0,.65);padding:24px;display:grid;gap:16px}.auth-brand{display:flex;align-items:center;gap:12px}.auth-brand img{width:54px;height:54px;object-fit:contain}.auth-card h1{margin:0;font-size:24px;letter-spacing:-.04em}.auth-card p{margin:0;color:var(--text-secondary);font-size:13px;line-height:1.55;font-weight:650}.auth-form{display:grid;gap:12px}.auth-field{display:grid;gap:7px}.auth-field span{color:var(--blue-soft);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.auth-submit{min-height:46px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--orange-soft));color:#fff;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}.auth-submit.secondary{border:1px solid rgba(127,212,255,.18);background:rgba(127,212,255,.06);color:var(--blue-soft)}.auth-submit:disabled{opacity:.55;cursor:wait}.auth-status{min-height:20px;color:var(--blue-soft);font-size:12px;line-height:1.45;font-weight:750}.auth-status.error{color:#ffd0d7}
     @media (max-width:1280px){.summary-grid,.split,.editor-grid,.estimator-workspace,.topbar-strip,.workspace-overview{grid-template-columns:1fr}.calendar-head,.calendar-grid,.flow-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.estimator-grid,.workspace-mini-grid,.view-intro-grid,.estimator-event-list{grid-template-columns:repeat(2,minmax(0,1fr))}#estimatorHandoffView .record-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media (max-width:980px){.layout{grid-template-columns:minmax(0,1fr);height:auto}.sidebar{min-width:0;max-width:100%;border-right:none;border-bottom:1px solid rgba(255,255,255,.06);overflow:hidden}.sidebar .profile-card,.sidebar-foot{display:none}.nav{min-width:0;width:100%;max-width:100%;grid-auto-flow:column;grid-auto-columns:155px;overflow-x:auto;padding-bottom:4px}.topbar-main{grid-template-columns:1fr}.topbar-right{justify-items:start}.flow-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.record-grid,#estimatorHandoffView .record-grid{grid-template-columns:1fr}.main{overflow:visible}}
     @media (max-width:760px){.page{padding:10px}.shell{width:calc(100vw - 20px);min-height:calc(100vh - 20px);border-radius:24px}.layout{min-height:calc(100vh - 20px)}.summary-grid,.estimator-grid,.record-grid,.workspace-mini-grid,.quote-editor-grid,.estimator-event-list{grid-template-columns:1fr}.quote-line-editor{grid-template-columns:1fr 1fr}.quote-line-editor .quote-editor-field:first-child{grid-column:1/-1}.calendar-head,.calendar-grid,.flow-steps{grid-template-columns:1fr 1fr}.day-card{min-height:180px}}
   </style>
 </head>
 <body>
+  <section class="auth-gate" id="estimatorAuthGate" aria-label="Estimator Director sign in">
+    <div class="auth-card">
+      <div class="auth-brand"><img src="public/assets/images/ai-abcx-logo-icon-tight-transparent.png" alt="AI-ABCX" /><div><h1>Estimator Director A</h1><p>Sign in with the Account user assigned to this dashboard.</p></div></div>
+      <form class="auth-form" id="estimatorAuthForm">
+        <label class="auth-field"><span>Email</span><input class="form-input" id="estimatorAuthEmail" type="email" autocomplete="username" required /></label>
+        <label class="auth-field"><span>Password</span><input class="form-input" id="estimatorAuthPassword" type="password" autocomplete="current-password" required /></label>
+        <button class="auth-submit" id="estimatorAuthSubmit" type="submit">Sign In</button>
+        <button class="auth-submit secondary" id="estimatorAuthRecover" type="button">Create or Reset Password</button>
+      </form>
+      <form class="auth-form" id="estimatorPasswordForm" hidden>
+        <label class="auth-field"><span>New password</span><input class="form-input" id="estimatorNewPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <label class="auth-field"><span>Confirm new password</span><input class="form-input" id="estimatorConfirmPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <button class="auth-submit" id="estimatorPasswordSubmit" type="submit">Save New Password</button>
+      </form>
+      <div class="auth-status" id="estimatorAuthStatus">Use the existing Supabase Account credentials. Your password stays with Supabase.</div>
+    </div>
+  </section>
   <div class="grid-bg"></div>
   <div class="page"><div class="shell"><div class="layout">
     <aside class="sidebar">
@@ -379,14 +398,118 @@
       </div>
     </div>
   </section>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.0/dist/umd/supabase.min.js"></script>
   <script src="ai-abc-stage-config.js"></script>
   <script src="ai-abc-config.js?v=20260618a"></script>
   <script src="ai-abcx-account-assignments.js"></script>
   <script src="ai-abcx-job-records.js?v=20260712a"></script>
-  <script src="ai-abcx-auth-client.js?v=20260712a"></script>
+  <script src="ai-abcx-auth-client.js?v=20260714b"></script>
   <script src="ai-abcx-server-repositories.js?v=20260712a"></script>
   <script>
     (async function () {
+      const authClient = window.AIABCXAuthClient || null;
+      const authGate = document.getElementById("estimatorAuthGate");
+      const authForm = document.getElementById("estimatorAuthForm");
+      const authEmail = document.getElementById("estimatorAuthEmail");
+      const authPassword = document.getElementById("estimatorAuthPassword");
+      const authSubmit = document.getElementById("estimatorAuthSubmit");
+      const authRecover = document.getElementById("estimatorAuthRecover");
+      const passwordForm = document.getElementById("estimatorPasswordForm");
+      const newPassword = document.getElementById("estimatorNewPassword");
+      const confirmPassword = document.getElementById("estimatorConfirmPassword");
+      const passwordSubmit = document.getElementById("estimatorPasswordSubmit");
+      const authStatus = document.getElementById("estimatorAuthStatus");
+      const requiresAuthentication = window.location.protocol === "https:";
+      const isPasswordRecovery = new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery";
+
+      async function requireEstimatorSession() {
+        if (!requiresAuthentication) {
+          authGate.hidden = true;
+          return null;
+        }
+        if (!authClient) throw new Error("Estimator authentication client is unavailable.");
+        try {
+          const existingSession = await authClient.getSession();
+          if (existingSession && !isPasswordRecovery) {
+            authGate.hidden = true;
+            return existingSession;
+          }
+        } catch (error) {
+          authStatus.textContent = error.message;
+          authStatus.classList.add("error");
+        }
+        authGate.hidden = false;
+        return new Promise((resolve) => {
+          if (isPasswordRecovery) {
+            authForm.hidden = true;
+            passwordForm.hidden = false;
+            authStatus.textContent = "Choose a new password for this Account user.";
+            passwordForm.addEventListener("submit", async (event) => {
+              event.preventDefault();
+              passwordSubmit.disabled = true;
+              authStatus.classList.remove("error");
+              try {
+                if (newPassword.value.length < 8) throw new Error("Use at least 8 characters.");
+                if (newPassword.value !== confirmPassword.value) throw new Error("The passwords do not match.");
+                await authClient.updatePassword(newPassword.value);
+                const session = await authClient.getSession();
+                if (!session) throw new Error("Password saved, but no authenticated session was returned.");
+                history.replaceState(null, "", window.location.pathname + window.location.search);
+                authGate.hidden = true;
+                resolve(session);
+              } catch (error) {
+                authStatus.textContent = error.message || "Password update failed.";
+                authStatus.classList.add("error");
+              } finally {
+                passwordSubmit.disabled = false;
+              }
+            });
+            return;
+          }
+          authRecover.addEventListener("click", async () => {
+            const email = authEmail.value.trim();
+            authStatus.classList.remove("error");
+            if (!email) {
+              authStatus.textContent = "Enter your Account email first.";
+              authStatus.classList.add("error");
+              authEmail.focus();
+              return;
+            }
+            authRecover.disabled = true;
+            authStatus.textContent = "Sending a secure password link…";
+            try {
+              const redirectTo = window.location.origin + window.location.pathname;
+              await authClient.sendPasswordRecovery(email, redirectTo);
+              authStatus.textContent = "Password email sent. Open the link in that email to choose your password.";
+            } catch (error) {
+              authStatus.textContent = error.message || "Password email could not be sent.";
+              authStatus.classList.add("error");
+            } finally {
+              authRecover.disabled = false;
+            }
+          });
+          authForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            authSubmit.disabled = true;
+            authStatus.classList.remove("error");
+            authStatus.textContent = "Signing in…";
+            try {
+              const session = await authClient.signInWithPassword(authEmail.value.trim(), authPassword.value);
+              if (!session) throw new Error("Supabase did not return an authenticated session.");
+              authPassword.value = "";
+              authGate.hidden = true;
+              resolve(session);
+            } catch (error) {
+              authStatus.textContent = error.message || "Sign-in failed.";
+              authStatus.classList.add("error");
+            } finally {
+              authSubmit.disabled = false;
+            }
+          });
+        });
+      }
+
+      await requireEstimatorSession();
       const stageConfig = window.AIABCStageConfig || null;
       const appConfig = window.AIABCConfig || null;
       const accountAssignments = window.AIABCXAccountAssignments || null;
@@ -516,6 +639,13 @@
         persistenceMode = persistenceBootstrap.mode;
         if (persistenceBootstrap.records && persistenceBootstrap.records.length) {
           jobRecords.writeState(persistenceBootstrap.records, requestedJob || persistenceBootstrap.records[0].id);
+        }
+        if (persistenceBootstrap.account?.user) {
+          accountAssignment = {
+            ...accountAssignment,
+            userId: persistenceBootstrap.account.user.id,
+            name: persistenceBootstrap.account.user.name
+          };
         }
         if (persistenceBootstrap.assignment) {
           accountAssignment = {
@@ -680,6 +810,14 @@
       function getSelectedJobId() {
         const selectedRecord = getSelectedRecord();
         return selectedRecord ? selectedRecord.id : null;
+      }
+
+      function selectEstimatorRecordByStatus(allowedStatuses) {
+        const current = getSelectedRecord();
+        if (current && allowedStatuses.includes(getEstimatorState(current).status)) return current;
+        const next = getEstimatorRecords().find((record) => allowedStatuses.includes(getEstimatorState(record).status)) || null;
+        if (next) selectedWorkerJobId = next.id;
+        return next;
       }
 
       function getSelectedRouteDate() {
@@ -1062,7 +1200,7 @@
           <div class="tag-row"><span class="tag ${getStatusTone(estimator.status)}">${titleWords(estimator.status)}</span><span class="tag blue">Level ${estimator.level}: ${allowedFormats}</span></div>
           ${estimator.status === "estimate_preparing" ? renderQuoteEditor(estimator) : `<div class="builder-list" style="margin-top:12px;">${items.map((item) => `<div class="builder-row"><span>${item.label}</span><strong>${formatQuoteMoney(item.amount)}</strong></div>`).join("")}</div><div class="builder-summary" style="margin-top:12px;"><span>Estimate total</span><strong>${formatQuoteMoney(summary.total)}</strong></div>`}
           <div class="option-row" style="margin-top:12px;">
-            ${["new_request", "revision_requested", "declined", "follow_up_needed", "lost"].includes(estimator.status) ? `<button class="action-btn primary" type="button" data-estimator-action="prepare">Prepare Standard Estimate</button>` : ""}
+            ${["new_request", "revision_requested", "follow_up_needed"].includes(estimator.status) ? `<button class="action-btn primary" type="button" data-estimator-action="prepare">Prepare Standard Estimate</button>` : ""}
             ${estimator.status === "estimate_preparing" ? `<button class="action-btn primary" type="button" data-estimator-action="ready-preview">Validate For Preview</button>` : ""}
             ${["estimate_ready_to_preview", "estimate_previewed", "estimate_ready_to_send"].includes(estimator.status) ? `<button class="action-btn primary" type="button" data-estimator-action="open-preview">Open Quote Preview</button>` : ""}
           </div>`;
@@ -1956,20 +2094,37 @@
         const viewLink = event.target.closest("[data-view-link]");
         if (!viewLink) return;
         event.preventDefault();
+        if (viewLink.dataset.viewLink === "create") {
+          const editableRecord = selectEstimatorRecordByStatus(["new_request", "estimate_preparing", "revision_requested", "follow_up_needed"]);
+          if (!editableRecord) {
+            resultStatus.textContent = "No estimate is currently available for preparation.";
+            return;
+          }
+        }
         setEstimatorView(viewLink.dataset.viewLink);
+        applyJobContext();
       });
       if (salesOpenQuoteAction) {
         salesOpenQuoteAction.addEventListener("click", () => {
-          const selectedRecord = getSelectedRecord();
+          const selectedRecord = selectEstimatorRecordByStatus([
+            "new_request", "estimate_preparing", "estimate_ready_to_preview", "estimate_previewed",
+            "estimate_ready_to_send", "estimate_sent", "waiting_on_customer", "revision_requested", "follow_up_needed"
+          ]);
           if (!selectedRecord) {
             resultStatus.textContent = "No active estimate is currently selected.";
             return;
           }
           setEstimatorView("create");
+          applyJobContext();
         });
       }
       if (salesCreateEstimateAction) {
         salesCreateEstimateAction.addEventListener("click", () => {
+          const editableRecord = selectEstimatorRecordByStatus(["new_request", "estimate_preparing", "revision_requested", "follow_up_needed"]);
+          if (!editableRecord) {
+            resultStatus.textContent = "No estimate is currently available for preparation.";
+            return;
+          }
           setEstimatorView("create");
           mutateSelectedEstimator((record, estimator) => {
             const draftItems = buildEstimateLineItems(record).map((item, index) => ({

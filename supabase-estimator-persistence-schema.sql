@@ -8,6 +8,8 @@ create table if not exists ai_abcx_schema_migrations (
   applied_at timestamptz not null default now()
 );
 
+alter table ai_abcx_schema_migrations enable row level security;
+
 create table if not exists account_memberships (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references companies(id) on delete cascade,
