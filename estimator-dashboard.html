@@ -812,6 +812,14 @@
         return selectedRecord ? selectedRecord.id : null;
       }
 
+      function selectEstimatorRecordByStatus(allowedStatuses) {
+        const current = getSelectedRecord();
+        if (current && allowedStatuses.includes(getEstimatorState(current).status)) return current;
+        const next = getEstimatorRecords().find((record) => allowedStatuses.includes(getEstimatorState(record).status)) || null;
+        if (next) selectedWorkerJobId = next.id;
+        return next;
+      }
+
       function getSelectedRouteDate() {
         const record = getSelectedRecord();
         return record && record.routeDate ? record.routeDate : null;
@@ -1192,7 +1200,7 @@
           <div class="tag-row"><span class="tag ${getStatusTone(estimator.status)}">${titleWords(estimator.status)}</span><span class="tag blue">Level ${estimator.level}: ${allowedFormats}</span></div>
           ${estimator.status === "estimate_preparing" ? renderQuoteEditor(estimator) : `<div class="builder-list" style="margin-top:12px;">${items.map((item) => `<div class="builder-row"><span>${item.label}</span><strong>${formatQuoteMoney(item.amount)}</strong></div>`).join("")}</div><div class="builder-summary" style="margin-top:12px;"><span>Estimate total</span><strong>${formatQuoteMoney(summary.total)}</strong></div>`}
           <div class="option-row" style="margin-top:12px;">
-            ${["new_request", "revision_requested", "declined", "follow_up_needed", "lost"].includes(estimator.status) ? `<button class="action-btn primary" type="button" data-estimator-action="prepare">Prepare Standard Estimate</button>` : ""}
+            ${["new_request", "revision_requested", "follow_up_needed"].includes(estimator.status) ? `<button class="action-btn primary" type="button" data-estimator-action="prepare">Prepare Standard Estimate</button>` : ""}
             ${estimator.status === "estimate_preparing" ? `<button class="action-btn primary" type="button" data-estimator-action="ready-preview">Validate For Preview</button>` : ""}
             ${["estimate_ready_to_preview", "estimate_previewed", "estimate_ready_to_send"].includes(estimator.status) ? `<button class="action-btn primary" type="button" data-estimator-action="open-preview">Open Quote Preview</button>` : ""}
           </div>`;
@@ -2086,20 +2094,37 @@
         const viewLink = event.target.closest("[data-view-link]");
         if (!viewLink) return;
         event.preventDefault();
+        if (viewLink.dataset.viewLink === "create") {
+          const editableRecord = selectEstimatorRecordByStatus(["new_request", "estimate_preparing", "revision_requested", "follow_up_needed"]);
+          if (!editableRecord) {
+            resultStatus.textContent = "No estimate is currently available for preparation.";
+            return;
+          }
+        }
         setEstimatorView(viewLink.dataset.viewLink);
+        applyJobContext();
       });
       if (salesOpenQuoteAction) {
         salesOpenQuoteAction.addEventListener("click", () => {
-          const selectedRecord = getSelectedRecord();
+          const selectedRecord = selectEstimatorRecordByStatus([
+            "new_request", "estimate_preparing", "estimate_ready_to_preview", "estimate_previewed",
+            "estimate_ready_to_send", "estimate_sent", "waiting_on_customer", "revision_requested", "follow_up_needed"
+          ]);
           if (!selectedRecord) {
             resultStatus.textContent = "No active estimate is currently selected.";
             return;
           }
           setEstimatorView("create");
+          applyJobContext();
         });
       }
       if (salesCreateEstimateAction) {
         salesCreateEstimateAction.addEventListener("click", () => {
+          const editableRecord = selectEstimatorRecordByStatus(["new_request", "estimate_preparing", "revision_requested", "follow_up_needed"]);
+          if (!editableRecord) {
+            resultStatus.textContent = "No estimate is currently available for preparation.";
+            return;
+          }
           setEstimatorView("create");
           mutateSelectedEstimator((record, estimator) => {
             const draftItems = buildEstimateLineItems(record).map((item, index) => ({

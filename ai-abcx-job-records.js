@@ -288,10 +288,10 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     waiting_on_customer: ["accepted", "declined", "revision_requested", "follow_up_needed", "lost"],
     revision_requested: ["estimate_preparing", "estimate_ready_to_send", "follow_up_needed", "lost"],
     accepted: ["scheduled_after_acceptance", "follow_up_needed"],
-    declined: ["follow_up_needed", "lost", "estimate_preparing"],
+    declined: ["follow_up_needed", "lost"],
     follow_up_needed: ["estimate_preparing", "estimate_ready_to_send", "accepted", "declined", "lost"],
     scheduled_after_acceptance: ["follow_up_needed"],
-    lost: ["estimate_preparing", "follow_up_needed"]
+    lost: ["follow_up_needed"]
   };
 
   function cloneRecord(record) {
@@ -489,6 +489,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
   function updateEstimatorQuote(record, quote = {}, actor = "President") {
     const estimator = ensureEstimatorRecord(record);
     if (!estimator) return false;
+    if (!["new_request", "estimate_preparing", "revision_requested", "follow_up_needed"].includes(estimator.status)) return false;
     const estimateType = ESTIMATE_TYPES.includes(quote.estimateType) ? quote.estimateType : estimator.estimateType;
     const capabilities = getEstimatorCapabilities(estimator.level);
     if (!capabilities.estimateTypes.includes(estimateType)) return false;
@@ -527,7 +528,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
           }))
         : estimator.quote.attachments
     };
-    if (["new_request", "revision_requested", "declined", "follow_up_needed", "lost"].includes(estimator.status)) {
+    if (["new_request", "revision_requested", "follow_up_needed"].includes(estimator.status)) {
       transitionEstimator(record, "estimate_preparing", {
         actor,
         title: "Estimate preparation started",
