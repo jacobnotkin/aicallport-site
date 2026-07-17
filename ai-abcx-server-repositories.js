@@ -33,10 +33,15 @@ window.AIABCXServerRepositories = window.AIABCXServerRepositories || (() => {
     const payload = await auth.request("/api/estimator/records", { method: "POST", body: JSON.stringify({ action: "upsert", expectedRevision: Number(record.serverRevision || 0), record }) });
     return payload.records[0];
   }
+
+  async function loadRecords() {
+    const payload = await auth.request("/api/estimator/records");
+    return payload.records || [];
+  }
   async function saveCalendar(state, revisions = {}) {
     const entries = calendarToEntries(state).map((entry) => ({ ...entry, serverRevision: Number(revisions[entry.externalKey] || 0) }));
     const payload = await auth.request("/api/estimator/calendar", { method: "POST", body: JSON.stringify({ action: "upsert", entries }) });
     return payload.entries;
   }
-  return { bootstrap, loadAccount, saveAssignment, saveRecord, saveCalendar, calendarToEntries, entriesToCalendar };
+  return { bootstrap, loadAccount, saveAssignment, saveRecord, loadRecords, saveCalendar, calendarToEntries, entriesToCalendar };
 })();
