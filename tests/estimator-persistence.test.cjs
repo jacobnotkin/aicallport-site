@@ -102,3 +102,21 @@ test("conflict responses retain server revision metadata", async () => {
   const repository = loadBrowserRepositories(async () => ({ ok: false, status: 409, json: async () => ({ error: "stale", code: "REVISION_CONFLICT", currentRevision: 4 }) }));
   await assert.rejects(() => repository.saveRecord({ id: "job-1", serverRevision: 3 }), (error) => error.status === 409 && error.currentRevision === 4);
 });
+
+test("browser repository can reload canonical estimator records after a conflict", async () => {
+  const calls = [];
+  const repository = loadBrowserRepositories(async (url, options = {}) => {
+    calls.push([url, options.method || "GET"]);
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ records: [{ id: "job-1", serverRevision: 5 }] })
+    };
+  });
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(await repository.loadRecords())),
+    [{ id: "job-1", serverRevision: 5 }]
+  );
+  assert.deepEqual(calls, [["/api/estimator/records", "GET"]]);
+});
