@@ -20,4 +20,3 @@ export default function handler(req, res) {
     vapiPublicKey: key
   });
 }
- 
