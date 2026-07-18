@@ -111,3 +111,80 @@ test("Estimator Director identity and level come from Account assignment", () =>
   assert.equal(assignment.name, "Alex Carter");
   assert.equal(assignment.level, "A");
 });
+
+test("Level A rejects options estimates", () => {
+  const record = recordAt("new_request");
+  assert.equal(records.updateEstimatorQuote(record, {
+    estimateType: "options",
+    customerScope: "Choose a service path.",
+    lineItems: [
+      { label: "Essential", quantity: 1, unitPrice: 100, optionId: "essential" },
+      { label: "Complete", quantity: 1, unitPrice: 200, optionId: "complete" }
+    ]
+  }), false);
+  assert.equal(records.ensureEstimatorRecord(record).status, "new_request");
+});
+
+test("Level B options estimate works through customer selection and acceptance", () => {
+  const record = recordAt("new_request");
+  record.estimator.level = "B";
+
+  assert.equal(records.updateEstimatorQuote(record, {
+    estimateType: "options",
+    customerScope: "Choose the service level that best fits the property.",
+    discountAmount: 10,
+    taxRate: 20,
+    lineItems: [
+      { id: "line-essential", label: "Essential", description: "Core service", quantity: 1, unitPrice: 100, optionId: "essential" },
+      { id: "line-complete", label: "Complete", description: "Core service and enhancement", quantity: 1, unitPrice: 200, optionId: "complete" }
+    ]
+  }, "Estimator Director"), true);
+
+  let estimator = records.ensureEstimatorRecord(record);
+  assert.equal(estimator.status, "estimate_preparing");
+  assert.equal(estimator.estimateType, "options");
+  assert.equal(estimator.quote.subtotal, 100, "unselected alternatives use the lowest starting price, not an additive total");
+  assert.equal(estimator.quote.total, 108);
+  assert.deepEqual(Array.from(records.validateEstimatorQuote(record)), []);
+
+  assert.equal(records.markEstimatorReadyToPreview(record, "Estimator Director"), true);
+  assert.equal(records.recordEstimatorPreview(record, "Estimator Director"), true);
+  assert.equal(records.markEstimatorReadyToSend(record, "Estimator Director"), true);
+  assert.equal(records.sendEstimatorQuote(record, { method: "manual_link" }, "Estimator Director"), true);
+  assert.equal(records.ensureEstimatorRecord(record).status, "waiting_on_customer");
+
+  assert.equal(records.recordEstimatorDecision(record, { value: "accepted" }, "Customer"), false, "acceptance requires a selected option");
+  assert.equal(records.recordEstimatorDecision(record, { value: "accepted", selectedOptionId: "unknown" }, "Customer"), false, "acceptance rejects an unknown option");
+  assert.equal(records.recordEstimatorDecision(record, {
+    value: "accepted",
+    selectedOptionId: "complete",
+    reason: "Customer selected Complete."
+  }, "Customer"), true);
+
+  estimator = records.ensureEstimatorRecord(record);
+  assert.equal(estimator.status, "accepted");
+  assert.equal(estimator.decision.selectedOptionId, "complete");
+  assert.equal(estimator.quote.subtotal, 200);
+  assert.equal(estimator.quote.taxAmount, 38);
+  assert.equal(estimator.quote.total, 228);
+});
+
+test("options estimate validation requires two distinct option IDs", () => {
+  const record = recordAt("new_request");
+  record.estimator.level = "B";
+  assert.equal(records.updateEstimatorQuote(record, {
+    estimateType: "options",
+    customerScope: "Choose one.",
+    lineItems: [{ label: "Only choice", quantity: 1, unitPrice: 100, optionId: "same" }]
+  }), true);
+  assert.ok(Array.from(records.validateEstimatorQuote(record)).includes("Options estimates require at least two customer choices."));
+
+  assert.equal(records.updateEstimatorQuote(record, {
+    estimateType: "options",
+    lineItems: [
+      { label: "Choice one", quantity: 1, unitPrice: 100, optionId: "same" },
+      { label: "Choice two", quantity: 1, unitPrice: 150, optionId: "same" }
+    ]
+  }), true);
+  assert.ok(Array.from(records.validateEstimatorQuote(record)).includes("Options estimate choice IDs must be unique."));
+});
