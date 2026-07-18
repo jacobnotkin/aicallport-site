@@ -80,6 +80,7 @@ test("non-draft estimates cannot be edited or reopened through quote preparation
 test("version 1 estimator data migrates to the current estimator schema", () => {
   const migrated = records.migrateEstimatorData({
     status: "follow_up_needed",
+    revisions: [{ reason: "Keep this legacy reason.", status: "requested" }],
     followUp: { reason: "Call customer", nextAction: "Call" },
     handoff: { scheduling: "not_requested" }
   });
@@ -88,6 +89,14 @@ test("version 1 estimator data migrates to the current estimator schema", () => 
   assert.equal(migrated.followUp.completedAt, "");
   assert.equal(migrated.handoff.scheduling.status, "not_requested");
   assert.equal(migrated.handoff.scheduling.scheduledDate, "");
+
+  const record = recordAt("revision_requested");
+  record.estimator.schemaVersion = 2;
+  record.estimator.revisions = migrated.revisions;
+  const estimator = records.ensureEstimatorRecord(record);
+  assert.equal(estimator.revisions[0].reason, "Keep this legacy reason.");
+  assert.equal(estimator.revisions[0].requestedQuoteVersion, 1);
+  assert.equal(estimator.revisions[0].originalQuote, null);
 });
 
 test("stored record state is rewritten with current schema versions", () => {
@@ -167,6 +176,97 @@ test("Level B options estimate works through customer selection and acceptance",
   assert.equal(estimator.quote.subtotal, 200);
   assert.equal(estimator.quote.taxAmount, 38);
   assert.equal(estimator.quote.total, 228);
+});
+
+test("Level B options revision preserves both quote versions through persisted acceptance", () => {
+  const { api, localStorage } = loadBrowserModule("ai-abcx-job-records.js", "AIABCXJobRecords");
+  const record = recordAt("new_request");
+  record.id = "persisted-options-revision";
+  record.jobNumber = "PERSISTED-REVISION";
+  record.customerName = "Revision Customer";
+  record.estimator.level = "B";
+
+  assert.equal(api.updateEstimatorQuote(record, {
+    estimateType: "options",
+    customerScope: "Original exterior service scope.",
+    lineItems: [
+      { id: "essential", label: "Essential", quantity: 1, unitPrice: 200, optionId: "essential" },
+      { id: "complete", label: "Complete", quantity: 1, unitPrice: 300, optionId: "complete" }
+    ]
+  }, "Estimator Director"), true);
+  const originalVersion = api.ensureEstimatorRecord(record).quote.version;
+  assert.equal(api.markEstimatorReadyToPreview(record, "Estimator Director"), true);
+  assert.equal(api.recordEstimatorPreview(record, "Estimator Director"), true);
+  assert.equal(api.markEstimatorReadyToSend(record, "Estimator Director"), true);
+  assert.equal(api.sendEstimatorQuote(record, { method: "email" }, "Estimator Director"), true);
+
+  const revisionReason = "Please expand the scope and revise the Complete option price.";
+  assert.equal(api.recordEstimatorDecision(record, {
+    value: "revision_requested",
+    reason: revisionReason
+  }, "Customer"), true);
+  let estimator = api.ensureEstimatorRecord(record);
+  assert.equal(estimator.status, "revision_requested");
+  assert.equal(estimator.revisions.length, 1);
+  assert.equal(estimator.revisions[0].reason, revisionReason);
+  assert.equal(estimator.revisions[0].requestedQuoteVersion, originalVersion);
+  assert.equal(estimator.revisions[0].originalQuote.quote.customerScope, "Original exterior service scope.");
+  assert.equal(estimator.revisions[0].originalQuote.quote.lineItems[1].unitPrice, 300);
+
+  assert.equal(api.updateEstimatorQuote(record, { customerScope: "Must not bypass return-to-draft." }), false);
+  assert.equal(api.returnEstimatorToDraft(record, "Estimator Director"), true);
+  estimator = api.ensureEstimatorRecord(record);
+  assert.equal(estimator.status, "estimate_preparing");
+  assert.equal(estimator.decision.value, "pending");
+  assert.equal(estimator.preview.quoteVersion, 0);
+  assert.equal(api.markEstimatorReadyToPreview(record, "Estimator Director"), false, "revision must create a new quote version before preview");
+
+  assert.equal(api.updateEstimatorQuote(record, {
+    estimateType: "options",
+    customerScope: "Revised exterior and drainage service scope.",
+    lineItems: [
+      { id: "essential", label: "Essential", quantity: 1, unitPrice: 225, optionId: "essential" },
+      { id: "complete", label: "Complete", quantity: 1, unitPrice: 360, optionId: "complete" }
+    ]
+  }, "Estimator Director"), true);
+  const revisedVersion = api.ensureEstimatorRecord(record).quote.version;
+  assert.ok(revisedVersion > originalVersion);
+  assert.equal(api.markEstimatorReadyToSend(record, "Estimator Director"), false, "revised quote cannot skip preview");
+  assert.equal(api.markEstimatorReadyToPreview(record, "Estimator Director"), true);
+  assert.equal(api.recordEstimatorPreview(record, "Estimator Director"), true);
+  assert.equal(api.markEstimatorReadyToSend(record, "Estimator Director"), true);
+  assert.equal(api.sendEstimatorQuote(record, { method: "email" }, "Estimator Director"), true);
+
+  estimator = api.ensureEstimatorRecord(record);
+  assert.equal(estimator.revisions[0].status, "resent");
+  assert.equal(estimator.revisions[0].revisedQuoteVersion, revisedVersion);
+  assert.equal(estimator.revisions[0].revisedQuote.quote.customerScope, "Revised exterior and drainage service scope.");
+  assert.equal(estimator.revisions[0].originalQuote.quote.lineItems[1].unitPrice, 300, "original sent quote remains immutable");
+
+  assert.equal(api.recordEstimatorDecision(record, {
+    value: "accepted",
+    selectedOptionId: "complete",
+    reason: "Customer selected the revised Complete option."
+  }, "Customer"), true);
+  estimator = api.ensureEstimatorRecord(record);
+  assert.equal(estimator.status, "accepted");
+  assert.equal(estimator.quote.total, 360);
+  assert.equal(estimator.revisions[0].status, "accepted");
+  assert.equal(estimator.revisions[0].acceptedTotal, 360);
+  assert.equal(estimator.revisions[0].selectedOptionId, "complete");
+
+  api.writeState([record], record.id);
+  assert.ok(localStorage.getItem(api.storageKey));
+  const reloaded = api.readState([]);
+  const persisted = api.findRecordById(reloaded.records, record.id);
+  const persistedEstimator = api.ensureEstimatorRecord(persisted);
+  assert.equal(persistedEstimator.status, "accepted");
+  assert.equal(persistedEstimator.quote.total, 360);
+  assert.equal(persistedEstimator.revisions.length, 1);
+  assert.equal(persistedEstimator.revisions[0].reason, revisionReason);
+  assert.equal(persistedEstimator.revisions[0].originalQuote.quote.lineItems[1].unitPrice, 300);
+  assert.equal(persistedEstimator.revisions[0].revisedQuote.quote.lineItems[1].unitPrice, 360);
+  assert.equal(persistedEstimator.revisions[0].acceptedTotal, 360);
 });
 
 test("options estimate validation requires two distinct option IDs", () => {

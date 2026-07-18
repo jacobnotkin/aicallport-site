@@ -419,7 +419,7 @@
   <script src="ai-abc-stage-config.js"></script>
   <script src="ai-abc-config.js?v=20260618a"></script>
   <script src="ai-abcx-account-assignments.js"></script>
-  <script src="ai-abcx-job-records.js?v=20260712a"></script>
+  <script src="ai-abcx-job-records.js?v=20260718b"></script>
   <script src="ai-abcx-auth-client.js?v=20260714b"></script>
   <script src="ai-abcx-server-repositories.js?v=20260712a"></script>
   <script>
@@ -1241,6 +1241,30 @@
         editor.querySelector("[data-total-final]").textContent = formatQuoteMoney(subtotal - discount + tax);
       }
 
+      function renderEstimatorRevisionHistory(estimator) {
+        if (!estimator.revisions.length) return "";
+        return `
+          <div class="workspace-card" style="margin-top:16px;">
+            <h3>Revision History</h3>
+            <p>Every customer request keeps the sent quote, reason, revised version, and final resolution attached to this estimate.</p>
+            <div class="route-list" style="margin-top:12px;">
+              ${estimator.revisions.map((revision, index) => {
+                const original = revision.originalQuote && revision.originalQuote.quote;
+                const revised = revision.revisedQuote && revision.revisedQuote.quote;
+                const originalItems = original && Array.isArray(original.lineItems) ? original.lineItems : [];
+                const revisedItems = revised && Array.isArray(revised.lineItems) ? revised.lineItems : [];
+                return `<div class="route-item">
+                  <div><strong>Revision ${index + 1}: ${escapeHtml(revision.reason)}</strong><span>Requested from quote version ${revision.requestedQuoteVersion} by ${escapeHtml(revision.requestedBy)}.</span></div>
+                  <span class="tag ${revision.status === "accepted" ? "green" : revision.status === "requested" ? "orange" : "blue"}">${titleWords(revision.status)}</span>
+                  ${original ? `<div class="item" style="margin-top:10px;"><strong>Original sent quote · Version ${revision.requestedQuoteVersion} · ${formatQuoteMoney(original.total)}</strong><p>${escapeHtml(original.customerScope || "No customer scope recorded.")}</p><div class="tag-row">${originalItems.map((item) => `<span class="tag">${escapeHtml(item.label)} · ${formatQuoteMoney(Number(item.quantity || 0) * Number(item.unitPrice || 0))}</span>`).join("")}</div></div>` : ""}
+                  ${revised ? `<div class="item" style="margin-top:10px;"><strong>Revised quote · Version ${revision.revisedQuoteVersion} · ${formatQuoteMoney(revised.total)}</strong><p>${escapeHtml(revised.customerScope || "No customer scope recorded.")}</p><div class="tag-row">${revisedItems.map((item) => `<span class="tag blue">${escapeHtml(item.label)} · ${formatQuoteMoney(Number(item.quantity || 0) * Number(item.unitPrice || 0))}</span>`).join("")}</div></div>` : ""}
+                  ${revision.status === "accepted" ? `<div class="item" style="margin-top:10px;"><strong>Accepted total · ${formatQuoteMoney(revision.acceptedTotal)}</strong><p>Selected option: ${escapeHtml(revision.selectedOptionId || "Standard quote")}</p></div>` : ""}
+                </div>`;
+              }).join("")}
+            </div>
+          </div>`;
+      }
+
       function renderEstimatorWorkspace(record) {
         if (!record) return;
         const estimator = getEstimatorState(record);
@@ -1288,11 +1312,13 @@
           <div class="tag-row"><span class="tag ${getStatusTone(estimator.status)}">${titleWords(estimator.status)}</span><span class="tag blue">Level ${estimator.level}: ${allowedFormats}</span></div>
           ${estimator.status === "estimate_preparing" ? renderQuoteEditor(estimator) : `<div class="builder-list" style="margin-top:12px;">${items.map((item) => `<div class="builder-row"><span>${item.label}</span><strong>${formatQuoteMoney(item.amount)}</strong></div>`).join("")}</div><div class="builder-summary" style="margin-top:12px;"><span>Estimate total</span><strong>${formatQuoteMoney(summary.total)}</strong></div>`}
           <div class="option-row" style="margin-top:12px;">
-            ${["new_request", "revision_requested", "follow_up_needed"].includes(estimator.status) ? capabilities.estimateTypes.map((type) => `<button class="action-btn ${type === "standard" ? "primary" : ""}" type="button" data-estimator-action="prepare" data-estimate-type="${type}">Prepare ${titleWords(type)} Estimate</button>`).join("") : ""}
+            ${["new_request", "follow_up_needed"].includes(estimator.status) ? capabilities.estimateTypes.map((type) => `<button class="action-btn ${type === "standard" ? "primary" : ""}" type="button" data-estimator-action="prepare" data-estimate-type="${type}">Prepare ${titleWords(type)} Estimate</button>`).join("") : ""}
+            ${estimator.status === "revision_requested" ? `<button class="action-btn primary" type="button" data-estimator-action="return-revision-draft">Return Revision To Draft</button>` : ""}
             ${estimator.status === "estimate_preparing" ? capabilities.estimateTypes.filter((type) => type !== estimator.estimateType).map((type) => `<button class="action-btn" type="button" data-estimator-action="prepare" data-estimate-type="${type}">Switch To ${titleWords(type)} Estimate</button>`).join("") : ""}
             ${estimator.status === "estimate_preparing" ? `<button class="action-btn primary" type="button" data-estimator-action="ready-preview">Validate For Preview</button>` : ""}
             ${["estimate_ready_to_preview", "estimate_previewed", "estimate_ready_to_send"].includes(estimator.status) ? `<button class="action-btn primary" type="button" data-estimator-action="open-preview">Open Quote Preview</button>` : ""}
-          </div>`;
+          </div>
+          ${renderEstimatorRevisionHistory(estimator)}`;
       }
 
       function renderEstimatorCustomerQuote(record) {
@@ -1351,7 +1377,8 @@
             ${estimator.status === "estimate_ready_to_send" ? `<button class="action-btn primary" type="button" data-preview-action="send">Send Quote</button>` : ""}
             ${["estimate_ready_to_preview", "estimate_previewed", "estimate_ready_to_send"].includes(estimator.status) ? `<button class="action-btn" type="button" data-preview-action="edit">Back To Edit</button>` : ""}
           </div>
-          ${estimator.status === "waiting_on_customer" ? `<div class="option-row" style="margin-top:14px;">${isOptions ? "" : `<button class="action-btn primary" type="button" data-estimator-decision="accepted">Accept</button>`}<button class="action-btn" type="button" data-estimator-decision="revision_requested">Request Revision</button><button class="action-btn" type="button" data-estimator-decision="declined">Decline</button></div>` : ""}
+          ${estimator.status === "waiting_on_customer" ? `<div class="item" style="margin-top:14px;"><strong>Request a revision</strong><p>Describe what should change so the estimator can preserve the reason with the original quote.</p><textarea class="form-input quote-textarea" data-revision-reason placeholder="Example: Please revise the scope and show a lower-priced option."></textarea></div><div class="option-row" style="margin-top:14px;">${isOptions ? "" : `<button class="action-btn primary" type="button" data-estimator-decision="accepted">Accept</button>`}<button class="action-btn" type="button" data-estimator-decision="revision_requested">Request Revision</button><button class="action-btn" type="button" data-estimator-decision="declined">Decline</button></div>` : ""}
+          ${renderEstimatorRevisionHistory(estimator)}
         `;
       }
 
@@ -2250,7 +2277,14 @@
         const button = event.target.closest("[data-estimator-action]");
         if (!button) return;
         const action = button.dataset.estimatorAction;
-        if (action === "add-line") {
+        if (action === "return-revision-draft") {
+          const reopened = mutateSelectedEstimator(
+            (record) => jobRecords.returnEstimatorToDraft(record, "President"),
+            "Revision returned to draft with the original quote preserved. A new preview will be required.",
+            "The requested revision could not be returned to draft."
+          );
+          if (reopened) setEstimatorView("create");
+        } else if (action === "add-line") {
           const lines = estimatorBuilderView.querySelector("[data-quote-lines]");
           if (!lines) return;
           const lineId = `line-${Date.now()}`;
@@ -2344,13 +2378,17 @@
         const decision = button.dataset.estimatorDecision;
         const selectedOptionId = button.dataset.optionId || "";
         const reason = decision === "revision_requested"
-          ? "Customer requested an estimate revision."
+          ? (estimatorCustomerQuoteView.querySelector("[data-revision-reason]")?.value || "").trim()
           : decision === "declined"
             ? "Customer declined the estimate."
             : "Customer accepted the estimate.";
+        if (decision === "revision_requested" && !reason) {
+          resultStatus.textContent = "Add the customer's revision reason before requesting a revision.";
+          return;
+        }
         mutateSelectedEstimator(
           (record) => jobRecords.recordEstimatorDecision(record, { value: decision, reason, selectedOptionId }, decision === "revision_requested" ? "Customer" : "President"),
-          decision === "revision_requested" ? "Revision requested; the estimate can be prepared again." : `Estimate ${titleWords(decision)}.`,
+          decision === "revision_requested" ? "Revision requested; the original quote and customer reason were preserved." : `Estimate ${titleWords(decision)}.`,
           "The customer decision could not be recorded."
         );
       });
