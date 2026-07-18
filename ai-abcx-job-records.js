@@ -486,6 +486,27 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     return true;
   }
 
+  function getEstimatorQuoteSubtotal(estimateType, lineItems) {
+    const totals = lineItems.map((item) => item.quantity * item.unitPrice);
+    if (estimateType === "options") {
+      return totals.length ? Math.min(...totals) : 0;
+    }
+    return totals.reduce((sum, total) => sum + total, 0);
+  }
+
+  function applyEstimatorQuoteTotals(estimator, subtotal) {
+    const safeSubtotal = Math.max(0, Number(subtotal || 0));
+    const discountAmount = Math.min(safeSubtotal, Math.max(0, Number(estimator.quote.discountAmount || 0)));
+    const taxRate = Math.min(100, Math.max(0, Number(estimator.quote.taxRate || 0)));
+    const taxableAmount = Math.max(0, safeSubtotal - discountAmount);
+    const taxAmount = taxableAmount * (taxRate / 100);
+    estimator.quote.subtotal = safeSubtotal;
+    estimator.quote.discountAmount = discountAmount;
+    estimator.quote.taxRate = taxRate;
+    estimator.quote.taxAmount = taxAmount;
+    estimator.quote.total = taxableAmount + taxAmount;
+  }
+
   function updateEstimatorQuote(record, quote = {}, actor = "President") {
     const estimator = ensureEstimatorRecord(record);
     if (!estimator) return false;
@@ -503,7 +524,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
           optionId: String(item.optionId || "")
         }))
       : estimator.quote.lineItems;
-    const subtotal = lineItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    const subtotal = getEstimatorQuoteSubtotal(estimateType, lineItems);
     const discountAmount = Math.min(subtotal, Math.max(0, Number(quote.discountAmount === undefined ? estimator.quote.discountAmount : quote.discountAmount)));
     const taxRate = Math.min(100, Math.max(0, Number(quote.taxRate === undefined ? estimator.quote.taxRate : quote.taxRate)));
     const taxableAmount = Math.max(0, subtotal - discountAmount);
@@ -556,6 +577,12 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
       if (!(Number(item.quantity) > 0)) errors.push(`Line item ${index + 1} quantity must be greater than zero.`);
       if (Number(item.unitPrice) < 0 || !Number.isFinite(Number(item.unitPrice))) errors.push(`Line item ${index + 1} needs a valid unit price.`);
     });
+    if (estimator.estimateType === "options") {
+      if (estimator.quote.lineItems.length < 2) errors.push("Options estimates require at least two customer choices.");
+      const optionIds = estimator.quote.lineItems.map((item) => String(item.optionId || "").trim());
+      if (optionIds.some((optionId) => !optionId)) errors.push("Every options estimate choice needs an option ID.");
+      if (new Set(optionIds.filter(Boolean)).size !== optionIds.filter(Boolean).length) errors.push("Options estimate choice IDs must be unique.");
+    }
     if (estimator.quote.total <= 0) errors.push("Final total must be greater than zero.");
     estimator.quote.attachments.forEach((attachment, index) => {
       if (!String(attachment.label || "").trim()) errors.push(`Attachment ${index + 1} needs a name.`);
@@ -647,11 +674,19 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     if (!nextStatus || !canTransitionEstimator(record, nextStatus)) return false;
     const estimator = ensureEstimatorRecord(record);
     if (!estimator) return false;
+    let selectedOption = null;
+    if (decision.value === "accepted" && estimator.estimateType === "options") {
+      selectedOption = estimator.quote.lineItems.find((item) => item.optionId === decision.selectedOptionId);
+      if (!selectedOption) return false;
+    }
     estimator.decision = {
       value: decision.value,
       decidedAt: decision.decidedAt || new Date().toISOString(),
       selectedOptionId: decision.selectedOptionId || ""
     };
+    if (selectedOption) {
+      applyEstimatorQuoteTotals(estimator, selectedOption.quantity * selectedOption.unitPrice);
+    }
     if (nextStatus === "revision_requested") {
       estimator.revisions.push({
         id: `revision-${estimator.revisions.length + 1}`,
