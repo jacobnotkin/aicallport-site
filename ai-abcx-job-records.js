@@ -1,7 +1,7 @@
 window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
   const storageKey = "ai-abcx-job-records-v1";
   const JOB_RECORDS_SCHEMA_VERSION = 2;
-  const ESTIMATOR_SCHEMA_VERSION = 2;
+  const ESTIMATOR_SCHEMA_VERSION = 3;
   const baseRecords = [
         {
           id: "job-240614-001",
@@ -298,6 +298,34 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     return JSON.parse(JSON.stringify(record));
   }
 
+  function cloneEstimatorQuoteSnapshot(estimator) {
+    return cloneRecord({
+      estimateType: estimator.estimateType,
+      quote: estimator.quote
+    });
+  }
+
+  function normalizeEstimatorRevision(revision, index) {
+    const existing = revision && typeof revision === "object" ? revision : {};
+    return {
+      id: existing.id || `revision-${index + 1}`,
+      requestedAt: existing.requestedAt || "",
+      requestedBy: existing.requestedBy || "Customer",
+      reason: existing.reason || "Customer requested an estimate revision.",
+      status: existing.status || "requested",
+      requestedQuoteVersion: Math.max(1, Number(existing.requestedQuoteVersion || 1)),
+      originalQuote: existing.originalQuote ? cloneRecord(existing.originalQuote) : null,
+      reopenedAt: existing.reopenedAt || "",
+      reopenedBy: existing.reopenedBy || "",
+      revisedQuoteVersion: Math.max(0, Number(existing.revisedQuoteVersion || 0)),
+      revisedQuote: existing.revisedQuote ? cloneRecord(existing.revisedQuote) : null,
+      resentAt: existing.resentAt || "",
+      acceptedAt: existing.acceptedAt || "",
+      acceptedTotal: Math.max(0, Number(existing.acceptedTotal || 0)),
+      selectedOptionId: existing.selectedOptionId || ""
+    };
+  }
+
   function normalizeEstimatorLevel(value) {
     const normalized = String(value || "A").toUpperCase();
     return ESTIMATOR_LEVELS.includes(normalized) ? normalized : "A";
@@ -402,7 +430,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
         decidedAt: existing.decision && existing.decision.decidedAt ? existing.decision.decidedAt : "",
         selectedOptionId: existing.decision && existing.decision.selectedOptionId ? existing.decision.selectedOptionId : ""
       },
-      revisions: Array.isArray(existing.revisions) ? existing.revisions : [],
+      revisions: Array.isArray(existing.revisions) ? existing.revisions.map(normalizeEstimatorRevision) : [],
       followUp: {
         reason: existing.followUp && existing.followUp.reason ? existing.followUp.reason : "",
         owner: existing.followUp && existing.followUp.owner ? existing.followUp.owner : "",
@@ -510,7 +538,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
   function updateEstimatorQuote(record, quote = {}, actor = "President") {
     const estimator = ensureEstimatorRecord(record);
     if (!estimator) return false;
-    if (!["new_request", "estimate_preparing", "revision_requested", "follow_up_needed"].includes(estimator.status)) return false;
+    if (!["new_request", "estimate_preparing", "follow_up_needed"].includes(estimator.status)) return false;
     const estimateType = ESTIMATE_TYPES.includes(quote.estimateType) ? quote.estimateType : estimator.estimateType;
     const capabilities = getEstimatorCapabilities(estimator.level);
     if (!capabilities.estimateTypes.includes(estimateType)) return false;
@@ -549,7 +577,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
           }))
         : estimator.quote.attachments
     };
-    if (["new_request", "revision_requested", "follow_up_needed"].includes(estimator.status)) {
+    if (["new_request", "follow_up_needed"].includes(estimator.status)) {
       transitionEstimator(record, "estimate_preparing", {
         actor,
         title: "Estimate preparation started",
@@ -557,6 +585,10 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
       });
     }
     const current = ensureEstimatorRecord(record);
+    const activeRevision = current.revisions[current.revisions.length - 1];
+    if (activeRevision && activeRevision.status === "drafting") {
+      activeRevision.revisedQuoteVersion = current.quote.version;
+    }
     current.activity.push({
       time: new Date().toISOString(),
       title: `${titleWords(estimateType)} estimate updated`,
@@ -593,6 +625,8 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
   function markEstimatorReadyToPreview(record, actor = "President") {
     const estimator = ensureEstimatorRecord(record);
     if (!estimator || validateEstimatorQuote(record).length) return false;
+    const activeRevision = estimator.revisions[estimator.revisions.length - 1];
+    if (activeRevision && activeRevision.status === "drafting" && activeRevision.revisedQuoteVersion <= activeRevision.requestedQuoteVersion) return false;
     return transitionEstimator(record, "estimate_ready_to_preview", {
       actor,
       title: "Estimate ready to preview",
@@ -634,12 +668,22 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
 
   function returnEstimatorToDraft(record, actor = "President") {
     const estimator = ensureEstimatorRecord(record);
-    if (!estimator || !["estimate_ready_to_preview", "estimate_previewed", "estimate_ready_to_send"].includes(estimator.status)) return false;
+    if (!estimator || !["estimate_ready_to_preview", "estimate_previewed", "estimate_ready_to_send", "revision_requested"].includes(estimator.status)) return false;
+    const isRevision = estimator.status === "revision_requested";
+    if (isRevision) {
+      const activeRevision = estimator.revisions[estimator.revisions.length - 1];
+      if (!activeRevision || activeRevision.status !== "requested") return false;
+      activeRevision.status = "drafting";
+      activeRevision.reopenedAt = new Date().toISOString();
+      activeRevision.reopenedBy = actor;
+      estimator.decision = { value: "pending", decidedAt: "", selectedOptionId: "" };
+      estimator.delivery = { method: "", sentAt: "", openedAt: "" };
+    }
     estimator.preview = { quoteVersion: 0, previewedAt: "", previewedBy: "", snapshot: null };
     return transitionEstimator(record, "estimate_preparing", {
       actor,
-      title: "Estimate returned to draft",
-      text: `${actor} reopened ${formatJobRef(record)}. A new preview will be required before sending.`
+      title: isRevision ? "Revision returned to draft" : "Estimate returned to draft",
+      text: `${actor} reopened ${formatJobRef(record)}${isRevision ? " after the customer revision request" : ""}. A new preview will be required before sending.`
     });
   }
 
@@ -652,6 +696,13 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
       sentAt: delivery.sentAt || new Date().toISOString(),
       openedAt: ""
     };
+    const activeRevision = estimator.revisions[estimator.revisions.length - 1];
+    if (activeRevision && activeRevision.status === "drafting") {
+      activeRevision.status = "resent";
+      activeRevision.resentAt = estimator.delivery.sentAt;
+      activeRevision.revisedQuoteVersion = estimator.quote.version;
+      activeRevision.revisedQuote = cloneEstimatorQuoteSnapshot(estimator);
+    }
     if (!transitionEstimator(record, "estimate_sent", {
       actor,
       title: "Estimate sent",
@@ -674,6 +725,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     if (!nextStatus || !canTransitionEstimator(record, nextStatus)) return false;
     const estimator = ensureEstimatorRecord(record);
     if (!estimator) return false;
+    if (decision.value === "revision_requested" && !String(decision.reason || "").trim()) return false;
     let selectedOption = null;
     if (decision.value === "accepted" && estimator.estimateType === "options") {
       selectedOption = estimator.quote.lineItems.find((item) => item.optionId === decision.selectedOptionId);
@@ -692,9 +744,29 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
         id: `revision-${estimator.revisions.length + 1}`,
         requestedAt: estimator.decision.decidedAt,
         requestedBy: actor,
-        reason: decision.reason || "Customer requested an estimate revision.",
-        status: "requested"
+        reason: String(decision.reason).trim(),
+        status: "requested",
+        requestedQuoteVersion: estimator.quote.version,
+        originalQuote: cloneEstimatorQuoteSnapshot(estimator),
+        reopenedAt: "",
+        reopenedBy: "",
+        revisedQuoteVersion: 0,
+        revisedQuote: null,
+        resentAt: "",
+        acceptedAt: "",
+        acceptedTotal: 0,
+        selectedOptionId: ""
       });
+    } else {
+      const activeRevision = estimator.revisions[estimator.revisions.length - 1];
+      if (activeRevision && activeRevision.status === "resent") {
+        activeRevision.status = nextStatus;
+        if (nextStatus === "accepted") {
+          activeRevision.acceptedAt = estimator.decision.decidedAt;
+          activeRevision.acceptedTotal = estimator.quote.total;
+          activeRevision.selectedOptionId = estimator.decision.selectedOptionId;
+        }
+      }
     }
     return transitionEstimator(record, nextStatus, {
       actor,
