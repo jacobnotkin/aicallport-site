@@ -147,7 +147,7 @@
 <body>
   <section class="auth-gate" id="estimatorAuthGate" aria-label="Estimator Director sign in">
     <div class="auth-card">
-      <div class="auth-brand"><img src="public/assets/images/ai-abcx-logo-icon-tight-transparent.png" alt="AI-ABCX" /><div><h1>Estimator Director A</h1><p>Sign in with the Account user assigned to this dashboard.</p></div></div>
+      <div class="auth-brand"><img src="public/assets/images/ai-abcx-logo-icon-tight-transparent.png" alt="AI-ABCX" /><div><h1 id="estimatorAuthTitle">Estimator Director A</h1><p>Sign in with the Account user assigned to this dashboard.</p></div></div>
       <form class="auth-form" id="estimatorAuthForm">
         <label class="auth-field"><span>Email</span><input class="form-input" id="estimatorAuthEmail" type="email" autocomplete="username" required /></label>
         <label class="auth-field"><span>Password</span><input class="form-input" id="estimatorAuthPassword" type="password" autocomplete="current-password" required /></label>
@@ -426,6 +426,7 @@
     (async function () {
       const authClient = window.AIABCXAuthClient || null;
       const authGate = document.getElementById("estimatorAuthGate");
+      const estimatorAuthTitle = document.getElementById("estimatorAuthTitle");
       const authForm = document.getElementById("estimatorAuthForm");
       const authEmail = document.getElementById("estimatorAuthEmail");
       const authPassword = document.getElementById("estimatorAuthPassword");
@@ -821,6 +822,7 @@
 
       function applyEstimatorBusinessCopy() {
         const estimatorName = accountAssignment ? accountAssignment.name : "Assigned Estimator";
+        if (estimatorAuthTitle) estimatorAuthTitle.textContent = estimatorTerms.stageLabel;
         estimatorAccountName.textContent = estimatorName;
         salesStageBadge.textContent = estimatorTerms.stageLabel;
         if (salesSidebarLevelBadge) {
@@ -1073,6 +1075,15 @@
       function buildEstimateLineItems(record, requestedType) {
         const estimator = getEstimatorState(record);
         if (estimator && estimator.quote.lineItems.length && (!requestedType || requestedType === estimator.estimateType)) {
+          if (estimator.estimateType === "package" && estimator.quote.packages.length) {
+            return estimator.quote.packages.map((item) => ({
+              label: item.name,
+              description: item.description,
+              optionId: item.id,
+              amount: item.price,
+              includedServices: item.includedServices
+            }));
+          }
           return estimator.quote.lineItems.map((item) => ({
             label: item.label,
             description: item.description || "",
@@ -1084,9 +1095,9 @@
         const amount = Number(record?.amountPaid || 0);
         if (type === "package") {
           return [
-            { label: "Base scope package", amount: Math.max(120, Math.round((amount || 420) * 0.55)) },
-            { label: "Preferred upgrade path", amount: Math.max(185, Math.round((amount || 420) * 0.8)) },
-            { label: "Full premium package", amount: Math.max(260, Math.round((amount || 420) * 1.15)) }
+            { label: "Good", description: "Essential service package.", optionId: "good", amount: Math.max(120, Math.round((amount || 420) * 0.55)), includedServices: [{ id: "good-core", label: "Core requested service" }, { id: "good-summary", label: "Completion summary" }] },
+            { label: "Better", description: "Recommended service package.", optionId: "better", amount: Math.max(185, Math.round((amount || 420) * 0.8)), includedServices: [{ id: "better-core", label: "Core requested service" }, { id: "better-enhancement", label: "Recommended enhancement" }] },
+            { label: "Best", description: "Premium service package.", optionId: "best", amount: Math.max(260, Math.round((amount || 420) * 1.15)), includedServices: [{ id: "best-core", label: "Core requested service" }, { id: "best-enhancement", label: "Premium enhancement" }, { id: "best-priority", label: "Priority completion support" }] }
           ];
         }
         if (type === "options") {
@@ -1152,9 +1163,33 @@
           .replaceAll("'", "&#039;");
       }
 
+      function renderPackageEditorCard(item) {
+        return `
+          <div class="workspace-card" data-quote-package data-package-id="${escapeHtml(item.id)}">
+            <div class="quote-editor-grid">
+              <div class="quote-editor-field"><label>Package name</label><input class="form-input" data-package-name value="${escapeHtml(item.name)}" /></div>
+              <div class="quote-editor-field"><label>Package price</label><input class="form-input" data-package-price type="number" min="0" step="0.01" value="${Number(item.price || 0)}" /></div>
+              <div class="quote-editor-field full"><label>Package description</label><input class="form-input" data-package-description value="${escapeHtml(item.description)}" /></div>
+            </div>
+            <div class="builder-list" data-package-services style="margin-top:12px;">
+              ${item.includedServices.map((service) => `
+                <div class="builder-row" data-package-service data-service-id="${escapeHtml(service.id)}">
+                  <input class="form-input" data-package-service-label value="${escapeHtml(service.label)}" aria-label="Included service" />
+                  <button class="window-remove" type="button" data-estimator-action="remove-package-service" aria-label="Remove included service">×</button>
+                </div>`).join("")}
+            </div>
+            <div class="option-row" style="margin-top:12px;">
+              <button class="action-btn" type="button" data-estimator-action="add-package-service">Add Included Service</button>
+              <button class="action-btn" type="button" data-estimator-action="remove-package">Remove Package</button>
+            </div>
+          </div>`;
+      }
+
       function renderQuoteEditor(estimator) {
         if (estimator.status !== "estimate_preparing") return "";
         const isOptions = estimator.estimateType === "options";
+        const isPackage = estimator.estimateType === "package";
+        const isChoiceEstimate = isOptions || isPackage;
         const attachmentsText = estimator.quote.attachments
           .map((attachment) => `${attachment.label}${attachment.url ? ` | ${attachment.url}` : ""}`)
           .join("\n");
@@ -1164,8 +1199,14 @@
               <label>Customer scope</label>
               <textarea class="form-input quote-textarea" data-quote-scope placeholder="Describe exactly what the customer will receive.">${escapeHtml(estimator.quote.customerScope)}</textarea>
             </div>
-            <div class="builder-list" data-quote-lines>
-              ${estimator.quote.lineItems.map((item) => `
+            ${isPackage ? `
+              <div class="builder-list" data-quote-packages>
+                ${estimator.quote.packages.map(renderPackageEditorCard).join("")}
+              </div>
+              <div class="option-row"><button class="action-btn" type="button" data-estimator-action="add-package">Add Package</button></div>
+            ` : `
+              <div class="builder-list" data-quote-lines>
+                ${estimator.quote.lineItems.map((item) => `
                 <div class="quote-line-editor" data-quote-line data-line-id="${escapeHtml(item.id)}" data-option-id="${escapeHtml(item.optionId)}">
                   <div class="quote-editor-field"><label>${isOptions ? "Option name" : "Line item"}</label><input class="form-input" data-line-label value="${escapeHtml(item.label)}" /></div>
                   <div class="quote-editor-field"><label>Description</label><input class="form-input" data-line-description value="${escapeHtml(item.description)}" /></div>
@@ -1173,8 +1214,9 @@
                   <div class="quote-editor-field"><label>Unit price</label><input class="form-input" data-line-price type="number" min="0" step="0.01" value="${Number(item.unitPrice || 0)}" /></div>
                   <button class="window-remove" type="button" data-estimator-action="remove-line" aria-label="Remove line item">×</button>
                 </div>`).join("")}
-            </div>
-            <div class="option-row"><button class="action-btn" type="button" data-estimator-action="add-line">Add ${isOptions ? "Option" : "Line Item"}</button></div>
+              </div>
+              <div class="option-row"><button class="action-btn" type="button" data-estimator-action="add-line">Add ${isOptions ? "Option" : "Line Item"}</button></div>
+            `}
             <div class="quote-editor-grid">
               <div class="quote-editor-field"><label>Discount amount</label><input class="form-input" data-quote-discount type="number" min="0" step="0.01" value="${Number(estimator.quote.discountAmount || 0)}" /></div>
               <div class="quote-editor-field"><label>Tax rate (%)</label><input class="form-input" data-quote-tax type="number" min="0" max="100" step="0.01" value="${Number(estimator.quote.taxRate || 0)}" /></div>
@@ -1182,10 +1224,10 @@
               <div class="quote-editor-field full"><label>Internal notes</label><textarea class="form-input quote-textarea" data-quote-notes placeholder="Visible to authorized company users only.">${escapeHtml(estimator.quote.internalNotes)}</textarea></div>
             </div>
             <div class="builder-summary quote-totals" data-quote-totals>
-              <div class="quote-total-row"><span>${isOptions ? "Starting subtotal" : "Subtotal"}</span><strong data-total-subtotal>${formatQuoteMoney(estimator.quote.subtotal)}</strong></div>
+              <div class="quote-total-row"><span>${isChoiceEstimate ? "Starting subtotal" : "Subtotal"}</span><strong data-total-subtotal>${formatQuoteMoney(estimator.quote.subtotal)}</strong></div>
               <div class="quote-total-row"><span>Discount</span><strong data-total-discount>-${formatQuoteMoney(estimator.quote.discountAmount)}</strong></div>
               <div class="quote-total-row"><span>Tax</span><strong data-total-tax>${formatQuoteMoney(estimator.quote.taxAmount)}</strong></div>
-              <div class="quote-total-row final"><span>${isOptions ? "Starting total" : "Final total"}</span><strong data-total-final>${formatQuoteMoney(estimator.quote.total)}</strong></div>
+              <div class="quote-total-row final"><span>${isChoiceEstimate ? "Starting total" : "Final total"}</span><strong data-total-final>${formatQuoteMoney(estimator.quote.total)}</strong></div>
             </div>
             <div class="quote-validation" data-quote-validation>Save the draft to validate the estimate.</div>
             <div class="option-row"><button class="action-btn primary" type="button" data-estimator-action="save-draft">Save Draft</button></div>
@@ -1203,6 +1245,16 @@
           unitPrice: Number(row.querySelector("[data-line-price]").value),
           optionId: row.dataset.optionId || `option-${index + 1}`
         }));
+        const packages = Array.from(editor.querySelectorAll("[data-quote-package]")).map((card, index) => ({
+          id: card.dataset.packageId || `package-${index + 1}`,
+          name: card.querySelector("[data-package-name]").value.trim(),
+          description: card.querySelector("[data-package-description]").value.trim(),
+          price: Number(card.querySelector("[data-package-price]").value),
+          includedServices: Array.from(card.querySelectorAll("[data-package-service]")).map((row, serviceIndex) => ({
+            id: row.dataset.serviceId || `service-${index + 1}-${serviceIndex + 1}`,
+            label: row.querySelector("[data-package-service-label]").value.trim()
+          }))
+        }));
         const attachments = editor.querySelector("[data-quote-attachments]").value
           .split("\n")
           .map((line) => line.trim())
@@ -1218,7 +1270,8 @@
           discountAmount: Number(editor.querySelector("[data-quote-discount]").value),
           taxRate: Number(editor.querySelector("[data-quote-tax]").value),
           attachments,
-          lineItems
+          lineItems,
+          packages
         };
       }
 
@@ -1226,10 +1279,12 @@
         const editor = estimatorBuilderView.querySelector("[data-quote-editor]");
         if (!editor) return;
         const estimator = getEstimatorState(getSelectedRecord());
-        const lineTotals = Array.from(editor.querySelectorAll("[data-quote-line]")).map((row) => {
-          return Math.max(0, Number(row.querySelector("[data-line-quantity]").value) || 0) * Math.max(0, Number(row.querySelector("[data-line-price]").value) || 0);
-        });
-        const subtotal = estimator.estimateType === "options"
+        const lineTotals = estimator.estimateType === "package"
+          ? Array.from(editor.querySelectorAll("[data-quote-package]")).map((card) => Math.max(0, Number(card.querySelector("[data-package-price]").value) || 0))
+          : Array.from(editor.querySelectorAll("[data-quote-line]")).map((row) => {
+              return Math.max(0, Number(row.querySelector("[data-line-quantity]").value) || 0) * Math.max(0, Number(row.querySelector("[data-line-price]").value) || 0);
+            });
+        const subtotal = ["options", "package"].includes(estimator.estimateType)
           ? (lineTotals.length ? Math.min(...lineTotals) : 0)
           : lineTotals.reduce((sum, total) => sum + total, 0);
         const discount = Math.min(subtotal, Math.max(0, Number(editor.querySelector("[data-quote-discount]").value) || 0));
@@ -1331,6 +1386,8 @@
         const summary = summarizeEstimateBuilder(record, items);
         const typeMeta = getEstimateTypeMeta(estimator.estimateType);
         const isOptions = estimator.estimateType === "options";
+        const isPackage = estimator.estimateType === "package";
+        const isChoiceEstimate = isOptions || isPackage;
         const statusTone = getStatusTone(estimator.status);
         const deliveryModes = record.transcript
           ? ["SMS quote link", "President visibility", "Transcript attached"]
@@ -1348,14 +1405,16 @@
             <span class="tag">${titleWords(estimator.decision.value)}</span>
           </div>
           <div class="builder-list" style="margin-top:16px;">
-            ${items.map((item) => `<div class="builder-row"><span><strong>${escapeHtml(item.label)}</strong>${item.description ? `<small style="display:block;">${escapeHtml(item.description)}</small>` : ""}</span>${estimator.decision.selectedOptionId === item.optionId ? `<span class="tag green">Selected</span>` : ""}<strong>${formatQuoteMoney(item.amount)}</strong>${isOptions && estimator.status === "waiting_on_customer" ? `<button class="action-btn primary" type="button" data-estimator-decision="accepted" data-option-id="${escapeHtml(item.optionId)}">Choose &amp; Accept</button>` : ""}</div>`).join("")}
+            ${isPackage
+              ? estimator.quote.packages.map((item) => `<div class="workspace-card"><div class="builder-row"><span><strong>${escapeHtml(item.name)}</strong><small style="display:block;">${escapeHtml(item.description)}</small></span><strong>${formatQuoteMoney(item.price)}</strong></div><div class="tag-row" style="margin-top:10px;">${item.includedServices.map((service) => `<span class="tag blue">${escapeHtml(service.label)}</span>`).join("")}</div></div>`).join("")
+              : items.map((item) => `<div class="builder-row"><span><strong>${escapeHtml(item.label)}</strong>${item.description ? `<small style="display:block;">${escapeHtml(item.description)}</small>` : ""}</span>${estimator.decision.selectedOptionId === item.optionId ? `<span class="tag green">Selected</span>` : ""}<strong>${formatQuoteMoney(item.amount)}</strong>${isOptions && estimator.status === "waiting_on_customer" ? `<button class="action-btn primary" type="button" data-estimator-decision="accepted" data-option-id="${escapeHtml(item.optionId)}">Choose &amp; Accept</button>` : ""}</div>`).join("")}
           </div>
           <div class="item" style="margin-top:16px;"><strong>Customer scope</strong><p>${escapeHtml(estimator.quote.customerScope || "Scope will be confirmed before delivery.")}</p></div>
           <div class="builder-summary quote-totals" style="margin-top:16px;">
-            <div class="quote-total-row"><span>${isOptions && !estimator.decision.selectedOptionId ? "Starting subtotal" : "Subtotal"}</span><strong>${formatQuoteMoney(estimator.quote.subtotal || summary.total)}</strong></div>
+            <div class="quote-total-row"><span>${isChoiceEstimate && !estimator.decision.selectedOptionId ? "Starting subtotal" : "Subtotal"}</span><strong>${formatQuoteMoney(estimator.quote.subtotal || summary.total)}</strong></div>
             <div class="quote-total-row"><span>Discount</span><strong>-${formatQuoteMoney(estimator.quote.discountAmount)}</strong></div>
             <div class="quote-total-row"><span>Tax</span><strong>${formatQuoteMoney(estimator.quote.taxAmount)}</strong></div>
-            <div class="quote-total-row final"><span>${isOptions && !estimator.decision.selectedOptionId ? "Starting total" : "Final total"}</span><strong>${formatQuoteMoney(summary.total)}</strong></div>
+            <div class="quote-total-row final"><span>${isChoiceEstimate && !estimator.decision.selectedOptionId ? "Starting total" : "Final total"}</span><strong>${formatQuoteMoney(summary.total)}</strong></div>
           </div>
           <div class="record-grid" style="margin-top:16px;">
             <div class="record-field"><strong>Customer Action</strong><span>${getCustomerQuoteActionLabel(estimator.status)}</span></div>
@@ -1377,7 +1436,7 @@
             ${estimator.status === "estimate_ready_to_send" ? `<button class="action-btn primary" type="button" data-preview-action="send">Send Quote</button>` : ""}
             ${["estimate_ready_to_preview", "estimate_previewed", "estimate_ready_to_send"].includes(estimator.status) ? `<button class="action-btn" type="button" data-preview-action="edit">Back To Edit</button>` : ""}
           </div>
-          ${estimator.status === "waiting_on_customer" ? `<div class="item" style="margin-top:14px;"><strong>Request a revision</strong><p>Describe what should change so the estimator can preserve the reason with the original quote.</p><textarea class="form-input quote-textarea" data-revision-reason placeholder="Example: Please revise the scope and show a lower-priced option."></textarea></div><div class="option-row" style="margin-top:14px;">${isOptions ? "" : `<button class="action-btn primary" type="button" data-estimator-decision="accepted">Accept</button>`}<button class="action-btn" type="button" data-estimator-decision="revision_requested">Request Revision</button><button class="action-btn" type="button" data-estimator-decision="declined">Decline</button></div>` : ""}
+          ${estimator.status === "waiting_on_customer" ? `<div class="item" style="margin-top:14px;"><strong>Request a revision</strong><p>Describe what should change so the estimator can preserve the reason with the original quote.</p><textarea class="form-input quote-textarea" data-revision-reason placeholder="Example: Please revise the scope and show a lower-priced option."></textarea></div><div class="option-row" style="margin-top:14px;">${isChoiceEstimate ? "" : `<button class="action-btn primary" type="button" data-estimator-decision="accepted">Accept</button>`}<button class="action-btn" type="button" data-estimator-decision="revision_requested">Request Revision</button><button class="action-btn" type="button" data-estimator-decision="declined">Decline</button></div>` : ""}
           ${renderEstimatorRevisionHistory(estimator)}
         `;
       }
@@ -1741,13 +1800,13 @@
         salesResultTitle.textContent = `${record.customerName} customer decision`;
         salesResultText.innerHTML = `${formatJobRef(record)} is <strong>${titleWords(estimator.status)}</strong>. Customer decision: <strong>${titleWords(estimator.decision.value)}</strong>.`;
         estimatorDecisionView.querySelectorAll("[data-canonical-decision]").forEach((button) => {
-          const needsOptionChoice = button.dataset.canonicalDecision === "accepted" && estimator.estimateType === "options" && !estimator.decision.selectedOptionId;
-          button.disabled = !canDecide || needsOptionChoice;
-          button.classList.toggle("disabled", !canDecide || needsOptionChoice);
+          const needsQuoteChoice = button.dataset.canonicalDecision === "accepted" && ["options", "package"].includes(estimator.estimateType) && !estimator.decision.selectedOptionId;
+          button.disabled = !canDecide || needsQuoteChoice;
+          button.classList.toggle("disabled", !canDecide || needsQuoteChoice);
           button.classList.toggle("selected", button.dataset.canonicalDecision === estimator.decision.value || button.dataset.canonicalDecision === estimator.status);
         });
         resultStatus.textContent = canDecide
-          ? (estimator.estimateType === "options" ? "Choose the accepted option in Quote Preview, or record a revision or decline here." : "Record the customer's response to the sent estimate.")
+          ? (["options", "package"].includes(estimator.estimateType) ? "Choose the accepted option or package in Quote Preview, or record a revision or decline here." : "Record the customer's response to the sent estimate.")
           : `Current canonical state: ${titleWords(estimator.status)}.`;
       }
 
@@ -2299,6 +2358,38 @@
               <button class="window-remove" type="button" data-estimator-action="remove-line" aria-label="Remove line item">×</button>
             </div>`);
           updateQuoteEditorTotals();
+        } else if (action === "add-package") {
+          const packages = estimatorBuilderView.querySelector("[data-quote-packages]");
+          if (!packages) return;
+          const packageId = `package-${Date.now()}`;
+          packages.insertAdjacentHTML("beforeend", renderPackageEditorCard({
+            id: packageId,
+            name: "",
+            description: "",
+            price: 0,
+            includedServices: [
+              { id: `${packageId}-service-1`, label: "" },
+              { id: `${packageId}-service-2`, label: "" }
+            ]
+          }));
+          updateQuoteEditorTotals();
+        } else if (action === "remove-package") {
+          const card = button.closest("[data-quote-package]");
+          if (card) card.remove();
+          updateQuoteEditorTotals();
+        } else if (action === "add-package-service") {
+          const card = button.closest("[data-quote-package]");
+          const services = card && card.querySelector("[data-package-services]");
+          if (!services) return;
+          const serviceId = `service-${Date.now()}`;
+          services.insertAdjacentHTML("beforeend", `
+            <div class="builder-row" data-package-service data-service-id="${serviceId}">
+              <input class="form-input" data-package-service-label value="" aria-label="Included service" />
+              <button class="window-remove" type="button" data-estimator-action="remove-package-service" aria-label="Remove included service">×</button>
+            </div>`);
+        } else if (action === "remove-package-service") {
+          const service = button.closest("[data-package-service]");
+          if (service) service.remove();
         } else if (action === "remove-line") {
           const row = button.closest("[data-quote-line]");
           if (row) row.remove();
@@ -2325,7 +2416,8 @@
         } else if (action === "prepare") {
           const estimateType = button.dataset.estimateType || "standard";
           mutateSelectedEstimator((record, estimator) => {
-            const draftItems = buildEstimateLineItems(record, estimateType).map((item, index) => ({
+            const estimateItems = buildEstimateLineItems(record, estimateType);
+            const draftItems = estimateItems.map((item, index) => ({
               id: `line-${index + 1}`,
               label: item.label,
               description: item.description || "",
@@ -2333,7 +2425,16 @@
               unitPrice: item.amount,
               optionId: item.optionId || ""
             }));
-            return jobRecords.updateEstimatorQuote(record, { estimateType, lineItems: draftItems }, "President");
+            const packages = estimateType === "package"
+              ? estimateItems.map((item, index) => ({
+                  id: item.optionId || `package-${index + 1}`,
+                  name: item.label,
+                  description: item.description || "",
+                  price: item.amount,
+                  includedServices: item.includedServices || []
+                }))
+              : [];
+            return jobRecords.updateEstimatorQuote(record, { estimateType, lineItems: draftItems, packages }, "President");
           }, `${titleWords(estimateType)} estimate prepared.`, "The estimate draft could not be prepared.");
         } else if (action === "ready-preview") {
           let readyErrors = [];

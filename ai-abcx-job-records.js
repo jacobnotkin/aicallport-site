@@ -1,7 +1,7 @@
 window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
   const storageKey = "ai-abcx-job-records-v1";
   const JOB_RECORDS_SCHEMA_VERSION = 2;
-  const ESTIMATOR_SCHEMA_VERSION = 3;
+  const ESTIMATOR_SCHEMA_VERSION = 4;
   const baseRecords = [
         {
           id: "job-240614-001",
@@ -261,6 +261,11 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
   };
 
   const ESTIMATOR_LEVELS = ["A", "B", "C"];
+  const ESTIMATOR_LEVEL_ESTIMATE_TYPES = {
+    A: ["standard"],
+    B: ["standard", "options"],
+    C: ["standard", "options", "package", "quick"]
+  };
   const ESTIMATOR_STATUSES = [
     "new_request",
     "estimate_preparing",
@@ -303,6 +308,44 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
       estimateType: estimator.estimateType,
       quote: estimator.quote
     });
+  }
+
+  function normalizeEstimatorPackage(value, index) {
+    const source = value && typeof value === "object" ? value : {};
+    const includedServices = Array.isArray(source.includedServices)
+      ? source.includedServices.map((service, serviceIndex) => ({
+          id: service && service.id ? String(service.id) : `service-${index + 1}-${serviceIndex + 1}`,
+          label: String(service && (service.label || service.name) || "")
+        }))
+      : [];
+    return {
+      id: String(source.id || source.packageId || `package-${index + 1}`),
+      name: String(source.name || source.label || `Package ${index + 1}`),
+      description: String(source.description || ""),
+      price: Math.max(0, Number(source.price === undefined ? source.unitPrice || source.amount || 0 : source.price)),
+      includedServices
+    };
+  }
+
+  function packagesFromLegacyLineItems(lineItems) {
+    return (Array.isArray(lineItems) ? lineItems : []).map((item, index) => normalizeEstimatorPackage({
+      id: item.optionId || `package-${index + 1}`,
+      name: item.label,
+      description: item.description,
+      price: Number(item.quantity || 1) * Number(item.unitPrice || 0),
+      includedServices: item.description ? [{ id: `service-${index + 1}-1`, label: item.description }] : []
+    }, index));
+  }
+
+  function packageLineItems(packages) {
+    return packages.map((item, index) => ({
+      id: `package-line-${index + 1}`,
+      label: item.name,
+      description: item.description,
+      quantity: 1,
+      unitPrice: item.price,
+      optionId: item.id
+    }));
   }
 
   function normalizeEstimatorRevision(revision, index) {
@@ -380,6 +423,14 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
         ? scheduling
         : { status: scheduling && scheduling !== "not_requested" ? scheduling : "not_requested", scheduledDate: "", scheduledTime: "", assignedTo: "", notes: "", requestedAt: "" };
     }
+    if (sourceVersion < 4) {
+      existing.quote = existing.quote && typeof existing.quote === "object" ? existing.quote : {};
+      if (!Array.isArray(existing.quote.packages)) {
+        existing.quote.packages = existing.estimateType === "package"
+          ? packagesFromLegacyLineItems(existing.quote.lineItems)
+          : [];
+      }
+    }
     existing.schemaVersion = ESTIMATOR_SCHEMA_VERSION;
     return existing;
   }
@@ -407,6 +458,9 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
         customerScope: existing.quote && existing.quote.customerScope ? existing.quote.customerScope : "",
         internalNotes: existing.quote && existing.quote.internalNotes ? existing.quote.internalNotes : "",
         lineItems: existing.quote && Array.isArray(existing.quote.lineItems) ? existing.quote.lineItems : [],
+        packages: existing.quote && Array.isArray(existing.quote.packages)
+          ? existing.quote.packages.map(normalizeEstimatorPackage)
+          : [],
         subtotal: Number(existing.quote && existing.quote.subtotal || 0),
         discountAmount: Number(existing.quote && existing.quote.discountAmount || 0),
         taxRate: Number(existing.quote && existing.quote.taxRate || 0),
@@ -485,11 +539,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     const normalizedLevel = normalizeEstimatorLevel(level);
     return {
       level: normalizedLevel,
-      estimateTypes: normalizedLevel === "A"
-        ? ["standard"]
-        : normalizedLevel === "B"
-          ? ["standard", "options"]
-          : ESTIMATE_TYPES.slice(),
+      estimateTypes: ESTIMATOR_LEVEL_ESTIMATE_TYPES[normalizedLevel].slice(),
       automatedDelivery: normalizedLevel !== "A",
       revisionWorkflow: true,
       automatedFollowUp: normalizedLevel === "C",
@@ -516,7 +566,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
 
   function getEstimatorQuoteSubtotal(estimateType, lineItems) {
     const totals = lineItems.map((item) => item.quantity * item.unitPrice);
-    if (estimateType === "options") {
+    if (["options", "package"].includes(estimateType)) {
       return totals.length ? Math.min(...totals) : 0;
     }
     return totals.reduce((sum, total) => sum + total, 0);
@@ -542,7 +592,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     const estimateType = ESTIMATE_TYPES.includes(quote.estimateType) ? quote.estimateType : estimator.estimateType;
     const capabilities = getEstimatorCapabilities(estimator.level);
     if (!capabilities.estimateTypes.includes(estimateType)) return false;
-    const lineItems = Array.isArray(quote.lineItems)
+    let lineItems = Array.isArray(quote.lineItems)
       ? quote.lineItems.map((item, index) => ({
           id: item.id || `line-${index + 1}`,
           label: String(item.label || `Line item ${index + 1}`),
@@ -552,6 +602,17 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
           optionId: String(item.optionId || "")
         }))
       : estimator.quote.lineItems;
+    let packages = Array.isArray(quote.packages)
+      ? quote.packages.map(normalizeEstimatorPackage)
+      : estimator.quote.packages;
+    if (estimateType === "package") {
+      if (!Array.isArray(quote.packages) && (Array.isArray(quote.lineItems) || !packages.length)) {
+        packages = packagesFromLegacyLineItems(lineItems);
+      }
+      lineItems = packageLineItems(packages);
+    } else {
+      packages = [];
+    }
     const subtotal = getEstimatorQuoteSubtotal(estimateType, lineItems);
     const discountAmount = Math.min(subtotal, Math.max(0, Number(quote.discountAmount === undefined ? estimator.quote.discountAmount : quote.discountAmount)));
     const taxRate = Math.min(100, Math.max(0, Number(quote.taxRate === undefined ? estimator.quote.taxRate : quote.taxRate)));
@@ -564,6 +625,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
       customerScope: quote.customerScope === undefined ? estimator.quote.customerScope : String(quote.customerScope || ""),
       internalNotes: quote.internalNotes === undefined ? estimator.quote.internalNotes : String(quote.internalNotes || ""),
       lineItems,
+      packages,
       subtotal,
       discountAmount,
       taxRate,
@@ -592,7 +654,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     current.activity.push({
       time: new Date().toISOString(),
       title: `${titleWords(estimateType)} estimate updated`,
-      text: `${actor} saved ${lineItems.length} line item${lineItems.length === 1 ? "" : "s"} totaling ${current.quote.currency} ${current.quote.total.toFixed(2)}.`,
+      text: `${actor} saved ${estimateType === "package" ? `${packages.length} package${packages.length === 1 ? "" : "s"}` : `${lineItems.length} line item${lineItems.length === 1 ? "" : "s"}`} totaling ${current.quote.currency} ${current.quote.total.toFixed(2)}.`,
       actor
     });
     return true;
@@ -614,6 +676,23 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
       const optionIds = estimator.quote.lineItems.map((item) => String(item.optionId || "").trim());
       if (optionIds.some((optionId) => !optionId)) errors.push("Every options estimate choice needs an option ID.");
       if (new Set(optionIds.filter(Boolean)).size !== optionIds.filter(Boolean).length) errors.push("Options estimate choice IDs must be unique.");
+    }
+    if (estimator.estimateType === "package") {
+      const requiredPackageNames = ["good", "better", "best"];
+      if (estimator.quote.packages.length !== requiredPackageNames.length) errors.push("Package estimates require exactly three packages.");
+      const packageNames = estimator.quote.packages.map((item) => String(item.name || "").trim().toLowerCase());
+      if (packageNames.length === requiredPackageNames.length && packageNames.some((name, index) => name !== requiredPackageNames[index])) {
+        errors.push("Package estimates must use Good, Better, and Best in order.");
+      }
+      const packageIds = estimator.quote.packages.map((item) => String(item.id || "").trim());
+      if (packageIds.some((packageId) => !packageId)) errors.push("Every package needs a package ID.");
+      if (new Set(packageIds.filter(Boolean)).size !== packageIds.filter(Boolean).length) errors.push("Package IDs must be unique.");
+      estimator.quote.packages.forEach((item, index) => {
+        if (!item.name.trim()) errors.push(`Package ${index + 1} needs a name.`);
+        if (!(item.price > 0)) errors.push(`Package ${index + 1} needs a price greater than zero.`);
+        if (item.includedServices.length < 2) errors.push(`Package ${index + 1} needs at least two included services.`);
+        if (item.includedServices.some((service) => !service.label.trim())) errors.push(`Package ${index + 1} has an empty included service.`);
+      });
     }
     if (estimator.quote.total <= 0) errors.push("Final total must be greater than zero.");
     estimator.quote.attachments.forEach((attachment, index) => {
@@ -727,7 +806,7 @@ window.AIABCXJobRecords = window.AIABCXJobRecords || (() => {
     if (!estimator) return false;
     if (decision.value === "revision_requested" && !String(decision.reason || "").trim()) return false;
     let selectedOption = null;
-    if (decision.value === "accepted" && estimator.estimateType === "options") {
+    if (decision.value === "accepted" && ["options", "package"].includes(estimator.estimateType)) {
       selectedOption = estimator.quote.lineItems.find((item) => item.optionId === decision.selectedOptionId);
       if (!selectedOption) return false;
     }
